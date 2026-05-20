@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { site } from '../data/site';
+---
+
+<Layout title={`About — ${site.title}`}>
+  <Header />
+  <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-8 md:px-10 md:pt-12">
+    <h1 class="max-w-3xl text-3xl font-medium tracking-tight text-ink md:text-4xl">
+      {site.about.heading}
+    </h1>
+    <div class="mt-10 max-w-3xl space-y-6">
+      {
+        site.about.paragraphs.map((paragraph) => (
+          <p class="text-base leading-relaxed text-ink md:text-lg">{paragraph}</p>
+        ))
+      }
+    </div>
+  </main>
+  <SiteFooter />
+</Layout>

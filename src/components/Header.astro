@@ -1,0 +1,47 @@
+---
+import { site } from '../data/site';
+
+const base = import.meta.env.BASE_URL;
+const root = base.endsWith('/') ? base.slice(0, -1) : base;
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+
+function resolveHref(href: string) {
+  if (href.startsWith('/#')) return `${root}${href}`;
+  if (href.startsWith('/')) return `${root}${href}`;
+  return href;
+}
+
+function isActive(href: string) {
+  if (href === '/about') return pathname.endsWith('/about');
+  if (href === '/extra') return pathname.endsWith('/extra');
+  if (href === '/#projects') {
+    return pathname === '/' || pathname === root || pathname.endsWith('/jane-portfolio');
+  }
+  return false;
+}
+---
+
+<header class="sticky top-0 z-50 bg-canvas/90 backdrop-blur-sm">
+  <div
+    class="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-5 md:px-10"
+  >
+    <a href={base} class="text-sm font-medium tracking-tight text-ink transition hover:opacity-70">
+      {site.name}
+    </a>
+    <nav class="flex items-center gap-5 md:gap-8" aria-label="Main">
+      {
+        site.nav.map((item) => (
+          <a
+            href={resolveHref(item.href)}
+            class:list={[
+              'text-sm font-medium transition hover:opacity-70',
+              isActive(item.href) && 'underline decoration-ink/30 underline-offset-4',
+            ]}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>

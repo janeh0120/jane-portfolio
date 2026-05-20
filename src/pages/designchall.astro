@@ -1,0 +1,177 @@
+---
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+
+const nav = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Process', href: '#process' },
+  { label: 'Final Solution', href: '#solution' },
+  { label: 'Reflection', href: '#reflection' },
+];
+---
+
+<CaseStudyLayout
+  title="Design Challenge"
+  heading="Design large data tables"
+  role="Designer"
+  team="Solo Project"
+  timeline="8 hours"
+  projectType="Product Design"
+  nav={nav}
+>
+  <section id="overview">
+    <h3>Context</h3>
+    <p class="lead">
+      This table is used by school principals to view and assess teacher applicants. It currently
+      supports grouping, filtering, and tags.
+    </p>
+    <h3>Problem</h3>
+    <p class="lead">
+      How might we give users more context through the applicant table while considering usability
+      and scalability?
+    </p>
+    <h3>new requirements</h3>
+    <ol>
+      <li>
+        <h2>Applicant Review</h2>
+        <p class="lead">
+          Show application review status, when and who has reviewed the application. Bonus: Show 3
+          reviewers inline
+        </p>
+      </li>
+      <li>
+        <h2>Pagination</h2>
+        <p class="lead">Show 20 rows per page.</p>
+      </li>
+      <li>
+        <h2>Ratings</h2>
+        <p class="lead">
+          Add a 5-point rating system per applicant, allow for multiple ratings. This should be
+          editable from the table.
+        </p>
+      </li>
+      <li>
+        <h2>Other Flags</h2>
+        <p class="lead">Support up to 3 other flags per row.</p>
+      </li>
+    </ol>
+    <p class="text-sm text-muted">
+      Considerations: developer-friendly naming conventions, WCAG AA compliance, file cleanliness,
+      hand-off documentation, device responsiveness.
+    </p>
+    <h3>My solution</h3>
+    <p class="lead">
+      Key information on the table view with a side panel for details about the applicant.
+    </p>
+  </section>
+
+  <section id="process">
+    <h3>process</h3>
+    <p class="lead">
+      I cycled between researching examples of existing products and iterating on my ideas.
+    </p>
+    <h3>pagination</h3>
+    <p class="lead">
+      I redesigned pagination for greater control, adding page number input and arrow icons to
+      navigation buttons.
+    </p>
+    <h3>overflow</h3>
+    <p class="lead">
+      After designing the new required columns, I put them onto the table to see what it would look
+      like.
+    </p>
+    <h3>inital problem statement</h3>
+    <p class="lead">How might we fit the new requirements onto the data table?</p>
+    <h3>horizontal scroll</h3>
+    <p class="lead">
+      After researching products like notion and google sheets, I tried to implement a horizontal
+      scroll design. Although this solution fits a theoretically infinite number of columns on the
+      table, it hides information behind the fold and could add development difficulty.
+    </p>
+    <h3>Key Insight</h3>
+    <p class="lead">
+      Initially, I assumed users needed to see all requirements within the table view. After
+      researching examples and best practices, I realized the table's main purpose is to support
+      comparison across candidates, not to display every applicant detail. This insight helped me
+      reframe my problem statement with a user-centered focus.
+    </p>
+    <h3>new problem statement</h3>
+    <p class="lead">
+      How might we provide users with the context necessary at the right stage in the process of
+      viewing an application?
+    </p>
+  </section>
+
+  <section id="solution">
+    <h3>final solution</h3>
+    <p class="lead">
+      Key columns are in the table view. To view the details, users can click each row to get more
+      information about the user. If more information needs to be added, the side panel could become
+      scrollable.
+    </p>
+    <h3>mobile responsiveness</h3>
+    <p class="lead">
+      Key columns will be kept on the table with a panel that expands from the bottom of the screen.
+    </p>
+    <h3>handoff documentation</h3>
+    <p class="lead">
+      I created a design system change log that outlines changes or new components. I used Dev-mode
+      to annotate measurements.
+    </p>
+    <p>
+      Next steps for the design system: introduce variables to make design responsive to mobile;
+      some of the "new" components might already exist in the design system however I was not given
+      the full system for this challenge.
+    </p>
+  </section>
+
+  <section id="reflection">
+    <h3>takeaways</h3>
+    <ol>
+      <li>
+        <h2>Keep Researching</h2>
+        <p class="lead">
+          Don't assume your first solution is the only way to approach something, look at what other
+          designers have done and how it works on live products.
+        </p>
+      </li>
+      <li>
+        <h2>Collaborate</h2>
+        <p class="lead">
+          Consider how you can involve the client or developer or user at different points of the
+          process to make sure your design is thoughtful and feasible.
+        </p>
+      </li>
+      <li>
+        <h2>Be Comfortable with Ambiguity</h2>
+        <p class="lead">
+          Since this was a challenge, the details of the project were open ended. It's important to
+          ask for clarification when necessary and take advantage of ambiguity to think outside the
+          box!
+        </p>
+      </li>
+    </ol>
+    <h3 class="!mt-12">next steps</h3>
+    <ol>
+      <li>
+        <h2>UX Research</h2>
+        <p class="lead">
+          Conduct user testing to gather insights and affirm or reject concept
+        </p>
+      </li>
+      <li>
+        <h2>Identify Constraints</h2>
+        <p class="lead">
+          Discuss with client/product manager and development team to identify budget/time
+          constraints
+        </p>
+      </li>
+      <li>
+        <h2>Consider Edge Cases</h2>
+        <p class="lead">
+          What happens when the user wants to add a column? Is the side panel editable? Do users
+          want to compare data while they see the details?
+        </p>
+      </li>
+    </ol>
+  </section>
+</CaseStudyLayout>

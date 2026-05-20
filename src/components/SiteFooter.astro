@@ -1,0 +1,63 @@
+---
+import { site } from '../data/site';
+---
+
+<footer class="border-t border-line">
+  <div
+    class="mx-auto flex max-w-[1400px] flex-col gap-8 px-6 py-10 md:flex-row md:items-center md:justify-between md:px-10 md:py-12"
+  >
+    <div class="flex flex-wrap items-center gap-6 text-sm font-medium">
+      {
+        site.email ? (
+          <button
+            type="button"
+            id="copy-email"
+            data-email={site.email}
+            class="cursor-pointer border-0 bg-transparent p-0 text-ink transition hover:opacity-70"
+          >
+            <span id="copy-email-label">Email</span>
+          </button>
+        ) : (
+          <span class="text-ink">Email</span>
+        )
+      }
+      <a
+        href={site.links.linkedin}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="transition hover:opacity-70"
+      >
+        Linkedin
+      </a>
+      <a
+        href={site.links.instagram}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="transition hover:opacity-70"
+      >
+        Instagram
+      </a>
+    </div>
+    <p class="text-sm text-muted">{site.year} ® {site.name}</p>
+  </div>
+</footer>
+
+<script>
+  const btn = document.getElementById('copy-email');
+  const label = document.getElementById('copy-email-label');
+  if (btn && label) {
+    btn.addEventListener('click', async () => {
+      const email = btn.getAttribute('data-email');
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        label.textContent = 'Copied!';
+        setTimeout(() => {
+          label.textContent = 'Email';
+        }, 2000);
+      } catch {
+        window.location.href = `mailto:${email}`;
+      }
+    });
+  }
+</script>

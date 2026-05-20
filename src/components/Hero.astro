@@ -1,0 +1,26 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="mx-auto max-w-[1400px] px-6 pb-10 pt-8 md:px-10 md:pb-16 md:pt-12">
+  <div class="hero-stack max-w-5xl">
+    <p class="hero-line text-ink">{site.hero.intro}</p>
+    <p class="hero-line font-serif-italic text-ink">{site.hero.emphasis[0]}</p>
+    <p class="hero-line text-ink">{site.hero.middle}</p>
+    <p class="hero-line font-serif-italic text-ink">{site.hero.emphasis[1]}</p>
+    <p class="hero-line font-serif-italic text-ink">{site.hero.emphasis[2]}</p>
+    <p class="hero-line text-ink">{site.hero.joiner}</p>
+    <p class="hero-line font-serif-italic text-ink">{site.hero.emphasis[3]}</p>
+    <p class="hero-line text-ink">{site.hero.outro}</p>
+  </div>
+</section>
+
+<style>
+  .hero-stack p {
+    margin: 0;
+  }
+
+  .hero-stack p + p {
+    margin-top: 0.08em;
+  }
+</style>

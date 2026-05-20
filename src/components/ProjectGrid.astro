@@ -1,0 +1,10 @@
+---
+import { site } from '../data/site';
+import ProjectCard from './ProjectCard.astro';
+---
+
+<section id="projects" class="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 md:pb-32">
+  <div class="grid gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-14">
+    {site.projects.map((project) => <ProjectCard project={project} />)}
+  </div>
+</section>

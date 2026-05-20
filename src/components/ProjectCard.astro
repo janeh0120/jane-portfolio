@@ -1,0 +1,55 @@
+---
+import type { Project } from '../data/site';
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const imageSrc = `${base}${project.image}`;
+const href = project.slug ? `${base}${project.slug}` : undefined;
+---
+
+<article class="group">
+  {
+    project.comingSoon ? (
+      <div class="relative block overflow-hidden rounded-xl bg-line">
+        <img
+          src={imageSrc}
+          alt=""
+          class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 flex items-center justify-center bg-canvas/55 backdrop-blur-[2px]">
+          <span class="rounded-full bg-canvas px-4 py-2 text-sm font-medium text-ink shadow-sm">
+            Coming soon
+          </span>
+        </div>
+      </div>
+    ) : (
+      <a href={href} class="relative block overflow-hidden rounded-xl bg-line">
+        <img
+          src={imageSrc}
+          alt=""
+          class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+          loading="lazy"
+        />
+      </a>
+    )
+  }
+  <div class="mt-4 space-y-2">
+    <p class="text-sm text-muted">{project.tags}</p>
+    {
+      project.comingSoon ? (
+        <h3 class="project-title text-ink">{project.title}</h3>
+      ) : (
+        <a href={href} class="block">
+          <h3 class="project-title text-ink transition group-hover:opacity-70">
+            {project.title}
+          </h3>
+        </a>
+      )
+    }
+  </div>
+</article>

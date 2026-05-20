@@ -1,0 +1,33 @@
+---
+import { site } from '../data/site';
+---
+
+<section class="mx-auto max-w-[1400px] px-6 pb-16 md:px-10 md:pb-24">
+  <p class="max-w-3xl text-base leading-relaxed text-muted md:text-lg">
+    Currently at
+    <a
+      href={site.experience.current.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="font-medium text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
+    >
+      {site.experience.current.label}
+    </a>
+    , previously at
+    {
+      site.experience.previous.map((place, index) => (
+        <>
+          {index > 0 ? ' and ' : ' '}
+          <a
+            href={place.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
+          >
+            {place.label}
+          </a>
+        </>
+      ))
+    }
+  </p>
+</section>

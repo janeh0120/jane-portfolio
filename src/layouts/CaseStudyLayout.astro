@@ -1,0 +1,134 @@
+---
+import Layout from './Layout.astro';
+import Header from '../components/Header.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+interface MetaItem {
+  label: string;
+  value: string;
+}
+
+interface Props {
+  title: string;
+  heading: string;
+  role: string;
+  team: string;
+  timeline: string;
+  projectType: string;
+  nav: NavItem[];
+}
+
+const { title, heading, role, team, timeline, projectType, nav } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const home = base;
+---
+
+<Layout title={`${title} — Jane Hou's Portfolio`}>
+  <Header />
+  <main class="mx-auto max-w-[1400px] px-6 pb-24 md:px-10">
+    <a
+      href={home}
+      class="mb-10 inline-block pt-6 text-sm text-muted transition hover:text-ink"
+    >
+      ← Back to Home
+    </a>
+
+    <div class="grid gap-12 lg:grid-cols-[200px_1fr] lg:gap-20">
+      <aside class="lg:sticky lg:top-24 lg:self-start">
+        <nav class="flex flex-wrap gap-4 lg:flex-col lg:gap-3" aria-label="Case study">
+          {
+            nav.map((item) => (
+              <a
+                href={item.href}
+                class="text-sm text-muted transition hover:text-ink"
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </aside>
+
+      <article class="min-w-0 max-w-3xl">
+        <h1 class="text-3xl font-medium tracking-tight text-ink md:text-4xl">{heading}</h1>
+
+        <dl class="mt-10 grid gap-6 sm:grid-cols-2">
+          <div>
+            <dt class="text-sm font-medium text-muted">Role:</dt>
+            <dd class="mt-1 text-base text-ink">{role}</dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-muted">Team:</dt>
+            <dd class="mt-1 text-base text-ink">{team}</dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-muted">Timeline:</dt>
+            <dd class="mt-1 text-base text-ink">{timeline}</dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-muted">Project Type:</dt>
+            <dd class="mt-1 text-base text-ink">{projectType}</dd>
+          </div>
+        </dl>
+
+        <div class="case-study-content mt-14 space-y-16">
+          <slot />
+        </div>
+      </article>
+    </div>
+  </main>
+  <SiteFooter />
+</Layout>
+
+<style>
+  .case-study-content :global(h2) {
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .case-study-content :global(h3) {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted);
+    margin: 0 0 0.75rem;
+    text-transform: lowercase;
+  }
+
+  .case-study-content :global(p) {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+    margin: 0;
+  }
+
+  .case-study-content :global(section) {
+    scroll-margin-top: 6rem;
+  }
+
+  .case-study-content :global(.lead) {
+    font-size: 1.5rem;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  .case-study-content :global(ol) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 2rem;
+  }
+
+  .case-study-content :global(ol li h2) {
+    font-size: 1.25rem;
+  }
+</style>
