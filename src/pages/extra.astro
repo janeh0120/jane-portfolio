@@ -1,16 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
-import SiteFooter from '../components/SiteFooter.astro';
+import ExtraGallery from '../components/extra/ExtraGallery.astro';
+import ExtraFooter from '../components/extra/ExtraFooter.astro';
 import { site } from '../data/site';
+import '../styles/extra.css';
 ---
 
 <Layout title={`Extra — ${site.title}`}>
-  <Header />
-  <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-8 md:px-10 md:pt-12">
-    <h1 class="text-3xl font-medium tracking-tight text-ink md:text-4xl">
-      {site.extra.heading}
-    </h1>
-  </main>
-  <SiteFooter />
+  <div class="extra-page">
+    <Header />
+    <main>
+      <ExtraGallery />
+    </main>
+    <ExtraFooter />
+  </div>
 </Layout>

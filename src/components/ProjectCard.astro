@@ -1,5 +1,6 @@
 ---
 import type { Project } from '../data/site';
+import { parseProjectTags } from '../utils/tags';
 
 interface Props {
   project: Project;
@@ -9,9 +10,10 @@ const { project } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const imageSrc = `${base}${project.image}`;
 const href = project.slug ? `${base}${project.slug}` : undefined;
+const tagList = parseProjectTags(project.tags).join(',');
 ---
 
-<article class="group">
+<article class="project-card group" data-project-card data-tags={tagList}>
   {
     project.comingSoon ? (
       <div class="relative block overflow-hidden rounded-xl bg-line">

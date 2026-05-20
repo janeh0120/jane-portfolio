@@ -1,0 +1,17 @@
+---
+import { site } from '../../data/site';
+
+const email = site.email || 'janeh0120@gmail.com';
+const linkedin = site.links.linkedin || 'https://www.linkedin.com/in/hou-jane/';
+---
+
+<footer class="extra-footer">
+  <div class="extra-footer-content">
+    <div class="extra-footer-links">
+      <a href={`mailto:${email}`}>Email</a>
+      <a href={linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      <a href={site.links.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
+    </div>
+    <div class="extra-footer-credit">© {site.year} {site.name}. All rights reserved.</div>
+  </div>
+</footer>

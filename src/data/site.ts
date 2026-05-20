@@ -3,7 +3,7 @@ export const site = {
   title: "Jane Hou's Portfolio",
   description:
     "I'm Jane Hou, I build creative design solutions fuelled by a passion for design's power to create positive change.",
-  email: '', // Add your email for the footer copy button
+  email: 'janeh0120@gmail.com',
   year: 2026,
   links: {
     intuit: 'https://www.intuit.com/ca/',
@@ -11,7 +11,7 @@ export const site = {
     simpleVentures: 'https://www.simpleventures.ca/',
     instagram: 'https://www.instagram.com/hsz_design/',
     x: 'https://x.com/jane09890',
-    linkedin: 'https://www.linkedin.com/in/janehou/',
+    linkedin: 'https://www.linkedin.com/in/hou-jane/',
     resume: '#',
   },
   nav: [
@@ -22,10 +22,15 @@ export const site = {
   ],
   hero: {
     intro: "I'm Jane , a",
-    emphasis: ['systems thinker', 'products', 'branding', 'community'],
+    role: 'systems thinker',
     middle: 'invested in designing',
     joiner: 'and',
     outro: 'with intention.',
+    filters: [
+      { label: 'products', tag: 'product' },
+      { label: 'branding', tag: 'brand' },
+      { label: 'community', tag: 'community' },
+    ],
   },
   experience: {
     current: { label: 'Intuit', href: 'https://www.intuit.com/ca/' },

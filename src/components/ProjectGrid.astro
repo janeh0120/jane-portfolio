@@ -4,7 +4,67 @@ import ProjectCard from './ProjectCard.astro';
 ---
 
 <section id="projects" class="mx-auto max-w-[1400px] px-6 pb-24 md:px-10 md:pb-32">
-  <div class="grid gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-14">
+  <div id="project-grid" class="grid gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-14">
     {site.projects.map((project) => <ProjectCard project={project} />)}
   </div>
+  <p id="project-grid-empty" class="hidden text-base text-muted" role="status">
+    No projects match this filter.
+  </p>
 </section>
+
+<script>
+  function parseTags(raw: string) {
+    return raw
+      .split(',')
+      .map((tag) => tag.trim().toLowerCase())
+      .filter(Boolean);
+  }
+
+  function matchesFilter(tags: string, filter: string) {
+    const normalized = filter.toLowerCase();
+    return parseTags(tags).some(
+      (tag) => tag === normalized || tag.startsWith(`${normalized} `) || tag.startsWith(normalized),
+    );
+  }
+
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('.hero-filter'));
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-project-card]'));
+  const emptyState = document.getElementById('project-grid-empty');
+  let activeFilter: string | null = null;
+
+  function applyFilter() {
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+      const tags = card.dataset.tags ?? '';
+      const show = !activeFilter || matchesFilter(tags, activeFilter);
+      card.classList.toggle('hidden', !show);
+      if (show) visibleCount += 1;
+    });
+
+    buttons.forEach((button) => {
+      const isActive = activeFilter !== null && button.dataset.filter === activeFilter;
+      button.classList.toggle('is-active', isActive);
+      button.classList.toggle('is-dimmed', activeFilter !== null && !isActive);
+      button.setAttribute('aria-pressed', String(isActive));
+    });
+
+    emptyState?.classList.toggle('hidden', visibleCount > 0);
+  }
+
+  buttons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const tag = button.dataset.filter;
+      if (!tag) return;
+
+      activeFilter = activeFilter === tag ? null : tag;
+      applyFilter();
+
+      if (activeFilter) {
+        document.getElementById('projects')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  applyFilter();
+</script>

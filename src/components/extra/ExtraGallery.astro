@@ -1,0 +1,190 @@
+---
+import { galleryItems } from '../../data/gallery';
+import { site } from '../../data/site';
+
+const base = import.meta.env.BASE_URL;
+
+function imageSrc(path: string) {
+  if (path.startsWith('data:') || path.startsWith('http')) return path;
+  return `${base}${path}`;
+}
+---
+
+<section class="gallery-section">
+  <h2 class="gallery-title">{site.extra.heading}</h2>
+  <div class="gallery-grid" id="gallery-grid">
+    {
+      galleryItems.map((item) => (
+        <button
+          type="button"
+          class:list={['gallery-item', item.images.length > 1 && 'carousel']}
+          data-gallery-id={item.id}
+          aria-label={`Open ${item.title}`}
+        >
+          <img src={imageSrc(item.images[0])} alt={item.title} loading="lazy" />
+          {item.images.length > 1 && (
+            <span class="carousel-indicator">{item.images.length}</span>
+          )}
+        </button>
+      ))
+    }
+  </div>
+</section>
+
+<div class="gallery-modal" id="gallery-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="gallery-modal-content">
+    <button type="button" class="gallery-modal-close" id="gallery-modal-close" aria-label="Close">
+      ×
+    </button>
+
+    <div class="gallery-carousel-container">
+      <div class="gallery-carousel" id="carousel-slides" />
+      <div class="carousel-controls-wrap" id="carousel-controls" hidden>
+        <button type="button" class="carousel-arrow prev" id="carousel-prev" aria-label="Previous slide">
+          ‹
+        </button>
+        <div class="carousel-controls" id="carousel-dots" />
+        <button type="button" class="carousel-arrow next" id="carousel-next" aria-label="Next slide">
+          ›
+        </button>
+      </div>
+    </div>
+
+    <div class="gallery-modal-description">
+      <h2 id="modal-title" />
+      <p id="modal-description" />
+      <div class="gallery-modal-meta" id="modal-meta" />
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ galleryItems, base }}>
+  function resolveSrc(path) {
+    if (path.startsWith('data:') || path.startsWith('http')) return path;
+    return `${base}${path}`;
+  }
+
+  let currentItemId = null;
+  let currentSlideIndex = 0;
+
+  const modal = document.getElementById('gallery-modal');
+  const carouselSlides = document.getElementById('carousel-slides');
+  const carouselDots = document.getElementById('carousel-dots');
+  const carouselControls = document.getElementById('carousel-controls');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDescription = document.getElementById('modal-description');
+  const modalMeta = document.getElementById('modal-meta');
+
+  function updateCarousel() {
+    if (!carouselSlides) return;
+    carouselSlides.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
+    carouselDots?.querySelectorAll('.carousel-dot').forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentSlideIndex);
+    });
+  }
+
+  function goToSlide(index) {
+    const item = galleryItems.find((i) => i.id === currentItemId);
+    if (!item) return;
+    currentSlideIndex = index;
+    updateCarousel();
+  }
+
+  function nextSlide() {
+    const item = galleryItems.find((i) => i.id === currentItemId);
+    if (!item) return;
+    currentSlideIndex = (currentSlideIndex + 1) % item.images.length;
+    updateCarousel();
+  }
+
+  function previousSlide() {
+    const item = galleryItems.find((i) => i.id === currentItemId);
+    if (!item) return;
+    currentSlideIndex = (currentSlideIndex - 1 + item.images.length) % item.images.length;
+    updateCarousel();
+  }
+
+  function openGallery(itemId) {
+    const item = galleryItems.find((i) => i.id === itemId);
+    if (!item || !modal || !carouselSlides) return;
+
+    currentItemId = itemId;
+    currentSlideIndex = 0;
+
+    carouselSlides.innerHTML = '';
+    carouselDots.innerHTML = '';
+
+    item.images.forEach((img, index) => {
+      const slide = document.createElement('div');
+      slide.className = 'gallery-carousel-slide';
+      slide.innerHTML = `<img src="${resolveSrc(img)}" alt="Slide ${index + 1}">`;
+      carouselSlides.appendChild(slide);
+
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = `carousel-dot${index === 0 ? ' active' : ''}`;
+      dot.setAttribute('aria-label', `Go to slide ${index + 1}`);
+      dot.addEventListener('click', () => goToSlide(index));
+      carouselDots?.appendChild(dot);
+    });
+
+    if (carouselControls) {
+      carouselControls.hidden = item.images.length <= 1;
+    }
+
+    if (modalTitle) modalTitle.textContent = item.title;
+    if (modalDescription) modalDescription.textContent = item.description;
+    if (modalMeta) modalMeta.textContent = `Year: ${item.year}`;
+
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    updateCarousel();
+  }
+
+  function closeGallery() {
+    modal?.classList.remove('active');
+    modal?.setAttribute('aria-hidden', 'true');
+    currentItemId = null;
+    currentSlideIndex = 0;
+  }
+
+  document.querySelectorAll('[data-gallery-id]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const id = Number(button.getAttribute('data-gallery-id'));
+      openGallery(id);
+    });
+  });
+
+  document.getElementById('gallery-modal-close')?.addEventListener('click', closeGallery);
+  document.getElementById('carousel-prev')?.addEventListener('click', previousSlide);
+  document.getElementById('carousel-next')?.addEventListener('click', nextSlide);
+
+  modal?.addEventListener('click', (event) => {
+    if (event.target === modal) closeGallery();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (!modal?.classList.contains('active')) return;
+    if (event.key === 'Escape') closeGallery();
+    if (event.key === 'ArrowRight') nextSlide();
+    if (event.key === 'ArrowLeft') previousSlide();
+  });
+
+  galleryItems.forEach((item) => {
+    if (item.images.length <= 1) return;
+    const button = document.querySelector(`[data-gallery-id="${item.id}"]`);
+    const img = button?.querySelector('img');
+    if (!button || !img) return;
+
+    let imageIndex = 0;
+    setInterval(() => {
+      if (modal?.classList.contains('active') && currentItemId === item.id) return;
+      imageIndex = (imageIndex + 1) % item.images.length;
+      img.style.opacity = '0';
+      setTimeout(() => {
+        img.src = resolveSrc(item.images[imageIndex]);
+        img.style.opacity = '1';
+      }, 300);
+    }, 4000);
+  });
+</script>
