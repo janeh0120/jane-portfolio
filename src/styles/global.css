@@ -38,12 +38,22 @@
     font-family: var(--font-serif);
   }
 
-  .hero-line {
+  .hero-copy {
+    margin: 0;
     font-family: var(--font-serif);
     font-size: clamp(2rem, 6vw, 4rem);
     line-height: 1.05;
-    letter-spacing: -0.02em;
-    font-weight: 400;
+    letter-spacing: -0.03em;
+    font-weight: 500;
+  }
+
+  .hero-copy .hero-emphasis,
+  .hero-copy .hero-filter {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
   }
 
   .project-title {

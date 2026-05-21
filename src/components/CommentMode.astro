@@ -1,0 +1,319 @@
+<div data-comment-ui>
+  <div class="comment-mode-highlight" id="comment-highlight" hidden></div>
+
+  <div class="comment-popover" id="comment-popover" hidden data-comment-ui>
+    <div class="comment-popover-field" id="comment-popover-field">
+      <textarea
+        id="comment-text"
+        rows="1"
+        placeholder="Add a comment…"
+        maxlength="2000"
+      ></textarea>
+      <button type="button" class="comment-popover-send" id="comment-submit" aria-label="Post comment">
+        ↑
+      </button>
+    </div>
+    <p class="comment-popover-status" id="comment-status" aria-live="polite"></p>
+  </div>
+
+  <div class="comment-mode-bar" data-comment-ui>
+    <span class="comment-mode-hint" id="comment-mode-hint">Leave feedback on any section</span>
+    <button type="button" class="comment-mode-toggle" id="comment-mode-toggle" aria-pressed="false">
+      Comment mode
+    </button>
+  </div>
+</div>
+
+<script>
+  import {
+    getElementLabel,
+    getStableSelector,
+    isSelectableElement,
+  } from '../utils/element-selector';
+
+  const configuredApi = import.meta.env.PUBLIC_COMMENT_API_URL ?? '';
+  const siteBase = import.meta.env.BASE_URL;
+  const apiRoot = configuredApi || siteBase;
+  const commentsUrl = new URL('api/comments', window.location.origin + apiRoot).href;
+
+  const toggle = document.getElementById('comment-mode-toggle');
+  const hint = document.getElementById('comment-mode-hint');
+  const highlight = document.getElementById('comment-highlight');
+  const popover = document.getElementById('comment-popover');
+  const popoverField = document.getElementById('comment-popover-field');
+  const commentText = document.getElementById('comment-text');
+  const SINGLE_LINE_HEIGHT = 32;
+  const POPOVER_WIDTH = 320;
+  const submitBtn = document.getElementById('comment-submit');
+  const statusEl = document.getElementById('comment-status');
+
+  let active = false;
+  let composing = false;
+  let hoveredElement = null;
+  let selectedElement = null;
+  let selectedSelector = '';
+  let selectedLabel = '';
+
+  function setHint(text) {
+    if (hint) hint.textContent = text;
+  }
+
+  function setStatus(message, type = '') {
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.className = `comment-popover-status${type ? ` ${type}` : ''}`;
+  }
+
+  function positionBox(element, box) {
+    if (!box) return;
+    const rect = element.getBoundingClientRect();
+    box.style.top = `${rect.top}px`;
+    box.style.left = `${rect.left}px`;
+    box.style.width = `${rect.width}px`;
+    box.style.height = `${rect.height}px`;
+  }
+
+  function positionHighlight(element) {
+    if (!highlight) return;
+    highlight.hidden = false;
+    positionBox(element, highlight);
+  }
+
+  function hideHighlight() {
+    if (highlight) highlight.hidden = true;
+  }
+
+  function positionPopover() {
+    if (!popover || !selectedElement) return;
+
+    const rect = selectedElement.getBoundingClientRect();
+    popover.hidden = false;
+
+    const gap = 10;
+    const margin = 12;
+    const popWidth = Math.min(POPOVER_WIDTH, window.innerWidth - margin * 2);
+    const popHeight = popover.getBoundingClientRect().height || 120;
+
+    let top = rect.bottom + gap;
+    let left = rect.left;
+
+    if (top + popHeight > window.innerHeight - margin) {
+      top = rect.top - popHeight - gap;
+    }
+    if (top < margin) top = margin;
+
+    const maxLeft = window.innerWidth - popWidth - margin;
+    left = Math.max(margin, Math.min(left, maxLeft));
+
+    popover.style.top = `${top}px`;
+    popover.style.left = `${left}px`;
+    popover.style.width = `${popWidth}px`;
+  }
+
+  function resizeTextarea() {
+    if (!commentText) return;
+    commentText.style.height = 'auto';
+    const scrollHeight = commentText.scrollHeight;
+    const nextHeight = Math.min(Math.max(SINGLE_LINE_HEIGHT, scrollHeight), 120);
+    const isWrapped = scrollHeight > SINGLE_LINE_HEIGHT + 2;
+
+    commentText.style.height = `${nextHeight}px`;
+    popoverField?.classList.toggle('is-wrapped', isWrapped);
+
+    if (composing) positionPopover();
+  }
+
+  function clearSelection() {
+    if (selectedElement) {
+      selectedElement.classList.remove('comment-mode-selected');
+      selectedElement = null;
+    }
+  }
+
+  function openComposer(element) {
+    if (!popover || !commentText) return;
+
+    selectedElement = element;
+    selectedSelector = getStableSelector(element);
+    selectedLabel = getElementLabel(element);
+    element.classList.add('comment-mode-selected');
+
+    composing = true;
+    hideHighlight();
+    hoveredElement = null;
+
+    positionHighlight(element);
+    if (highlight) highlight.hidden = false;
+
+    commentText.value = '';
+    resizeTextarea();
+    setStatus('');
+    popover.hidden = false;
+    positionPopover();
+    commentText.focus();
+    setHint('Commenting on selected section');
+  }
+
+  function closeComposer() {
+    if (!popover) return;
+    composing = false;
+    popover.hidden = true;
+    hideHighlight();
+    clearSelection();
+    setStatus('');
+    if (active) setHint('Hover a section, then click to comment');
+  }
+
+  function setActive(next) {
+    active = next;
+    document.body.classList.toggle('comment-mode-active', active);
+    toggle?.classList.toggle('is-on', active);
+    toggle?.setAttribute('aria-pressed', String(active));
+
+    if (active) {
+      setHint('Hover a section, then click to comment');
+    } else {
+      setHint('Leave feedback on any section');
+      hoveredElement = null;
+      closeComposer();
+    }
+  }
+
+  function elementUnderPointer(event) {
+    highlight?.style.setProperty('pointer-events', 'none');
+    popover?.style.setProperty('pointer-events', 'none');
+    const raw = document.elementFromPoint(event.clientX, event.clientY);
+    highlight?.style.removeProperty('pointer-events');
+    popover?.style.removeProperty('pointer-events');
+
+    let current = raw;
+    while (current) {
+      if (isSelectableElement(current)) return current;
+      current = current.parentElement;
+    }
+    return null;
+  }
+
+  document.addEventListener(
+    'mousemove',
+    (event) => {
+      if (!active || composing) return;
+      const element = elementUnderPointer(event);
+      if (element === hoveredElement) return;
+      hoveredElement = element;
+      if (element) positionHighlight(element);
+      else hideHighlight();
+    },
+    true,
+  );
+
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (!active) return;
+      if (event.target.closest('[data-comment-ui]')) return;
+
+      const element = elementUnderPointer(event);
+      if (!element) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      openComposer(element);
+    },
+    true,
+  );
+
+  document.addEventListener(
+    'mousedown',
+    (event) => {
+      if (!composing) return;
+      if (event.target.closest('[data-comment-ui]')) return;
+      if (selectedElement?.contains(event.target)) return;
+      closeComposer();
+    },
+    true,
+  );
+
+  toggle?.addEventListener('click', () => setActive(!active));
+
+  commentText?.addEventListener('input', resizeTextarea);
+
+  commentText?.addEventListener('blur', (event) => {
+    if (!composing) return;
+    const related = event.relatedTarget;
+    if (related instanceof Node && popover?.contains(related)) return;
+    window.setTimeout(() => {
+      if (!composing || document.activeElement === commentText) return;
+      if (document.activeElement === submitBtn) return;
+      closeComposer();
+    }, 0);
+  });
+
+  commentText?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      submitBtn?.click();
+    }
+  });
+
+  window.addEventListener('scroll', () => {
+    if (!composing || !selectedElement) return;
+    positionHighlight(selectedElement);
+    positionPopover();
+  }, true);
+
+  window.addEventListener('resize', () => {
+    if (!composing || !selectedElement) return;
+    positionHighlight(selectedElement);
+    positionPopover();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      if (composing) closeComposer();
+      else if (active) setActive(false);
+    }
+  });
+
+  submitBtn?.addEventListener('click', async () => {
+    if (!commentText || !selectedSelector) return;
+    const comment = commentText.value.trim();
+    if (!comment) {
+      setStatus('Write a comment first', 'error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    setStatus('Sending…');
+
+    try {
+      const response = await fetch(commentsUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          comment,
+          selector: selectedSelector,
+          elementLabel: selectedLabel,
+          pageUrl: window.location.href,
+          viewportWidth: window.innerWidth,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not save comment.');
+      }
+
+      setStatus('Sent — thank you!', 'success');
+      setTimeout(closeComposer, 1200);
+    } catch (error) {
+      setStatus(
+        error instanceof Error ? error.message : 'Could not save comment.',
+        'error',
+      );
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+</script>

@@ -29,3 +29,9 @@ Push to `main` and enable **GitHub Actions** as the Pages source. Live URL:
 | `/ixd`, `/gwsk`, `/designchall` | Case studies |
 
 Case study pages include full text content; add images under `public/images/` to match the Framer site visuals.
+
+## Anonymous comment mode
+
+Visitors can enable **Comment mode** (floating bar at the bottom), click any section, and leave private feedback. Comments are saved to MongoDB and only you can read them.
+
+See **[COMMENTS_SETUP.md](./COMMENTS_SETUP.md)** for MongoDB Atlas + Vercel deploy steps.

@@ -21,11 +21,10 @@ export const site = {
     { label: 'Resume', href: '#resume', external: false },
   ],
   hero: {
-    intro: "I'm Jane , a",
+    intro: "I'm Jane, a ",
     role: 'systems thinker',
-    middle: 'invested in designing',
-    joiner: 'and',
-    outro: 'with intention.',
+    middle: ' invested in designing ',
+    outro: ' with intention.',
     filters: [
       { label: 'products', tag: 'product' },
       { label: 'branding', tag: 'brand' },

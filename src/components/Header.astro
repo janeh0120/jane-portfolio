@@ -25,8 +25,15 @@ function isActive(href: string) {
   <div
     class="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-5 md:px-10"
   >
-    <a href={base} class="text-sm font-medium tracking-tight text-ink transition hover:opacity-70">
-      {site.name}
+    <a
+      href={base}
+      class="nav-logo inline-flex items-center transition hover:opacity-70"
+      aria-label={`${site.name} home`}
+    >
+      <span
+        class="nav-logo-mark block h-7 w-7 shrink-0 bg-ink"
+        style={`mask: url('${base}images/my-logo.png') center / contain no-repeat; -webkit-mask: url('${base}images/my-logo.png') center / contain no-repeat;`}
+      ></span>
     </a>
     <nav class="flex items-center gap-5 md:gap-8" aria-label="Main">
       {

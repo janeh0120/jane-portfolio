@@ -23,11 +23,11 @@ const tagList = parseProjectTags(project.tags).join(',');
           class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
           loading="lazy"
         />
-        <div class="absolute inset-0 flex items-center justify-center bg-canvas/55 backdrop-blur-[2px]">
-          <span class="rounded-full bg-canvas px-4 py-2 text-sm font-medium text-ink shadow-sm">
-            Coming soon
-          </span>
-        </div>
+        <span
+          class="absolute top-2 right-2 rounded-full bg-canvas px-2 py-0.5 text-xs font-medium text-ink shadow-sm"
+        >
+          Coming soon
+        </span>
       </div>
     ) : (
       <a href={href} class="relative block overflow-hidden rounded-xl bg-line">

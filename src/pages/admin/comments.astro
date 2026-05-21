@@ -1,0 +1,102 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { ADMIN_SECRET } from 'astro:env/server';
+import { listComments } from '../../lib/comments';
+
+const key = Astro.url.searchParams.get('key') ?? '';
+const base = import.meta.env.BASE_URL;
+const authorized = Boolean(ADMIN_SECRET && key === ADMIN_SECRET);
+
+let comments: Awaited<ReturnType<typeof listComments>> = [];
+let error = '';
+
+if (authorized) {
+  try {
+    comments = await listComments();
+  } catch (e) {
+    error = 'Could not load comments. Check MONGODB_URI and replace <db_password> in .env with your real Atlas password.';
+    console.error(e);
+  }
+}
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat('en-CA', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
+}
+---
+
+<Layout title="Comments — Admin" showCommentMode={false}>
+  <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
+    {
+      !authorized ? (
+        <>
+          <h1 class="font-serif text-3xl font-normal tracking-tight">Admin access required</h1>
+          <p class="mt-4 text-muted">
+            Add <code class="rounded bg-line px-1.5 py-0.5 text-sm">?key=YOUR_ADMIN_SECRET</code> to
+            the URL.
+          </p>
+          <p class="mt-4 text-sm text-muted">
+            Example:{' '}
+            <code class="break-all rounded bg-line px-1.5 py-0.5 text-xs">
+              {Astro.url.origin}
+              {base}admin/comments?key=…
+            </code>
+          </p>
+        </>
+      ) : (
+        <>
+          <h1 class="font-serif text-3xl font-normal tracking-tight">Portfolio comments</h1>
+          <p class="mt-2 text-sm text-muted">Private view — not shown to visitors.</p>
+
+          {error && <p class="mt-6 text-sm text-red-700">{error}</p>}
+
+          {!error && comments.length === 0 && (
+            <p class="mt-10 text-muted">No comments yet.</p>
+          )}
+
+          <ul class="mt-10 space-y-8">
+            {
+              comments.map((item) => (
+                <li class="rounded-xl border border-line bg-canvas p-6">
+                  <div class="flex flex-wrap items-baseline justify-between gap-2">
+                    <p class="text-sm font-medium text-ink">{item.elementLabel}</p>
+                    <time class="text-xs text-muted" datetime={item.createdAt.toISOString()}>
+                      {formatDate(item.createdAt)}
+                    </time>
+                  </div>
+                  <p class="mt-3 text-base leading-relaxed text-ink">{item.comment}</p>
+                  <dl class="mt-4 grid gap-2 text-xs text-muted sm:grid-cols-2">
+                    <div>
+                      <dt class="inline font-medium">Device:</dt>{' '}
+                      <dd class="inline">{item.deviceType}</dd>
+                    </div>
+                    <div>
+                      <dt class="inline font-medium">OS:</dt>{' '}
+                      <dd class="inline">{item.os}</dd>
+                    </div>
+                    <div>
+                      <dt class="inline font-medium">Viewport:</dt>{' '}
+                      <dd class="inline">{item.viewportWidth}px</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <dt class="inline font-medium">Page:</dt>{' '}
+                      <dd class="inline break-all">{item.pageUrl}</dd>
+                    </div>
+                    <div class="sm:col-span-2">
+                      <dt class="inline font-medium">Selector:</dt>{' '}
+                      <dd class="inline break-all font-mono text-[11px]">{item.selector}</dd>
+                    </div>
+                  </dl>
+                </li>
+              ))
+            }
+          </ul>
+        </>
+      )
+    }
+  </main>
+</Layout>
