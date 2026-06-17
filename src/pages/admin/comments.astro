@@ -27,6 +27,14 @@ function formatDate(date: Date) {
     timeStyle: 'short',
   }).format(date);
 }
+
+const categoryLabels: Record<string, string> = {
+  '': 'No category',
+  accessibility: 'Accessibility',
+  content: 'Content',
+  'visual-design': 'Visual design',
+  bug: 'Bug',
+};
 ---
 
 <Layout title="Comments — Admin" showCommentMode={false}>
@@ -63,7 +71,14 @@ function formatDate(date: Date) {
               comments.map((item) => (
                 <li class="rounded-xl border border-line bg-canvas p-6">
                   <div class="flex flex-wrap items-baseline justify-between gap-2">
-                    <p class="text-sm font-medium text-ink">{item.elementLabel}</p>
+                    <div>
+                      <p class="text-xs font-medium text-muted">
+                        {categoryLabels[item.category ?? ''] ?? 'No category'}
+                      </p>
+                      <p class="text-sm font-medium text-ink">
+                        {item.elementDisplayName || item.elementLabel}
+                      </p>
+                    </div>
                     <time class="text-xs text-muted" datetime={item.createdAt.toISOString()}>
                       {formatDate(item.createdAt)}
                     </time>

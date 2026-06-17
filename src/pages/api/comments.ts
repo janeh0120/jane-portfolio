@@ -1,11 +1,18 @@
 import type { APIRoute } from 'astro';
 import { ADMIN_SECRET } from 'astro:env/server';
-import { insertComment, listComments } from '../../lib/comments';
+import { insertComment, listComments, type CommentCategory } from '../../lib/comments';
 import { parseDeviceMeta } from '../../lib/device';
 
 export const prerender = false;
 
 const MAX_COMMENT_LENGTH = 2000;
+const VALID_CATEGORIES = new Set<CommentCategory>([
+  '',
+  'accessibility',
+  'content',
+  'visual-design',
+  'bug',
+]);
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -21,6 +28,9 @@ export const POST: APIRoute = async ({ request }) => {
     const selector = String(body.selector ?? '').trim();
     const pageUrl = String(body.pageUrl ?? '').trim();
     const elementLabel = String(body.elementLabel ?? '').trim().slice(0, 200);
+    const elementDisplayName = String(body.elementDisplayName ?? '').trim().slice(0, 80);
+    const rawCategory = String(body.category ?? '').trim() as CommentCategory;
+    const category: CommentCategory = VALID_CATEGORIES.has(rawCategory) ? rawCategory : '';
     const viewportWidth = Number(body.viewportWidth ?? 0);
     const userAgent = request.headers.get('user-agent') ?? '';
 
@@ -40,6 +50,8 @@ export const POST: APIRoute = async ({ request }) => {
       pageUrl,
       selector,
       elementLabel: elementLabel || selector,
+      elementDisplayName: elementDisplayName || undefined,
+      category,
       comment,
       deviceType: device.deviceType,
       os: device.os,

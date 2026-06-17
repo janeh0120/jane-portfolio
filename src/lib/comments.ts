@@ -2,11 +2,20 @@ import type { ObjectId } from 'mongodb';
 import { COMMENTS_COLLECTION, getDb } from './mongodb';
 import type { DeviceMeta } from './device';
 
+export type CommentCategory =
+  | ''
+  | 'accessibility'
+  | 'content'
+  | 'visual-design'
+  | 'bug';
+
 export type PortfolioComment = {
   _id?: ObjectId;
   pageUrl: string;
   selector: string;
   elementLabel: string;
+  elementDisplayName?: string;
+  category: CommentCategory;
   comment: string;
   createdAt: Date;
   deviceType: DeviceMeta['deviceType'];

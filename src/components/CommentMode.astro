@@ -1,71 +1,179 @@
 <div data-comment-ui>
+  <div class="comment-view-toggle" role="group" aria-label="Site view mode">
+    <button
+      type="button"
+      id="comment-view-only-btn"
+      class="is-active"
+      aria-pressed="true"
+      aria-label="View only"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      id="comment-comment-btn"
+      aria-pressed="false"
+      aria-label="Comment mode"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" />
+      </svg>
+    </button>
+  </div>
+
+  <aside class="comment-sidebar" id="comment-sidebar" data-comment-ui aria-label="Comments">
+    <div class="comment-sidebar-panel">
+      <div class="comment-sidebar-header">
+        <span class="comment-sidebar-title">Comments</span>
+        <div id="comment-sidebar-toggle-anchor" class="comment-sidebar-toggle-anchor" data-comment-ui></div>
+      </div>
+      <div class="comment-sidebar-list" id="comment-sidebar-list"></div>
+    </div>
+  </aside>
+
   <div class="comment-mode-highlight" id="comment-highlight" hidden></div>
 
   <div class="comment-popover" id="comment-popover" hidden data-comment-ui>
-    <div class="comment-popover-field" id="comment-popover-field">
-      <textarea
-        id="comment-text"
-        rows="1"
-        placeholder="Add a comment…"
-        maxlength="2000"
-      ></textarea>
-      <button type="button" class="comment-popover-send" id="comment-submit" aria-label="Post comment">
-        ↑
-      </button>
+    <div class="comment-popover-card">
+      <p class="comment-popover-target" id="comment-target-label"></p>
+      <div class="comment-popover-category-wrap">
+        <select id="comment-category-select" class="comment-popover-category-select" aria-label="Comment category"></select>
+      </div>
+      <div class="comment-popover-input-row" id="comment-popover-field">
+        <textarea
+          id="comment-text"
+          rows="1"
+          placeholder="Add a comment…"
+          maxlength="2000"
+        ></textarea>
+        <button type="button" class="comment-popover-send" id="comment-submit" aria-label="Post comment">
+          ↑
+        </button>
+      </div>
     </div>
     <p class="comment-popover-status" id="comment-status" aria-live="polite"></p>
-  </div>
-
-  <div class="comment-mode-bar" data-comment-ui>
-    <span class="comment-mode-hint" id="comment-mode-hint">Leave feedback on any section</span>
-    <button type="button" class="comment-mode-toggle" id="comment-mode-toggle" aria-pressed="false">
-      Comment mode
-    </button>
   </div>
 </div>
 
 <script>
   import {
+    getCommentTargetLabel,
     getElementLabel,
     getStableSelector,
     isSelectableElement,
   } from '../utils/element-selector';
+
+  const CATEGORIES = [
+    { id: '', label: 'No category' },
+    { id: 'accessibility', label: 'Accessibility' },
+    { id: 'content', label: 'Content' },
+    { id: 'visual-design', label: 'Visual design' },
+    { id: 'bug', label: 'Bug' },
+  ] as const;
+
+  type CategoryId = (typeof CATEGORIES)[number]['id'];
+
+  type SessionComment = {
+    id: string;
+    pageUrl: string;
+    selector: string;
+    elementLabel: string;
+    elementDisplayName: string;
+    category: CategoryId;
+    comment: string;
+    createdAt: string;
+  };
+
+  const STORAGE_KEY = 'portfolio-session-comments';
+  const SINGLE_LINE_HEIGHT = 32;
+  const POPOVER_WIDTH = 360;
 
   const configuredApi = import.meta.env.PUBLIC_COMMENT_API_URL ?? '';
   const siteBase = import.meta.env.BASE_URL;
   const apiRoot = configuredApi || siteBase;
   const commentsUrl = new URL('api/comments', window.location.origin + apiRoot).href;
 
-  const toggle = document.getElementById('comment-mode-toggle');
-  const hint = document.getElementById('comment-mode-hint');
+  const viewOnlyBtn = document.getElementById('comment-view-only-btn');
+  const commentBtn = document.getElementById('comment-comment-btn');
+  const sidebar = document.getElementById('comment-sidebar');
+  const sidebarList = document.getElementById('comment-sidebar-list');
   const highlight = document.getElementById('comment-highlight');
   const popover = document.getElementById('comment-popover');
   const popoverField = document.getElementById('comment-popover-field');
-  const commentText = document.getElementById('comment-text');
-  const SINGLE_LINE_HEIGHT = 32;
-  const POPOVER_WIDTH = 320;
-  const submitBtn = document.getElementById('comment-submit');
+  const categoriesEl = document.getElementById('comment-category-select') as HTMLSelectElement | null;
+  const commentText = document.getElementById('comment-text') as HTMLTextAreaElement | null;
+  const submitBtn = document.getElementById('comment-submit') as HTMLButtonElement | null;
   const statusEl = document.getElementById('comment-status');
+  const targetLabelEl = document.getElementById('comment-target-label');
+  const siteShell = document.getElementById('site-shell');
 
-  let active = false;
+  let mode: 'view' | 'comment' = 'view';
   let composing = false;
-  let hoveredElement = null;
-  let selectedElement = null;
+  let hoveredElement: HTMLElement | null = null;
+  let selectedElement: HTMLElement | null = null;
   let selectedSelector = '';
   let selectedLabel = '';
+  let selectedDisplayName = '';
+  let selectedCategory: CategoryId = '';
+  let sessionComments: SessionComment[] = [];
+  let activeCardId: string | null = null;
+  let previewCardId: string | null = null;
+  let editingCommentId: string | null = null;
+  let pinnedTarget: HTMLElement | null = null;
+  let sidebarInteracting = false;
 
-  function setHint(text) {
-    if (hint) hint.textContent = text;
+  function setSidebarInteracting(next: boolean) {
+    sidebarInteracting = next;
+    document.body.classList.toggle('comment-sidebar-interacting', next);
   }
 
-  function setStatus(message, type = '') {
+  function canSelectOnCanvas(): boolean {
+    return mode === 'comment' && !composing && !sidebarInteracting && !editingCommentId;
+  }
+
+  function resolveTarget(selector: string): HTMLElement | null {
+    const target = document.querySelector(selector);
+    return target instanceof HTMLElement ? target : null;
+  }
+
+  function categoryLabel(id: CategoryId): string {
+    return CATEGORIES.find((item) => item.id === id)?.label ?? 'No category';
+  }
+
+  function loadSessionComments(): SessionComment[] {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as SessionComment[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveSessionComments() {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sessionComments));
+  }
+
+  function pageComments(): SessionComment[] {
+    const pageUrl = window.location.href.split('#')[0];
+    return sessionComments.filter((item) => item.pageUrl === pageUrl);
+  }
+
+  function setStatus(message: string, type = '') {
     if (!statusEl) return;
     statusEl.textContent = message;
     statusEl.className = `comment-popover-status${type ? ` ${type}` : ''}`;
   }
 
-  function positionBox(element, box) {
-    if (!box) return;
+  function getSidebarOffset(): number {
+    if (mode !== 'comment' || !sidebar) return 0;
+    const rect = sidebar.getBoundingClientRect();
+    return rect.width > 0 && rect.left < window.innerWidth ? rect.width + 10 : 0;
+  }
+
+  function positionBox(element: HTMLElement, box: HTMLElement) {
     const rect = element.getBoundingClientRect();
     box.style.top = `${rect.top}px`;
     box.style.left = `${rect.left}px`;
@@ -73,41 +181,100 @@
     box.style.height = `${rect.height}px`;
   }
 
-  function positionHighlight(element) {
+  function positionHighlight(
+    element: HTMLElement,
+    options: { pinned?: boolean; preview?: boolean } = {},
+  ) {
     if (!highlight) return;
+    const { pinned = false, preview = false } = options;
+
     highlight.hidden = false;
+    highlight.classList.toggle('is-pinned', pinned);
+    highlight.classList.toggle('is-preview', preview && !pinned);
     positionBox(element, highlight);
   }
 
   function hideHighlight() {
-    if (highlight) highlight.hidden = true;
+    if (highlight) {
+      highlight.hidden = true;
+      highlight.classList.remove('is-pinned', 'is-preview');
+    }
+    pinnedTarget = null;
+  }
+
+  function updatePinnedHighlight() {
+    if (!activeCardId) return;
+    const item = sessionComments.find((entry) => entry.id === activeCardId);
+    if (!item) return;
+
+    const target = resolveTarget(item.selector);
+    if (!target) return;
+
+    pinnedTarget = target;
+    positionHighlight(target, { pinned: true });
+  }
+
+  function previewCommentTarget(item: SessionComment) {
+    if (activeCardId === item.id) return;
+
+    const target = resolveTarget(item.selector);
+    if (!target) return;
+
+    previewCardId = item.id;
+    positionHighlight(target, { preview: true });
+  }
+
+  function clearPreviewHighlight() {
+    previewCardId = null;
+    if (activeCardId) {
+      updatePinnedHighlight();
+      return;
+    }
+    hideHighlight();
+  }
+
+  function pinCommentTarget(item: SessionComment) {
+    const target = resolveTarget(item.selector);
+    if (!target) return;
+
+    activeCardId = item.id;
+    previewCardId = null;
+    pinnedTarget = target;
+
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.setTimeout(() => {
+      positionHighlight(target, { pinned: true });
+    }, 300);
   }
 
   function positionPopover() {
     if (!popover || !selectedElement) return;
 
     const rect = selectedElement.getBoundingClientRect();
-    popover.hidden = false;
-
-    const gap = 10;
+    const sidebarOffset = getSidebarOffset();
     const margin = 12;
-    const popWidth = Math.min(POPOVER_WIDTH, window.innerWidth - margin * 2);
-    const popHeight = popover.getBoundingClientRect().height || 120;
+    const gap = 10;
+    const maxRight = window.innerWidth - sidebarOffset - margin;
+    const popWidth = Math.min(POPOVER_WIDTH, maxRight - margin);
+    const popHeight = popover.getBoundingClientRect().height || 160;
 
     let top = rect.bottom + gap;
     let left = rect.left;
+
+    if (left + popWidth > maxRight) {
+      left = maxRight - popWidth;
+    }
+    if (left < margin) left = margin;
 
     if (top + popHeight > window.innerHeight - margin) {
       top = rect.top - popHeight - gap;
     }
     if (top < margin) top = margin;
 
-    const maxLeft = window.innerWidth - popWidth - margin;
-    left = Math.max(margin, Math.min(left, maxLeft));
-
     popover.style.top = `${top}px`;
     popover.style.left = `${left}px`;
     popover.style.width = `${popWidth}px`;
+    popover.hidden = false;
   }
 
   function resizeTextarea() {
@@ -130,28 +297,209 @@
     }
   }
 
-  function openComposer(element) {
+  function createCategorySelect(value: CategoryId, className: string): HTMLSelectElement {
+    const select = document.createElement('select');
+    select.className = className;
+
+    for (const category of CATEGORIES) {
+      const option = document.createElement('option');
+      option.value = category.id;
+      option.textContent = category.label;
+      option.selected = category.id === value;
+      select.appendChild(option);
+    }
+
+    select.addEventListener('mousedown', (event) => event.stopPropagation());
+    select.addEventListener('click', (event) => event.stopPropagation());
+    return select;
+  }
+
+  function initCategorySelect() {
+    if (!categoriesEl || categoriesEl.options.length > 0) return;
+
+    for (const category of CATEGORIES) {
+      const option = document.createElement('option');
+      option.value = category.id;
+      option.textContent = category.label;
+      categoriesEl.appendChild(option);
+    }
+
+    categoriesEl.addEventListener('change', () => {
+      selectedCategory = categoriesEl.value as CategoryId;
+    });
+  }
+
+  function resetCategorySelect() {
+    if (!categoriesEl) return;
+    categoriesEl.value = '';
+    selectedCategory = '';
+  }
+
+  function deleteComment(id: string) {
+    sessionComments = sessionComments.filter((entry) => entry.id !== id);
+    saveSessionComments();
+
+    if (activeCardId === id) {
+      activeCardId = null;
+      hideHighlight();
+    }
+    if (editingCommentId === id) {
+      editingCommentId = null;
+      setSidebarInteracting(false);
+    }
+
+    renderSidebar();
+  }
+
+  function updateCommentCategory(id: string, category: CategoryId) {
+    const entry = sessionComments.find((item) => item.id === id);
+    if (!entry) return;
+    entry.category = category;
+    saveSessionComments();
+  }
+
+  function finishCommentTextEdit(id: string, value: string) {
+    const entry = sessionComments.find((item) => item.id === id);
+    if (!entry) return;
+
+    const next = value.trim();
+    if (next) entry.comment = next;
+    saveSessionComments();
+    editingCommentId = null;
+    setSidebarInteracting(false);
+    renderSidebar();
+  }
+
+  function cancelCommentTextEdit() {
+    editingCommentId = null;
+    setSidebarInteracting(false);
+    renderSidebar();
+  }
+
+  function renderSidebar() {
+    if (!sidebarList) return;
+
+    const items = pageComments();
+    sidebarList.innerHTML = '';
+
+    if (items.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'comment-sidebar-empty';
+      empty.textContent = 'Click any section on the page to leave feedback.';
+      sidebarList.appendChild(empty);
+      return;
+    }
+
+    for (const item of [...items].reverse()) {
+      const isEditingComment = editingCommentId === item.id;
+      const card = document.createElement('article');
+      card.className = `comment-sidebar-card${activeCardId === item.id ? ' is-active' : ''}${isEditingComment ? ' is-editing-comment' : ''}`;
+      card.dataset.commentId = item.id;
+
+      const header = document.createElement('div');
+      header.className = 'comment-sidebar-card-header';
+
+      const categorySelect = createCategorySelect(
+        item.category,
+        'comment-sidebar-card-category-select',
+      );
+      categorySelect.addEventListener('change', () => {
+        updateCommentCategory(item.id, categorySelect.value as CategoryId);
+      });
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'comment-sidebar-card-delete';
+      deleteBtn.setAttribute('aria-label', 'Delete comment');
+      deleteBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+      deleteBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        deleteComment(item.id);
+      });
+
+      header.append(categorySelect, deleteBtn);
+      card.appendChild(header);
+
+      const title = document.createElement('p');
+      title.className = 'comment-sidebar-card-title';
+      title.textContent = item.elementDisplayName;
+      title.addEventListener('click', (event) => {
+        event.stopPropagation();
+        pinCommentTarget(item);
+        renderSidebar();
+      });
+      card.appendChild(title);
+
+      if (isEditingComment) {
+        const textarea = document.createElement('textarea');
+        textarea.className = 'comment-sidebar-card-body-input';
+        textarea.value = item.comment;
+        textarea.maxLength = 2000;
+        textarea.rows = 3;
+        textarea.addEventListener('click', (event) => event.stopPropagation());
+        textarea.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            cancelCommentTextEdit();
+          }
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            finishCommentTextEdit(item.id, textarea.value);
+          }
+        });
+        textarea.addEventListener('blur', () => {
+          finishCommentTextEdit(item.id, textarea.value);
+        });
+        card.appendChild(textarea);
+        window.requestAnimationFrame(() => {
+          textarea.focus();
+          textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        });
+      } else {
+        const body = document.createElement('p');
+        body.className = 'comment-sidebar-card-body';
+        body.textContent = item.comment;
+        body.title = 'Click to edit';
+        body.addEventListener('click', (event) => {
+          event.stopPropagation();
+          editingCommentId = item.id;
+          setSidebarInteracting(true);
+          renderSidebar();
+        });
+        card.appendChild(body);
+      }
+
+      card.addEventListener('mouseenter', () => previewCommentTarget(item));
+      card.addEventListener('mouseleave', () => {
+        if (previewCardId === item.id) clearPreviewHighlight();
+      });
+
+      sidebarList.appendChild(card);
+    }
+  }
+
+  function openComposer(element: HTMLElement) {
     if (!popover || !commentText) return;
 
     selectedElement = element;
     selectedSelector = getStableSelector(element);
     selectedLabel = getElementLabel(element);
+    selectedDisplayName = getCommentTargetLabel(element);
+    selectedCategory = '';
     element.classList.add('comment-mode-selected');
 
     composing = true;
-    hideHighlight();
     hoveredElement = null;
 
-    positionHighlight(element);
-    if (highlight) highlight.hidden = false;
+    if (targetLabelEl) targetLabelEl.textContent = selectedDisplayName;
 
+    positionHighlight(element, { pinned: true });
     commentText.value = '';
     resizeTextarea();
+    resetCategorySelect();
     setStatus('');
-    popover.hidden = false;
     positionPopover();
     commentText.focus();
-    setHint('Commenting on selected section');
   }
 
   function closeComposer() {
@@ -161,32 +509,49 @@
     hideHighlight();
     clearSelection();
     setStatus('');
-    if (active) setHint('Hover a section, then click to comment');
   }
 
-  function setActive(next) {
-    active = next;
-    document.body.classList.toggle('comment-mode-active', active);
-    toggle?.classList.toggle('is-on', active);
-    toggle?.setAttribute('aria-pressed', String(active));
+  function setMode(next: 'view' | 'comment', options: { animate?: boolean } = {}) {
+    const { animate = true } = options;
+    const toggle = document.querySelector('.comment-view-toggle') as HTMLElement | null;
+    const fromRect =
+      animate && toggle && toggle.isConnected ? toggle.getBoundingClientRect() : undefined;
 
-    if (active) {
-      setHint('Hover a section, then click to comment');
-    } else {
-      setHint('Leave feedback on any section');
+    mode = next;
+    document.body.classList.toggle('comment-view-only', next === 'view');
+    document.body.classList.toggle('comment-view-comment', next === 'comment');
+    document.body.classList.toggle('comment-mode-active', next === 'comment');
+
+    viewOnlyBtn?.classList.toggle('is-active', next === 'view');
+    commentBtn?.classList.toggle('is-active', next === 'comment');
+    viewOnlyBtn?.setAttribute('aria-pressed', String(next === 'view'));
+    commentBtn?.setAttribute('aria-pressed', String(next === 'comment'));
+
+    if (next === 'view') {
       hoveredElement = null;
+      activeCardId = null;
+      previewCardId = null;
+      editingCommentId = null;
+      setSidebarInteracting(false);
       closeComposer();
+      hideHighlight();
+    } else {
+      renderSidebar();
     }
+
+    window.requestAnimationFrame(() => {
+      placeToggle(next === 'view' ? 'header' : 'sidebar', fromRect);
+    });
   }
 
-  function elementUnderPointer(event) {
+  function elementUnderPointer(event: MouseEvent): HTMLElement | null {
     highlight?.style.setProperty('pointer-events', 'none');
     popover?.style.setProperty('pointer-events', 'none');
     const raw = document.elementFromPoint(event.clientX, event.clientY);
     highlight?.style.removeProperty('pointer-events');
     popover?.style.removeProperty('pointer-events');
 
-    let current = raw;
+    let current: Element | null = raw;
     while (current) {
       if (isSelectableElement(current)) return current;
       current = current.parentElement;
@@ -194,15 +559,92 @@
     return null;
   }
 
+  function addSessionComment(comment: string, serverId?: string) {
+    const entry: SessionComment = {
+      id: serverId ?? crypto.randomUUID(),
+      pageUrl: window.location.href.split('#')[0],
+      selector: selectedSelector,
+      elementLabel: selectedLabel,
+      elementDisplayName: selectedDisplayName,
+      category: selectedCategory,
+      comment,
+      createdAt: new Date().toISOString(),
+    };
+
+    sessionComments.push(entry);
+    saveSessionComments();
+    activeCardId = entry.id;
+    renderSidebar();
+  }
+
+  function placeToggle(location: 'header' | 'sidebar', fromRect?: DOMRect) {
+    const toggle = document.querySelector('.comment-view-toggle') as HTMLElement | null;
+    const anchor =
+      location === 'sidebar'
+        ? document.getElementById('comment-sidebar-toggle-anchor')
+        : document.getElementById('comment-toggle-anchor');
+
+    if (!toggle || !anchor) return;
+
+    const shouldAnimate = Boolean(fromRect);
+
+    if (toggle.parentElement !== anchor) {
+      anchor.appendChild(toggle);
+    }
+
+    if (!shouldAnimate || !fromRect) return;
+
+    const last = toggle.getBoundingClientRect();
+    const dx = fromRect.left - last.left;
+    const dy = fromRect.top - last.top;
+
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+
+    toggle.classList.add('is-animating');
+    toggle.style.transition = 'none';
+    toggle.style.transform = `translate(${dx}px, ${dy}px)`;
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        toggle.style.transition = 'transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)';
+        toggle.style.transform = '';
+      });
+    });
+
+    const cleanup = () => {
+      toggle.classList.remove('is-animating');
+      toggle.style.transition = '';
+      toggle.style.transform = '';
+    };
+
+    toggle.addEventListener('transitionend', cleanup, { once: true });
+    window.setTimeout(cleanup, 400);
+  }
+
+  viewOnlyBtn?.addEventListener('click', () => setMode('view'));
+  commentBtn?.addEventListener('click', () => setMode('comment'));
+
+  sidebar?.addEventListener('mouseenter', () => setSidebarInteracting(true));
+  sidebar?.addEventListener('mouseleave', () => {
+    if (!editingCommentId) setSidebarInteracting(false);
+  });
+  sidebar?.addEventListener('focusin', () => setSidebarInteracting(true));
+  sidebar?.addEventListener('focusout', (event) => {
+    if (editingCommentId) return;
+    const related = event.relatedTarget;
+    if (related instanceof Node && sidebar?.contains(related)) return;
+    setSidebarInteracting(false);
+  });
+
   document.addEventListener(
     'mousemove',
     (event) => {
-      if (!active || composing) return;
+      if (!canSelectOnCanvas()) return;
       const element = elementUnderPointer(event);
       if (element === hoveredElement) return;
       hoveredElement = element;
-      if (element) positionHighlight(element);
-      else hideHighlight();
+      if (element) positionHighlight(element, { preview: true });
+      else if (!activeCardId) hideHighlight();
     },
     true,
   );
@@ -210,14 +652,15 @@
   document.addEventListener(
     'click',
     (event) => {
-      if (!active) return;
-      if (event.target.closest('[data-comment-ui]')) return;
+      if (!canSelectOnCanvas()) return;
+      if (event.target instanceof Element && event.target.closest('[data-comment-ui]')) return;
 
       const element = elementUnderPointer(event);
       if (!element) return;
 
       event.preventDefault();
       event.stopPropagation();
+      activeCardId = null;
       openComposer(element);
     },
     true,
@@ -227,14 +670,12 @@
     'mousedown',
     (event) => {
       if (!composing) return;
-      if (event.target.closest('[data-comment-ui]')) return;
-      if (selectedElement?.contains(event.target)) return;
+      if (event.target instanceof Element && event.target.closest('[data-comment-ui]')) return;
+      if (selectedElement?.contains(event.target as Node)) return;
       closeComposer();
     },
     true,
   );
-
-  toggle?.addEventListener('click', () => setActive(!active));
 
   commentText?.addEventListener('input', resizeTextarea);
 
@@ -256,22 +697,35 @@
     }
   });
 
-  window.addEventListener('scroll', () => {
-    if (!composing || !selectedElement) return;
-    positionHighlight(selectedElement);
-    positionPopover();
-  }, true);
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (composing && selectedElement) {
+        positionHighlight(selectedElement, { pinned: true });
+        positionPopover();
+      } else if (activeCardId) {
+        updatePinnedHighlight();
+      } else if (previewCardId) {
+        const item = sessionComments.find((entry) => entry.id === previewCardId);
+        if (item) previewCommentTarget(item);
+      }
+    },
+    true,
+  );
 
   window.addEventListener('resize', () => {
-    if (!composing || !selectedElement) return;
-    positionHighlight(selectedElement);
-    positionPopover();
+    if (composing && selectedElement) {
+      positionHighlight(selectedElement, { pinned: true });
+      positionPopover();
+    } else if (activeCardId) {
+      updatePinnedHighlight();
+    }
   });
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
       if (composing) closeComposer();
-      else if (active) setActive(false);
+      else if (mode === 'comment') setMode('view');
     }
   });
 
@@ -294,7 +748,9 @@
           comment,
           selector: selectedSelector,
           elementLabel: selectedLabel,
-          pageUrl: window.location.href,
+          elementDisplayName: selectedDisplayName,
+          category: selectedCategory,
+          pageUrl: window.location.href.split('#')[0],
           viewportWidth: window.innerWidth,
         }),
       });
@@ -305,15 +761,29 @@
         throw new Error(data.error || 'Could not save comment.');
       }
 
+      addSessionComment(comment, data.id);
       setStatus('Sent — thank you!', 'success');
-      setTimeout(closeComposer, 1200);
+      window.setTimeout(closeComposer, 900);
     } catch (error) {
+      addSessionComment(comment);
       setStatus(
-        error instanceof Error ? error.message : 'Could not save comment.',
+        error instanceof Error
+          ? `${error.message} Saved locally in this session.`
+          : 'Saved locally in this session.',
         'error',
       );
+      window.setTimeout(closeComposer, 1400);
     } finally {
       submitBtn.disabled = false;
     }
   });
+
+  if (siteShell && sidebar && sidebar.parentElement !== siteShell) {
+    siteShell.appendChild(sidebar);
+  }
+
+  placeToggle('header');
+  sessionComments = loadSessionComments();
+  initCategorySelect();
+  setMode('view', { animate: false });
 </script>
