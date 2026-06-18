@@ -8,13 +8,19 @@ interface Props {
   title?: string;
   description?: string;
   showCommentMode?: boolean;
+  adminReview?: boolean;
 }
 
 const {
   title = site.title,
   description = site.description,
   showCommentMode = true,
+  adminReview = false,
 } = Astro.props;
+
+if (adminReview) {
+  await import('../styles/admin-review.css');
+}
 const base = import.meta.env.BASE_URL;
 ---
 
@@ -37,11 +43,17 @@ const base = import.meta.env.BASE_URL;
   <body
     class:list={[
       'min-h-screen text-ink antialiased',
-      showCommentMode ? 'comment-feedback-root comment-view-only' : 'bg-canvas',
+      adminReview
+        ? 'comment-feedback-root admin-review-root comment-view-comment'
+        : showCommentMode
+          ? 'comment-feedback-root comment-view-only'
+          : 'bg-canvas',
     ]}
   >
     {
-      showCommentMode ? (
+      adminReview ? (
+        <slot />
+      ) : showCommentMode ? (
         <div id="site-shell" class="site-shell">
           <div id="site-canvas" class="site-canvas">
             <slot />
@@ -51,6 +63,6 @@ const base = import.meta.env.BASE_URL;
         <slot />
       )
     }
-    {showCommentMode && <CommentMode />}
+    {showCommentMode && !adminReview && <CommentMode />}
   </body>
 </html>

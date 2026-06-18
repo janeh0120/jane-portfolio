@@ -1,0 +1,104 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import AdminCommentReview from '../../components/AdminCommentReview.astro';
+import { ADMIN_SECRET } from 'astro:env/server';
+import { listCommentsByVersion } from '../../lib/comments';
+import { getVersionById, listVersions } from '../../lib/versions';
+
+const key = Astro.url.searchParams.get('key') ?? '';
+const versionParam = Astro.url.searchParams.get('version') ?? '';
+const base = import.meta.env.BASE_URL;
+const authorized = Boolean(ADMIN_SECRET && key === ADMIN_SECRET);
+
+let versions: Awaited<ReturnType<typeof listVersions>> = [];
+let comments: Awaited<ReturnType<typeof listCommentsByVersion>> = [];
+let selectedVersion: Awaited<ReturnType<typeof getVersionById>> = null;
+let error = '';
+
+if (authorized) {
+  try {
+    versions = await listVersions();
+    const active = versions.find((item) => item.isActive) ?? versions[0] ?? null;
+    const selectedId = versionParam || active?.id || '';
+    selectedVersion = selectedId ? await getVersionById(selectedId) : null;
+
+    if (selectedVersion) {
+      comments = await listCommentsByVersion(selectedVersion.id);
+    }
+  } catch (e) {
+    error =
+      'Could not load version review. Check Supabase configuration and run supabase/migrations/001_initial.sql.';
+    console.error(e);
+  }
+}
+
+const frameBaseUrl = selectedVersion?.deployUrl
+  ? selectedVersion.deployUrl.replace(/\/$/, '')
+  : `${Astro.url.origin}${base}`.replace(/\/$/, '');
+
+const clientComments = comments.map((item) => ({
+  id: item.id,
+  pageUrl: item.pageUrl,
+  selector: item.selector,
+  elementDisplayName: item.elementDisplayName || item.elementLabel,
+  category: item.category ?? '',
+  comment: item.comment,
+  deviceType: item.deviceType,
+  os: item.os,
+  viewportWidth: item.viewportWidth,
+  scrollY: item.scrollY,
+  upvoteCount: item.upvoteCount ?? 0,
+  createdAt: item.createdAt.toISOString(),
+}));
+
+const clientVersions = versions.map((version) => ({
+  id: version.id,
+  label: version.label,
+  deployUrl: version.deployUrl,
+  isActive: version.isActive,
+  createdAt: version.createdAt.toISOString(),
+}));
+---
+
+<Layout title="Admin review" adminReview={authorized && !error}>
+  {
+    !authorized ? (
+      <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
+        <h1 class="font-serif text-3xl font-normal tracking-tight">Admin access required</h1>
+        <p class="mt-4 text-muted">
+          Add <code class="rounded bg-line px-1.5 py-0.5 text-sm">?key=YOUR_ADMIN_SECRET</code> to the
+          URL.
+        </p>
+        <p class="mt-4 text-sm text-muted">
+          Example:{' '}
+          <code class="break-all rounded bg-line px-1.5 py-0.5 text-xs">
+            {Astro.url.origin}
+            {base}admin/review?key=…
+          </code>
+        </p>
+      </main>
+    ) : error ? (
+      <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
+        <h1 class="font-serif text-3xl font-normal tracking-tight">Version review</h1>
+        <p class="mt-6 text-sm text-red-700">{error}</p>
+      </main>
+    ) : selectedVersion ? (
+      <AdminCommentReview
+        adminKey={key}
+        comments={clientComments}
+        versions={clientVersions}
+        selectedVersionId={selectedVersion.id}
+        frameBaseUrl={frameBaseUrl}
+      />
+    ) : (
+      <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
+        <h1 class="font-serif text-3xl font-normal tracking-tight">Version review</h1>
+        <p class="mt-6 text-sm text-muted">
+          No portfolio versions yet. Deploy the site or run the deploy hook to create one.
+        </p>
+      </main>
+    )
+  }
+</Layout>

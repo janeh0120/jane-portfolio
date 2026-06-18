@@ -1,0 +1,375 @@
+---
+interface SerializedComment {
+  id: string;
+  pageUrl: string;
+  selector: string;
+  elementDisplayName: string;
+  category: string;
+  comment: string;
+  deviceType: string;
+  os: string;
+  viewportWidth: number;
+  scrollY: number;
+  upvoteCount: number;
+  createdAt: string;
+}
+
+interface SerializedVersion {
+  id: string;
+  label: string;
+  deployUrl: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+interface Props {
+  adminKey: string;
+  comments: SerializedComment[];
+  versions: SerializedVersion[];
+  selectedVersionId: string;
+  frameBaseUrl: string;
+}
+
+const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.props;
+---
+
+<div class="admin-review-toolbar" data-comment-ui>
+  <div class="admin-review-toolbar-left">
+    <span class="admin-review-badge">Admin review</span>
+    <label class="sr-only" for="admin-version-select">Portfolio version</label>
+    <select id="admin-version-select" class="admin-review-version-select">
+      {
+        versions.map((version) => (
+          <option value={version.id} selected={version.id === selectedVersionId}>
+            {version.label}
+            {version.isActive ? ' (live)' : ''}
+          </option>
+        ))
+      }
+    </select>
+  </div>
+  <p class="admin-review-toolbar-meta" id="admin-review-summary">
+    {comments.length} comment{comments.length === 1 ? '' : 's'} on this version
+  </p>
+</div>
+
+<div id="admin-site-shell" class="site-shell admin-review-shell">
+  <div id="admin-site-canvas" class="site-canvas admin-review-canvas">
+    <iframe
+      id="admin-portfolio-frame"
+      class="admin-review-frame"
+      title="Portfolio preview"
+      src={frameBaseUrl}
+    ></iframe>
+  </div>
+
+  <aside class="comment-sidebar" id="admin-comment-sidebar" data-comment-ui aria-label="Comments">
+    <div class="comment-sidebar-panel">
+      <div class="comment-sidebar-header">
+        <div class="comment-sidebar-header-row">
+          <span class="comment-sidebar-title">Comments</span>
+        </div>
+        <div class="comment-sidebar-tabs" role="tablist" aria-label="Comment filter">
+          <button
+            type="button"
+            id="admin-scope-page"
+            class="comment-sidebar-tab is-active"
+            role="tab"
+            aria-selected="true"
+          >
+            This page
+          </button>
+          <button
+            type="button"
+            id="admin-scope-all"
+            class="comment-sidebar-tab"
+            role="tab"
+            aria-selected="false"
+          >
+            All pages
+          </button>
+        </div>
+      </div>
+      <div class="comment-sidebar-list" id="admin-comment-list" role="tabpanel"></div>
+    </div>
+  </aside>
+</div>
+
+<div class="comment-mode-highlight" id="admin-highlight" hidden data-comment-ui></div>
+
+<script define:vars={{ adminKey, comments, frameBaseUrl }}>
+  const CATEGORY_LABELS = {
+    '': 'No category',
+    accessibility: 'Accessibility',
+    content: 'Content',
+    'visual-design': 'Visual design',
+    bug: 'Bug',
+  };
+
+  const versionSelect = document.getElementById('admin-version-select');
+  const frame = document.getElementById('admin-portfolio-frame');
+  const sidebarList = document.getElementById('admin-comment-list');
+  const highlight = document.getElementById('admin-highlight');
+  const scopePageBtn = document.getElementById('admin-scope-page');
+  const scopeAllBtn = document.getElementById('admin-scope-all');
+
+  let scope = 'page';
+  let activeCardId = null;
+  let previewCardId = null;
+  let pinnedComment = null;
+
+  function categoryLabel(id) {
+    return CATEGORY_LABELS[id] ?? 'No category';
+  }
+
+  function formatMeta(item) {
+    const when = new Intl.DateTimeFormat('en-CA', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(item.createdAt));
+    return `${when} · ${item.deviceType} · ${item.os} · ${item.viewportWidth}px`;
+  }
+
+  function pagePathFromUrl(pageUrl) {
+    try {
+      const url = new URL(pageUrl);
+      return url.pathname + url.search;
+    } catch {
+      return '/';
+    }
+  }
+
+  function currentFramePath() {
+    if (!frame?.contentWindow) return '/';
+    try {
+      return frame.contentWindow.location.pathname + frame.contentWindow.location.search;
+    } catch {
+      return pagePathFromUrl(frame.src);
+    }
+  }
+
+  function resolveFrameUrl(pageUrl) {
+    const path = pagePathFromUrl(pageUrl);
+    const base = frameBaseUrl.replace(/\/$/, '');
+    return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+  }
+
+  function canAccessFrameDocument() {
+    try {
+      return Boolean(frame?.contentDocument);
+    } catch {
+      return false;
+    }
+  }
+
+  function positionHighlightForElement(element) {
+    if (!highlight || !frame) return;
+    const frameRect = frame.getBoundingClientRect();
+    const elRect = element.getBoundingClientRect();
+    highlight.hidden = false;
+    highlight.classList.add('is-pinned');
+    highlight.classList.remove('is-preview');
+    highlight.style.top = `${frameRect.top + elRect.top}px`;
+    highlight.style.left = `${frameRect.left + elRect.left}px`;
+    highlight.style.width = `${elRect.width}px`;
+    highlight.style.height = `${elRect.height}px`;
+  }
+
+  function hideHighlight() {
+    if (!highlight) return;
+    highlight.hidden = true;
+    highlight.classList.remove('is-pinned', 'is-preview');
+  }
+
+  function tryHighlightComment(item) {
+    if (!canAccessFrameDocument()) {
+      hideHighlight();
+      return;
+    }
+    const doc = frame.contentDocument;
+    const target = doc?.querySelector(item.selector);
+    if (target instanceof HTMLElement) {
+      positionHighlightForElement(target);
+    } else {
+      hideHighlight();
+    }
+  }
+
+  function scrollFrameToComment(item) {
+    try {
+      frame?.contentWindow?.scrollTo({ top: item.scrollY, behavior: 'smooth' });
+    } catch {
+      /* cross-origin: scroll may be blocked */
+    }
+  }
+
+  function onFrameReady(item, { pin = true } = {}) {
+    scrollFrameToComment(item);
+    if (pin) {
+      pinnedComment = item;
+      tryHighlightComment(item);
+      attachFrameScrollListener();
+    }
+  }
+
+  let scrollListenerAttached = false;
+
+  function attachFrameScrollListener() {
+    if (scrollListenerAttached || !canAccessFrameDocument()) return;
+    frame?.contentWindow?.addEventListener(
+      'scroll',
+      () => {
+        if (pinnedComment) tryHighlightComment(pinnedComment);
+      },
+      { passive: true },
+    );
+    scrollListenerAttached = true;
+  }
+
+  function navigateToComment(item, { pin = true } = {}) {
+    if (!frame) return;
+    const targetUrl = resolveFrameUrl(item.pageUrl);
+    const currentPath = pagePathFromUrl(item.pageUrl);
+    let samePage = false;
+
+    try {
+      samePage = frame.contentWindow?.location.pathname === new URL(targetUrl).pathname;
+    } catch {
+      samePage = frame.src === targetUrl;
+    }
+
+    if (samePage && canAccessFrameDocument()) {
+      onFrameReady(item, { pin });
+      return;
+    }
+
+    const handleLoad = () => {
+      frame?.removeEventListener('load', handleLoad);
+      onFrameReady(item, { pin });
+    };
+
+    frame.addEventListener('load', handleLoad);
+    frame.src = targetUrl;
+  }
+
+  function filteredComments() {
+    if (scope === 'all') return comments;
+    const path = currentFramePath();
+    return comments.filter((item) => pagePathFromUrl(item.pageUrl) === path);
+  }
+
+  function renderSidebar() {
+    if (!sidebarList) return;
+    const items = filteredComments();
+    sidebarList.innerHTML = '';
+
+    if (items.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'comment-sidebar-empty';
+      empty.textContent =
+        scope === 'page'
+          ? 'No comments on this page for this version.'
+          : 'No comments for this version yet.';
+      sidebarList.appendChild(empty);
+      return;
+    }
+
+    for (const item of [...items].reverse()) {
+      const card = document.createElement('article');
+      card.className = `comment-sidebar-card comment-sidebar-card--readonly${activeCardId === item.id ? ' is-active' : ''}`;
+      card.dataset.commentId = item.id;
+
+      const header = document.createElement('div');
+      header.className = 'comment-sidebar-card-header';
+
+      const category = document.createElement('span');
+      category.className = 'comment-sidebar-card-category-label';
+      category.textContent = categoryLabel(item.category);
+
+      const upvotes = document.createElement('span');
+      upvotes.className = 'comment-sidebar-card-upvote comment-sidebar-card-upvote--readonly';
+      upvotes.textContent = `+1 · ${item.upvoteCount}`;
+
+      header.append(category, upvotes);
+      card.appendChild(header);
+
+      const title = document.createElement('p');
+      title.className = 'comment-sidebar-card-title';
+      title.textContent = item.elementDisplayName;
+      card.appendChild(title);
+
+      const body = document.createElement('p');
+      body.className = 'comment-sidebar-card-body';
+      body.textContent = item.comment;
+      card.appendChild(body);
+
+      const meta = document.createElement('p');
+      meta.className = 'comment-sidebar-card-meta';
+      meta.textContent = formatMeta(item);
+      card.appendChild(meta);
+
+      card.addEventListener('click', () => {
+        activeCardId = item.id;
+        previewCardId = null;
+        navigateToComment(item, { pin: true });
+        renderSidebar();
+      });
+
+      card.addEventListener('mouseenter', () => {
+        previewCardId = item.id;
+        if (canAccessFrameDocument()) {
+          const doc = frame.contentDocument;
+          const target = doc?.querySelector(item.selector);
+          if (target instanceof HTMLElement) {
+            const frameRect = frame.getBoundingClientRect();
+            const elRect = target.getBoundingClientRect();
+            highlight.hidden = false;
+            highlight.classList.add('is-preview');
+            highlight.classList.remove('is-pinned');
+            highlight.style.top = `${frameRect.top + elRect.top}px`;
+            highlight.style.left = `${frameRect.left + elRect.left}px`;
+            highlight.style.width = `${elRect.width}px`;
+            highlight.style.height = `${elRect.height}px`;
+          }
+        }
+      });
+
+      card.addEventListener('mouseleave', () => {
+        if (previewCardId === item.id) {
+          previewCardId = null;
+          if (pinnedComment) tryHighlightComment(pinnedComment);
+          else hideHighlight();
+        }
+      });
+
+      sidebarList.appendChild(card);
+    }
+  }
+
+  function setScope(next) {
+    scope = next;
+    scopePageBtn?.classList.toggle('is-active', next === 'page');
+    scopeAllBtn?.classList.toggle('is-active', next === 'all');
+    scopePageBtn?.setAttribute('aria-selected', String(next === 'page'));
+    scopeAllBtn?.setAttribute('aria-selected', String(next === 'all'));
+    renderSidebar();
+  }
+
+  versionSelect?.addEventListener('change', () => {
+    const versionId = versionSelect.value;
+    const url = new URL(window.location.href);
+    url.searchParams.set('version', versionId);
+    url.searchParams.set('key', adminKey);
+    window.location.href = url.toString();
+  });
+
+  scopePageBtn?.addEventListener('click', () => setScope('page'));
+  scopeAllBtn?.addEventListener('click', () => setScope('all'));
+
+  frame?.addEventListener('load', () => {
+    if (scope === 'page') renderSidebar();
+  });
+
+  document.body.classList.add('comment-view-comment');
+  renderSidebar();
+</script>

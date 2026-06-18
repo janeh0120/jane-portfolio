@@ -11,9 +11,17 @@ const base = import.meta.env.BASE_URL;
 const imageSrc = `${base}${project.image}`;
 const href = project.slug ? `${base}${project.slug}` : undefined;
 const tagList = parseProjectTags(project.tags).join(',');
+const commentId = project.slug
+  ? `project-${project.slug}`
+  : `project-${project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 ---
 
-<article class="project-card group" data-project-card data-tags={tagList}>
+<article
+  class="project-card group"
+  data-project-card
+  data-comment-id={commentId}
+  data-tags={tagList}
+>
   {
     project.comingSoon ? (
       <div class="relative block overflow-hidden rounded-xl bg-line">

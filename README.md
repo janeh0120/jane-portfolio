@@ -1,10 +1,10 @@
 # Jane Hou — Portfolio
 
-Static replica of [janehou.framer.website](https://janehou.framer.website), built with Astro and Tailwind CSS.
+Portfolio site with anonymous **comment mode** (sidebar feedback, categories, upvotes). Built with Astro, Tailwind CSS, Vercel, and Supabase.
 
 ## Customize
 
-Edit **`src/data/site.ts`** for copy, links, projects, and your email (enables the footer copy button).
+Edit **`src/data/site.ts`** for copy, links, projects, and your email.
 
 ## Development
 
@@ -13,11 +13,16 @@ npm install
 npm run dev
 ```
 
-## Deploy (GitHub Pages)
+Open http://localhost:4321/
 
-Push to `main` and enable **GitHub Actions** as the Pages source. Live URL:
+## Comment mode setup
 
-**https://janeh0120.github.io/jane-portfolio/**
+See **[COMMENTS_SETUP.md](./COMMENTS_SETUP.md)** for Supabase + Vercel deploy steps (no custom domain required to start).
+
+## Admin (private)
+
+- All comments: `/admin/comments?key=YOUR_ADMIN_SECRET`
+- Version review: `/admin/review?key=YOUR_ADMIN_SECRET`
 
 ## Pages
 
@@ -25,13 +30,15 @@ Push to `main` and enable **GitHub Actions** as the Pages source. Live URL:
 |-------|-------------|
 | `/` | Home — hero, experience, project grid |
 | `/about` | About page |
-| `/extra` | Extra page |
+| `/extra` | Extra gallery |
 | `/ixd`, `/gwsk`, `/designchall` | Case studies |
 
-Case study pages include full text content; add images under `public/images/` to match the Framer site visuals.
+## Deploy
 
-## Anonymous comment mode
+**Vercel (recommended)** — full site + API + comments. Free Hobby tier + free Supabase.
 
-Visitors can enable **Comment mode** (floating bar at the bottom), click any section, and leave private feedback. Comments are saved to MongoDB and only you can read them.
+**GitHub Pages** — static mirror only; comment saving requires Vercel.
 
-See **[COMMENTS_SETUP.md](./COMMENTS_SETUP.md)** for MongoDB Atlas + Vercel deploy steps.
+## Framer?
+
+See **[FRAMER_EVAL.md](./FRAMER_EVAL.md)** if you are considering moving the portfolio back to Framer.

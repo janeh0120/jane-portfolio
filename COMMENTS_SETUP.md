@@ -1,76 +1,96 @@
 # Anonymous comment mode — setup guide
 
-Visitors can turn on **Comment mode** (bottom bar), hover any section, click it, and leave anonymous feedback. Comments are stored in MongoDB and are **only visible to you** on the private admin page.
+Visitors can enable **Comment mode**, click any section, and leave feedback. Comments are stored in **Supabase** and are only visible to you on private admin pages (unless visitors switch to **All** to read and upvote others' comments on the same page).
 
-## What you need from MongoDB Atlas
+## 1. Supabase (database)
 
-1. Create a free cluster at [mongodb.com/atlas](https://www.mongodb.com/atlas).
-2. **Database Access** → add a database user (username + password).
-3. **Network Access** → allow your IP (or `0.0.0.0/0` for Vercel serverless).
-4. **Connect** → “Drivers” → copy the connection string. It looks like:
-   ```
-   mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
-   ```
-5. Replace `<password>` with your real password (URL-encode special characters).
+You already have a Supabase account. In your project:
 
-## Environment variables
+1. Open **SQL Editor** → **New query**
+2. Paste and run [`supabase/migrations/001_initial.sql`](supabase/migrations/001_initial.sql)
+3. Go to **Project Settings → API** and copy:
+   - **Project URL** → `SUPABASE_URL` (base URL only, e.g. `https://xxxxx.supabase.co` — **not** `.../rest/v1`)
+   - **service_role** key (secret) → `SUPABASE_SERVICE_ROLE_KEY`
 
-Copy `.env.example` to `.env` and fill in:
+Never put the service role key in client-side code or Git.
 
-| Variable | Purpose |
-|----------|---------|
-| `MONGODB_URI` | Atlas connection string |
-| `MONGODB_DB_NAME` | Database name (default: `jane-portfolio`) |
-| `ADMIN_SECRET` | Long random string — **only you** use this to view comments |
+## 2. Local environment
 
-Optional:
+Create `.env` in the project root:
 
-| Variable | Purpose |
-|----------|---------|
-| `PUBLIC_COMMENT_API_URL` | Only if the site and API are on different domains |
+```env
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+ADMIN_SECRET=your-long-random-secret
 
-## View your comments (private)
-
-After deploy, open:
-
-```
-https://<your-site>/jane-portfolio/admin/comments?key=<ADMIN_SECRET>
+# Optional — for recording deploy versions (phase 3)
+DEPLOY_HOOK_SECRET=another-long-random-secret
 ```
 
-Bookmark this URL. Do not share `ADMIN_SECRET`.
-
-## Deploy (required for saving comments)
-
-**GitHub Pages is static** — it cannot run `/api/comments` or MongoDB. Deploy the full project to **Vercel** (free):
-
-1. Import `janeh0120/jane-portfolio` on [vercel.com](https://vercel.com).
-2. Add the environment variables above in **Project → Settings → Environment Variables**.
-3. Deploy. Vercel runs the API routes and admin page.
-
-You can keep GitHub Pages for the old static site, or switch your main URL to Vercel.
-
-## Local development
+## 3. Run locally
 
 ```bash
-cp .env.example .env
-# Edit .env with your Atlas URI and ADMIN_SECRET
+npm install
 npm run dev
 ```
 
-- Comment mode: any page, bottom bar → **Comment mode**
-- Admin: `http://localhost:4321/jane-portfolio/admin/comments?key=YOUR_SECRET`
+- Site: http://localhost:4321/
+- Comment mode: bottom/sidebar toggle on any page
+- Admin list: http://localhost:4321/admin/comments?key=YOUR_ADMIN_SECRET
+- Version review: http://localhost:4321/admin/review?key=YOUR_ADMIN_SECRET
+
+## 4. Deploy to Vercel (no custom domain required)
+
+You can launch on the free **`.vercel.app`** URL before buying a domain.
+
+1. Push this repo to GitHub
+2. Import the project at [vercel.com](https://vercel.com)
+3. Add the same environment variables under **Settings → Environment Variables**
+4. Deploy
+
+Your live URLs will look like:
+
+- `https://jane-portfolio-xxxx.vercel.app/`
+- Admin: `https://jane-portfolio-xxxx.vercel.app/admin/comments?key=YOUR_ADMIN_SECRET`
+
+**GitHub Pages cannot run the comment API** — use Vercel for the full app.
+
+### Optional: record a new portfolio version after deploy
+
+Call your deploy hook (set `DEPLOY_HOOK_SECRET` on Vercel):
+
+```bash
+curl -X POST "https://YOUR-VERCEL-URL/api/deploy-hook" \
+  -H "Authorization: Bearer YOUR_DEPLOY_HOOK_SECRET" \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://YOUR-VERCEL-URL","name":"v1.0"}'
+```
+
+This creates a new `portfolio_versions` row and marks it active. Use **Admin → Version review** to open that deployment beside its comments.
+
+## 5. Custom domain (later)
+
+When you buy a domain (e.g. `jane-hou.com`):
+
+1. Vercel → **Project → Settings → Domains** → add domain
+2. Add the DNS records Vercel shows at your registrar
+3. No code changes required
 
 ## Data stored per comment
 
 | Field | Example |
 |-------|---------|
-| `comment` | User’s text |
-| `selector` | CSS path to the clicked element |
-| `elementLabel` | e.g. `p: “systems thinker”` |
+| `comment` | User's text |
+| `category` | accessibility, content, visual-design, bug |
+| `elementDisplayName` | `Project card · Greenwich Skatepark` |
+| `selector` | `[data-comment-id="project-gwsk"]` |
 | `pageUrl` | Full page URL |
-| `createdAt` | Server timestamp |
-| `deviceType` | `desktop`, `mobile`, or `tablet` |
-| `os` | `ios`, `android`, or `other` |
-| `viewportWidth` | Window width in pixels |
+| `scrollY` | Scroll position when submitted |
+| `version_id` | Portfolio version at submit time |
+| `deviceType`, `os`, `viewportWidth` | Anonymous device info |
 
-No names or emails are collected (anonymous).
+## Visitor experience
+
+- **Mine** — comments from this browser session (editable in sidebar)
+- **All** — everyone's comments on this page (read-only, +1 to agree)
+- No accounts; visitors cannot edit comments from a previous visit

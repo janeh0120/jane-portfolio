@@ -1,0 +1,118 @@
+/* Admin inline review — mirrors visitor comment layout */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+body.admin-review-root {
+  overflow: hidden;
+}
+
+.admin-review-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-shrink: 0;
+  padding: 10px 16px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.admin-review-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-review-badge {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #444;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 999px;
+}
+
+.admin-review-version-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111;
+  white-space: nowrap;
+}
+
+.admin-review-version-select {
+  min-width: 200px;
+  max-width: min(360px, 50vw);
+  padding: 7px 32px 7px 12px;
+  font: inherit;
+  font-size: 13px;
+  color: #111;
+  background: #fff
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")
+    no-repeat right 10px center;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  appearance: none;
+}
+
+.admin-review-version-select:focus {
+  outline: 2px solid var(--comment-accent-soft);
+  border-color: var(--comment-accent);
+}
+
+.admin-review-toolbar-meta {
+  font-size: 12px;
+  color: #666;
+  white-space: nowrap;
+}
+
+body.admin-review-root .admin-review-shell {
+  height: calc(100vh - 49px);
+  min-height: 0;
+}
+
+body.admin-review-root .admin-review-canvas {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #fff;
+}
+
+.admin-review-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+body.admin-review-root .comment-sidebar {
+  width: var(--comment-sidebar-width);
+  min-width: var(--comment-sidebar-width);
+}
+
+.comment-sidebar-card-meta {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: #888;
+}
+
+.comment-sidebar-card-upvote--readonly {
+  cursor: default;
+  opacity: 0.85;
+}

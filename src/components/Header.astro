@@ -15,7 +15,7 @@ function isActive(href: string) {
   if (href === '/about') return pathname.endsWith('/about');
   if (href === '/extra') return pathname.endsWith('/extra');
   if (href === '/#projects') {
-    return pathname === '/' || pathname === root || pathname.endsWith('/jane-portfolio');
+    return pathname === '/' || pathname === root;
   }
   return false;
 }
@@ -35,7 +35,7 @@ function isActive(href: string) {
         style={`mask: url('${base}images/my-logo.png') center / contain no-repeat; -webkit-mask: url('${base}images/my-logo.png') center / contain no-repeat;`}
       ></span>
     </a>
-    <nav class="main-nav flex items-center gap-5 md:gap-8" aria-label="Main">
+    <nav class="main-nav flex items-center gap-5 md:gap-8" aria-label="Main" data-comment-id="main-nav">
       {
         site.nav.map((item) => (
           <a

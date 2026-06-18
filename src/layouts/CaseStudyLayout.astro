@@ -21,9 +21,11 @@ interface Props {
   timeline: string;
   projectType: string;
   nav: NavItem[];
+  commentId?: string;
 }
 
-const { title, heading, role, team, timeline, projectType, nav } = Astro.props;
+const { title, heading, role, team, timeline, projectType, nav, commentId } = Astro.props;
+const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 const base = import.meta.env.BASE_URL;
 const home = base;
 ---
@@ -54,7 +56,7 @@ const home = base;
         </nav>
       </aside>
 
-      <article class="min-w-0 max-w-3xl">
+      <article class="min-w-0 max-w-3xl" data-comment-id={studyCommentId}>
         <h1 class="text-3xl font-medium tracking-tight text-ink md:text-4xl">{heading}</h1>
 
         <dl class="mt-10 grid gap-6 sm:grid-cols-2">

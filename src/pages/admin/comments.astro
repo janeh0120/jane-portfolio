@@ -9,6 +9,10 @@ const key = Astro.url.searchParams.get('key') ?? '';
 const base = import.meta.env.BASE_URL;
 const authorized = Boolean(ADMIN_SECRET && key === ADMIN_SECRET);
 
+if (authorized && key) {
+  return Astro.redirect(`${base}admin/review?key=${encodeURIComponent(key)}`);
+}
+
 let comments: Awaited<ReturnType<typeof listComments>> = [];
 let error = '';
 
@@ -16,7 +20,8 @@ if (authorized) {
   try {
     comments = await listComments();
   } catch (e) {
-    error = 'Could not load comments. Check MONGODB_URI and replace <db_password> in .env with your real Atlas password.';
+    error =
+      'Could not load comments. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, and run supabase/migrations/001_initial.sql in your Supabase project.';
     console.error(e);
   }
 }
@@ -57,8 +62,18 @@ const categoryLabels: Record<string, string> = {
         </>
       ) : (
         <>
-          <h1 class="font-serif text-3xl font-normal tracking-tight">Portfolio comments</h1>
-          <p class="mt-2 text-sm text-muted">Private view — not shown to visitors.</p>
+          <div class="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h1 class="font-serif text-3xl font-normal tracking-tight">Portfolio comments</h1>
+              <p class="mt-2 text-sm text-muted">Private view — not shown to visitors.</p>
+            </div>
+            <a
+              href={`${base}admin/review?key=${encodeURIComponent(key)}`}
+              class="text-sm font-medium text-ink underline decoration-ink/30 underline-offset-4"
+            >
+              Version review →
+            </a>
+          </div>
 
           {error && <p class="mt-6 text-sm text-red-700">{error}</p>}
 
@@ -96,6 +111,14 @@ const categoryLabels: Record<string, string> = {
                     <div>
                       <dt class="inline font-medium">Viewport:</dt>{' '}
                       <dd class="inline">{item.viewportWidth}px</dd>
+                    </div>
+                    <div>
+                      <dt class="inline font-medium">Scroll:</dt>{' '}
+                      <dd class="inline">{item.scrollY}px</dd>
+                    </div>
+                    <div>
+                      <dt class="inline font-medium">Upvotes:</dt>{' '}
+                      <dd class="inline">{item.upvoteCount ?? 0}</dd>
                     </div>
                     <div class="sm:col-span-2">
                       <dt class="inline font-medium">Page:</dt>{' '}

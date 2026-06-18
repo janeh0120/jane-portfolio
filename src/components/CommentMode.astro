@@ -27,10 +27,34 @@
   <aside class="comment-sidebar" id="comment-sidebar" data-comment-ui aria-label="Comments">
     <div class="comment-sidebar-panel">
       <div class="comment-sidebar-header">
-        <span class="comment-sidebar-title">Comments</span>
-        <div id="comment-sidebar-toggle-anchor" class="comment-sidebar-toggle-anchor" data-comment-ui></div>
+        <div class="comment-sidebar-header-row">
+          <span class="comment-sidebar-title">Comments</span>
+          <div id="comment-sidebar-toggle-anchor" class="comment-sidebar-toggle-anchor" data-comment-ui></div>
+        </div>
+        <div class="comment-sidebar-tabs" role="tablist" aria-label="Comment list">
+          <button
+            type="button"
+            id="comment-scope-mine"
+            class="comment-sidebar-tab is-active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="comment-sidebar-list"
+          >
+            Mine
+          </button>
+          <button
+            type="button"
+            id="comment-scope-all"
+            class="comment-sidebar-tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="comment-sidebar-list"
+          >
+            All
+          </button>
+        </div>
       </div>
-      <div class="comment-sidebar-list" id="comment-sidebar-list"></div>
+      <div class="comment-sidebar-list" id="comment-sidebar-list" role="tabpanel"></div>
     </div>
   </aside>
 
@@ -53,8 +77,8 @@
           ↑
         </button>
       </div>
+      <p class="comment-popover-status" id="comment-status" aria-live="polite" hidden></p>
     </div>
-    <p class="comment-popover-status" id="comment-status" aria-live="polite"></p>
   </div>
 </div>
 
@@ -85,9 +109,24 @@
     category: CategoryId;
     comment: string;
     createdAt: string;
+    savedToServer: boolean;
+  };
+
+  type GlobalComment = {
+    id: string;
+    pageUrl: string;
+    selector: string;
+    elementLabel: string;
+    elementDisplayName: string;
+    category: CategoryId;
+    comment: string;
+    createdAt: string;
+    upvoteCount: number;
   };
 
   const STORAGE_KEY = 'portfolio-session-comments';
+  const VISITOR_ID_KEY = 'portfolio-visitor-id';
+  const UPVOTED_KEY = 'portfolio-upvoted-comments';
   const SINGLE_LINE_HEIGHT = 32;
   const POPOVER_WIDTH = 360;
 
@@ -95,6 +134,37 @@
   const siteBase = import.meta.env.BASE_URL;
   const apiRoot = configuredApi || siteBase;
   const commentsUrl = new URL('api/comments', window.location.origin + apiRoot).href;
+
+  function commentItemUrl(id: string) {
+    return new URL(`api/comments/${id}`, window.location.origin + apiRoot).href;
+  }
+
+  async function patchCommentOnServer(
+    id: string,
+    patch: { comment?: string; category?: CategoryId },
+  ) {
+    const response = await fetch(commentItemUrl(id), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...patch, visitorId: getVisitorId() }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || 'Could not update comment.');
+    }
+  }
+
+  async function deleteCommentOnServer(id: string) {
+    const response = await fetch(commentItemUrl(id), {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ visitorId: getVisitorId() }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || 'Could not delete comment.');
+    }
+  }
 
   const viewOnlyBtn = document.getElementById('comment-view-only-btn');
   const commentBtn = document.getElementById('comment-comment-btn');
@@ -108,9 +178,14 @@
   const submitBtn = document.getElementById('comment-submit') as HTMLButtonElement | null;
   const statusEl = document.getElementById('comment-status');
   const targetLabelEl = document.getElementById('comment-target-label');
+  const scopeMineBtn = document.getElementById('comment-scope-mine');
+  const scopeAllBtn = document.getElementById('comment-scope-all');
   const siteShell = document.getElementById('site-shell');
 
   let mode: 'view' | 'comment' = 'view';
+  let sidebarScope: 'mine' | 'all' = 'mine';
+  let globalComments: GlobalComment[] = [];
+  let globalLoading = false;
   let composing = false;
   let hoveredElement: HTMLElement | null = null;
   let selectedElement: HTMLElement | null = null;
@@ -143,11 +218,120 @@
     return CATEGORIES.find((item) => item.id === id)?.label ?? 'No category';
   }
 
+  function getVisitorId(): string {
+    let id = localStorage.getItem(VISITOR_ID_KEY);
+    if (!id) {
+      id = crypto.randomUUID();
+      localStorage.setItem(VISITOR_ID_KEY, id);
+    }
+    return id;
+  }
+
+  function getUpvotedIds(): Set<string> {
+    try {
+      const raw = localStorage.getItem(UPVOTED_KEY);
+      return new Set(raw ? (JSON.parse(raw) as string[]) : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  function markUpvoted(commentId: string) {
+    const ids = getUpvotedIds();
+    ids.add(commentId);
+    localStorage.setItem(UPVOTED_KEY, JSON.stringify([...ids]));
+  }
+
+  function mapGlobalComment(raw: Record<string, unknown>): GlobalComment {
+    return {
+      id: String(raw.id),
+      pageUrl: String(raw.pageUrl),
+      selector: String(raw.selector),
+      elementLabel: String(raw.elementLabel),
+      elementDisplayName: String(raw.elementDisplayName ?? raw.elementLabel),
+      category: (String(raw.category ?? '') || '') as CategoryId,
+      comment: String(raw.comment),
+      createdAt: String(raw.createdAt),
+      upvoteCount: Number(raw.upvoteCount ?? 0),
+    };
+  }
+
+  async function fetchGlobalComments() {
+    if (globalLoading) return;
+    globalLoading = true;
+
+    const pageUrl = window.location.href.split('#')[0];
+    const url = new URL(commentsUrl);
+    url.searchParams.set('public', '1');
+    url.searchParams.set('pageUrl', pageUrl);
+
+    try {
+      const response = await fetch(url.href);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Could not load comments.');
+      globalComments = Array.isArray(data.comments)
+        ? data.comments.map((item: Record<string, unknown>) => mapGlobalComment(item))
+        : [];
+    } catch {
+      globalComments = [];
+    } finally {
+      globalLoading = false;
+      if (sidebarScope === 'all') renderSidebar();
+    }
+  }
+
+  async function upvoteComment(commentId: string) {
+    if (getUpvotedIds().has(commentId)) return;
+
+    const upvoteUrl = new URL(`api/comments/${commentId}/upvote`, window.location.origin + apiRoot).href;
+
+    try {
+      const response = await fetch(upvoteUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ voterFingerprint: getVisitorId() }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error();
+
+      markUpvoted(commentId);
+      const entry = globalComments.find((item) => item.id === commentId);
+      if (entry) entry.upvoteCount = Number(data.upvoteCount ?? entry.upvoteCount + 1);
+      renderSidebar();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function setSidebarScope(next: 'mine' | 'all') {
+    sidebarScope = next;
+    scopeMineBtn?.classList.toggle('is-active', next === 'mine');
+    scopeAllBtn?.classList.toggle('is-active', next === 'all');
+    scopeMineBtn?.setAttribute('aria-selected', String(next === 'mine'));
+    scopeAllBtn?.setAttribute('aria-selected', String(next === 'all'));
+
+    if (next === 'all') {
+      void fetchGlobalComments();
+    } else {
+      renderSidebar();
+    }
+  }
+
   function loadSessionComments(): SessionComment[] {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as SessionComment[]) : [];
+      if (!raw) return [];
+
+      const items = JSON.parse(raw) as SessionComment[];
+      const saved = items.filter((item) => item.savedToServer === true);
+
+      if (saved.length !== items.length) {
+        sessionStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      }
+
+      return saved;
     } catch {
+      sessionStorage.removeItem(STORAGE_KEY);
       return [];
     }
   }
@@ -165,6 +349,10 @@
     if (!statusEl) return;
     statusEl.textContent = message;
     statusEl.className = `comment-popover-status${type ? ` ${type}` : ''}`;
+    statusEl.hidden = !message;
+    if (message && composing) {
+      requestAnimationFrame(() => positionPopover());
+    }
   }
 
   function getSidebarOffset(): number {
@@ -335,39 +523,90 @@
     selectedCategory = '';
   }
 
-  function deleteComment(id: string) {
-    sessionComments = sessionComments.filter((entry) => entry.id !== id);
-    saveSessionComments();
-
-    if (activeCardId === id) {
-      activeCardId = null;
-      hideHighlight();
-    }
-    if (editingCommentId === id) {
-      editingCommentId = null;
-      setSidebarInteracting(false);
-    }
-
-    renderSidebar();
-  }
-
-  function updateCommentCategory(id: string, category: CategoryId) {
+  async function deleteComment(id: string) {
     const entry = sessionComments.find((item) => item.id === id);
     if (!entry) return;
-    entry.category = category;
-    saveSessionComments();
+
+    try {
+      if (entry.savedToServer) {
+        await deleteCommentOnServer(id);
+      }
+
+      sessionComments = sessionComments.filter((item) => item.id !== id);
+      globalComments = globalComments.filter((item) => item.id !== id);
+      saveSessionComments();
+
+      if (activeCardId === id) {
+        activeCardId = null;
+        hideHighlight();
+      }
+      if (editingCommentId === id) {
+        editingCommentId = null;
+        setSidebarInteracting(false);
+      }
+
+      renderSidebar();
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Could not delete comment.');
+    }
   }
 
-  function finishCommentTextEdit(id: string, value: string) {
+  async function updateCommentCategory(
+    id: string,
+    category: CategoryId,
+    revertSelect?: HTMLSelectElement,
+    previous?: CategoryId,
+  ) {
+    const entry = sessionComments.find((item) => item.id === id);
+    if (!entry) return;
+
+    try {
+      await patchCommentOnServer(id, { category });
+      entry.category = category;
+      saveSessionComments();
+
+      const global = globalComments.find((item) => item.id === id);
+      if (global) global.category = category;
+    } catch (error) {
+      if (revertSelect && previous !== undefined) revertSelect.value = previous;
+      window.alert(error instanceof Error ? error.message : 'Could not update category.');
+    }
+  }
+
+  async function finishCommentTextEdit(id: string, value: string) {
     const entry = sessionComments.find((item) => item.id === id);
     if (!entry) return;
 
     const next = value.trim();
-    if (next) entry.comment = next;
-    saveSessionComments();
-    editingCommentId = null;
-    setSidebarInteracting(false);
-    renderSidebar();
+    if (!next) {
+      cancelCommentTextEdit();
+      return;
+    }
+
+    if (next === entry.comment) {
+      editingCommentId = null;
+      setSidebarInteracting(false);
+      renderSidebar();
+      return;
+    }
+
+    try {
+      await patchCommentOnServer(id, { comment: next });
+      entry.comment = next;
+      saveSessionComments();
+
+      const global = globalComments.find((item) => item.id === id);
+      if (global) global.comment = next;
+
+      editingCommentId = null;
+      setSidebarInteracting(false);
+      renderSidebar();
+    } catch (error) {
+      editingCommentId = id;
+      setSidebarInteracting(true);
+      renderSidebar();
+      window.alert(error instanceof Error ? error.message : 'Could not update comment.');
+    }
   }
 
   function cancelCommentTextEdit() {
@@ -376,7 +615,106 @@
     renderSidebar();
   }
 
+  function renderGlobalSidebar() {
+    if (!sidebarList) return;
+
+    sidebarList.innerHTML = '';
+
+    if (globalLoading) {
+      const loading = document.createElement('p');
+      loading.className = 'comment-sidebar-empty';
+      loading.textContent = 'Loading comments…';
+      sidebarList.appendChild(loading);
+      return;
+    }
+
+    if (globalComments.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'comment-sidebar-empty';
+      empty.textContent = 'No comments on this page yet.';
+      sidebarList.appendChild(empty);
+      return;
+    }
+
+    const upvoted = getUpvotedIds();
+
+    for (const item of globalComments) {
+      const card = document.createElement('article');
+      card.className = `comment-sidebar-card comment-sidebar-card--readonly${activeCardId === item.id ? ' is-active' : ''}`;
+      card.dataset.commentId = item.id;
+
+      const header = document.createElement('div');
+      header.className = 'comment-sidebar-card-header';
+
+      const category = document.createElement('span');
+      category.className = 'comment-sidebar-card-category-label';
+      category.textContent = categoryLabel(item.category);
+
+      const upvoteBtn = document.createElement('button');
+      upvoteBtn.type = 'button';
+      upvoteBtn.className = 'comment-sidebar-card-upvote';
+      upvoteBtn.disabled = upvoted.has(item.id);
+      upvoteBtn.textContent = upvoted.has(item.id)
+        ? `+1 · ${item.upvoteCount}`
+        : `+1 · ${item.upvoteCount}`;
+      upvoteBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        void upvoteComment(item.id);
+      });
+
+      header.append(category, upvoteBtn);
+      card.appendChild(header);
+
+      const title = document.createElement('p');
+      title.className = 'comment-sidebar-card-title';
+      title.textContent = item.elementDisplayName;
+      title.addEventListener('click', (event) => {
+        event.stopPropagation();
+        pinGlobalTarget(item);
+        renderSidebar();
+      });
+      card.appendChild(title);
+
+      const body = document.createElement('p');
+      body.className = 'comment-sidebar-card-body';
+      body.textContent = item.comment;
+      card.appendChild(body);
+
+      card.addEventListener('mouseenter', () => previewGlobalTarget(item));
+      card.addEventListener('mouseleave', () => {
+        if (previewCardId === item.id) clearPreviewHighlight();
+      });
+
+      sidebarList.appendChild(card);
+    }
+  }
+
+  function pinGlobalTarget(item: GlobalComment) {
+    activeCardId = item.id;
+    previewCardId = null;
+    const target = resolveTarget(item.selector);
+    if (target) {
+      pinnedTarget = target;
+      positionHighlight(target, { pinned: true });
+    } else {
+      pinnedTarget = null;
+      hideHighlight();
+    }
+  }
+
+  function previewGlobalTarget(item: GlobalComment) {
+    previewCardId = item.id;
+    const target = resolveTarget(item.selector);
+    if (target) positionHighlight(target, { preview: true });
+    else hideHighlight();
+  }
+
   function renderSidebar() {
+    if (sidebarScope === 'all') {
+      renderGlobalSidebar();
+      return;
+    }
+
     if (!sidebarList) return;
 
     const items = pageComments();
@@ -404,7 +742,13 @@
         'comment-sidebar-card-category-select',
       );
       categorySelect.addEventListener('change', () => {
-        updateCommentCategory(item.id, categorySelect.value as CategoryId);
+        const previous = item.category;
+        void updateCommentCategory(
+          item.id,
+          categorySelect.value as CategoryId,
+          categorySelect,
+          previous,
+        );
       });
 
       const deleteBtn = document.createElement('button');
@@ -414,7 +758,7 @@
       deleteBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
       deleteBtn.addEventListener('click', (event) => {
         event.stopPropagation();
-        deleteComment(item.id);
+        void deleteComment(item.id);
       });
 
       header.append(categorySelect, deleteBtn);
@@ -444,11 +788,11 @@
           }
           if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault();
-            finishCommentTextEdit(item.id, textarea.value);
+            void finishCommentTextEdit(item.id, textarea.value);
           }
         });
         textarea.addEventListener('blur', () => {
-          finishCommentTextEdit(item.id, textarea.value);
+          void finishCommentTextEdit(item.id, textarea.value);
         });
         card.appendChild(textarea);
         window.requestAnimationFrame(() => {
@@ -559,9 +903,9 @@
     return null;
   }
 
-  function addSessionComment(comment: string, serverId?: string) {
+  function addSessionComment(serverId: string, comment: string) {
     const entry: SessionComment = {
-      id: serverId ?? crypto.randomUUID(),
+      id: serverId,
       pageUrl: window.location.href.split('#')[0],
       selector: selectedSelector,
       elementLabel: selectedLabel,
@@ -569,6 +913,7 @@
       category: selectedCategory,
       comment,
       createdAt: new Date().toISOString(),
+      savedToServer: true,
     };
 
     sessionComments.push(entry);
@@ -623,6 +968,8 @@
 
   viewOnlyBtn?.addEventListener('click', () => setMode('view'));
   commentBtn?.addEventListener('click', () => setMode('comment'));
+  scopeMineBtn?.addEventListener('click', () => setSidebarScope('mine'));
+  scopeAllBtn?.addEventListener('click', () => setSidebarScope('all'));
 
   sidebar?.addEventListener('mouseenter', () => setSidebarInteracting(true));
   sidebar?.addEventListener('mouseleave', () => {
@@ -677,7 +1024,10 @@
     true,
   );
 
-  commentText?.addEventListener('input', resizeTextarea);
+  commentText?.addEventListener('input', () => {
+    resizeTextarea();
+    if (statusEl?.classList.contains('error')) setStatus('');
+  });
 
   commentText?.addEventListener('blur', (event) => {
     if (!composing) return;
@@ -738,7 +1088,7 @@
     }
 
     submitBtn.disabled = true;
-    setStatus('Sending…');
+    setStatus('');
 
     try {
       const response = await fetch(commentsUrl, {
@@ -752,6 +1102,8 @@
           category: selectedCategory,
           pageUrl: window.location.href.split('#')[0],
           viewportWidth: window.innerWidth,
+          scrollY: window.scrollY,
+          visitorId: getVisitorId(),
         }),
       });
 
@@ -761,18 +1113,15 @@
         throw new Error(data.error || 'Could not save comment.');
       }
 
-      addSessionComment(comment, data.id);
-      setStatus('Sent — thank you!', 'success');
-      window.setTimeout(closeComposer, 900);
+      addSessionComment(data.id, comment);
+      closeComposer();
     } catch (error) {
-      addSessionComment(comment);
       setStatus(
         error instanceof Error
-          ? `${error.message} Saved locally in this session.`
-          : 'Saved locally in this session.',
+          ? error.message
+          : 'Could not save comment. Please try again.',
         'error',
       );
-      window.setTimeout(closeComposer, 1400);
     } finally {
       submitBtn.disabled = false;
     }
