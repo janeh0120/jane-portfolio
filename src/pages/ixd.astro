@@ -1,5 +1,8 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+
+const img = (file: string) => `images/case-studies/ixd/${file}`;
 
 const nav = [
   { label: 'Overview', href: '#overview' },
@@ -25,6 +28,12 @@ const nav = [
       My program did not have a year end show this year. So how might I use design to build a fresh
       and experience-lead event concept?
     </p>
+    <CaseStudyFigure
+      src={img('event-experience-collage.gif')}
+      alt="Collage of IXDA year-end event concept materials including hoodies, pins, and name tags"
+      caption="Event experience collage"
+      wide
+    />
   </section>
 
   <section id="brand">
@@ -34,6 +43,12 @@ const nav = [
       Association). Since this design is validated as popular choice by the students in my program,
       I thought to turn this one-off design into a brand system.
     </p>
+    <CaseStudyFigure
+      src={img('hoodie-concept-collage.png')}
+      alt="IXDA hoodie concept with award ribbon and portfolio keychain mockup"
+      caption="Hoodie design challenge — starting point for the brand system"
+      wide
+    />
     <h3>Concept</h3>
     <p class="lead">
       Most people don't know what interaction design is. My hoodie design played on this, and drove
@@ -55,15 +70,31 @@ const nav = [
       Colour choice is simple and accessible in different combinations. Sheridan's brand colour is
       blue, but in a more vibrant tone.
     </p>
+    <CaseStudyFigure
+      src={img('brand-foundations-system.png')}
+      alt="IXDA System 01 brand foundations — atoms, typography scale, and Winter Frost colour way"
+      caption="Brand foundations — typography, components, and colour"
+      wide
+    />
     <p>
       The Interaction Design Association runs the program's year end party and annual hoodie design
       challenge.
     </p>
+    <CaseStudyFigure
+      placeholder
+      alt="Sheridan IXDA club logo"
+      caption="IXDA logo — image missing (*this logo was not designed by me)"
+    />
     <p class="text-muted text-sm italic">*this logo was not designed by me</p>
     <p>
       This illustration represents our school mascot: the bruin, while also communicating a sense
-      of reliability in it's tired stance.
+      of reliability in its tired stance.
     </p>
+    <CaseStudyFigure
+      placeholder
+      alt="Bruin mascot illustration representing reliability"
+      caption="Bruin mascot illustration — image missing"
+    />
   </section>
 
   <section id="applications">
@@ -73,23 +104,62 @@ const nav = [
       the year end party. My idea is that students can make their own award pins with their given
       superlative (or another tagline) as an activity to do with friends.
     </p>
-    <p>
-      Sticker sheet border is used as a photo frame for a photobooth! Website directory for this
-      years new grad designers!
-    </p>
+    <CaseStudyFigure
+      placeholder
+      alt="Custom award pin activity for year end party"
+      caption="Award pin making activity — image missing"
+    />
+    <p>Sticker sheet border is used as a photo frame for a photobooth!</p>
+    <CaseStudyFigure
+      placeholder
+      alt="Photobooth frame using sticker sheet border"
+      caption="Photobooth sticker frame — image missing"
+    />
+    <p>Website directory for this years new grad designers!</p>
+    <CaseStudyFigure
+      placeholder
+      alt="New grad designer website directory"
+      caption="Grad designer directory — image missing"
+    />
     <p>
       Each attendee of the year end show gets a connect the dots card with a handwritten note and a
       way to keep track of which tables they have yet to visit! Each card has "interaction design"
-      written in a different language.
+      written in a different language. (you can't understand it in any language anyways…)
     </p>
+    <CaseStudyFigure
+      placeholder
+      alt="Connect the dots card with interaction design in different languages"
+      caption="Connect the dots attendee card — image missing"
+    />
     <p>
       Every year, the IXDA club at Sheridan makes different limited edition pins that students can
-      collect. This tote bag design helps students find a home for them!
+      collect. This tote bag design helps students find a home for them! They can also put their
+      award pin on it too!
     </p>
+    <CaseStudyFigure
+      placeholder
+      alt="Tote bag design for collecting limited edition pins"
+      caption="Pin collection tote bag — image missing"
+    />
+    <p>
+      Using the Sheridan IXDA logo reference, each new grad's name tag will have a cohesive event
+      identity.
+    </p>
+    <CaseStudyFigure
+      placeholder
+      alt="New grad name tag using IXDA logo reference"
+      caption="Grad name tag — image missing"
+    />
     <p>
       Instead of traditional large, crossbody portfolios, students can purchase our portfolio
       keychains to showcase their work in mini booklets and share their social links via NFC tags!
+      (QR codes can be printed on the books as well if NFC is that compatible)
     </p>
+    <CaseStudyFigure
+      placeholder
+      alt="Portfolio keychain with mini booklet and NFC social links"
+      caption="Portfolio keychain concept — image missing"
+    />
   </section>
 
   <section id="aiprocess">
@@ -100,9 +170,22 @@ const nav = [
     </p>
     <p class="lead">
       When I rely on flat lay designs that I designed only, it creates a design that is almost too
-      perfect. When I use an award ribbon I made myself and took pictures of, it created a much more
-      realistic mockup.
+      perfect.
     </p>
+    <CaseStudyFigure
+      placeholder
+      alt="AI mockup generated from flat lay design only"
+      caption="AI mockup from flat lay only (too perfect) — image missing"
+    />
+    <p class="lead">
+      When I use an award ribbon I made myself and took pictures of, it created a much more realistic
+      mockup.
+    </p>
+    <CaseStudyFigure
+      placeholder
+      alt="AI mockup generated using photographed award ribbon"
+      caption="AI mockup with real-world photo context — image missing"
+    />
   </section>
 
   <section id="reflection">
@@ -116,7 +199,7 @@ const nav = [
       </li>
       <li>
         <h2>Explore different tools</h2>
-        <p class="lead">Challenge myself to use new tools like Figma Weave.</p>
+        <p class="lead">Find ways to achieve the vision with new tools.</p>
       </li>
     </ol>
     <h3 class="!mt-12">next steps</h3>
@@ -129,10 +212,10 @@ const nav = [
         </p>
       </li>
       <li>
-        <h2>Build a team</h2>
+        <h2>Build on with peers</h2>
         <p class="lead">
           Building out large scale events is not a task for one. Gathering a community of like minded
-          students is important to making this concept feasible.
+          students is important to breath life into this concept.
         </p>
       </li>
     </ol>

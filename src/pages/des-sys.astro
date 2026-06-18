@@ -1,0 +1,146 @@
+---
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+
+const img = (file: string) => `images/case-studies/des-sys/${file}`;
+
+const nav = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Impact & Process', href: '#impact' },
+  { label: 'AI Workflow', href: '#workflow' },
+  { label: 'Reflection', href: '#reflection' },
+];
+---
+
+<CaseStudyLayout
+  title="Design Systems"
+  heading="Bridging design and code with AI"
+  role="Product Designer"
+  team="Intuit Design Systems"
+  timeline="Jan 2026 – Present"
+  projectType="Product, Design Systems"
+  nav={nav}
+  commentId="case-study-des-sys"
+>
+  <section id="overview">
+    <h3>context</h3>
+    <p class="lead">
+      The Intuit Design System (IDS) supports designers and engineers across Intuit through a shared
+      library of components and design tokens.
+    </p>
+    <p class="lead">
+      As the design system evolves, maintaining alignment between design and code becomes
+      increasingly difficult.
+    </p>
+
+    <h3>why this matters</h3>
+    <ol>
+      <li>
+        <h2>Design handoff less reliable</h2>
+        <p class="lead">
+          Handoff is less reliable if components are not 1-to-1 between prototypes and
+          implementation.
+        </p>
+      </li>
+      <li>
+        <h2>Hardcoded values bypass tokens</h2>
+        <p class="lead">
+          Use of hardcoded values instead of tokens in components bypasses global theme updates.
+        </p>
+      </li>
+    </ol>
+
+    <h3>opportunity</h3>
+    <p class="lead">
+      I explored how AI can empower designers to take greater ownership of implementation while
+      maintaining quality and consistency.
+    </p>
+  </section>
+
+  <section id="impact">
+    <h3>How small changes scale</h3>
+    <p class="lead">
+      I updated 3 (+ more in progress) core components across the design system. Just one component
+      can have a large systematic impact.
+    </p>
+    <p class="lead">For the checkbox component:</p>
+    <div class="case-study-stats">
+      <div class="case-study-stat">
+        <strong>355k+</strong>
+        <span>instances of checkbox in Figma</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>143</strong>
+        <span>business units use checkbox in code</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>164</strong>
+        <span>design teams use checkbox</span>
+      </div>
+    </div>
+    <CaseStudyFigure
+      src={img('ids-project-hero.png')}
+      alt="Intuit Design Systems project — checkbox component at scale"
+      caption="IDS component work at Intuit"
+    />
+
+    <h3>What do token adjustments look like</h3>
+    <p class="lead">
+      Some token adjustments bring alignment between design and code. Others are adjusted to align
+      with documentation. In the example below, the use of input-label as the colour token is
+      incorrect for its use case regardless of the alignment between design and code.
+    </p>
+    <CaseStudyFigure
+      src={img('token-alignment-input-label.png')}
+      alt="Before and after aligning input label colour token from --input-label to --text-primary"
+      caption="Token alignment — label colour consolidated to --text-primary"
+    />
+    <CaseStudyFigure
+      src={img('token-alignment-font-weight.png')}
+      alt="Before and after aligning checkbox label font weight between design and code"
+      caption="Token alignment — font weight synced to --font-weight-component"
+    />
+  </section>
+
+  <section id="workflow">
+    <h3>audit process</h3>
+    <p class="lead">
+      Previously, identifying an issue and implementing a fix required separate design and
+      engineering workflows. Below is the workflow that designers can own in the process.
+    </p>
+    <div class="case-study-figure-row">
+      <CaseStudyFigure
+        src={img('audit-workflow-before.png')}
+        alt="Previous audit workflow with separate design and engineering handoffs"
+        caption="Before — separate design and engineering workflows"
+      />
+      <CaseStudyFigure
+        src={img('audit-workflow-after.png')}
+        alt="Designer-owned audit workflow with AI-assisted review, Storybook preview, and PR"
+        caption="After — designer-owned workflow with AI-assisted steps"
+      />
+    </div>
+    <p class="lead">AI didn't replace review or decision-making.</p>
+    <p class="lead">
+      Instead, it enabled me to participate more directly in implementation, reducing dependency on
+      engineering bandwidth for lower-risk updates while maintaining quality.
+    </p>
+  </section>
+
+  <section id="reflection">
+    <h3>Reflection</h3>
+    <p class="lead">
+      Nothing is too small. Maintaining the integrity of a design system starts at the pixel level.
+      By leveraging AI throughout the workflow, I was able to move beyond identifying problems and
+      contribute directly to implementation, validation, and shipping while maintaining confidence
+      in the quality of the work.
+    </p>
+
+    <h3 class="!mt-12">next steps</h3>
+    <p class="lead">
+      I'm interested in refining the auditing skill to detect deeper system-level inconsistencies,
+      such as incorrect or inconsistent token usage that may not be caught by surface-level checks
+      as I move through the components within the design system.
+    </p>
+  </section>
+</CaseStudyLayout>

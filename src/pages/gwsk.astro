@@ -1,5 +1,8 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+
+const img = (file: string) => `images/case-studies/gwsk/${file}`;
 
 const nav = [
   { label: 'Overview', href: '#overview' },
@@ -41,9 +44,22 @@ const nav = [
         GWSK Website
       </a>
     </p>
+    <CaseStudyFigure
+      src={img('final-website-responsive.png')}
+      alt="GWSK redesigned website on desktop and mobile"
+      caption="Final responsive website"
+      wide
+    />
   </section>
 
   <section id="branding">
+    <h3>brand system</h3>
+    <CaseStudyFigure
+      src={img('brand-style-tile.png')}
+      alt="GWSK brand style tile with transit-inspired colour system"
+      caption="Brand style tile"
+      wide
+    />
     <h3>brand tone</h3>
     <p class="lead">
       Brutalist, smart, minimal, confident, Bauhaus-inspired, and accessible. Refined but human,
@@ -54,25 +70,45 @@ const nav = [
       We were suggested to reference Landon Nordeman, Zaha Hadid, Pentagram, Teenage Engineering,
       and the Bauhaus and Brutalist movement when ideating.
     </p>
+    <h3>moodboarding</h3>
+    <CaseStudyFigure
+      src={img('moodboard.png')}
+      alt="GWSK brand moodboard with reference inspirations"
+      caption="Moodboard"
+      wide
+    />
     <h3>final concept</h3>
     <p class="lead">
       Modular, TTC transit system inspired visual language to communicate the systematic and
-      accessible approach GWSK brings to product design. Each accent colour represents a stage of the
-      Double Diamond Process.
+      accessible approach GWSK brings to product design. Each accent colour represents a stage of
+      the Double Diamond Process.
     </p>
+    <h3>final brand design system</h3>
     <p>
       We created type styles, colour variables, effect styles, layout grid styles, as well as
       components for visual assets and plugin use cases.
     </p>
+    <CaseStudyFigure
+      src={img('brand-design-system.png')}
+      alt="GWSK final brand design system in Figma with typography, colour, and layout grids"
+      caption="Figma brand design system"
+      wide
+    />
   </section>
 
   <section id="template">
     <h3>Presentation Deck</h3>
     <p>
-      Slide decks are colour coded based on the step of the design process the deck has content
+      Slide decks are colour coded based on the step of the design process the deck content
       correlates to. Plugins were linked for data visualization slides for easy data entry. Animated
       key interactions in slide deck.
     </p>
+    <CaseStudyFigure
+      src={img('presentation-deck-cycle.png')}
+      alt="GWSK presentation deck iterative process diagram"
+      caption="Presentation deck — colour coded by design process stage"
+      wide
+    />
   </section>
 
   <section id="website">
@@ -81,6 +117,12 @@ const nav = [
       The existing website is responsive, with good visual hierarchy and colour accessibility, but
       lacks personality and could have a more emphasized CTA to book a meeting.
     </p>
+    <CaseStudyFigure
+      src={img('existing-website.png')}
+      alt="GWSK existing website with services table"
+      caption="Existing website"
+      wide
+    />
     <h3>redesign objective</h3>
     <ol>
       <li>
@@ -93,16 +135,59 @@ const nav = [
         <h2>Encourage potential clients to book a meeting</h2>
       </li>
     </ol>
+    <h3>lo-fi sketches</h3>
+    <p class="lead">
+      After getting feedback from my PM/Stakeholder, we continued with the red-outlined sketches. In
+      this concept, each section of the website will be sticky to the page and open as the user
+      scrolls down.
+    </p>
+    <CaseStudyFigure
+      src={img('lofi-sketches.png')}
+      alt="Lo-fi website sketches with red-outlined selected concept"
+      caption="Lo-fi sketches"
+      wide
+    />
     <h3>process</h3>
     <p class="lead">
       Due to the tight time constraint, the other intern and I rapidly iterated between design and
       implementation to see what is feasible and what isn't.
     </p>
+    <CaseStudyFigure
+      src={img('project-timeline.png')}
+      alt="GWSK website redesign project timeline"
+      caption="Project timeline"
+      wide
+    />
     <h3>Responsiveness</h3>
     <p class="lead">
       I had to wear both design and dev hats through the process. Here's an example of the
       responsiveness issues we faced along the way.
     </p>
+    <div class="case-study-figure-row">
+      <CaseStudyFigure
+        src={img('responsive-design-mockup.png')}
+        alt="Responsive design mockup"
+        caption="Design"
+      />
+      <CaseStudyFigure
+        src={img('responsive-initial-code.png')}
+        alt="Initial code implementation"
+        caption="Initial Code"
+      />
+    </div>
+    <CaseStudyFigure
+      src={img('responsive-final-code.png')}
+      alt="Final responsive code implementation"
+      caption="Final Code"
+      wide
+    />
+    <h3>Final website</h3>
+    <CaseStudyFigure
+      src={img('website-hero.png')}
+      alt="Final GWSK website redesign hero section"
+      caption="Final website screens"
+      wide
+    />
   </section>
 
   <section id="reflection">

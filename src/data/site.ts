@@ -18,7 +18,7 @@ export const site = {
     { label: 'Projects', href: '/#projects' },
     { label: 'About', href: '/about' },
     { label: 'Extra!', href: '/extra' },
-    { label: 'Resume', href: '#resume', external: false },
+    { label: 'Resume', href: 'https://drive.google.com/file/d/1GIoyNn6HADODpR-6b8PsSf7BwYmytnxg/view', external: false },
   ],
   hero: {
     intro: "I'm Jane, a ",
@@ -40,6 +40,13 @@ export const site = {
   },
   projects: [
     {
+      slug: 'des-sys',
+      tags: 'product, design systems, internship',
+      title: 'Bridging design and code with AI',
+      image: 'images/7UtMUHlfBYMyZYCFvm22bixCyVI.png',
+      comingSoon: false,
+    },
+    {
       slug: 'ixd',
       tags: 'brand, community, concept',
       title: 'Building community through design',
@@ -47,23 +54,9 @@ export const site = {
       comingSoon: false,
     },
     {
-      slug: null,
-      tags: 'product, design systems, internship',
-      title: 'Bridging design and code with AI',
-      image: 'images/7UtMUHlfBYMyZYCFvm22bixCyVI.png',
-      comingSoon: true,
-    },
-    {
-      slug: null,
-      tags: 'product, internship',
-      title: 'AI first product development',
-      image: 'images/tt2ttvnMYWp8S50iil6NuJwqMh4.png',
-      comingSoon: true,
-    },
-    {
       slug: 'designchall',
       tags: 'product, concept',
-      title: 'Designing large data tables',
+      title: 'Design large data tables',
       image: 'images/idJoFG559gccPL1RNMnuFQz3mvQ.png',
       comingSoon: false,
     },
@@ -73,13 +66,6 @@ export const site = {
       title: 'Building an enduring identity',
       image: 'images/3iUOparZSy8dbxSG8ObclzL8Q.png',
       comingSoon: false,
-    },
-    {
-      slug: null,
-      tags: 'brand, internship',
-      title: 'Expressing brand through illustration',
-      image: 'images/SnkKucdW7H3JnnEfTOX4yJru7oA.png',
-      comingSoon: true,
     },
   ],
   about: {

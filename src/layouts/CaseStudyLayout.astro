@@ -42,7 +42,7 @@ const home = base;
 
     <div class="grid gap-12 lg:grid-cols-[200px_1fr] lg:gap-20">
       <aside class="lg:sticky lg:top-24 lg:self-start">
-        <nav class="flex flex-wrap gap-4 lg:flex-col lg:gap-3" aria-label="Case study">
+        <nav class="case-study-nav flex flex-wrap gap-4 lg:flex-col lg:gap-3" aria-label="Case study">
           {
             nav.map((item) => (
               <a
@@ -87,6 +87,26 @@ const home = base;
   <SiteFooter />
 </Layout>
 
+<script>
+  const nav = document.querySelector('.case-study-nav');
+  if (nav) {
+    nav.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const href = link.getAttribute('href');
+        if (!href?.startsWith('#')) return;
+
+        const target = document.getElementById(href.slice(1));
+        if (!target) return;
+
+        event.preventDefault();
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        history.replaceState(null, '', href);
+      });
+    });
+  }
+</script>
+
 <style>
   .case-study-content :global(h2) {
     font-size: 1.5rem;
@@ -115,6 +135,12 @@ const home = base;
     scroll-margin-top: 6rem;
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html:has(.case-study-nav)) {
+      scroll-behavior: smooth;
+    }
+  }
+
   .case-study-content :global(.lead) {
     font-size: 1.5rem;
     line-height: 1.35;
@@ -132,5 +158,88 @@ const home = base;
 
   .case-study-content :global(ol li h2) {
     font-size: 1.25rem;
+  }
+
+  .case-study-content :global(.case-study-figure) {
+    margin: 1.5rem 0 0;
+  }
+
+  .case-study-content :global(.case-study-figure img) {
+    display: block;
+    width: 100%;
+    border-radius: 12px;
+    background: #fafafa;
+  }
+
+  .case-study-content :global(.case-study-figure video) {
+    display: block;
+    width: 100%;
+    border-radius: 12px;
+    background: #000;
+  }
+
+  .case-study-content :global(.case-study-figure--placeholder img) {
+    border: 1px dashed #c8c8c8;
+  }
+
+  .case-study-content :global(.case-study-figure figcaption) {
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: var(--color-muted);
+  }
+
+  .case-study-content :global(.case-study-figure-row) {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .case-study-content :global(.case-study-figure-row) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .case-study-content :global(.case-study-stats) {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .case-study-content :global(.case-study-stats) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .case-study-content :global(.case-study-stat) {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: var(--color-canvas);
+  }
+
+  .case-study-content :global(.case-study-stat strong) {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+  }
+
+  .case-study-content :global(.case-study-stat span) {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .case-study-content :global(ul.case-study-list) {
+    margin: 0.75rem 0 0;
+    padding-left: 1.25rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-ink);
   }
 </style>

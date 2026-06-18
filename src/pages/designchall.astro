@@ -1,5 +1,8 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+
+const img = (file: string) => `images/case-studies/designchall/${file}`;
 
 const nav = [
   { label: 'Overview', href: '#overview' },
@@ -62,6 +65,18 @@ const nav = [
     <p class="lead">
       Key information on the table view with a side panel for details about the applicant.
     </p>
+    <CaseStudyFigure
+      src={img('solution-hero-laptop.png')}
+      alt="Applicant data table with ratings and review status on a laptop mockup"
+      caption="Table view with key applicant columns"
+      wide
+    />
+    <CaseStudyFigure
+      src={img('solution-table-panel.png')}
+      alt="Applicant table with side panel showing John Jacob's review details"
+      caption="Side panel for applicant details"
+      wide
+    />
   </section>
 
   <section id="process">
@@ -74,11 +89,29 @@ const nav = [
       I redesigned pagination for greater control, adding page number input and arrow icons to
       navigation buttons.
     </p>
+    <div class="case-study-figure-row">
+      <CaseStudyFigure
+        src={img('pagination-before.png')}
+        alt="Pagination controls before redesign"
+        caption="Before — pagination"
+      />
+      <CaseStudyFigure
+        src={img('pagination-after.png')}
+        alt="Pagination controls after redesign with page input and arrows"
+        caption="After — pagination"
+      />
+    </div>
     <h3>overflow</h3>
     <p class="lead">
       After designing the new required columns, I put them onto the table to see what it would look
       like.
     </p>
+    <CaseStudyFigure
+      src={img('overflow-columns.png')}
+      alt="Data table with all new required columns showing overflow"
+      caption="Exploring column overflow with new requirements"
+      wide
+    />
     <h3>inital problem statement</h3>
     <p class="lead">How might we fit the new requirements onto the data table?</p>
     <h3>horizontal scroll</h3>
@@ -87,6 +120,12 @@ const nav = [
       scroll design. Although this solution fits a theoretically infinite number of columns on the
       table, it hides information behind the fold and could add development difficulty.
     </p>
+    <CaseStudyFigure
+      src={img('horizontal-scroll.png')}
+      alt="Horizontal scroll table layout exploration"
+      caption="Horizontal scroll concept"
+      wide
+    />
     <h3>Key Insight</h3>
     <p class="lead">
       Initially, I assumed users needed to see all requirements within the table view. After
@@ -108,15 +147,32 @@ const nav = [
       information about the user. If more information needs to be added, the side panel could become
       scrollable.
     </p>
+    <CaseStudyFigure
+      src={img('final-solution-panel.png')}
+      alt="Final applicant table with key columns and detail side panel"
+      caption="Final table and side panel solution"
+      wide
+    />
     <h3>mobile responsiveness</h3>
     <p class="lead">
       Key columns will be kept on the table with a panel that expands from the bottom of the screen.
     </p>
+    <CaseStudyFigure
+      src={img('mobile-responsive.png')}
+      alt="Mobile responsive table with bottom sheet detail panel"
+      caption="Mobile bottom panel expansion"
+    />
     <h3>handoff documentation</h3>
     <p class="lead">
       I created a design system change log that outlines changes or new components. I used Dev-mode
       to annotate measurements.
     </p>
+    <CaseStudyFigure
+      src={img('handoff-process.png')}
+      alt="Design system change log and Dev Mode measurement annotations"
+      caption="Handoff documentation and process notes"
+      wide
+    />
     <p>
       Next steps for the design system: introduce variables to make design responsive to mobile;
       some of the "new" components might already exist in the design system however I was not given

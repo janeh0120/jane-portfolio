@@ -1,0 +1,31 @@
+---
+interface Props {
+  alt: string;
+  caption?: string;
+  wide?: boolean;
+  src?: string;
+  placeholder?: boolean;
+}
+
+const {
+  alt,
+  caption,
+  wide = false,
+  src = 'images/placeholders/case-study-filler.png',
+  placeholder = false,
+} = Astro.props;
+const base = import.meta.env.BASE_URL;
+const imageSrc = src.startsWith('http') ? src : `${base}${src.replace(/^\//, '')}`;
+const isVideo = /\.(mp4|webm|mov)$/i.test(src);
+---
+
+<figure class:list={['case-study-figure', wide && 'case-study-figure--wide', placeholder && 'case-study-figure--placeholder']}>
+  {
+    isVideo ? (
+      <video src={imageSrc} controls muted playsinline preload="metadata" />
+    ) : (
+      <img src={imageSrc} alt={alt} loading="lazy" decoding="async" />
+    )
+  }
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
