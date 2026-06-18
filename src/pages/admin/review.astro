@@ -5,6 +5,7 @@ import Layout from '../../layouts/Layout.astro';
 import AdminCommentReview from '../../components/AdminCommentReview.astro';
 import { ADMIN_SECRET } from 'astro:env/server';
 import { listCommentsByVersion } from '../../lib/comments';
+import { resolvePortfolioPreviewBase } from '../../lib/deploy-url';
 import { getVersionById, listVersions } from '../../lib/versions';
 
 const key = Astro.url.searchParams.get('key') ?? '';
@@ -17,7 +18,10 @@ let comments: Awaited<ReturnType<typeof listCommentsByVersion>> = [];
 let selectedVersion: Awaited<ReturnType<typeof getVersionById>> = null;
 let error = '';
 
-if (authorized) {
+if (!ADMIN_SECRET) {
+  error =
+    'ADMIN_SECRET is not configured on the server. Add it in Vercel Environment Variables and redeploy.';
+} else if (authorized) {
   try {
     versions = await listVersions();
     const active = versions.find((item) => item.isActive) ?? versions[0] ?? null;
@@ -34,9 +38,11 @@ if (authorized) {
   }
 }
 
-const frameBaseUrl = selectedVersion?.deployUrl
-  ? selectedVersion.deployUrl.replace(/\/$/, '')
-  : `${Astro.url.origin}${base}`.replace(/\/$/, '');
+const frameBaseUrl = resolvePortfolioPreviewBase(
+  selectedVersion?.deployUrl,
+  Astro.url.origin,
+  base,
+);
 
 const clientComments = comments.map((item) => ({
   id: item.id,
@@ -71,6 +77,12 @@ const clientVersions = versions.map((version) => ({
           Add <code class="rounded bg-line px-1.5 py-0.5 text-sm">?key=YOUR_ADMIN_SECRET</code> to the
           URL.
         </p>
+        {!ADMIN_SECRET && (
+          <p class="mt-4 text-sm text-red-700">
+            <code class="rounded bg-line px-1 py-0.5 text-xs">ADMIN_SECRET</code> is not set on this
+            server. Add it in Vercel Environment Variables and redeploy.
+          </p>
+        )}
         <p class="mt-4 text-sm text-muted">
           Example:{' '}
           <code class="break-all rounded bg-line px-1.5 py-0.5 text-xs">
@@ -83,6 +95,13 @@ const clientVersions = versions.map((version) => ({
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
         <h1 class="font-serif text-3xl font-normal tracking-tight">Version review</h1>
         <p class="mt-6 text-sm text-red-700">{error}</p>
+        <p class="mt-4 text-sm text-muted">
+          On Vercel, open <strong>Settings → Environment Variables</strong> and add{' '}
+          <code class="rounded bg-line px-1 py-0.5 text-xs">SUPABASE_URL</code>,{' '}
+          <code class="rounded bg-line px-1 py-0.5 text-xs">SUPABASE_SERVICE_ROLE_KEY</code>, and{' '}
+          <code class="rounded bg-line px-1 py-0.5 text-xs">ADMIN_SECRET</code> (same values as your
+          local <code class="rounded bg-line px-1 py-0.5 text-xs">.env</code>), then redeploy.
+        </p>
       </main>
     ) : selectedVersion ? (
       <AdminCommentReview

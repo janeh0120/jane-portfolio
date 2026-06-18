@@ -12,9 +12,14 @@ export default defineConfig({
   adapter: vercel(),
   env: {
     schema: {
-      SUPABASE_URL: envField.string({ context: 'server', access: 'secret' }),
-      SUPABASE_SERVICE_ROLE_KEY: envField.string({ context: 'server', access: 'secret' }),
-      ADMIN_SECRET: envField.string({ context: 'server', access: 'secret' }),
+      SUPABASE_URL: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
+      SUPABASE_SERVICE_ROLE_KEY: envField.string({
+        context: 'server',
+        access: 'secret',
+        optional: true,
+        default: '',
+      }),
+      ADMIN_SECRET: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
       DEPLOY_HOOK_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
       PUBLIC_COMMENT_API_URL: envField.string({
         context: 'client',
