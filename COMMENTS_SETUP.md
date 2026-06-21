@@ -55,7 +55,11 @@ Your live URLs will look like:
 
 **GitHub Pages cannot run the comment API** — use Vercel for the full app.
 
-### Optional: record a new portfolio version after deploy
+## Record a new portfolio version
+
+After each deploy, call the deploy hook so comments stay tied to the right snapshot. See **[README.md](./README.md#publishing-a-new-version)** for full editing and versioning workflow.
+
+Quick reference:
 
 Call your deploy hook (set `DEPLOY_HOOK_SECRET` on Vercel):
 

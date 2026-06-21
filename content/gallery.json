@@ -1,0 +1,86 @@
+[
+  {
+    "slug": "zestie-festie",
+    "title": "A Zestie Festie",
+    "description": "A vibrant community event celebrating diverse perspectives and creative expression through collaborative art and design.",
+    "year": "2023"
+  },
+  {
+    "slug": "community-project",
+    "title": "Community Project",
+    "description": "Collaborative design initiative bringing together community members to create meaningful visual experiences.",
+    "year": "2023"
+  },
+  {
+    "slug": "puzzle-exploration",
+    "title": "Puzzle Exploration",
+    "description": "Exploring interactive puzzle mechanics and spatial design thinking through hands-on prototyping.",
+    "year": "2023"
+  },
+  {
+    "slug": "calculator-ui",
+    "title": "Calculator UI",
+    "description": "Minimalist calculator interface design focusing on usability and visual clarity in functional applications.",
+    "year": "2023"
+  },
+  {
+    "slug": "product-photography",
+    "title": "Product Photography",
+    "description": "Clean product photography and styling for e-commerce and brand storytelling.",
+    "year": "2023"
+  },
+  {
+    "slug": "social-print",
+    "title": "Social & Print",
+    "description": "Comprehensive social media and print collateral design for brand consistency across channels.",
+    "year": "2023-2024"
+  },
+  {
+    "slug": "sky-view-series",
+    "title": "Sky View Series",
+    "description": "Atmospheric photography series exploring perspectives and natural elements through design lens.",
+    "year": "2023"
+  },
+  {
+    "slug": "framed-memories",
+    "title": "Framed Memories",
+    "description": "Personal photography project capturing candid moments and human connection through framing.",
+    "year": "2023"
+  },
+  {
+    "slug": "product-display",
+    "title": "Product Display",
+    "description": "Retail and digital product display strategies emphasizing visual hierarchy and user engagement.",
+    "year": "2023"
+  },
+  {
+    "slug": "ceramics-crafts",
+    "title": "Ceramics & Crafts",
+    "description": "Exploring tactile design through ceramics, craftsmanship, and material exploration.",
+    "year": "2023"
+  },
+  {
+    "slug": "besties-brunch",
+    "title": "Besties Brunch",
+    "description": "Branding and design identity for a local cafe focusing on community and connection.",
+    "year": "2023"
+  },
+  {
+    "slug": "floral-studies",
+    "title": "Floral Studies",
+    "description": "Nature-inspired design studies exploring color, form, and botanical aesthetics.",
+    "year": "2023"
+  },
+  {
+    "slug": "creative-tools",
+    "title": "Creative Tools",
+    "description": "Design exploration of artistic tools, materials, and creative workflows.",
+    "year": "2023"
+  },
+  {
+    "slug": "data-visualization",
+    "title": "Data Visualization",
+    "description": "Complex data visualization and information design for meaningful storytelling.",
+    "year": "2023-2024"
+  }
+]

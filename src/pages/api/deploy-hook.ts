@@ -11,6 +11,55 @@ function json(data: unknown, status = 200) {
   });
 }
 
+function resolveDeployUrl(body: Record<string, unknown>): string {
+  const fromBody =
+    String(body.url ?? '').trim() ||
+    String((body.deployment as Record<string, unknown> | undefined)?.url ?? '').trim() ||
+    String((body.payload as Record<string, unknown> | undefined)?.url ?? '').trim();
+
+  if (fromBody) {
+    return fromBody.startsWith('http') ? fromBody : `https://${fromBody}`;
+  }
+
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  if (vercelUrl) {
+    return vercelUrl.startsWith('http') ? vercelUrl : `https://${vercelUrl}`;
+  }
+
+  return '';
+}
+
+function resolveGitSha(body: Record<string, unknown>): string | undefined {
+  const meta = body.meta as Record<string, unknown> | undefined;
+  const deployment = body.deployment as Record<string, unknown> | undefined;
+  const payload = body.payload as Record<string, unknown> | undefined;
+  const deploymentMeta = deployment?.meta as Record<string, unknown> | undefined;
+
+  const sha =
+    String(meta?.githubCommitSha ?? '').trim() ||
+    String(body.gitSha ?? '').trim() ||
+    String(deploymentMeta?.githubCommitSha ?? '').trim() ||
+    String(payload?.deploymentId ?? '').trim() ||
+    String(process.env.VERCEL_GIT_COMMIT_SHA ?? '').trim();
+
+  return sha || undefined;
+}
+
+function resolveLabel(body: Record<string, unknown>): string {
+  const deployment = body.deployment as Record<string, unknown> | undefined;
+  const fromBody =
+    String(body.name ?? '').trim() ||
+    String(deployment?.name ?? '').trim() ||
+    String(process.env.VERCEL_GIT_COMMIT_MESSAGE ?? '').trim();
+
+  if (fromBody) return fromBody.slice(0, 120);
+
+  const ref = String(process.env.VERCEL_GIT_COMMIT_REF ?? '').trim();
+  if (ref) return ref;
+
+  return 'deploy';
+}
+
 export const POST: APIRoute = async ({ request }) => {
   if (!DEPLOY_HOOK_SECRET) {
     return json({ error: 'Deploy hook is not configured.' }, 503);
@@ -25,12 +74,10 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
-    const body = await request.json().catch(() => ({}));
-    const deployUrl =
-      String(body.url ?? body.deployment?.url ?? '').trim() ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '');
-    const gitSha = String(body.meta?.githubCommitSha ?? body.gitSha ?? '').trim() || undefined;
-    const label = String(body.name ?? body.deployment?.name ?? 'deploy').trim() || 'deploy';
+    const body = (await request.json().catch(() => ({}))) as Record<string, unknown>;
+    const deployUrl = resolveDeployUrl(body);
+    const gitSha = resolveGitSha(body);
+    const label = resolveLabel(body);
 
     const versionId = await createVersion({
       label,
@@ -39,7 +86,7 @@ export const POST: APIRoute = async ({ request }) => {
       setActive: true,
     });
 
-    return json({ ok: true, versionId, deployUrl });
+    return json({ ok: true, versionId, deployUrl, label, gitSha });
   } catch (error) {
     console.error('POST /api/deploy-hook', error);
     return json({ error: 'Unable to record portfolio version.' }, 503);

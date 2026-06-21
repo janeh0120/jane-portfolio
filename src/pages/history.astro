@@ -1,0 +1,138 @@
+---
+export const prerender = false;
+
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import VersionHistoryView from '../components/VersionHistoryView.astro';
+import { getVersionSummary } from '../lib/content';
+import { listCommentsByVersion } from '../lib/comments';
+import { resolvePortfolioPreviewBase } from '../lib/deploy-url';
+import { getVersionById, listVersions } from '../lib/versions';
+
+const versionParam = Astro.url.searchParams.get('version') ?? '';
+const base = import.meta.env.BASE_URL;
+const liveSiteUrl = `${Astro.url.origin}${base}`.replace(/\/$/, '') + '/';
+
+let versions: Awaited<ReturnType<typeof listVersions>> = [];
+let comments: Awaited<ReturnType<typeof listCommentsByVersion>> = [];
+let selectedVersion: Awaited<ReturnType<typeof getVersionById>> = null;
+let error = '';
+
+try {
+  versions = await listVersions();
+  const active = versions.find((item) => item.isActive) ?? versions[0] ?? null;
+  const selectedId = versionParam || '';
+  selectedVersion = selectedId ? await getVersionById(selectedId) : null;
+
+  if (selectedVersion) {
+    comments = await listCommentsByVersion(selectedVersion.id);
+  }
+} catch (e) {
+  error =
+    'Could not load portfolio history. Check Supabase configuration and run supabase/migrations/001_initial.sql.';
+  console.error(e);
+}
+
+const frameBaseUrl = selectedVersion
+  ? resolvePortfolioPreviewBase(selectedVersion.deployUrl, Astro.url.origin, base)
+  : '';
+
+const clientComments = comments.map((item) => ({
+  id: item.id,
+  pageUrl: item.pageUrl,
+  selector: item.selector,
+  elementDisplayName: item.elementDisplayName || item.elementLabel,
+  category: item.category ?? '',
+  comment: item.comment,
+  deviceType: item.deviceType,
+  os: item.os,
+  viewportWidth: item.viewportWidth,
+  scrollY: item.scrollY,
+  upvoteCount: item.upvoteCount ?? 0,
+  createdAt: item.createdAt.toISOString(),
+}));
+
+const clientVersions = versions.map((version) => ({
+  id: version.id,
+  label: version.label,
+  deployUrl: version.deployUrl,
+  isActive: version.isActive,
+  createdAt: version.createdAt.toISOString(),
+  summary: getVersionSummary(version.label),
+}));
+
+function formatDate(iso: string) {
+  return new Intl.DateTimeFormat('en-CA', { dateStyle: 'long', timeStyle: 'short' }).format(
+    new Date(iso),
+  );
+}
+---
+
+{
+  selectedVersion ? (
+    <Layout title="Portfolio history" adminReview={true} showCommentMode={false}>
+      <VersionHistoryView
+        comments={clientComments}
+        versions={clientVersions}
+        selectedVersionId={selectedVersion.id}
+        frameBaseUrl={frameBaseUrl}
+        liveSiteUrl={liveSiteUrl}
+      />
+    </Layout>
+  ) : (
+    <Layout title="Portfolio history">
+      <Header />
+      <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-8 md:px-10 md:pt-12">
+        <h1 class="font-serif text-4xl font-normal tracking-tight md:text-5xl">Portfolio history</h1>
+        <p class="mt-4 max-w-2xl text-muted">
+          Browse past versions of this site and the feedback left on each one. Comments stay tied to
+          the version they were written on — open an archived version to see them in context.
+        </p>
+
+        {error ? (
+          <p class="mt-8 text-sm text-red-700">{error}</p>
+        ) : versions.length === 0 ? (
+          <p class="mt-8 text-sm text-muted">
+            No versions recorded yet. After you deploy, call the deploy hook to snapshot this
+            portfolio (see README).
+          </p>
+        ) : (
+          <ol class="mt-12 space-y-6">
+            {versions.map((version) => {
+              const summary = getVersionSummary(version.label);
+              return (
+                <li class="rounded-xl border border-line p-6 md:p-8">
+                  <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div class="min-w-0 space-y-2">
+                      <div class="flex flex-wrap items-center gap-3">
+                        <h2 class="font-serif text-2xl font-normal tracking-tight">{version.label}</h2>
+                        {version.isActive && (
+                          <span class="rounded-full bg-line px-2.5 py-0.5 text-xs font-medium text-ink">
+                            Live
+                          </span>
+                        )}
+                      </div>
+                      <p class="text-sm text-muted">{formatDate(version.createdAt.toISOString())}</p>
+                      {summary && <p class="max-w-2xl text-sm leading-relaxed">{summary}</p>}
+                      {version.gitSha && (
+                        <p class="font-mono text-xs text-muted">{version.gitSha.slice(0, 7)}</p>
+                      )}
+                    </div>
+                    <a
+                      href={`${base}history?version=${version.id}`}
+                      class="inline-flex shrink-0 items-center justify-center rounded-lg border border-ink px-4 py-2 text-sm font-medium transition hover:bg-ink hover:text-white"
+                    >
+                      View version →
+                    </a>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </main>
+      <SiteFooter />
+    </Layout>
+  )
+}

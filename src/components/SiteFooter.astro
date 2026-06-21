@@ -8,35 +8,36 @@ import { site } from '../data/site';
   >
     <div class="flex flex-wrap items-center gap-6 text-sm font-medium">
       {
-        site.email ? (
-          <button
-            type="button"
-            id="copy-email"
-            data-email={site.email}
-            class="cursor-pointer border-0 bg-transparent p-0 text-ink transition hover:opacity-70"
-          >
-            <span id="copy-email-label">Email</span>
-          </button>
-        ) : (
-          <span class="text-ink">Email</span>
-        )
+        site.footer.links.map((link) => {
+          if ('type' in link && link.type === 'email') {
+            return site.email ? (
+              <button
+                type="button"
+                id="copy-email"
+                data-email={site.email}
+                data-default-label={link.label}
+                class="cursor-pointer border-0 bg-transparent p-0 text-ink transition hover:opacity-70"
+              >
+                <span id="copy-email-label">{link.label}</span>
+              </button>
+            ) : (
+              <span class="text-ink">{link.label}</span>
+            );
+          }
+
+          const href = site.links[link.hrefKey];
+          return (
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="transition hover:opacity-70"
+            >
+              {link.label}
+            </a>
+          );
+        })
       }
-      <a
-        href={site.links.linkedin}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="transition hover:opacity-70"
-      >
-        Linkedin
-      </a>
-      <a
-        href={site.links.instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="transition hover:opacity-70"
-      >
-        Instagram
-      </a>
     </div>
     <p class="text-sm text-muted">{site.year} ® {site.name}</p>
   </div>
@@ -53,7 +54,7 @@ import { site } from '../data/site';
         await navigator.clipboard.writeText(email);
         label.textContent = 'Copied!';
         setTimeout(() => {
-          label.textContent = 'Email';
+        label.textContent = btn.getAttribute('data-default-label') ?? 'Email';
         }, 2000);
       } catch {
         window.location.href = `mailto:${email}`;

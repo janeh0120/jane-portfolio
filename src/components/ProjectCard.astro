@@ -1,6 +1,6 @@
 ---
 import type { Project } from '../data/site';
-import { parseProjectTags } from '../utils/tags';
+import { formatProjectTags, parseProjectTags } from '../utils/tags';
 
 interface Props {
   project: Project;
@@ -49,7 +49,7 @@ const commentId = project.slug
     )
   }
   <div class="mt-4 space-y-2">
-    <p class="text-sm text-muted">{project.tags}</p>
+    <p class="text-sm text-muted">{formatProjectTags(project.tags)}</p>
     {
       project.comingSoon ? (
         <h3 class="project-title text-ink">{project.title}</h3>

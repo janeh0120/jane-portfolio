@@ -14,6 +14,7 @@ function resolveHref(href: string) {
 function isActive(href: string) {
   if (href === '/about') return pathname.endsWith('/about');
   if (href === '/extra') return pathname.endsWith('/extra');
+  if (href === '/history') return pathname.endsWith('/history');
   if (href === '/#projects') {
     return pathname === '/' || pathname === root;
   }
@@ -32,7 +33,7 @@ function isActive(href: string) {
     >
       <span
         class="nav-logo-mark block h-7 w-7 shrink-0 bg-ink"
-        style={`mask: url('${base}images/my-logo.png') center / contain no-repeat; -webkit-mask: url('${base}images/my-logo.png') center / contain no-repeat;`}
+        style={`mask: url('${base}${site.logo}') center / contain no-repeat; -webkit-mask: url('${base}${site.logo}') center / contain no-repeat;`}
       ></span>
     </a>
     <nav class="main-nav flex items-center gap-5 md:gap-8" aria-label="Main" data-comment-id="main-nav">
