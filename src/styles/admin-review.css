@@ -22,6 +22,7 @@ body.admin-review-root {
   justify-content: space-between;
   gap: 16px;
   flex-shrink: 0;
+  flex-wrap: wrap;
   padding: 10px 16px;
   background: #f5f5f5;
   border-bottom: 1px solid #e8e8e8;
@@ -32,6 +33,8 @@ body.admin-review-root {
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
 }
 
 .admin-review-badge {
@@ -55,8 +58,9 @@ body.admin-review-root {
 }
 
 .admin-review-version-select {
-  min-width: 200px;
-  max-width: min(360px, 50vw);
+  min-width: 0;
+  width: 100%;
+  max-width: min(360px, 100%);
   padding: 7px 32px 7px 12px;
   font: inherit;
   font-size: 13px;
@@ -69,6 +73,14 @@ body.admin-review-root {
   appearance: none;
 }
 
+@media (min-width: 640px) {
+  .admin-review-version-select {
+    min-width: 200px;
+    width: auto;
+    max-width: min(360px, 50vw);
+  }
+}
+
 .admin-review-version-select:focus {
   outline: 2px solid var(--comment-accent-soft);
   border-color: var(--comment-accent);
@@ -77,7 +89,7 @@ body.admin-review-root {
 .admin-review-toolbar-meta {
   font-size: 12px;
   color: #666;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 body.admin-review-root .admin-review-shell {
@@ -100,9 +112,11 @@ body.admin-review-root .admin-review-canvas {
   background: #fff;
 }
 
-body.admin-review-root .comment-sidebar {
-  width: var(--comment-sidebar-width);
-  min-width: var(--comment-sidebar-width);
+@media (min-width: 901px) {
+  body.admin-review-root .comment-sidebar {
+    width: var(--comment-sidebar-width);
+    min-width: var(--comment-sidebar-width);
+  }
 }
 
 .comment-sidebar-card-meta {
@@ -115,4 +129,40 @@ body.admin-review-root .comment-sidebar {
 .comment-sidebar-card-upvote--readonly {
   cursor: default;
   opacity: 0.85;
+}
+
+@media (max-width: 900px) {
+  body.admin-review-root {
+    overflow: auto;
+  }
+
+  body.admin-review-root .admin-review-shell {
+    flex-direction: column;
+    height: auto;
+    min-height: calc(100vh - 49px);
+  }
+
+  body.admin-review-root .admin-review-canvas {
+    flex: 1 1 auto;
+    min-height: 50vh;
+    height: 50vh;
+  }
+
+  body.admin-review-root .comment-sidebar {
+    width: 100%;
+    min-width: 100%;
+    min-height: 0;
+    max-height: none;
+    flex: 0 0 auto;
+  }
+
+  body.admin-review-root .comment-sidebar-panel {
+    width: 100%;
+    min-height: 0;
+    max-height: 45vh;
+  }
+
+  .admin-review-toolbar {
+    align-items: flex-start;
+  }
 }

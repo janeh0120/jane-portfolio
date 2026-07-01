@@ -61,23 +61,35 @@ body.comment-sidebar-interacting.comment-mode-active .site-canvas * {
 }
 
 /* ── Mode toggle: header (view) or sidebar (comment) ── */
+.header-actions {
+  position: relative;
+}
+
 .comment-toggle-anchor {
-  position: absolute;
-  top: 50%;
-  right: 1.5rem;
+  position: relative;
   z-index: 2;
-  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
 }
 
 @media (min-width: 768px) {
   .comment-toggle-anchor {
+    position: absolute;
+    top: 50%;
     right: 2.5rem;
+    transform: translateY(-50%);
   }
 }
 
 body.comment-view-only header .main-nav {
   padding-right: calc(var(--comment-toggle-width) + var(--comment-toggle-gap));
   transition: padding-right 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 767px) {
+  body.comment-view-only header .main-nav {
+    padding-right: 0;
+  }
 }
 
 body.comment-view-comment header .main-nav {
@@ -135,6 +147,13 @@ body.comment-view-comment header .main-nav {
 .comment-view-toggle button svg {
   width: 16px;
   height: 16px;
+}
+
+@media (max-width: 767px) {
+  .comment-view-toggle button {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 /* ── Right sidebar (comment mode only) ── */
@@ -637,6 +656,24 @@ body.comment-mode-active [data-comment-ui] * {
   text-align: left;
 }
 
+.comment-popover-guidelines {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #666;
+}
+
+.comment-sidebar-card-error {
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 8px;
+}
+
 .comment-popover-status[hidden] {
   display: none;
 }
@@ -700,7 +737,7 @@ body.comment-mode-active [data-comment-ui] * {
     width: 100%;
     min-width: 100%;
     min-height: 0;
-    max-height: 40vh;
+    max-height: 55vh;
   }
 
   body.comment-view-only .comment-sidebar {
@@ -714,7 +751,22 @@ body.comment-mode-active [data-comment-ui] * {
   .comment-sidebar-panel {
     width: 100%;
     min-height: 0;
-    max-height: 40vh;
+    max-height: 55vh;
+  }
+}
+
+@media (max-width: 480px) {
+  body.comment-feedback-root {
+    --comment-shell-padding: 4px;
+  }
+
+  .site-shell {
+    padding: var(--comment-shell-padding);
+  }
+
+  .site-canvas {
+    min-height: calc(100vh - (var(--comment-shell-padding) * 2));
+    border-radius: 10px;
   }
 }
 

@@ -399,7 +399,7 @@
 
 @media (max-width: 768px) {
   .gallery-section {
-    padding: 88px 20px 160px;
+    padding: 88px 20px 180px;
   }
 
   .gallery-title {
@@ -408,7 +408,16 @@
   }
 
   .extra-hero {
-    padding: 100px 20px 160px;
+    padding: 100px 20px 180px;
+  }
+
+  .gallery-item {
+    min-width: 100%;
+    max-width: none;
+  }
+
+  .gallery-modal-description {
+    padding: 20px;
   }
 
   .extra-footer {

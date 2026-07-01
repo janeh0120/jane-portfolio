@@ -2,22 +2,26 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import AboutStory from '../components/about/AboutStory';
+import { aboutTimeline } from '../data/about-timeline';
 import { site } from '../data/site';
+
+const base = import.meta.env.BASE_URL;
 ---
 
-<Layout title={`About — ${site.title}`}>
+<Layout title={`About — ${site.title}`} description={site.description}>
   <Header />
-  <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-8 md:px-10 md:pt-12" data-comment-id="about-page">
-    <h1 class="max-w-3xl text-3xl font-medium tracking-tight text-ink md:text-4xl">
-      {site.about.heading}
-    </h1>
-    <div class="mt-10 max-w-3xl space-y-6">
-      {
-        site.about.paragraphs.map((paragraph) => (
-          <p class="text-base leading-relaxed text-ink md:text-lg">{paragraph}</p>
-        ))
-      }
-    </div>
+  <main class="about-story-page">
+    <AboutStory client:load content={aboutTimeline} base={base} name={site.name} />
   </main>
   <SiteFooter />
 </Layout>
+
+<style>
+  .about-story-page {
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 50% -10%, rgb(0 153 255 / 5%), transparent 45%),
+      var(--color-canvas);
+  }
+</style>

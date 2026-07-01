@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig, envField } from 'astro/config';
+import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -9,6 +10,7 @@ const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
 export default defineConfig({
   site: vercelUrl ?? 'http://localhost:4321',
   base: '/',
+  integrations: [react()],
   adapter: vercel(),
   env: {
     schema: {

@@ -5,7 +5,7 @@ import {
   updateCommentByVisitor,
   type CommentCategory,
 } from '../../../lib/comments';
-import { BLOCKED_CONTENT_MESSAGE, containsBlockedContent } from '../../../lib/content-filter';
+import { validateComment } from '../../../lib/comment-validation';
 import { checkRateLimit, getClientIp } from '../../../lib/rate-limit';
 
 export const prerender = false;
@@ -56,8 +56,9 @@ export const PATCH: APIRoute = async ({ params, request }) => {
       if (!comment || comment.length > MAX_COMMENT_LENGTH) {
         return json({ error: 'Comment is required (max 2000 characters).' }, 400);
       }
-      if (containsBlockedContent(comment)) {
-        return json({ error: BLOCKED_CONTENT_MESSAGE }, 400);
+      const validation = validateComment(comment);
+      if (!validation.ok) {
+        return json({ error: validation.message, code: validation.code }, 400);
       }
       patch.comment = comment;
     }

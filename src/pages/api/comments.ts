@@ -1,14 +1,17 @@
 import type { APIRoute } from 'astro';
 import { ADMIN_SECRET } from 'astro:env/server';
 import {
-  addUpvote,
   insertComment,
   listComments,
   listCommentsByVersion,
   listPublicComments,
   type CommentCategory,
 } from '../../lib/comments';
-import { BLOCKED_CONTENT_MESSAGE, containsBlockedContent } from '../../lib/content-filter';
+import { validateComment } from '../../lib/comment-validation';
+import {
+  checkCommentSubmission,
+  rateLimitedCommentMessage,
+} from '../../lib/comment-submission-guard';
 import { parseDeviceMeta } from '../../lib/device';
 import { checkRateLimit, getClientIp } from '../../lib/rate-limit';
 
@@ -32,9 +35,10 @@ function json(data: unknown, status = 200) {
 
 export const POST: APIRoute = async ({ request }) => {
   const ip = getClientIp(request);
-  const rate = checkRateLimit(`comment-post:${ip}`, 20, 60 * 60 * 1000);
-  if (!rate.ok) {
-    return json({ error: `Too many comments. Try again in ${rate.retryAfterSec}s.` }, 429);
+  const ipRate = checkRateLimit(`comment-post:${ip}`, 20, 60 * 60 * 1000);
+  if (!ipRate.ok) {
+    const { code, message } = rateLimitedCommentMessage(ipRate.retryAfterSec);
+    return json({ error: message, code }, 429);
   }
 
   try {
@@ -54,14 +58,46 @@ export const POST: APIRoute = async ({ request }) => {
     if (!comment || comment.length > MAX_COMMENT_LENGTH) {
       return json({ error: 'Comment is required (max 2000 characters).' }, 400);
     }
-    if (containsBlockedContent(comment)) {
-      return json({ error: BLOCKED_CONTENT_MESSAGE }, 400);
-    }
     if (!selector || selector.length > 500) {
       return json({ error: 'Invalid element selector.' }, 400);
     }
     if (!pageUrl) {
       return json({ error: 'Page URL is required.' }, 400);
+    }
+
+    if (visitorId) {
+      const visitorRate = checkRateLimit(
+        `comment-post:visitor:${visitorId}`,
+        15,
+        60 * 60 * 1000,
+      );
+      if (!visitorRate.ok) {
+        const { code, message } = rateLimitedCommentMessage(visitorRate.retryAfterSec);
+        return json({ error: message, code }, 429);
+      }
+    }
+
+    const validation = validateComment(comment);
+    if (!validation.ok) {
+      return json({ error: validation.message, code: validation.code }, 400);
+    }
+
+    const submission = checkCommentSubmission({
+      visitorId,
+      pageUrl,
+      selector,
+      comment,
+    });
+    if (!submission.ok) {
+      const status = submission.code === 'duplicate_submit' ? 400 : 429;
+      return json(
+        {
+          error: submission.message,
+          code: submission.code,
+          retryAfterSec: submission.retryAfterSec,
+        },
+        status,
+      );
     }
 
     const device = parseDeviceMeta(userAgent, viewportWidth || 0);

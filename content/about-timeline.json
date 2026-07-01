@@ -1,0 +1,115 @@
+{
+  "hero": {
+    "eyebrow": "About",
+    "headline": "Designing with intention, growing through craft.",
+    "intro": "I'm Jane — a product designer shaping thoughtful experiences at Intuit. What started in a family business became freelance work, hackathons, community leadership, and a practice grounded in systems, accessibility, and impact.",
+    "portraitAlt": "Portrait of Jane Hou",
+    "portraitImage": ""
+  },
+  "cta": {
+    "label": "Begin My Story",
+    "hint": "Jump to where it all started — then scroll up toward the present."
+  },
+  "milestones": [
+    {
+      "id": "intuit",
+      "year": "2026–Present",
+      "role": "Product Design Intern",
+      "organization": "Intuit · Design Systems",
+      "description": "I collaborate with designers and engineers to improve reusable components, accessibility, documentation, and workflows.",
+      "learned": "Designing at scale taught me how design systems create consistency across products.",
+      "image": "",
+      "imageAlt": "Intuit design systems work"
+    },
+    {
+      "id": "gwsk",
+      "year": "2025",
+      "role": "Design Intern",
+      "organization": "GWSK",
+      "description": "Worked on branding, websites, and visual design for clients while learning agency workflows and professional collaboration.",
+      "learned": "Studio work sharpened how I present ideas, iterate with clients, and ship polished visual design.",
+      "image": "",
+      "imageAlt": "GWSK design internship"
+    },
+    {
+      "id": "develop-for-good",
+      "year": "2025",
+      "role": "Product Designer",
+      "organization": "Develop for Good",
+      "description": "Designed for nonprofits alongside cross-functional teams and learned how UX can create meaningful social impact.",
+      "learned": "Impactful design balances empathy, constraints, and clarity for the people who need it most.",
+      "image": "",
+      "imageAlt": "Develop for Good project"
+    },
+    {
+      "id": "hackville",
+      "year": "2024–Present",
+      "role": "Co-President",
+      "organization": "Hackville",
+      "description": "Lead Canada's largest student-run hackathon across design, development, logistics, sponsorship, marketing, and operations.",
+      "learned": "Leading at scale means designing experiences for teams, not just screens.",
+      "image": "",
+      "imageAlt": "Hackville leadership"
+    },
+    {
+      "id": "hackathons",
+      "year": "2023–2024",
+      "role": "Hackathon Participant",
+      "organization": "",
+      "description": "Discovered product design through hackathons and learned rapid prototyping and collaboration.",
+      "learned": "Building under pressure taught me to move from idea to interface with speed and intention.",
+      "image": "",
+      "imageAlt": "Hackathon projects"
+    },
+    {
+      "id": "sheridan",
+      "year": "2023",
+      "role": "Interaction Design Student",
+      "organization": "Sheridan College",
+      "description": "Transitioned from graphic design into UX, accessibility, interaction design, and product thinking.",
+      "learned": "Formal training grounded my practice in research, craft, and designing for real people.",
+      "image": "",
+      "imageAlt": "Sheridan College interaction design"
+    },
+    {
+      "id": "design-club",
+      "year": "2021–2022",
+      "role": "Founder",
+      "organization": "Digital Design Club",
+      "description": "Started a club to introduce students to digital design through workshops and creative projects.",
+      "learned": "Building community taught me that design culture is something you create, not just consume.",
+      "image": "",
+      "imageAlt": "Digital Design Club"
+    },
+    {
+      "id": "fiverr",
+      "year": "2020–2022",
+      "role": "Freelance Designer",
+      "organization": "Fiverr",
+      "description": "Worked with small businesses on branding, presentations, and graphic design.",
+      "learned": "Client work early on built my eye for detail and confidence shipping real deliverables.",
+      "image": "",
+      "imageAlt": "Freelance design work"
+    },
+    {
+      "id": "beginning",
+      "year": "Beginning",
+      "role": "Family Business",
+      "organization": "",
+      "description": "My design journey began helping my family's business with social media, websites, and promotional materials, which sparked my passion for design.",
+      "learned": "Hands-on work showed me that design is a tool for connection — and I've been chasing that ever since.",
+      "image": "",
+      "imageAlt": "Family business beginnings"
+    }
+  ],
+  "next": {
+    "eyebrow": "Where to next?",
+    "headline": "See the work behind the journey.",
+    "description": "Explore case studies, side projects, and the experiments that shaped how I design today.",
+    "links": [
+      { "label": "View projects", "href": "/#projects" },
+      { "label": "Case studies", "href": "/des-sys" },
+      { "label": "Get in touch", "href": "mailto:janeh0120@gmail.com" }
+    ]
+  }
+}

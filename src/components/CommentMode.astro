@@ -77,6 +77,9 @@
           ↑
         </button>
       </div>
+      <p class="comment-popover-guidelines">
+        Keep feedback constructive. No profanity, spam, or off-topic promotion.
+      </p>
       <p class="comment-popover-status" id="comment-status" aria-live="polite" hidden></p>
     </div>
   </div>
@@ -89,6 +92,7 @@
     getStableSelector,
     isSelectableElement,
   } from '../utils/element-selector';
+  import { validateComment } from '../lib/comment-validation';
 
   const CATEGORIES = [
     { id: '', label: 'No category' },
@@ -197,6 +201,8 @@
   let activeCardId: string | null = null;
   let previewCardId: string | null = null;
   let editingCommentId: string | null = null;
+  let editCommentErrorId: string | null = null;
+  let editCommentErrorMessage = '';
   let pinnedTarget: HTMLElement | null = null;
   let sidebarInteracting = false;
 
@@ -585,7 +591,19 @@
 
     if (next === entry.comment) {
       editingCommentId = null;
+      editCommentErrorId = null;
+      editCommentErrorMessage = '';
       setSidebarInteracting(false);
+      renderSidebar();
+      return;
+    }
+
+    const validation = validateComment(next);
+    if (!validation.ok) {
+      editCommentErrorId = id;
+      editCommentErrorMessage = validation.message;
+      editingCommentId = id;
+      setSidebarInteracting(true);
       renderSidebar();
       return;
     }
@@ -599,18 +617,24 @@
       if (global) global.comment = next;
 
       editingCommentId = null;
+      editCommentErrorId = null;
+      editCommentErrorMessage = '';
       setSidebarInteracting(false);
       renderSidebar();
     } catch (error) {
+      editCommentErrorId = id;
+      editCommentErrorMessage =
+        error instanceof Error ? error.message : 'Could not update comment.';
       editingCommentId = id;
       setSidebarInteracting(true);
       renderSidebar();
-      window.alert(error instanceof Error ? error.message : 'Could not update comment.');
     }
   }
 
   function cancelCommentTextEdit() {
     editingCommentId = null;
+    editCommentErrorId = null;
+    editCommentErrorMessage = '';
     setSidebarInteracting(false);
     renderSidebar();
   }
@@ -781,6 +805,12 @@
         textarea.maxLength = 2000;
         textarea.rows = 3;
         textarea.addEventListener('click', (event) => event.stopPropagation());
+        textarea.addEventListener('input', () => {
+          if (editCommentErrorId === item.id) {
+            editCommentErrorId = null;
+            editCommentErrorMessage = '';
+          }
+        });
         textarea.addEventListener('keydown', (event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
@@ -795,6 +825,12 @@
           void finishCommentTextEdit(item.id, textarea.value);
         });
         card.appendChild(textarea);
+        if (editCommentErrorId === item.id && editCommentErrorMessage) {
+          const error = document.createElement('p');
+          error.className = 'comment-sidebar-card-error';
+          error.textContent = editCommentErrorMessage;
+          card.appendChild(error);
+        }
         window.requestAnimationFrame(() => {
           textarea.focus();
           textarea.setSelectionRange(textarea.value.length, textarea.value.length);
@@ -1084,6 +1120,12 @@
     const comment = commentText.value.trim();
     if (!comment) {
       setStatus('Write a comment first', 'error');
+      return;
+    }
+
+    const validation = validateComment(comment);
+    if (!validation.ok) {
+      setStatus(validation.message, 'error');
       return;
     }
 

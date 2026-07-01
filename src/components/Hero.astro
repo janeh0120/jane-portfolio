@@ -9,17 +9,46 @@ const [products, branding, community] = site.hero.filters;
     {site.hero.intro}
     <em class="hero-emphasis">{site.hero.role}</em>
     {site.hero.middle}
-    <button type="button" class="hero-filter" data-filter={products.tag} aria-pressed="false">
-      {products.label}
-    </button>,{' '}
-    <button type="button" class="hero-filter" data-filter={branding.tag} aria-pressed="false">
-      {branding.label}
-    </button>, and{' '}
-    <button type="button" class="hero-filter" data-filter={community.tag} aria-pressed="false">
-      {community.label}
-    </button>
+    <span class="hero-filter-inline hidden md:inline">
+      <button type="button" class="hero-filter" data-filter={products.tag} aria-pressed="false">
+        {products.label}
+      </button>,{' '}
+      <button type="button" class="hero-filter" data-filter={branding.tag} aria-pressed="false">
+        {branding.label}
+      </button>, and{' '}
+      <button type="button" class="hero-filter" data-filter={community.tag} aria-pressed="false">
+        {community.label}
+      </button>
+    </span>
     {site.hero.outro}
   </p>
+
+  <div class="hero-filters-mobile mt-4 flex flex-wrap gap-2 md:hidden" aria-label="Filter projects">
+    <button
+      type="button"
+      class="hero-filter hero-filter--chip"
+      data-filter={products.tag}
+      aria-pressed="false"
+    >
+      {products.label}
+    </button>
+    <button
+      type="button"
+      class="hero-filter hero-filter--chip"
+      data-filter={branding.tag}
+      aria-pressed="false"
+    >
+      {branding.label}
+    </button>
+    <button
+      type="button"
+      class="hero-filter hero-filter--chip"
+      data-filter={community.tag}
+      aria-pressed="false"
+    >
+      {community.label}
+    </button>
+  </div>
 </section>
 
 <style>
@@ -42,11 +71,32 @@ const [products, branding, community] = site.hero.filters;
       text-decoration-color 0.2s ease;
   }
 
+  .hero-filter--chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    color: var(--color-ink);
+    background: var(--color-canvas);
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+  }
+
   .hero-filter:hover {
     opacity: 0.7;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.12em;
+  }
+
+  .hero-filter--chip:hover {
+    opacity: 1;
+    text-decoration: none;
+    background: var(--color-line);
   }
 
   .hero-filter.is-active {
@@ -56,8 +106,20 @@ const [products, branding, community] = site.hero.filters;
     text-underline-offset: 0.12em;
   }
 
+  .hero-filter--chip.is-active {
+    text-decoration: none;
+    background: var(--color-ink);
+    color: #fff;
+    border-color: var(--color-ink);
+  }
+
   .hero-filter.is-dimmed {
     opacity: 0.35;
+  }
+
+  .hero-filter--chip.is-dimmed {
+    opacity: 1;
+    color: var(--color-muted);
   }
 
   .hero-filter.is-dimmed:hover {
@@ -65,5 +127,11 @@ const [products, branding, community] = site.hero.filters;
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 0.12em;
+  }
+
+  .hero-filter--chip.is-dimmed:hover {
+    opacity: 1;
+    text-decoration: none;
+    color: var(--color-ink);
   }
 </style>

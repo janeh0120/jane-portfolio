@@ -20,6 +20,12 @@ const nav = [
   timeline="8 hours"
   projectType="Product Design"
   nav={nav}
+  heroImage={{
+    src: img('solution-hero-laptop.png'),
+    alt: 'Applicant data table with ratings and review status on a laptop mockup',
+    caption: 'Table view with key applicant columns',
+    wide: true,
+  }}
 >
   <section id="overview" data-comment-id="designchall-overview">
     <h3>Context</h3>
@@ -65,12 +71,6 @@ const nav = [
     <p class="lead">
       Key information on the table view with a side panel for details about the applicant.
     </p>
-    <CaseStudyFigure
-      src={img('solution-hero-laptop.png')}
-      alt="Applicant data table with ratings and review status on a laptop mockup"
-      caption="Table view with key applicant columns"
-      wide
-    />
     <CaseStudyFigure
       src={img('solution-table-panel.png')}
       alt="Applicant table with side panel showing John Jacob's review details"
