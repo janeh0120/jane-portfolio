@@ -2,8 +2,6 @@ export type CommentValidationCode =
   | 'too_short'
   | 'inappropriate_language'
   | 'too_many_links'
-  | 'emoji_only'
-  | 'too_many_emojis'
   | 'repeated_chars'
   | 'shouting'
   | 'promo_spam';
@@ -17,8 +15,6 @@ export const VALIDATION_MESSAGES: Record<CommentValidationCode, string> = {
   inappropriate_language:
     'Please keep feedback respectful — remove inappropriate language and try again.',
   too_many_links: 'Too many links — max 3 per comment.',
-  emoji_only: "Add some words — emoji-only comments aren't allowed.",
-  too_many_emojis: 'Too many emojis — use text for your feedback.',
   repeated_chars: 'Ease up on repeated characters.',
   shouting: 'Most of your comment is uppercase — normal casing reads easier.',
   promo_spam: "Promotional or off-topic content isn't allowed here.",
@@ -29,8 +25,6 @@ export const BLOCKED_CONTENT_MESSAGE = VALIDATION_MESSAGES.inappropriate_languag
 
 const MIN_COMMENT_LENGTH = 3;
 const MAX_LINKS = 3;
-const MAX_EMOJI_COUNT = 25;
-const MAX_EMOJI_RATIO = 0.6;
 const SHOUTING_MIN_LENGTH = 30;
 const SHOUTING_UPPER_RATIO = 0.85;
 const REPEATED_CHAR_THRESHOLD = 8;
@@ -143,11 +137,6 @@ function countEmojis(text: string): number {
   return text.match(EMOJI_RE)?.length ?? 0;
 }
 
-function isEmojiOnly(text: string): boolean {
-  const withoutEmoji = text.replace(EMOJI_RE, '').replace(/[\s\p{P}\p{S}]/gu, '');
-  return withoutEmoji.length === 0 && countEmojis(text) > 0;
-}
-
 function isShouting(text: string): boolean {
   if (text.length <= SHOUTING_MIN_LENGTH) return false;
 
@@ -167,7 +156,12 @@ function containsPromoSpam(text: string): boolean {
 export function validateComment(text: string): CommentValidationResult {
   const trimmed = text.trim();
 
-  if (trimmed.replace(/\s/g, '').length < MIN_COMMENT_LENGTH) {
+  if (!trimmed) {
+    return fail('too_short');
+  }
+
+  const hasEmoji = countEmojis(trimmed) > 0;
+  if (!hasEmoji && trimmed.replace(/\s/g, '').length < MIN_COMMENT_LENGTH) {
     return fail('too_short');
   }
 
@@ -181,20 +175,6 @@ export function validateComment(text: string): CommentValidationResult {
 
   if (countUrls(trimmed) > MAX_LINKS) {
     return fail('too_many_links');
-  }
-
-  if (isEmojiOnly(trimmed)) {
-    return fail('emoji_only');
-  }
-
-  const emojiCount = countEmojis(trimmed);
-  if (emojiCount > MAX_EMOJI_COUNT) {
-    return fail('too_many_emojis');
-  }
-
-  const meaningfulLength = trimmed.replace(/\s/g, '').length;
-  if (meaningfulLength > 0 && emojiCount / meaningfulLength > MAX_EMOJI_RATIO) {
-    return fail('too_many_emojis');
   }
 
   if (isShouting(trimmed)) {

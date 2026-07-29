@@ -1,0 +1,106 @@
+---
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+
+const nav = [
+  { label: 'Project Context', href: '#context' },
+  { label: 'Opportunity', href: '#opportunity' },
+  { label: 'Solution', href: '#relationships' },
+  { label: 'Process', href: '#structure' },
+  { label: 'Takeaway', href: '#takeaway' },
+];
+---
+
+<CaseStudyLayout
+  title="Migration Dashboard"
+  heading="Designing a self-service migration experience"
+  role="Product Designer"
+  team="1 Product Manager, 3 Developers"
+  timeline="March 2026-Present"
+  projectType="Product Design"
+  nav={nav}
+  commentId="case-study-migration"
+>
+  <section id="context" data-comment-id="migration-context">
+    <p class="lead">
+      Helping teams independently configure complex migration projects through a clearer and more
+      scalable workflow.
+    </p>
+
+    <h3>Project Context</h3>
+    <p class="lead">
+      The Migration Dashboard is an enterprise platform that helps teams configure and manage
+      migration projects.
+    </p>
+    <p class="lead">
+      Originally created for design system migrations, the platform is designed to scale across
+      different migration use cases and teams. As adoption grows, enabling users to independently
+      create projects becomes essential to reducing reliance on specialized support.
+    </p>
+  </section>
+
+  <section id="opportunity" data-comment-id="migration-opportunity">
+    <h3>Defining the Opportunity</h3>
+    <p class="lead">
+      I was tasked with improving the self-service experience for engineers configuring migration
+      projects, but without a defined user problem or formal PRD.
+    </p>
+    <p class="lead">
+      Through user conversations and workflow exploration, I identified a key challenge:
+    </p>
+    <p class="lead">
+      Users struggled to understand how configuration decisions connected and how each choice
+      influenced the overall migration project.
+    </p>
+    <p class="lead">
+      Opportunity: How might we provide the right context at the right moment to help users
+      confidently navigate complex workflows?
+    </p>
+  </section>
+
+  <section id="relationships" data-comment-id="migration-relationships">
+    <h3>Making Complex Relationships Clearer</h3>
+    <p class="lead">
+      Users struggled to understand how Rules, Agents, and Candidate Selection worked together to
+      define a migration project.
+    </p>
+    <p class="lead">
+      I explored different approaches to make these relationships more visible, including combining
+      related steps into a single view.
+    </p>
+    <p class="lead">
+      However, testing revealed that showing everything at once increased cognitive load.
+    </p>
+    <p class="lead">
+      Final direction: Maintained the progressive step flow while introducing clearer relationships
+      between decisions through content, information architecture, and interaction design.
+    </p>
+  </section>
+
+  <section id="structure" data-comment-id="migration-structure">
+    <h3>Creating Structure in Ambiguity</h3>
+    <p class="lead">I established a lightweight design process to move the project forward:</p>
+    <ul class="case-study-list">
+      <li>Audited the existing experience to identify usability gaps</li>
+      <li>Conducted user conversations to understand workflows and pain points</li>
+      <li>Defined design priorities based on user needs</li>
+      <li>Iterated through concepts with users and cross-functional partners</li>
+    </ul>
+    <p class="lead">
+      The initial experience was rapidly prototyped using AI-assisted workflows. I used AI tools to
+      accelerate exploration and prototyping, while relying on research, accessibility principles,
+      and design judgment to guide decisions.
+    </p>
+  </section>
+
+  <section id="takeaway" data-comment-id="migration-takeaway">
+    <h3>Takeaway</h3>
+    <p class="lead">
+      Designing complex workflows is not about removing complexity—it is about helping users
+      understand it at the moments where it matters.
+    </p>
+    <p class="lead">
+      This project strengthened my ability to define ambiguous problems, create structure without a
+      fixed roadmap, and make intentional design decisions in evolving technical environments.
+    </p>
+  </section>
+</CaseStudyLayout>

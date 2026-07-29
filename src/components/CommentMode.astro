@@ -1,28 +1,12 @@
 <div data-comment-ui>
-  <div class="comment-view-toggle" role="group" aria-label="Site view mode">
-    <button
-      type="button"
-      id="comment-view-only-btn"
-      class="is-active"
-      aria-pressed="true"
-      aria-label="View only"
-    >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
-        <circle cx="12" cy="12" r="3" />
-      </svg>
-    </button>
-    <button
-      type="button"
-      id="comment-comment-btn"
-      aria-pressed="false"
-      aria-label="Comment mode"
-    >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5Z" />
-      </svg>
-    </button>
-  </div>
+  <button
+    type="button"
+    class="comment-mode-toggle"
+    id="comment-mode-toggle"
+    aria-pressed="false"
+  >
+    Leave feedback
+  </button>
 
   <aside class="comment-sidebar" id="comment-sidebar" data-comment-ui aria-label="Comments">
     <div class="comment-sidebar-panel">
@@ -31,7 +15,8 @@
           <span class="comment-sidebar-title">Comments</span>
           <div id="comment-sidebar-toggle-anchor" class="comment-sidebar-toggle-anchor" data-comment-ui></div>
         </div>
-        <div class="comment-sidebar-tabs" role="tablist" aria-label="Comment list">
+        <!-- Public "All" comments UI — re-enable via PUBLIC_COMMENTS_ENABLED in the script below -->
+        <div class="comment-sidebar-tabs" id="comment-sidebar-tabs" role="tablist" aria-label="Comment list" hidden>
           <button
             type="button"
             id="comment-scope-mine"
@@ -61,11 +46,11 @@
   <div class="comment-mode-highlight" id="comment-highlight" hidden></div>
 
   <div class="comment-popover" id="comment-popover" hidden data-comment-ui>
-    <div class="comment-popover-card">
-      <p class="comment-popover-target" id="comment-target-label"></p>
+      <div class="comment-popover-card">
       <div class="comment-popover-category-wrap">
         <select id="comment-category-select" class="comment-popover-category-select" aria-label="Comment category"></select>
       </div>
+      <p class="comment-popover-target" id="comment-target-label"></p>
       <div class="comment-popover-input-row" id="comment-popover-field">
         <textarea
           id="comment-text"
@@ -77,9 +62,6 @@
           ↑
         </button>
       </div>
-      <p class="comment-popover-guidelines">
-        Keep feedback constructive. No profanity, spam, or off-topic promotion.
-      </p>
       <p class="comment-popover-status" id="comment-status" aria-live="polite" hidden></p>
     </div>
   </div>
@@ -133,6 +115,8 @@
   const UPVOTED_KEY = 'portfolio-upvoted-comments';
   const SINGLE_LINE_HEIGHT = 32;
   const POPOVER_WIDTH = 360;
+  /** Set true to show Mine/All tabs and let visitors browse public comments. */
+  const PUBLIC_COMMENTS_ENABLED = false;
 
   const configuredApi = import.meta.env.PUBLIC_COMMENT_API_URL ?? '';
   const siteBase = import.meta.env.BASE_URL;
@@ -170,8 +154,7 @@
     }
   }
 
-  const viewOnlyBtn = document.getElementById('comment-view-only-btn');
-  const commentBtn = document.getElementById('comment-comment-btn');
+  const modeToggleBtn = document.getElementById('comment-mode-toggle');
   const sidebar = document.getElementById('comment-sidebar');
   const sidebarList = document.getElementById('comment-sidebar-list');
   const highlight = document.getElementById('comment-highlight');
@@ -184,7 +167,9 @@
   const targetLabelEl = document.getElementById('comment-target-label');
   const scopeMineBtn = document.getElementById('comment-scope-mine');
   const scopeAllBtn = document.getElementById('comment-scope-all');
+  const scopeTabs = document.getElementById('comment-sidebar-tabs');
   const siteShell = document.getElementById('site-shell');
+  const siteCanvas = document.getElementById('site-canvas');
 
   let mode: 'view' | 'comment' = 'view';
   let sidebarScope: 'mine' | 'all' = 'mine';
@@ -205,6 +190,17 @@
   let editCommentErrorMessage = '';
   let pinnedTarget: HTMLElement | null = null;
   let sidebarInteracting = false;
+
+  if (PUBLIC_COMMENTS_ENABLED) {
+    scopeTabs?.removeAttribute('hidden');
+  } else {
+    scopeTabs?.setAttribute('hidden', '');
+    sidebarScope = 'mine';
+  }
+
+  function getPageScrollY(): number {
+    return siteCanvas?.scrollTop ?? window.scrollY;
+  }
 
   function setSidebarInteracting(next: boolean) {
     sidebarInteracting = next;
@@ -310,6 +306,8 @@
   }
 
   function setSidebarScope(next: 'mine' | 'all') {
+    if (!PUBLIC_COMMENTS_ENABLED && next === 'all') return;
+
     sidebarScope = next;
     scopeMineBtn?.classList.toggle('is-active', next === 'mine');
     scopeAllBtn?.classList.toggle('is-active', next === 'all');
@@ -476,10 +474,8 @@
     commentText.style.height = 'auto';
     const scrollHeight = commentText.scrollHeight;
     const nextHeight = Math.min(Math.max(SINGLE_LINE_HEIGHT, scrollHeight), 120);
-    const isWrapped = scrollHeight > SINGLE_LINE_HEIGHT + 2;
 
     commentText.style.height = `${nextHeight}px`;
-    popoverField?.classList.toggle('is-wrapped', isWrapped);
 
     if (composing) positionPopover();
   }
@@ -891,21 +887,38 @@
     setStatus('');
   }
 
+  const CLOSE_ICON = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+
+  function updateModeToggle(next: 'view' | 'comment') {
+    if (!modeToggleBtn) return;
+
+    const isComment = next === 'comment';
+    modeToggleBtn.setAttribute('aria-pressed', String(isComment));
+    modeToggleBtn.classList.toggle('is-icon', isComment);
+
+    if (isComment) {
+      modeToggleBtn.setAttribute('aria-label', 'Exit feedback');
+      modeToggleBtn.title = 'Exit feedback';
+      modeToggleBtn.innerHTML = CLOSE_ICON;
+    } else {
+      modeToggleBtn.removeAttribute('aria-label');
+      modeToggleBtn.removeAttribute('title');
+      modeToggleBtn.textContent = 'Leave feedback';
+    }
+  }
+
   function setMode(next: 'view' | 'comment', options: { animate?: boolean } = {}) {
     const { animate = true } = options;
-    const toggle = document.querySelector('.comment-view-toggle') as HTMLElement | null;
+    const toggle = modeToggleBtn;
     const fromRect =
       animate && toggle && toggle.isConnected ? toggle.getBoundingClientRect() : undefined;
+    const preservedScroll = getPageScrollY();
 
     mode = next;
     document.body.classList.toggle('comment-view-only', next === 'view');
     document.body.classList.toggle('comment-view-comment', next === 'comment');
     document.body.classList.toggle('comment-mode-active', next === 'comment');
-
-    viewOnlyBtn?.classList.toggle('is-active', next === 'view');
-    commentBtn?.classList.toggle('is-active', next === 'comment');
-    viewOnlyBtn?.setAttribute('aria-pressed', String(next === 'view'));
-    commentBtn?.setAttribute('aria-pressed', String(next === 'comment'));
+    updateModeToggle(next);
 
     if (next === 'view') {
       hoveredElement = null;
@@ -920,6 +933,7 @@
     }
 
     window.requestAnimationFrame(() => {
+      if (siteCanvas) siteCanvas.scrollTop = preservedScroll;
       placeToggle(next === 'view' ? 'header' : 'sidebar', fromRect);
     });
   }
@@ -931,12 +945,29 @@
     highlight?.style.removeProperty('pointer-events');
     popover?.style.removeProperty('pointer-events');
 
+    if (!(raw instanceof Element)) return null;
+    if (raw.closest('[data-comment-ui]')) return null;
+    if (sidebar?.contains(raw)) return null;
+    if (siteCanvas && (raw === siteCanvas || !siteCanvas.contains(raw))) return null;
+
     let current: Element | null = raw;
     while (current) {
+      if (current === siteCanvas) break;
       if (isSelectableElement(current)) return current;
       current = current.parentElement;
     }
     return null;
+  }
+
+  function clearHoverHighlight() {
+    hoveredElement = null;
+    if (!activeCardId && !composing && !previewCardId) hideHighlight();
+  }
+
+  function isCommentUiTarget(target: EventTarget | null): boolean {
+    return target instanceof Element && Boolean(
+      target.closest('[data-comment-ui]') || (sidebar && sidebar.contains(target)),
+    );
   }
 
   function addSessionComment(serverId: string, comment: string) {
@@ -959,7 +990,7 @@
   }
 
   function placeToggle(location: 'header' | 'sidebar', fromRect?: DOMRect) {
-    const toggle = document.querySelector('.comment-view-toggle') as HTMLElement | null;
+    const toggle = modeToggleBtn;
     const anchor =
       location === 'sidebar'
         ? document.getElementById('comment-sidebar-toggle-anchor')
@@ -1002,12 +1033,18 @@
     window.setTimeout(cleanup, 400);
   }
 
-  viewOnlyBtn?.addEventListener('click', () => setMode('view'));
-  commentBtn?.addEventListener('click', () => setMode('comment'));
-  scopeMineBtn?.addEventListener('click', () => setSidebarScope('mine'));
-  scopeAllBtn?.addEventListener('click', () => setSidebarScope('all'));
+  modeToggleBtn?.addEventListener('click', () => {
+    setMode(mode === 'comment' ? 'view' : 'comment');
+  });
+  if (PUBLIC_COMMENTS_ENABLED) {
+    scopeMineBtn?.addEventListener('click', () => setSidebarScope('mine'));
+    scopeAllBtn?.addEventListener('click', () => setSidebarScope('all'));
+  }
 
-  sidebar?.addEventListener('mouseenter', () => setSidebarInteracting(true));
+  sidebar?.addEventListener('mouseenter', () => {
+    setSidebarInteracting(true);
+    clearHoverHighlight();
+  });
   sidebar?.addEventListener('mouseleave', () => {
     if (!editingCommentId) setSidebarInteracting(false);
   });
@@ -1022,7 +1059,13 @@
   document.addEventListener(
     'mousemove',
     (event) => {
+      if (mode !== 'comment' || composing || editingCommentId) return;
+      if (isCommentUiTarget(event.target) || sidebarInteracting) {
+        clearHoverHighlight();
+        return;
+      }
       if (!canSelectOnCanvas()) return;
+
       const element = elementUnderPointer(event);
       if (element === hoveredElement) return;
       hoveredElement = element;
@@ -1036,7 +1079,7 @@
     'click',
     (event) => {
       if (!canSelectOnCanvas()) return;
-      if (event.target instanceof Element && event.target.closest('[data-comment-ui]')) return;
+      if (isCommentUiTarget(event.target)) return;
 
       const element = elementUnderPointer(event);
       if (!element) return;
@@ -1053,7 +1096,7 @@
     'mousedown',
     (event) => {
       if (!composing) return;
-      if (event.target instanceof Element && event.target.closest('[data-comment-ui]')) return;
+      if (isCommentUiTarget(event.target)) return;
       if (selectedElement?.contains(event.target as Node)) return;
       closeComposer();
     },
@@ -1098,6 +1141,18 @@
     },
     true,
   );
+
+  siteCanvas?.addEventListener('scroll', () => {
+    if (composing && selectedElement) {
+      positionHighlight(selectedElement, { pinned: true });
+      positionPopover();
+    } else if (activeCardId) {
+      updatePinnedHighlight();
+    } else if (previewCardId) {
+      const item = sessionComments.find((entry) => entry.id === previewCardId);
+      if (item) previewCommentTarget(item);
+    }
+  });
 
   window.addEventListener('resize', () => {
     if (composing && selectedElement) {
@@ -1144,7 +1199,7 @@
           category: selectedCategory,
           pageUrl: window.location.href.split('#')[0],
           viewportWidth: window.innerWidth,
-          scrollY: window.scrollY,
+          scrollY: getPageScrollY(),
           visitorId: getVisitorId(),
         }),
       });

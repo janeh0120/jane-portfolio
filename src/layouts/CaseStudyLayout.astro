@@ -99,7 +99,7 @@ const home = base;
           </div>
         </dl>
 
-        <div class="case-study-content mt-14 space-y-16">
+        <div class="case-study-content mt-14">
           <slot />
         </div>
       </article>
@@ -169,6 +169,18 @@ const home = base;
     margin: 0;
   }
 
+  .case-study-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .case-study-content {
+      gap: 7rem;
+    }
+  }
+
   .case-study-content :global(h2) {
     font-size: 1.5rem;
     font-weight: 500;
@@ -185,11 +197,20 @@ const home = base;
     text-transform: lowercase;
   }
 
+  /* Keep heading + body as one unit; separate each unit clearly */
+  .case-study-content :global(h3:not(:first-child)) {
+    margin-top: 2.75rem;
+  }
+
   .case-study-content :global(p) {
     font-size: 1.125rem;
     line-height: 1.6;
     color: var(--color-ink);
     margin: 0;
+  }
+
+  .case-study-content :global(p + p) {
+    margin-top: 0.875rem;
   }
 
   .case-study-content :global(section) {
@@ -218,7 +239,7 @@ const home = base;
   .case-study-content :global(ol) {
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin: 0.875rem 0 0;
     display: grid;
     gap: 2rem;
   }
@@ -308,5 +329,20 @@ const home = base;
     font-size: 1rem;
     line-height: 1.6;
     color: var(--color-ink);
+  }
+
+  .case-study-content :global(ol.case-study-list) {
+    list-style: decimal;
+    display: block;
+    gap: unset;
+    margin: 0.75rem 0 0;
+    padding-left: 1.25rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+  }
+
+  .case-study-content :global(ol.case-study-list li + li) {
+    margin-top: 0.35rem;
   }
 </style>

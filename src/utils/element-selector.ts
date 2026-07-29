@@ -33,14 +33,39 @@ const SELECTABLE_TAGS = new Set([
   'FIGURE',
 ]);
 
+const PAGE_CHROME_IDS = new Set(['site-shell', 'site-canvas']);
+
+function isPageChrome(element: HTMLElement): boolean {
+  if (PAGE_CHROME_IDS.has(element.id)) return true;
+  if (element.classList.contains('site-shell')) return true;
+  if (element.classList.contains('site-canvas')) return true;
+  return false;
+}
+
+function isInsideSiteCanvas(element: HTMLElement): boolean {
+  const canvas = document.getElementById('site-canvas');
+  if (!canvas) return true;
+  return canvas.contains(element) && element !== canvas;
+}
+
+function isPageSized(rect: DOMRect): boolean {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  return rect.width >= vw * 0.85 && rect.height >= vh * 0.7;
+}
+
 export function isSelectableElement(element: Element | null): element is HTMLElement {
   if (!element || !(element instanceof HTMLElement)) return false;
   if (IGNORED_TAGS.has(element.tagName)) return false;
+  if (isPageChrome(element)) return false;
   if (element.closest('[data-comment-ui]')) return false;
+  if (!isInsideSiteCanvas(element)) return false;
   if (!SELECTABLE_TAGS.has(element.tagName)) return false;
 
   const rect = element.getBoundingClientRect();
-  return rect.width >= 24 && rect.height >= 16;
+  if (rect.width < 24 || rect.height < 16) return false;
+  if (isPageSized(rect)) return false;
+  return true;
 }
 
 function snippet(text: string, max = 60): string {
