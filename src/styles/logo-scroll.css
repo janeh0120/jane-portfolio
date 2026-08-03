@@ -1,0 +1,108 @@
+/* Homepage logo intro — autoplay reel, then settle into header */
+
+body.logo-intro-active .site-header {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.logo-intro-settling .site-header,
+body.logo-intro-complete .site-header {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.55s ease;
+}
+
+body.logo-intro-active .nav-logo-mark {
+  opacity: 0;
+}
+
+body.logo-intro-complete .nav-logo-mark {
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+body.logo-intro-active .home-intro-content {
+  transform: translate3d(0, 100%, 0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.logo-intro-settling .home-intro-content,
+body.logo-intro-complete .home-intro-content {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.home-intro-content {
+  transition:
+    transform 1.15s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.7s ease;
+  will-change: transform, opacity;
+}
+
+.logo-intro-morph {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 60;
+  width: min(42vw, 42vh, 260px);
+  height: min(42vw, 42vh, 260px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  will-change: width, height, top, left, opacity;
+}
+
+.logo-intro-morph.is-complete {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.logo-intro-frame {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.logo-intro-frame.is-active {
+  opacity: 1;
+}
+
+.logo-intro-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: clamp(4px, 18%, 28px);
+}
+
+.logo-intro-frame.is-mark img {
+  object-fit: contain;
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-intro-morph {
+    display: none !important;
+  }
+
+  body.logo-intro-active .site-header,
+  body.logo-intro-settling .site-header,
+  body.logo-intro-complete .site-header,
+  body.logo-intro-active .nav-logo-mark,
+  body.logo-intro-complete .nav-logo-mark,
+  body.logo-intro-active .home-intro-content,
+  body.logo-intro-settling .home-intro-content,
+  body.logo-intro-complete .home-intro-content {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .home-intro-content {
+    transition: none;
+  }
+}

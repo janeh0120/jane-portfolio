@@ -34,30 +34,33 @@ const linkClass = (href: string) =>
   <div
     class="relative mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-6 py-5 md:px-10"
   >
-    <a
-      href={base}
-      class="nav-logo inline-flex shrink-0 items-center transition hover:opacity-70"
-      aria-label={`${site.name} home`}
-    >
-      <span
-        class="nav-logo-mark block h-7 w-7 shrink-0 bg-ink"
-        style={`mask: url('${base}${site.logo}') center / contain no-repeat; -webkit-mask: url('${base}${site.logo}') center / contain no-repeat;`}
-      ></span>
-    </a>
+    <div class="flex min-w-0 items-center gap-5 md:gap-8">
+      <a
+        href={base}
+        class="nav-logo inline-flex shrink-0 items-center transition hover:opacity-70"
+        aria-label={`${site.name} home`}
+      >
+        <span
+          class="nav-logo-mark block h-7 w-7 shrink-0 bg-ink"
+          data-logo-target
+          style={`mask: url('${base}${site.logo}') center / contain no-repeat; -webkit-mask: url('${base}${site.logo}') center / contain no-repeat;`}
+        ></span>
+      </a>
 
-    <nav
-      class="main-nav hidden items-center gap-5 md:flex md:gap-8"
-      aria-label="Main"
-      data-comment-id="main-nav"
-    >
-      {
-        site.nav.map((item) => (
-          <a href={resolveHref(item.href)} class={linkClass(item.href)}>
-            {item.label}
-          </a>
-        ))
-      }
-    </nav>
+      <nav
+        class="main-nav hidden items-center gap-5 md:flex md:gap-8"
+        aria-label="Main"
+        data-comment-id="main-nav"
+      >
+        {
+          site.nav.map((item) => (
+            <a href={resolveHref(item.href)} class={linkClass(item.href)}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
 
     <div class="header-actions flex shrink-0 items-center gap-2">
       <div id="comment-toggle-anchor" class="comment-toggle-anchor" data-comment-ui></div>

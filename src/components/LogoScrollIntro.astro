@@ -1,0 +1,136 @@
+---
+import { site } from '../data/site';
+import '../styles/logo-scroll.css';
+
+const base = import.meta.env.BASE_URL;
+const startEndSrc = `${base}${site.logoScroll?.startEnd ?? site.logo}`;
+const midImages = (site.logoScroll?.images ?? []).slice(0, 6);
+const frames = [startEndSrc, ...midImages.map((src) => `${base}${src}`), startEndSrc];
+---
+
+{
+  midImages.length > 0 && (
+    <div class="logo-intro-morph" id="logo-intro-morph" aria-hidden="true">
+      {
+        frames.map((src, index) => (
+          <div
+            class:list={[
+              'logo-intro-frame',
+              (index === 0 || index === frames.length - 1) && 'is-mark',
+              index === 0 && 'is-active',
+            ]}
+            data-frame-index={index}
+          >
+            <img src={src} alt="" loading={index < 3 ? 'eager' : 'lazy'} />
+          </div>
+        ))
+      }
+    </div>
+  )
+}
+
+<script>
+  const REEL_MS = 2800;
+  const SETTLE_MS = 1200;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const morph = document.getElementById('logo-intro-morph');
+  const logoTarget = document.querySelector('[data-logo-target]') as HTMLElement | null;
+
+  if (reduceMotion || !morph || !logoTarget) {
+    document.body.classList.add('logo-intro-complete');
+    morph?.remove();
+  } else {
+    document.body.appendChild(morph);
+    document.body.classList.add('logo-intro-active');
+
+    const frames = Array.from(morph.querySelectorAll<HTMLElement>('.logo-intro-frame'));
+    const frameCount = frames.length;
+    const startSize = () => Math.min(window.innerWidth, window.innerHeight) * 0.42;
+
+    function easeInOutCubic(t: number) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function setActiveFrame(index: number) {
+      frames.forEach((frame, i) => {
+        frame.classList.toggle('is-active', i === index);
+      });
+    }
+
+    function placeCentered(size: number) {
+      morph!.style.width = `${size}px`;
+      morph!.style.height = `${size}px`;
+      morph!.style.left = `${window.innerWidth / 2}px`;
+      morph!.style.top = `${window.innerHeight / 2}px`;
+    }
+
+    function placeSettled(progress: number) {
+      const eased = easeInOutCubic(progress);
+      const target = logoTarget!.getBoundingClientRect();
+      const endSize = Math.max(target.width, target.height) || 28;
+      const from = startSize();
+      const size = from + (endSize - from) * eased;
+
+      const startX = window.innerWidth / 2;
+      const startY = window.innerHeight / 2;
+      const endX = target.left + target.width / 2;
+      const endY = target.top + target.height / 2;
+
+      morph!.style.width = `${size}px`;
+      morph!.style.height = `${size}px`;
+      morph!.style.left = `${startX + (endX - startX) * eased}px`;
+      morph!.style.top = `${startY + (endY - startY) * eased}px`;
+    }
+
+    function finish() {
+      morph!.classList.add('is-complete');
+      document.body.classList.remove('logo-intro-active', 'logo-intro-settling');
+      document.body.classList.add('logo-intro-complete');
+      window.setTimeout(() => morph!.remove(), 220);
+    }
+
+    function runSettle(nowStart: number) {
+      document.body.classList.add('logo-intro-settling');
+      setActiveFrame(frameCount - 1);
+
+      function tick(now: number) {
+        const progress = Math.min(1, (now - nowStart) / SETTLE_MS);
+        placeSettled(progress);
+        if (progress < 1) {
+          window.requestAnimationFrame(tick);
+        } else {
+          finish();
+        }
+      }
+
+      window.requestAnimationFrame(tick);
+    }
+
+    function runReel(nowStart: number) {
+      placeCentered(startSize());
+      setActiveFrame(0);
+
+      function tick(now: number) {
+        const progress = Math.min(1, (now - nowStart) / REEL_MS);
+        const frameIndex = Math.min(
+          frameCount - 1,
+          Math.round(progress * (frameCount - 1)),
+        );
+        setActiveFrame(frameIndex);
+        placeCentered(startSize());
+
+        if (progress < 1) {
+          window.requestAnimationFrame(tick);
+        } else {
+          setActiveFrame(frameCount - 1);
+          window.requestAnimationFrame((settleStart) => runSettle(settleStart));
+        }
+      }
+
+      window.requestAnimationFrame(tick);
+    }
+
+    placeCentered(startSize());
+    window.requestAnimationFrame((now) => runReel(now));
+  }
+</script>

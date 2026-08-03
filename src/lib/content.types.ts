@@ -19,6 +19,10 @@ export type SiteContent = {
   email: string;
   year: number;
   logo: string;
+  logoScroll?: {
+    startEnd?: string;
+    images: string[];
+  };
   links: Record<string, string>;
   nav: NavItem[];
   hero: {

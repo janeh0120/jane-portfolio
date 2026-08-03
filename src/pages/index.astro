@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import LogoScrollIntro from '../components/LogoScrollIntro.astro';
 import Hero from '../components/Hero.astro';
 import Experience from '../components/Experience.astro';
 import ProjectGrid from '../components/ProjectGrid.astro';
@@ -8,11 +9,14 @@ import SiteFooter from '../components/SiteFooter.astro';
 ---
 
 <Layout>
+  <LogoScrollIntro />
   <Header />
-  <main>
-    <Hero />
-    <Experience />
-    <ProjectGrid />
-  </main>
-  <SiteFooter />
+  <div class="home-intro-content" id="home-intro-content">
+    <main>
+      <Hero />
+      <Experience />
+      <ProjectGrid />
+    </main>
+    <SiteFooter />
+  </div>
 </Layout>

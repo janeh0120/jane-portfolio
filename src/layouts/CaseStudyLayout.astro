@@ -23,16 +23,17 @@ interface Props {
   team: string;
   timeline: string;
   projectType: string;
-  nav: NavItem[];
+  nav?: NavItem[];
   commentId?: string;
   heroImage?: HeroImage;
 }
 
-const { title, heading, role, team, timeline, projectType, nav, commentId, heroImage } =
+const { title, heading, role, team, timeline, projectType, nav = [], commentId, heroImage } =
   Astro.props;
 const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 const base = import.meta.env.BASE_URL;
 const home = base;
+const hasNav = nav.length > 0;
 ---
 
 <Layout title={`${title} — Jane Hou's Portfolio`}>
@@ -45,24 +46,23 @@ const home = base;
       ← Back to Home
     </a>
 
-    <div class="grid gap-12 lg:grid-cols-[200px_1fr] lg:gap-20">
-      <aside class="case-study-aside lg:sticky lg:top-24 lg:self-start">
-        <nav
-          class="case-study-nav flex gap-3 overflow-x-auto lg:flex-col lg:overflow-visible lg:gap-3"
-          aria-label="Case study"
-        >
-          {
-            nav.map((item) => (
-              <a
-                href={item.href}
-                class="text-sm text-muted transition hover:text-ink"
-              >
-                {item.label}
-              </a>
-            ))
-          }
-        </nav>
-      </aside>
+    <div class:list={['grid gap-12', hasNav && 'lg:grid-cols-[200px_1fr] lg:gap-20']}>
+      {
+        hasNav && (
+          <aside class="case-study-aside lg:sticky lg:top-24 lg:self-start">
+            <nav
+              class="case-study-nav flex gap-3 overflow-x-auto lg:flex-col lg:overflow-visible lg:gap-3"
+              aria-label="Case study"
+            >
+              {nav.map((item) => (
+                <a href={item.href} class="text-sm text-muted transition hover:text-ink">
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          </aside>
+        )
+      }
 
       <article class="min-w-0 max-w-3xl" data-comment-id={studyCommentId}>
         <h1 class="font-serif text-3xl font-normal tracking-tight text-ink md:text-4xl">{heading}</h1>

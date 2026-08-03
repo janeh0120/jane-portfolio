@@ -5,6 +5,16 @@
   "email": "janeh0120@gmail.com",
   "year": 2026,
   "logo": "images/my-logo.png",
+  "logoScroll": {
+    "startEnd": "images/logo-reel/start-end.png",
+    "images": [
+      "images/logo-reel/01.png",
+      "images/logo-reel/02.png",
+      "images/logo-reel/03.png",
+      "images/logo-reel/04.png",
+      "images/logo-reel/05.png"
+    ]
+  },
   "links": {
     "intuit": "https://www.intuit.com/ca/",
     "gwsk": "https://gwsk.studio/",
@@ -46,36 +56,36 @@
     {
       "slug": "des-sys",
       "tags": ["product", "design systems", "internship"],
-      "title": "Bridging design and code with AI",
-      "image": "images/7UtMUHlfBYMyZYCFvm22bixCyVI.png",
+      "title": "Design and code shouldn't fall out of sync.",
+      "image": "images/case study hero/dessys.png",
       "comingSoon": false
     },
     {
       "slug": "migration",
       "tags": ["product", "internship"],
-      "title": "Designing a self-service migration experience",
-      "image": "images/placeholders/case-study-filler.png",
+      "title": "Complex migrations shouldn't require experts.",
+      "image": "images/case study hero/intuit.png",
       "comingSoon": false
     },
     {
       "slug": "ixd",
       "tags": ["brand", "community", "concept"],
-      "title": "Building community through design",
-      "image": "images/n2vRFBwXMxinRHvWMr4M300XMYQ.png",
+      "title": "A design community shouldn't graduate without a shared experience.",
+      "image": "images/case study hero/ixdyes.png",
       "comingSoon": false
     },
     {
       "slug": "designchall",
       "tags": ["product", "concept"],
-      "title": "Design large data tables",
-      "image": "images/idJoFG559gccPL1RNMnuFQz3mvQ.png",
+      "title": "Hiring decisions shouldn't hide behind a crowded table.",
+      "image": "images/case study hero/datatable.png",
       "comingSoon": false
     },
     {
       "slug": "gwsk",
       "tags": ["brand", "internship"],
-      "title": "Building an enduring identity",
-      "image": "images/3iUOparZSy8dbxSG8ObclzL8Q.png",
+      "title": "A design studio shouldn't outgrow its identity.",
+      "image": "images/case study hero/gwsk.png",
       "comingSoon": false
     }
   ],
