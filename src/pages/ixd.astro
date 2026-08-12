@@ -5,10 +5,9 @@ import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 const img = (file: string) => `images/case-studies/ixd/${file}`;
 
 const nav = [
-  { label: 'Overview', href: '#overview' },
-  { label: 'Foundations', href: '#brand' },
-  { label: 'Applications', href: '#applications' },
-  { label: 'AI in Process', href: '#aiprocess' },
+  { label: 'Intro', href: '#intro' },
+  { label: 'Visuals', href: '#visuals' },
+  { label: 'Exploration', href: '#exploration' },
   { label: 'Reflection', href: '#reflection' },
 ];
 ---
@@ -17,207 +16,125 @@ const nav = [
   title="IXDA"
   heading="A design community shouldn't graduate without a shared experience."
   role="Creative Director, Designer"
-  team="Solo Concept Project"
+  team="Figma, Figma Weave, Photoshop"
+  teamLabel="Tools"
   timeline="1 week"
   projectType="Brand, Community"
   nav={nav}
+  commentId="case-study-ixd"
   heroImage={{
-    src: img('event-experience-collage.gif'),
-    alt: 'Collage of IXDA year-end event concept materials including hoodies, pins, and name tags',
-    caption: 'Event experience collage',
+    src: 'images/case study hero/ixdyes.png',
+    alt: 'IXDA year-end event experience concept collage',
     wide: true,
   }}
 >
-  <section id="overview" data-comment-id="ixd-overview">
-    <h3>context</h3>
+  <section id="intro" data-comment-id="ixd-intro">
+    <h3>Intro</h3>
     <p class="lead">
-      My program did not have a year end show this year. So how might I use design to build a fresh
-      and experience-lead event concept?
+      My program didn’t have a year-end show. I designed an experience-led event concept to give
+      graduating interaction designers a shared moment.
+    </p>
+    <p class="lead">
+      It started with a hoodie design students already loved — then grew into a full brand system for
+      the night.
     </p>
   </section>
 
-  <section id="brand" data-comment-id="ixd-brand">
-    <h3>inspiration</h3>
+  <section id="visuals" data-comment-id="ixd-visuals">
+    <h3>Visuals</h3>
     <p class="lead">
-      I won the hoodie design challenge run annually by the IXDA club (Sheridan Interaction Design
-      Association). Since this design is validated as popular choice by the students in my program,
-      I thought to turn this one-off design into a brand system.
+      Minimal, bold, and honest. Typography stays quiet so graphic moments and interactive
+      touchpoints can lead.
     </p>
+
+    <div class="case-study-figure-row">
+      <CaseStudyFigure
+        src={img('hoodie-back.png')}
+        alt="Black and white Sheridan IXD hoodies with please don't ask me what interaction design is printed on the back"
+        caption="Hoodie design — the line that launched the system"
+      />
+      <CaseStudyFigure
+        src={img('hoodie-award-pins.png')}
+        alt="Students wearing Sheridan IXD hoodies with handmade award ribbons"
+        caption="Award pins worn with the hoodies"
+      />
+    </div>
+
     <CaseStudyFigure
-      src={img('hoodie-concept-collage.png')}
-      alt="IXDA hoodie concept with award ribbon and portfolio keychain mockup"
-      caption="Hoodie design challenge — starting point for the brand system"
+      src={img('tote-bag.png')}
+      alt="Black tote bag with IXD lattice icons, pin, and Best in Show ribbon"
+      caption="Tote bag for collecting pins and awards"
       wide
     />
-    <h3>Concept</h3>
-    <p class="lead">
-      Most people don't know what interaction design is. My hoodie design played on this, and drove
-      the direction of my brand system. Create a space for audiences new to interaction design, a
-      way to interact and experience it.
-    </p>
-    <p class="lead">
-      My concept was to print the definition onto the sleeve. Budget constraints didn't allow, but
-      the lesson stuck. Beyond strong visuals, audiences connect to interactive experiences.
-    </p>
-    <h3>brand tone</h3>
-    <p class="lead">Minimal, bold, honest.</p>
-    <h3>brand foundations</h3>
-    <p>
-      Typography is simple, letting the graphic elements and layout shine. Inter is also Figma's
-      default font, calling back to the most used software in our program.
-    </p>
-    <p>
-      Colour choice is simple and accessible in different combinations. Sheridan's brand colour is
-      blue, but in a more vibrant tone.
-    </p>
+
+    <div class="case-study-figure-row">
+      <CaseStudyFigure
+        src={img('name-badge.png')}
+        alt="Name badge with skill radar chart on a Sheridan XD sweatshirt"
+        caption="Grad name badge"
+      />
+      <CaseStudyFigure
+        src={img('portfolio-keychain.png')}
+        alt="Portfolio keychain and ID holder clipped to jeans with ixd? yes tag"
+        caption="Portfolio keychain + event tag"
+      />
+    </div>
+
     <CaseStudyFigure
-      src={img('brand-foundations-system.png')}
-      alt="IXDA System 01 brand foundations — atoms, typography scale, and Winter Frost colour way"
-      caption="Brand foundations — typography, components, and colour"
+      src={img('connect-the-dots.png')}
+      alt="Connect the dots attendee cards in blue and grey with frosted thank-you overlays"
+      caption="Connect-the-dots attendee cards"
       wide
     />
-    <p>
-      The Interaction Design Association runs the program's year end party and annual hoodie design
-      challenge.
-    </p>
     <CaseStudyFigure
-      placeholder
-      alt="Sheridan IXDA club logo"
-      caption="IXDA logo — image missing (*this logo was not designed by me)"
+      src={img('grad-directory-website.png')}
+      alt="Laptop mockup of Sheridan IXD yes 2028 grad designer directory website"
+      caption="New grad designer directory"
+      wide
     />
-    <p class="text-muted text-sm italic">*this logo was not designed by me</p>
-    <p>
-      This illustration represents our school mascot: the bruin, while also communicating a sense
-      of reliability in its tired stance.
-    </p>
     <CaseStudyFigure
-      placeholder
-      alt="Bruin mascot illustration representing reliability"
-      caption="Bruin mascot illustration — image missing"
+      src={img('event-branding-grid.png')}
+      alt="Grid of event branding posts for award ribbons, merch drop, and year end party"
+      caption="Event branding system"
+      wide
     />
-  </section>
-
-  <section id="applications" data-comment-id="ixd-applications">
-    <h3>applications</h3>
-    <p>
-      Every year, the IXDA club runs an award ceremony for new grads to vote on their peers during
-      the year end party. My idea is that students can make their own award pins with their given
-      superlative (or another tagline) as an activity to do with friends.
-    </p>
     <CaseStudyFigure
-      placeholder
-      alt="Custom award pin activity for year end party"
-      caption="Award pin making activity — image missing"
+      src={img('event-posters.png')}
+      alt="Two wheatpaste-style posters for Sheridan IXD 2028 merch and year-end show"
+      caption="Campaign posters"
+      wide
     />
-    <p>Sticker sheet border is used as a photo frame for a photobooth!</p>
     <CaseStudyFigure
-      placeholder
-      alt="Photobooth frame using sticker sheet border"
-      caption="Photobooth sticker frame — image missing"
-    />
-    <p>Website directory for this years new grad designers!</p>
-    <CaseStudyFigure
-      placeholder
-      alt="New grad designer website directory"
-      caption="Grad designer directory — image missing"
-    />
-    <p>
-      Each attendee of the year end show gets a connect the dots card with a handwritten note and a
-      way to keep track of which tables they have yet to visit! Each card has "interaction design"
-      written in a different language. (you can't understand it in any language anyways…)
-    </p>
-    <CaseStudyFigure
-      placeholder
-      alt="Connect the dots card with interaction design in different languages"
-      caption="Connect the dots attendee card — image missing"
-    />
-    <p>
-      Every year, the IXDA club at Sheridan makes different limited edition pins that students can
-      collect. This tote bag design helps students find a home for them! They can also put their
-      award pin on it too!
-    </p>
-    <CaseStudyFigure
-      placeholder
-      alt="Tote bag design for collecting limited edition pins"
-      caption="Pin collection tote bag — image missing"
-    />
-    <p>
-      Using the Sheridan IXDA logo reference, each new grad's name tag will have a cohesive event
-      identity.
-    </p>
-    <CaseStudyFigure
-      placeholder
-      alt="New grad name tag using IXDA logo reference"
-      caption="Grad name tag — image missing"
-    />
-    <p>
-      Instead of traditional large, crossbody portfolios, students can purchase our portfolio
-      keychains to showcase their work in mini booklets and share their social links via NFC tags!
-      (QR codes can be printed on the books as well if NFC is that compatible)
-    </p>
-    <CaseStudyFigure
-      placeholder
-      alt="Portfolio keychain with mini booklet and NFC social links"
-      caption="Portfolio keychain concept — image missing"
+      src={img('sticker-sheet.png')}
+      alt="IXD sticker sheet and year end party photo sticker"
+      caption="Stickers and keepsakes"
+      wide
     />
   </section>
 
-  <section id="aiprocess" data-comment-id="ixd-aiprocess">
-    <h3>using ai in the process</h3>
+  <section id="exploration" data-comment-id="ixd-exploration">
+    <h3>Exploration</h3>
     <p class="lead">
-      I used AI to generate mockups of my concepts. I used Figma Weave and AI tools within Figma and
-      found that the tools/workflow doesn't matter as much as the context that you feed it.
-    </p>
-    <p class="lead">
-      When I rely on flat lay designs that I designed only, it creates a design that is almost too
-      perfect.
+      The winning hoodie became the seed. Interaction design is hard to explain — so the system
+      leans into experiences people can touch, wear, and collect.
     </p>
     <CaseStudyFigure
-      placeholder
-      alt="AI mockup generated from flat lay design only"
-      caption="AI mockup from flat lay only (too perfect) — image missing"
-    />
-    <p class="lead">
-      When I use an award ribbon I made myself and took pictures of, it created a much more realistic
-      mockup.
-    </p>
-    <CaseStudyFigure
-      placeholder
-      alt="AI mockup generated using photographed award ribbon"
-      caption="AI mockup with real-world photo context — image missing"
+      src={img('hoodie-exploration.png')}
+      alt="IXDA hoodie exploration with award ribbon and portfolio keychain mockup"
+      caption="Early concept — hoodie challenge as the starting point"
+      wide
     />
   </section>
 
   <section id="reflection" data-comment-id="ixd-reflection">
-    <h3>Reflections</h3>
-    <ol>
-      <li>
-        <h2>Don't wait for permission</h2>
-        <p class="lead">
-          Design and build what you want to see, even if it's not yet possible.
-        </p>
-      </li>
-      <li>
-        <h2>Explore different tools</h2>
-        <p class="lead">Find ways to achieve the vision with new tools.</p>
-      </li>
-    </ol>
-    <h3>next steps</h3>
-    <ol>
-      <li>
-        <h2>Pitch to Faculty</h2>
-        <p class="lead">
-          Now that the concept is built out, I want to bring this to reality by getting buy in from
-          faculty and external sponsors.
-        </p>
-      </li>
-      <li>
-        <h2>Build on with peers</h2>
-        <p class="lead">
-          Building out large scale events is not a task for one. Gathering a community of like minded
-          students is important to breath life into this concept.
-        </p>
-      </li>
-    </ol>
+    <h3>Reflection</h3>
+    <p class="lead">
+      Don’t wait for permission — design the community experience you want to see, then find the
+      tools to get there.
+    </p>
+    <p class="lead">
+      Next: pitch faculty and sponsors, and build it with peers. An event this size needs a
+      community behind it.
+    </p>
   </section>
 </CaseStudyLayout>

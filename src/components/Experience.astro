@@ -1,33 +1,36 @@
 ---
 import { site } from '../data/site';
+
+const previous = site.experience.previous;
 ---
 
-<section class="mx-auto max-w-[1400px] px-6 pb-16 md:px-10 md:pb-24" data-comment-id="experience">
-  <p class="max-w-3xl text-base leading-relaxed text-muted md:text-lg">
+<section class="mx-auto max-w-[1400px] px-6 pb-20 pt-5 md:px-10 md:pb-28 md:pt-6" data-comment-id="experience">
+  <p class="experience-copy max-w-2xl text-muted">
     Currently at
     <a
       href={site.experience.current.href}
       target="_blank"
       rel="noopener noreferrer"
-      class="font-medium text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
+      class="text-ink underline decoration-ink/25 underline-offset-[3px] transition hover:decoration-ink"
     >
       {site.experience.current.label}
     </a>
-    , previously at
+    previously at
     {
-      site.experience.previous.map((place, index) => (
+      previous.map((place, index) => (
         <>
-          {index > 0 ? ' and ' : ' '}
+          {index > 0 ? (index === previous.length - 1 ? ' and ' : ', ') : ' '}
           <a
             href={place.href}
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-ink underline decoration-ink/30 underline-offset-4 transition hover:decoration-ink"
+            class="text-ink underline decoration-ink/25 underline-offset-[3px] transition hover:decoration-ink"
           >
             {place.label}
           </a>
         </>
       ))
-    }
+    }.
+    {site.experience.note && <> {site.experience.note}</>}
   </p>
 </section>

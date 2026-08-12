@@ -10,6 +10,9 @@ const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
 export default defineConfig({
   site: vercelUrl ?? 'http://localhost:4321',
   base: '/',
+  redirects: {
+    '/extra': '/play',
+  },
   integrations: [react()],
   adapter: vercel(),
   env: {

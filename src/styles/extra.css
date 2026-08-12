@@ -59,13 +59,13 @@
 
 .extra-button {
   padding: 14px 32px;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   letter-spacing: 0.05em;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-  border: 2px solid #000;
+  transition: opacity 0.3s ease;
+  border: none;
   text-transform: uppercase;
 }
 
@@ -75,19 +75,18 @@
 }
 
 .extra-button.primary:hover {
-  background: white;
-  color: #000;
-  transform: translateY(-4px);
+  opacity: 0.8;
 }
 
 .extra-button.secondary {
   background: transparent;
   color: #000;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .extra-button.secondary:hover {
-  background: rgb(0 0 0 / 5%);
-  transform: translateY(-4px);
+  opacity: 0.7;
 }
 
 .gallery-section {
@@ -107,17 +106,18 @@
 .gallery-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 40px 32px;
   align-items: flex-end;
+  justify-content: center;
 }
 
 .gallery-item {
-  background: #f0f0f0;
-  border-radius: 8px;
+  background: transparent;
+  border-radius: 0;
   overflow: hidden;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.3s ease;
   flex: 1 1 auto;
   min-width: 150px;
   max-width: 400px;
@@ -127,8 +127,7 @@
 }
 
 .gallery-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 16px rgb(0 0 0 / 12%);
+  opacity: 0.9;
 }
 
 .gallery-item img {
@@ -146,7 +145,7 @@
   background: rgb(0 0 0 / 60%);
   color: white;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 0;
   font-size: 10px;
   font-weight: 600;
 }
@@ -178,15 +177,16 @@
 }
 
 .gallery-modal-content {
-  background: white;
-  border-radius: 12px;
-  max-width: 1200px;
-  width: 100%;
+  background: transparent;
+  border-radius: 0;
+  max-width: min(1100px, 100%);
+  width: fit-content;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: visible;
   position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .gallery-modal-close {
@@ -198,7 +198,7 @@
   border: none;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 0;
   font-size: 24px;
   cursor: pointer;
   z-index: 3010;
@@ -216,8 +216,9 @@
 
 .gallery-carousel-container {
   position: relative;
-  width: 100%;
-  background: #f0f0f0;
+  width: fit-content;
+  max-width: 100%;
+  background: transparent;
   overflow: hidden;
 }
 
@@ -235,10 +236,11 @@
 }
 
 .gallery-carousel-slide img {
-  width: 100%;
+  width: auto;
   height: auto;
   display: block;
-  max-height: 70vh;
+  max-width: min(85vw, 1000px);
+  max-height: 75vh;
   object-fit: contain;
 }
 
@@ -265,7 +267,7 @@
 .carousel-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 0;
   background: rgb(255 255 255 / 50%);
   border: none;
   padding: 0;
@@ -276,7 +278,7 @@
 .carousel-dot.active {
   background: white;
   width: 24px;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .carousel-arrow {
@@ -286,9 +288,9 @@
   background: rgb(0 0 0 / 50%);
   color: white;
   border: none;
-  width: 48px;
-  height: 48px;
-  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 0;
   font-size: 20px;
   cursor: pointer;
   transition: all 0.3s;
@@ -300,35 +302,23 @@
 }
 
 .carousel-arrow.prev {
-  left: 12px;
+  left: 8px;
 }
 
 .carousel-arrow.next {
-  right: 12px;
+  right: 8px;
 }
 
 .gallery-modal-description {
-  padding: 32px;
-}
-
-.gallery-modal-description h2 {
-  font-size: 24px;
-  margin-bottom: 12px;
-  letter-spacing: -0.03em;
-}
-
-.gallery-modal-description p {
-  font-size: 16px;
-  color: #666;
-  line-height: 1.7;
-}
-
-.gallery-modal-meta {
-  font-size: 13px;
-  color: #999;
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #f0f0f0;
+  margin: 16px 0 0;
+  max-width: 36rem;
+  padding: 0 8px;
+  text-align: center;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: rgb(255 255 255 / 78%);
 }
 
 .extra-footer {
@@ -417,7 +407,7 @@
   }
 
   .gallery-modal-description {
-    padding: 20px;
+    margin-top: 12px;
   }
 
   .extra-footer {

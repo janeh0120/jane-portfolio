@@ -43,24 +43,30 @@
     </div>
   </aside>
 
-  <div class="comment-mode-highlight" id="comment-highlight" hidden></div>
+  <div class="comment-mode-highlights" id="comment-highlights" aria-hidden="true"></div>
 
   <div class="comment-popover" id="comment-popover" hidden data-comment-ui>
-      <div class="comment-popover-card">
-      <div class="comment-popover-category-wrap">
-        <select id="comment-category-select" class="comment-popover-category-select" aria-label="Comment category"></select>
-      </div>
-      <p class="comment-popover-target" id="comment-target-label"></p>
-      <div class="comment-popover-input-row" id="comment-popover-field">
-        <textarea
-          id="comment-text"
-          rows="1"
-          placeholder="Add a comment…"
-          maxlength="2000"
-        ></textarea>
-        <button type="button" class="comment-popover-send" id="comment-submit" aria-label="Post comment">
-          ↑
-        </button>
+    <div class="comment-popover-card">
+      <div class="comment-popover-body">
+        <div class="comment-popover-compose">
+          <div class="comment-popover-chips" id="comment-target-chips"></div>
+          <textarea
+            id="comment-text"
+            rows="1"
+            placeholder="Leave feedback…"
+            maxlength="2000"
+          ></textarea>
+        </div>
+        <div class="comment-popover-footer">
+          <select
+            id="comment-category-select"
+            class="comment-popover-category-select"
+            aria-label="Comment category (optional)"
+          ></select>
+          <button type="button" class="comment-popover-send" id="comment-submit" aria-label="Post comment">
+            ↑
+          </button>
+        </div>
       </div>
       <p class="comment-popover-status" id="comment-status" aria-live="polite" hidden></p>
     </div>
@@ -77,7 +83,7 @@
   import { validateComment } from '../lib/comment-validation';
 
   const CATEGORIES = [
-    { id: '', label: 'No category' },
+    { id: '', label: 'Category' },
     { id: 'accessibility', label: 'Accessibility' },
     { id: 'content', label: 'Content' },
     { id: 'visual-design', label: 'Visual design' },
@@ -113,7 +119,7 @@
   const STORAGE_KEY = 'portfolio-session-comments';
   const VISITOR_ID_KEY = 'portfolio-visitor-id';
   const UPVOTED_KEY = 'portfolio-upvoted-comments';
-  const SINGLE_LINE_HEIGHT = 32;
+  const SINGLE_LINE_HEIGHT = 22;
   const POPOVER_WIDTH = 360;
   /** Set true to show Mine/All tabs and let visitors browse public comments. */
   const PUBLIC_COMMENTS_ENABLED = false;
@@ -157,19 +163,20 @@
   const modeToggleBtn = document.getElementById('comment-mode-toggle');
   const sidebar = document.getElementById('comment-sidebar');
   const sidebarList = document.getElementById('comment-sidebar-list');
-  const highlight = document.getElementById('comment-highlight');
+  const highlightsRoot = document.getElementById('comment-highlights');
   const popover = document.getElementById('comment-popover');
-  const popoverField = document.getElementById('comment-popover-field');
+  const chipsEl = document.getElementById('comment-target-chips');
   const categoriesEl = document.getElementById('comment-category-select') as HTMLSelectElement | null;
   const commentText = document.getElementById('comment-text') as HTMLTextAreaElement | null;
   const submitBtn = document.getElementById('comment-submit') as HTMLButtonElement | null;
   const statusEl = document.getElementById('comment-status');
-  const targetLabelEl = document.getElementById('comment-target-label');
   const scopeMineBtn = document.getElementById('comment-scope-mine');
   const scopeAllBtn = document.getElementById('comment-scope-all');
   const scopeTabs = document.getElementById('comment-sidebar-tabs');
   const siteShell = document.getElementById('site-shell');
   const siteCanvas = document.getElementById('site-canvas');
+
+  const SELECTOR_SEP = '\n';
 
   let mode: 'view' | 'comment' = 'view';
   let sidebarScope: 'mine' | 'all' = 'mine';
@@ -177,10 +184,7 @@
   let globalLoading = false;
   let composing = false;
   let hoveredElement: HTMLElement | null = null;
-  let selectedElement: HTMLElement | null = null;
-  let selectedSelector = '';
-  let selectedLabel = '';
-  let selectedDisplayName = '';
+  let selectedTargets: HTMLElement[] = [];
   let selectedCategory: CategoryId = '';
   let sessionComments: SessionComment[] = [];
   let activeCardId: string | null = null;
@@ -208,15 +212,54 @@
   }
 
   function canSelectOnCanvas(): boolean {
-    return mode === 'comment' && !composing && !sidebarInteracting && !editingCommentId;
+    return mode === 'comment' && !sidebarInteracting && !editingCommentId;
+  }
+
+  function splitSelectors(selector: string): string[] {
+    return selector
+      .split(SELECTOR_SEP)
+      .map((part) => part.trim())
+      .filter(Boolean);
   }
 
   function resolveTarget(selector: string): HTMLElement | null {
-    const target = document.querySelector(selector);
+    const primary = splitSelectors(selector)[0];
+    if (!primary) return null;
+    const target = document.querySelector(primary);
     return target instanceof HTMLElement ? target : null;
   }
 
+  function resolveTargets(selector: string): HTMLElement[] {
+    const targets: HTMLElement[] = [];
+    for (const part of splitSelectors(selector)) {
+      const target = document.querySelector(part);
+      if (target instanceof HTMLElement) targets.push(target);
+    }
+    return targets;
+  }
+
+  function getShortTag(element: HTMLElement): string {
+    return element.tagName.toLowerCase();
+  }
+
+  function getSelectionMeta() {
+    const selectors = selectedTargets.map((el) => getStableSelector(el));
+    const tags = selectedTargets.map((el) => getShortTag(el));
+    const labels = selectedTargets.map((el) => getElementLabel(el));
+    const displayNames = selectedTargets.map((el) => getCommentTargetLabel(el));
+
+    return {
+      selector: selectors.join(SELECTOR_SEP),
+      elementLabel: labels.join(' · '),
+      elementDisplayName:
+        tags.length <= 1
+          ? displayNames[0] ?? tags[0] ?? ''
+          : tags.map((tag) => `<${tag}>`).join(' · '),
+    };
+  }
+
   function categoryLabel(id: CategoryId): string {
+    if (!id) return 'No category';
     return CATEGORIES.find((item) => item.id === id)?.label ?? 'No category';
   }
 
@@ -373,25 +416,90 @@
     box.style.height = `${rect.height}px`;
   }
 
+  function clearHighlightBoxes() {
+    if (highlightsRoot) highlightsRoot.replaceChildren();
+  }
+
+  function ensureHighlightBoxes(count: number) {
+    if (!highlightsRoot) return [];
+    while (highlightsRoot.children.length < count) {
+      const box = document.createElement('div');
+      box.className = 'comment-mode-highlight';
+      highlightsRoot.appendChild(box);
+    }
+    while (highlightsRoot.children.length > count) {
+      highlightsRoot.lastElementChild?.remove();
+    }
+    return Array.from(highlightsRoot.children) as HTMLElement[];
+  }
+
   function positionHighlight(
     element: HTMLElement,
     options: { pinned?: boolean; preview?: boolean } = {},
   ) {
-    if (!highlight) return;
-    const { pinned = false, preview = false } = options;
+    positionHighlights([element], options);
+  }
 
-    highlight.hidden = false;
-    highlight.classList.toggle('is-pinned', pinned);
-    highlight.classList.toggle('is-preview', preview && !pinned);
-    positionBox(element, highlight);
+  function positionHighlights(
+    elements: HTMLElement[],
+    options: { pinned?: boolean; preview?: boolean } = {},
+  ) {
+    const { pinned = false, preview = false } = options;
+    const boxes = ensureHighlightBoxes(elements.length);
+    boxes.forEach((box, index) => {
+      const element = elements[index];
+      if (!element) return;
+      box.hidden = false;
+      box.classList.toggle('is-pinned', pinned);
+      box.classList.toggle('is-preview', preview && !pinned);
+      positionBox(element, box);
+    });
   }
 
   function hideHighlight() {
-    if (highlight) {
-      highlight.hidden = true;
-      highlight.classList.remove('is-pinned', 'is-preview');
-    }
+    clearHighlightBoxes();
     pinnedTarget = null;
+  }
+
+  function syncSelectionHighlights() {
+    if (!composing || selectedTargets.length === 0) {
+      if (!activeCardId && !previewCardId) hideHighlight();
+      return;
+    }
+    positionHighlights(selectedTargets, { pinned: true });
+  }
+
+  function renderTargetChips() {
+    if (!chipsEl) return;
+    chipsEl.replaceChildren();
+
+    selectedTargets.forEach((element, index) => {
+      const tag = getShortTag(element);
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'comment-popover-chip';
+      chip.title = getCommentTargetLabel(element);
+      chip.setAttribute('aria-label', `Remove ${tag} from selection`);
+
+      const label = document.createElement('span');
+      label.className = 'comment-popover-chip-label';
+      label.textContent = tag;
+
+      const remove = document.createElement('span');
+      remove.className = 'comment-popover-chip-remove';
+      remove.setAttribute('aria-hidden', 'true');
+      remove.innerHTML =
+        '<svg viewBox="0 0 12 12" width="10" height="10" fill="none"><path d="M3 3l6 6M9 3 3 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+
+      chip.append(label, remove);
+      chip.addEventListener('mousedown', (event) => event.preventDefault());
+      chip.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        removeTargetAt(index);
+      });
+      chipsEl.appendChild(chip);
+    });
   }
 
   function updatePinnedHighlight() {
@@ -399,21 +507,21 @@
     const item = sessionComments.find((entry) => entry.id === activeCardId);
     if (!item) return;
 
-    const target = resolveTarget(item.selector);
-    if (!target) return;
+    const targets = resolveTargets(item.selector);
+    if (targets.length === 0) return;
 
-    pinnedTarget = target;
-    positionHighlight(target, { pinned: true });
+    pinnedTarget = targets[0] ?? null;
+    positionHighlights(targets, { pinned: true });
   }
 
   function previewCommentTarget(item: SessionComment) {
     if (activeCardId === item.id) return;
 
-    const target = resolveTarget(item.selector);
-    if (!target) return;
+    const targets = resolveTargets(item.selector);
+    if (targets.length === 0) return;
 
     previewCardId = item.id;
-    positionHighlight(target, { preview: true });
+    positionHighlights(targets, { preview: true });
   }
 
   function clearPreviewHighlight() {
@@ -422,11 +530,16 @@
       updatePinnedHighlight();
       return;
     }
+    if (composing) {
+      syncSelectionHighlights();
+      return;
+    }
     hideHighlight();
   }
 
   function pinCommentTarget(item: SessionComment) {
-    const target = resolveTarget(item.selector);
+    const targets = resolveTargets(item.selector);
+    const target = targets[0];
     if (!target) return;
 
     activeCardId = item.id;
@@ -435,14 +548,17 @@
 
     target.scrollIntoView({ behavior: 'smooth', block: 'center' });
     window.setTimeout(() => {
-      positionHighlight(target, { pinned: true });
+      positionHighlights(targets, { pinned: true });
     }, 300);
   }
 
   function positionPopover() {
-    if (!popover || !selectedElement) return;
+    if (!popover || selectedTargets.length === 0) return;
 
-    const rect = selectedElement.getBoundingClientRect();
+    const anchor = selectedTargets[selectedTargets.length - 1] ?? selectedTargets[0];
+    if (!anchor) return;
+
+    const rect = anchor.getBoundingClientRect();
     const sidebarOffset = getSidebarOffset();
     const margin = 12;
     const gap = 10;
@@ -481,10 +597,43 @@
   }
 
   function clearSelection() {
-    if (selectedElement) {
-      selectedElement.classList.remove('comment-mode-selected');
-      selectedElement = null;
+    for (const element of selectedTargets) {
+      element.classList.remove('comment-mode-selected');
     }
+    selectedTargets = [];
+  }
+
+  function removeTargetAt(index: number) {
+    const element = selectedTargets[index];
+    if (!element) return;
+
+    if (selectedTargets.length === 1) {
+      closeComposer();
+      return;
+    }
+
+    element.classList.remove('comment-mode-selected');
+    selectedTargets = selectedTargets.filter((_, i) => i !== index);
+    renderTargetChips();
+    syncSelectionHighlights();
+    positionPopover();
+  }
+
+  function addOrToggleTarget(element: HTMLElement, toggle: boolean) {
+    const existingIndex = selectedTargets.indexOf(element);
+
+    if (existingIndex >= 0) {
+      if (toggle || selectedTargets.length > 1) {
+        removeTargetAt(existingIndex);
+      }
+      return;
+    }
+
+    selectedTargets.push(element);
+    element.classList.add('comment-mode-selected');
+    renderTargetChips();
+    syncSelectionHighlights();
+    positionPopover();
   }
 
   function createCategorySelect(value: CategoryId, className: string): HTMLSelectElement {
@@ -504,6 +653,32 @@
     return select;
   }
 
+  function syncCategorySelectWidth() {
+    if (!categoriesEl) return;
+
+    const label = categoriesEl.options[categoriesEl.selectedIndex]?.textContent ?? '';
+    const probe = document.createElement('span');
+    const styles = getComputedStyle(categoriesEl);
+
+    probe.textContent = label;
+    probe.style.cssText = [
+      'position:absolute',
+      'visibility:hidden',
+      'white-space:nowrap',
+      `font-family:${styles.fontFamily}`,
+      `font-size:${styles.fontSize}`,
+      `font-weight:${styles.fontWeight}`,
+      `letter-spacing:${styles.letterSpacing}`,
+    ].join(';');
+
+    document.body.appendChild(probe);
+    const textWidth = probe.getBoundingClientRect().width;
+    probe.remove();
+
+    // left pad 6 + text + gap 2 + chevron 12 + right pad 4
+    categoriesEl.style.width = `${Math.ceil(textWidth + 24)}px`;
+  }
+
   function initCategorySelect() {
     if (!categoriesEl || categoriesEl.options.length > 0) return;
 
@@ -516,13 +691,17 @@
 
     categoriesEl.addEventListener('change', () => {
       selectedCategory = categoriesEl.value as CategoryId;
+      syncCategorySelectWidth();
     });
+
+    syncCategorySelectWidth();
   }
 
   function resetCategorySelect() {
     if (!categoriesEl) return;
     categoriesEl.value = '';
     selectedCategory = '';
+    syncCategorySelectWidth();
   }
 
   async function deleteComment(id: string) {
@@ -857,19 +1036,16 @@
   function openComposer(element: HTMLElement) {
     if (!popover || !commentText) return;
 
-    selectedElement = element;
-    selectedSelector = getStableSelector(element);
-    selectedLabel = getElementLabel(element);
-    selectedDisplayName = getCommentTargetLabel(element);
+    clearSelection();
+    selectedTargets = [element];
     selectedCategory = '';
     element.classList.add('comment-mode-selected');
 
     composing = true;
     hoveredElement = null;
 
-    if (targetLabelEl) targetLabelEl.textContent = selectedDisplayName;
-
-    positionHighlight(element, { pinned: true });
+    renderTargetChips();
+    positionHighlights(selectedTargets, { pinned: true });
     commentText.value = '';
     resizeTextarea();
     resetCategorySelect();
@@ -884,6 +1060,7 @@
     popover.hidden = true;
     hideHighlight();
     clearSelection();
+    if (chipsEl) chipsEl.replaceChildren();
     setStatus('');
   }
 
@@ -939,10 +1116,10 @@
   }
 
   function elementUnderPointer(event: MouseEvent): HTMLElement | null {
-    highlight?.style.setProperty('pointer-events', 'none');
+    if (highlightsRoot) highlightsRoot.style.pointerEvents = 'none';
     popover?.style.setProperty('pointer-events', 'none');
     const raw = document.elementFromPoint(event.clientX, event.clientY);
-    highlight?.style.removeProperty('pointer-events');
+    if (highlightsRoot) highlightsRoot.style.pointerEvents = '';
     popover?.style.removeProperty('pointer-events');
 
     if (!(raw instanceof Element)) return null;
@@ -971,12 +1148,13 @@
   }
 
   function addSessionComment(serverId: string, comment: string) {
+    const meta = getSelectionMeta();
     const entry: SessionComment = {
       id: serverId,
       pageUrl: window.location.href.split('#')[0],
-      selector: selectedSelector,
-      elementLabel: selectedLabel,
-      elementDisplayName: selectedDisplayName,
+      selector: meta.selector,
+      elementLabel: meta.elementLabel,
+      elementDisplayName: meta.elementDisplayName,
       category: selectedCategory,
       comment,
       createdAt: new Date().toISOString(),
@@ -1078,12 +1256,22 @@
   document.addEventListener(
     'click',
     (event) => {
-      if (!canSelectOnCanvas()) return;
+      if (mode !== 'comment' || sidebarInteracting || editingCommentId) return;
       if (isCommentUiTarget(event.target)) return;
 
       const element = elementUnderPointer(event);
-      if (!element) return;
+      const multi = event.metaKey || event.ctrlKey;
 
+      if (composing) {
+        if (!element) return;
+        event.preventDefault();
+        event.stopPropagation();
+        addOrToggleTarget(element, multi || selectedTargets.includes(element));
+        commentText?.focus();
+        return;
+      }
+
+      if (!element) return;
       event.preventDefault();
       event.stopPropagation();
       activeCardId = null;
@@ -1097,7 +1285,10 @@
     (event) => {
       if (!composing) return;
       if (isCommentUiTarget(event.target)) return;
-      if (selectedElement?.contains(event.target as Node)) return;
+
+      const element = elementUnderPointer(event);
+      if (element) return;
+      if (selectedTargets.some((target) => target.contains(event.target as Node))) return;
       closeComposer();
     },
     true,
@@ -1112,11 +1303,8 @@
     if (!composing) return;
     const related = event.relatedTarget;
     if (related instanceof Node && popover?.contains(related)) return;
-    window.setTimeout(() => {
-      if (!composing || document.activeElement === commentText) return;
-      if (document.activeElement === submitBtn) return;
-      closeComposer();
-    }, 0);
+    // Keep composer open on blur so multi-select clicks can add targets.
+    // Dismissal is handled by mousedown outside selectable content.
   });
 
   commentText?.addEventListener('keydown', (event) => {
@@ -1129,8 +1317,8 @@
   window.addEventListener(
     'scroll',
     () => {
-      if (composing && selectedElement) {
-        positionHighlight(selectedElement, { pinned: true });
+      if (composing && selectedTargets.length > 0) {
+        syncSelectionHighlights();
         positionPopover();
       } else if (activeCardId) {
         updatePinnedHighlight();
@@ -1143,8 +1331,8 @@
   );
 
   siteCanvas?.addEventListener('scroll', () => {
-    if (composing && selectedElement) {
-      positionHighlight(selectedElement, { pinned: true });
+    if (composing && selectedTargets.length > 0) {
+      syncSelectionHighlights();
       positionPopover();
     } else if (activeCardId) {
       updatePinnedHighlight();
@@ -1155,8 +1343,8 @@
   });
 
   window.addEventListener('resize', () => {
-    if (composing && selectedElement) {
-      positionHighlight(selectedElement, { pinned: true });
+    if (composing && selectedTargets.length > 0) {
+      syncSelectionHighlights();
       positionPopover();
     } else if (activeCardId) {
       updatePinnedHighlight();
@@ -1171,7 +1359,7 @@
   });
 
   submitBtn?.addEventListener('click', async () => {
-    if (!commentText || !selectedSelector) return;
+    if (!commentText || selectedTargets.length === 0) return;
     const comment = commentText.value.trim();
     if (!comment) {
       setStatus('Write a comment first', 'error');
@@ -1184,6 +1372,7 @@
       return;
     }
 
+    const meta = getSelectionMeta();
     submitBtn.disabled = true;
     setStatus('');
 
@@ -1193,9 +1382,9 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           comment,
-          selector: selectedSelector,
-          elementLabel: selectedLabel,
-          elementDisplayName: selectedDisplayName,
+          selector: meta.selector,
+          elementLabel: meta.elementLabel,
+          elementDisplayName: meta.elementDisplayName,
           category: selectedCategory,
           pageUrl: window.location.href.split('#')[0],
           viewportWidth: window.innerWidth,
@@ -1212,6 +1401,10 @@
 
       addSessionComment(data.id, comment);
       closeComposer();
+      const savedTargets = resolveTargets(meta.selector);
+      if (savedTargets.length > 0) {
+        positionHighlights(savedTargets, { pinned: true });
+      }
     } catch (error) {
       setStatus(
         error instanceof Error

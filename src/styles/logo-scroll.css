@@ -76,7 +76,7 @@ body.logo-intro-complete .home-intro-content {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: clamp(4px, 18%, 28px);
+  border-radius: 0;
 }
 
 .logo-intro-frame.is-mark img {

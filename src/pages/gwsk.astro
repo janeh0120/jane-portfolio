@@ -5,10 +5,9 @@ import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 const img = (file: string) => `images/case-studies/gwsk/${file}`;
 
 const nav = [
-  { label: 'Overview', href: '#overview' },
-  { label: 'Branding', href: '#branding' },
-  { label: 'Template', href: '#template' },
-  { label: 'Website', href: '#website' },
+  { label: 'Intro', href: '#intro' },
+  { label: 'Visuals', href: '#visuals' },
+  { label: 'Exploration', href: '#exploration' },
   { label: 'Reflection', href: '#reflection' },
 ];
 ---
@@ -21,216 +20,97 @@ const nav = [
   timeline="3.5 weeks"
   projectType="Brand Design, Web Design"
   nav={nav}
+  commentId="case-study-gwsk"
   heroImage={{
-    src: img('final-website-responsive.png'),
+    src: 'images/case study hero/gwsk.png',
     alt: 'GWSK redesigned website on desktop and mobile',
-    caption: 'Final responsive website',
     wide: true,
   }}
 >
-  <section id="overview" data-comment-id="gwsk-overview">
-    <h3>context</h3>
+  <section id="intro" data-comment-id="gwsk-intro">
+    <h3>Intro</h3>
     <p class="lead">
-      I collaborated with another intern to reimagine the studio's brand identity and website. We
-      built a cohesive, transit-inspired system that brought personality and consistency to the
-      brand.
+      I collaborated with another intern to reimagine GWSK’s brand identity and website. We built a
+      transit-inspired system that brought personality and consistency back to the studio.
     </p>
-    <h3>final result</h3>
     <p class="lead">
-      Built a full brand system with reusable templates and redesigned the website, achieving an
-      83.3% scroll depth on mobile.
-    </p>
-    <p>
+      The result was a full brand system, reusable templates, and a redesigned site —
       <a
         href="https://gwsk.studio/"
         target="_blank"
         rel="noopener noreferrer"
         class="font-medium underline decoration-ink/30 underline-offset-4"
       >
-        GWSK Website
-      </a>
+        gwsk.studio
+      </a>.
     </p>
   </section>
 
-  <section id="branding" data-comment-id="gwsk-branding">
-    <h3>brand system</h3>
-    <CaseStudyFigure
-      src={img('brand-style-tile.png')}
-      alt="GWSK brand style tile with transit-inspired colour system"
-      caption="Brand style tile"
-      wide
-    />
-    <h3>brand tone</h3>
+  <section id="visuals" data-comment-id="gwsk-visuals">
+    <h3>Visuals</h3>
     <p class="lead">
-      Brutalist, smart, minimal, confident, Bauhaus-inspired, and accessible. Refined but human,
-      modular but not robotic.
-    </p>
-    <h3>Research</h3>
-    <p class="lead">
-      We were suggested to reference Landon Nordeman, Zaha Hadid, Pentagram, Teenage Engineering,
-      and the Bauhaus and Brutalist movement when ideating.
-    </p>
-    <h3>moodboarding</h3>
-    <CaseStudyFigure
-      src={img('moodboard.png')}
-      alt="GWSK brand moodboard with reference inspirations"
-      caption="Moodboard"
-      wide
-    />
-    <h3>final concept</h3>
-    <p class="lead">
-      Modular, TTC transit system inspired visual language to communicate the systematic and
-      accessible approach GWSK brings to product design. Each accent colour represents a stage of
-      the Double Diamond Process.
-    </p>
-    <h3>final brand design system</h3>
-    <p>
-      We created type styles, colour variables, effect styles, layout grid styles, as well as
-      components for visual assets and plugin use cases.
+      Brutalist, smart, and accessible. Accent colours map to Double Diamond stages so the brand
+      stays modular without feeling robotic.
     </p>
     <CaseStudyFigure
       src={img('brand-design-system.png')}
       alt="GWSK final brand design system in Figma with typography, colour, and layout grids"
-      caption="Figma brand design system"
+      caption="Brand design system"
       wide
     />
-  </section>
-
-  <section id="template" data-comment-id="gwsk-template">
-    <h3>Presentation Deck</h3>
-    <p>
-      Slide decks are colour coded based on the step of the design process the deck content
-      correlates to. Plugins were linked for data visualization slides for easy data entry. Animated
-      key interactions in slide deck.
-    </p>
     <CaseStudyFigure
       src={img('presentation-deck-cycle.png')}
       alt="GWSK presentation deck iterative process diagram"
-      caption="Presentation deck — colour coded by design process stage"
+      caption="Presentation deck — colour coded by design process"
+      wide
+    />
+    <CaseStudyFigure
+      src={img('website-hero.png')}
+      alt="Final GWSK website redesign hero section"
+      caption="Website redesign"
+      wide
+    />
+    <CaseStudyFigure
+      src={img('final-website-responsive.png')}
+      alt="GWSK redesigned website on desktop and mobile"
+      caption="Responsive website"
       wide
     />
   </section>
 
-  <section id="website" data-comment-id="gwsk-website">
-    <h3>website review</h3>
+  <section id="exploration" data-comment-id="gwsk-exploration">
+    <h3>Exploration</h3>
     <p class="lead">
-      The existing website is responsive, with good visual hierarchy and colour accessibility, but
-      lacks personality and could have a more emphasized CTA to book a meeting.
+      We started with moodboards from references like Pentagram, Teenage Engineering, and Bauhaus —
+      looking for a language that felt systematic, but still human.
     </p>
     <CaseStudyFigure
-      src={img('existing-website.png')}
-      alt="GWSK existing website with services table"
-      caption="Existing website"
+      src={img('moodboard.png')}
+      alt="GWSK brand moodboard with reference inspirations"
+      caption="Moodboarding"
       wide
     />
-    <h3>redesign objective</h3>
-    <ol>
-      <li>
-        <h2>Represent GWSK's style and design philosophy</h2>
-      </li>
-      <li>
-        <h2>Show GWSK's design process and services</h2>
-      </li>
-      <li>
-        <h2>Encourage potential clients to book a meeting</h2>
-      </li>
-    </ol>
-    <h3>lo-fi sketches</h3>
     <p class="lead">
-      After getting feedback from my PM/Stakeholder, we continued with the red-outlined sketches. In
-      this concept, each section of the website will be sticky to the page and open as the user
-      scrolls down.
+      From there I tested colour combinations for accessibility, so each process-stage accent stayed
+      readable across the system.
     </p>
     <CaseStudyFigure
-      src={img('lofi-sketches.png')}
-      alt="Lo-fi website sketches with red-outlined selected concept"
-      caption="Lo-fi sketches"
-      wide
-    />
-    <h3>process</h3>
-    <p class="lead">
-      Due to the tight time constraint, the other intern and I rapidly iterated between design and
-      implementation to see what is feasible and what isn't.
-    </p>
-    <CaseStudyFigure
-      src={img('project-timeline.png')}
-      alt="GWSK website redesign project timeline"
-      caption="Project timeline"
-      wide
-    />
-    <h3>Responsiveness</h3>
-    <p class="lead">
-      I had to wear both design and dev hats through the process. Here's an example of the
-      responsiveness issues we faced along the way.
-    </p>
-    <div class="case-study-figure-row">
-      <CaseStudyFigure
-        src={img('responsive-design-mockup.png')}
-        alt="Responsive design mockup"
-        caption="Design"
-      />
-      <CaseStudyFigure
-        src={img('responsive-initial-code.png')}
-        alt="Initial code implementation"
-        caption="Initial Code"
-      />
-    </div>
-    <CaseStudyFigure
-      src={img('responsive-final-code.png')}
-      alt="Final responsive code implementation"
-      caption="Final Code"
-      wide
-    />
-    <h3>Final website</h3>
-    <CaseStudyFigure
-      src={img('website-hero.png')}
-      alt="Final GWSK website redesign hero section"
-      caption="Final website screens"
+      src={img('brand-style-tile.png')}
+      alt="GWSK brand style tile with transit-inspired colour system"
+      caption="Colour accessibility testing"
       wide
     />
   </section>
 
   <section id="reflection" data-comment-id="gwsk-reflection">
-    <h3>Reflections</h3>
-    <ol>
-      <li>
-        <h2>Design process is not linear!</h2>
-        <p class="lead">
-          The process is highly iterative and doesn't always follow a clear linear trajectory.
-        </p>
-      </li>
-      <li>
-        <h2>Work under a time crunch</h2>
-        <p class="lead">
-          Prioritize key deliverables and communicate frequently to make necessary pivots.
-        </p>
-      </li>
-      <li>
-        <h2>Wear multiple hats</h2>
-        <p class="lead">
-          Think about technical constraints and think of backup plans when implementing.
-        </p>
-      </li>
-    </ol>
-    <h3>next steps</h3>
-    <ol>
-      <li>
-        <h2>Pre-launch usability testing</h2>
-        <p class="lead">Identify any changes needed to make the design more intuitive.</p>
-      </li>
-      <li>
-        <h2>Quantify outcomes</h2>
-        <p class="lead">
-          Compare the conversion rate of users (How many clicked book a meeting)
-        </p>
-      </li>
-      <li>
-        <h2>Evaluate visual communication</h2>
-        <p class="lead">
-          Interview users about their experience and impression of GWSK to see if the brand vision
-          is communicated.
-        </p>
-      </li>
-    </ol>
+    <h3>Reflection</h3>
+    <p class="lead">
+      Design process isn’t linear. Under a tight timeline we iterated between design and code,
+      wearing both hats to see what was actually feasible.
+    </p>
+    <p class="lead">
+      Next: usability testing before launch, then measure booking conversion and whether the brand
+      actually communicates how GWSK works.
+    </p>
   </section>
 </CaseStudyLayout>

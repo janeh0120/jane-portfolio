@@ -21,6 +21,7 @@ interface Props {
   heading: string;
   role: string;
   team: string;
+  teamLabel?: string;
   timeline: string;
   projectType: string;
   nav?: NavItem[];
@@ -28,8 +29,18 @@ interface Props {
   heroImage?: HeroImage;
 }
 
-const { title, heading, role, team, timeline, projectType, nav = [], commentId, heroImage } =
-  Astro.props;
+const {
+  title,
+  heading,
+  role,
+  team,
+  teamLabel = 'Team',
+  timeline,
+  projectType,
+  nav = [],
+  commentId,
+  heroImage,
+} = Astro.props;
 const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 const base = import.meta.env.BASE_URL;
 const home = base;
@@ -38,20 +49,16 @@ const hasNav = nav.length > 0;
 
 <Layout title={`${title} — Jane Hou's Portfolio`}>
   <Header />
-  <main class="mx-auto max-w-[1400px] px-6 pb-24 md:px-10">
-    <a
-      href={home}
-      class="mb-10 inline-block pt-6 text-sm text-muted transition hover:text-ink"
-    >
-      ← Back to Home
-    </a>
-
-    <div class:list={['grid gap-12', hasNav && 'lg:grid-cols-[200px_1fr] lg:gap-20']}>
-      {
-        hasNav && (
-          <aside class="case-study-aside lg:sticky lg:top-24 lg:self-start">
+  <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-6 md:px-10">
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr] lg:gap-20">
+      <aside class="case-study-aside lg:sticky lg:top-24 lg:self-start">
+        <a href={home} class="case-study-back text-sm text-muted transition hover:text-ink">
+          ← Back to Home
+        </a>
+        {
+          hasNav && (
             <nav
-              class="case-study-nav flex gap-3 overflow-x-auto lg:flex-col lg:overflow-visible lg:gap-3"
+              class="case-study-nav flex gap-3 overflow-x-auto lg:mt-6 lg:flex-col lg:overflow-visible lg:gap-3"
               aria-label="Case study"
             >
               {nav.map((item) => (
@@ -60,23 +67,29 @@ const hasNav = nav.length > 0;
                 </a>
               ))}
             </nav>
-          </aside>
-        )
-      }
+          )
+        }
+      </aside>
 
       <article class="min-w-0 max-w-3xl" data-comment-id={studyCommentId}>
-        <h1 class="font-serif text-3xl font-normal tracking-tight text-ink md:text-4xl">{heading}</h1>
+        <h1 class="case-study-heading font-serif tracking-tight text-ink">{heading}</h1>
 
         {
-          heroImage && (
-            <div class="case-study-hero mt-6">
-              <CaseStudyFigure
-                src={heroImage.src}
-                alt={heroImage.alt}
-                caption={heroImage.caption}
-                wide={heroImage.wide}
-              />
+          Astro.slots.has('hero') ? (
+            <div class="case-study-hero mt-6 min-w-0">
+              <slot name="hero" />
             </div>
+          ) : (
+            heroImage && (
+              <div class="case-study-hero mt-6">
+                <CaseStudyFigure
+                  src={heroImage.src}
+                  alt={heroImage.alt}
+                  caption={heroImage.caption}
+                  wide={heroImage.wide}
+                />
+              </div>
+            )
           )
         }
 
@@ -86,7 +99,7 @@ const hasNav = nav.length > 0;
             <dd class="mt-1 text-base text-ink">{role}</dd>
           </div>
           <div>
-            <dt class="text-sm font-medium text-muted">Team:</dt>
+            <dt class="text-sm font-medium text-muted">{teamLabel}:</dt>
             <dd class="mt-1 text-base text-ink">{team}</dd>
           </div>
           <div>
@@ -129,6 +142,10 @@ const hasNav = nav.length > 0;
 </script>
 
 <style>
+  .case-study-back {
+    display: inline-block;
+  }
+
   .case-study-aside {
     scroll-margin-top: 5rem;
   }
@@ -138,12 +155,14 @@ const hasNav = nav.length > 0;
       position: sticky;
       top: 4.5rem;
       z-index: 40;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
       margin-left: -1.5rem;
       margin-right: -1.5rem;
       padding: 0.75rem 1.5rem;
-      background: rgb(252 252 252 / 92%);
+      background: rgb(245 244 240 / 92%);
       backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--color-line);
     }
 
     .case-study-nav {
@@ -252,22 +271,34 @@ const hasNav = nav.length > 0;
     margin: 1.5rem 0 0;
   }
 
+  .case-study-content :global(.case-study-figure--wide) {
+    margin-top: 2rem;
+  }
+
+  .case-study-content :global(.case-study-figure--wide + .case-study-figure--wide) {
+    margin-top: 2.5rem;
+  }
+
   .case-study-content :global(.case-study-figure img) {
     display: block;
     width: 100%;
-    border-radius: 12px;
-    background: #fafafa;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .case-study-content :global(.case-study-figure--wide img) {
+    border-radius: 0;
   }
 
   .case-study-content :global(.case-study-figure video) {
     display: block;
     width: 100%;
-    border-radius: 12px;
+    border-radius: 0;
     background: #000;
   }
 
   .case-study-content :global(.case-study-figure--placeholder img) {
-    border: 1px dashed #c8c8c8;
+    outline: 1px dashed #c8c8c8;
   }
 
   .case-study-content :global(.case-study-figure figcaption) {
@@ -302,10 +333,8 @@ const hasNav = nav.length > 0;
   }
 
   .case-study-content :global(.case-study-stat) {
-    padding: 1rem 1.25rem;
-    border: 1px solid var(--color-line);
-    border-radius: 12px;
-    background: var(--color-canvas);
+    padding: 0;
+    background: transparent;
   }
 
   .case-study-content :global(.case-study-stat strong) {

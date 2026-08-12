@@ -22,69 +22,58 @@
     "instagram": "https://www.instagram.com/hsz_design/",
     "x": "https://x.com/jane09890",
     "linkedin": "https://www.linkedin.com/in/hou-jane/",
-    "resume": "#"
+    "resume": "https://drive.google.com/file/d/111occ2vre2kxozXngtKpFiRRdHcc2ZfP/view"
   },
   "nav": [
-    { "label": "Projects", "href": "/#projects" },
     { "label": "About", "href": "/about" },
-    { "label": "Extra!", "href": "/extra" },
+    { "label": "Play", "href": "/play" },
     {
       "label": "Resume",
-      "href": "https://drive.google.com/file/d/1GIoyNn6HADODpR-6b8PsSf7BwYmytnxg/view",
-      "external": false
+      "href": "https://drive.google.com/file/d/111occ2vre2kxozXngtKpFiRRdHcc2ZfP/view",
+      "external": true
     }
   ],
   "hero": {
-    "intro": "I'm Jane, a ",
-    "role": "systems thinker",
-    "middle": " invested in designing ",
-    "outro": " with intention.",
-    "filters": [
-      { "label": "products", "tag": "product" },
-      { "label": "branding", "tag": "brand" },
-      { "label": "community", "tag": "community" }
-    ]
+    "headline": "I'm Jane, and I like to design things at a systems level. Product, brand & community!"
   },
   "experience": {
     "current": { "label": "Intuit", "href": "https://www.intuit.com/ca/" },
     "previous": [
       { "label": "GWSK", "href": "https://gwsk.studio/" },
-      { "label": "Simple Ventures.", "href": "https://www.simpleventures.ca/" }
-    ]
+      { "label": "Simple Ventures", "href": "https://www.simpleventures.ca/" }
+    ],
+    "note": "Interested in Summer 2027 internships and part-time/contract work!"
   },
   "projects": [
     {
       "slug": "des-sys",
-      "tags": ["product", "design systems", "internship"],
-      "title": "Design and code shouldn't fall out of sync.",
+      "name": "Design Systems",
+      "tags": ["product", "shipped"],
+      "title": "Scaling design systems across products",
       "image": "images/case study hero/dessys.png",
       "comingSoon": false
     },
     {
       "slug": "migration",
-      "tags": ["product", "internship"],
-      "title": "Complex migrations shouldn't require experts.",
+      "name": "Migration",
+      "tags": ["product", "shipped"],
+      "title": "Leading design of 0 → 1 internal tooling",
       "image": "images/case study hero/intuit.png",
       "comingSoon": false
     },
     {
       "slug": "ixd",
-      "tags": ["brand", "community", "concept"],
-      "title": "A design community shouldn't graduate without a shared experience.",
+      "name": "IXDA",
+      "tags": ["brand", "community"],
+      "title": "Building a brand around community",
       "image": "images/case study hero/ixdyes.png",
       "comingSoon": false
     },
     {
-      "slug": "designchall",
-      "tags": ["product", "concept"],
-      "title": "Hiring decisions shouldn't hide behind a crowded table.",
-      "image": "images/case study hero/datatable.png",
-      "comingSoon": false
-    },
-    {
       "slug": "gwsk",
-      "tags": ["brand", "internship"],
-      "title": "A design studio shouldn't outgrow its identity.",
+      "name": "GWSK",
+      "tags": ["brand", "shipped"],
+      "title": "Refreshing a design studio's identity",
       "image": "images/case study hero/gwsk.png",
       "comingSoon": false
     }
@@ -93,20 +82,21 @@
     "heading": "A little bit more about me!",
     "paragraphs": [
       "Growing up in a family business, I became an eager self-starter with a strong drive for learning. I first explored design by creating social media posts, in-store displays, and managing the online presence for my family's business. That experience sparked my freelance journey on Fiverr, where I helped small businesses with graphic design.",
-      "In high school, noticing the lack of a strong design community, I founded a digital design club to introduce peers to creative tools and run workshops on free resources. Later, my involvement in hackathons inspired me to take on a leadership role as co-president of my college's hackathon club—overseeing not only design, but also development, logistics, sponsorship, and social media.",
+      "In high school, noticing the lack of a strong design community, I founded a digital design club to introduce peers to creative tools and run workshops on free resources. Later, my involvement in hackathons inspired me to take on a leadership role as co-president of my college's hackathon club, overseeing not only design, but also development, logistics, sponsorship, and social media.",
       "Alongside school, I volunteered my UX skills through Develop for Good, designing for a nonprofit organization, and gained professional experience interning at GWSK, a GTA-based design studio, where I contributed to visual and web design projects.",
       "Besides UX/product design, I love to apply my passion for design to drawing, crochet/knitting, scrapbooking, sewing, 3D modelling and more!",
-      "I'm interested in Fall 2026 and Summer 2027 internships that can push my design craft and process to the next level, so feel free to connect with me!"
+      "I'm interested in Summer 2027 internships and part-time contract work, so feel free to connect with me!"
     ]
   },
   "extra": {
-    "heading": "Extra Stuff!"
+    "heading": "Play"
   },
   "footer": {
     "links": [
       { "label": "Email", "type": "email" },
       { "label": "Linkedin", "hrefKey": "linkedin" },
-      { "label": "Instagram", "hrefKey": "instagram" }
+      { "label": "Instagram", "hrefKey": "instagram" },
+      { "label": "X", "hrefKey": "x" }
     ]
   }
 }

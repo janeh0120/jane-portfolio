@@ -6,6 +6,7 @@ export type NavItem = {
 
 export type Project = {
   slug: string;
+  name: string;
   tags: string[];
   title: string;
   image: string;
@@ -26,15 +27,12 @@ export type SiteContent = {
   links: Record<string, string>;
   nav: NavItem[];
   hero: {
-    intro: string;
-    role: string;
-    middle: string;
-    outro: string;
-    filters: { label: string; tag: string }[];
+    headline: string;
   };
   experience: {
     current: { label: string; href: string };
     previous: { label: string; href: string }[];
+    note?: string;
   };
   projects: Project[];
   about: {

@@ -1,64 +1,64 @@
 ---
 import { site } from '../data/site';
+import SocialLinks from './SocialLinks.astro';
+
+interface Props {
+  showSocials?: boolean;
+}
+
+const { showSocials = true } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const root = base.endsWith('/') ? base.slice(0, -1) : base;
+
+function resolveHref(href: string) {
+  if (href.startsWith('http://') || href.startsWith('https://')) return href;
+  if (href.startsWith('/')) return `${root}${href}`;
+  return href;
+}
+
+const caseStudyLinks = site.projects
+  .filter((project) => !project.comingSoon)
+  .map((project) => ({
+    label: project.name,
+    href: `/${project.slug}`,
+    external: false,
+  }));
+
+const otherLinks = site.nav
+  .filter((item) => item.label !== 'Projects')
+  .map((item) => ({
+    label: item.label,
+    href: item.href,
+    external: Boolean(item.external) || item.href.startsWith('http'),
+  }));
+
+const pageLinks = [...caseStudyLinks, ...otherLinks];
 ---
 
-<footer class="border-t border-line" data-comment-id="site-footer">
-  <div
-    class="mx-auto flex max-w-[1400px] flex-col gap-8 px-6 py-10 md:flex-row md:items-center md:justify-between md:px-10 md:py-12"
-  >
-    <div class="flex flex-wrap items-center gap-6 text-sm font-medium">
+<footer data-comment-id="site-footer">
+  <div class="mx-auto flex max-w-[1400px] flex-col gap-8 px-6 py-10 md:px-10 md:py-12">
+    <nav
+      class="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium"
+      aria-label="Footer"
+      data-comment-id="footer-nav"
+    >
       {
-        site.footer.links.map((link) => {
-          if ('type' in link && link.type === 'email') {
-            return site.email ? (
-              <button
-                type="button"
-                id="copy-email"
-                data-email={site.email}
-                data-default-label={link.label}
-                class="cursor-pointer border-0 bg-transparent p-0 text-ink transition hover:opacity-70"
-              >
-                <span id="copy-email-label">{link.label}</span>
-              </button>
-            ) : (
-              <span class="text-ink">{link.label}</span>
-            );
-          }
-
-          const href = site.links[link.hrefKey];
-          return (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="transition hover:opacity-70"
-            >
-              {link.label}
-            </a>
-          );
-        })
+        pageLinks.map((item) => (
+          <a
+            href={resolveHref(item.href)}
+            class="text-ink underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink"
+            target={item.external ? '_blank' : undefined}
+            rel={item.external ? 'noopener noreferrer' : undefined}
+          >
+            {item.label}
+            {item.external && <span aria-hidden="true"> ↗</span>}
+          </a>
+        ))
       }
-    </div>
+    </nav>
+
+    {showSocials && <SocialLinks />}
+
     <p class="text-sm text-muted">{site.year} ® {site.name}</p>
   </div>
 </footer>
-
-<script>
-  const btn = document.getElementById('copy-email');
-  const label = document.getElementById('copy-email-label');
-  if (btn && label) {
-    btn.addEventListener('click', async () => {
-      const email = btn.getAttribute('data-email');
-      if (!email) return;
-      try {
-        await navigator.clipboard.writeText(email);
-        label.textContent = 'Copied!';
-        setTimeout(() => {
-        label.textContent = btn.getAttribute('data-default-label') ?? 'Email';
-        }, 2000);
-      } catch {
-        window.location.href = `mailto:${email}`;
-      }
-    });
-  }
-</script>

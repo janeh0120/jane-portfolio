@@ -14,15 +14,28 @@ const email = site.email || 'janeh0120@gmail.com';
   projectType="Product Design"
   commentId="case-study-migration"
 >
-  <section data-comment-id="migration-summary">
+  <section id="outline" data-comment-id="migration-outline" class="migration-outline">
     <p class="lead">
-      Helping teams independently configure complex migration projects through a clearer and more
-      scalable workflow.
+      I joined an early-stage, startup-like beta as the sole designer—defining design direction and
+      what success looked like.
     </p>
-    <aside class="migration-disclaimer" role="note" aria-label="Work in progress">
+    <p>
+      The product is a complex internal tool for engineers and technical program managers making
+      code updates across teams like QuickBooks—updating dependencies, swapping hardcoded values
+      for tokens, and more. Agents discover needed fixes and apply the changes so teams spend less
+      time on manual work.
+    </p>
+    <p>
+      I navigated vibe-coded early designs, reverse-engineered the product, learned a technical
+      space quickly, and thought strategically about where it should go next.
+    </p>
+  </section>
+
+  <section data-comment-id="migration-nda">
+    <aside class="migration-disclaimer" role="note" aria-label="NDA notice">
       <p>
-        This case study is still in progress. If you’d like to learn more, please
-        <a href={`mailto:${email}`}>email me</a> for details.
+        I’m not able to publicize this work due to an NDA. If you’d like to learn more, please
+        <a href={`mailto:${email}`}>contact me personally</a> for details.
       </p>
     </aside>
   </section>
@@ -30,11 +43,8 @@ const email = site.email || 'janeh0120@gmail.com';
 
 <style>
   .migration-disclaimer {
-    margin-top: 1.75rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid var(--color-line);
-    border-radius: 12px;
-    background: var(--color-canvas);
+    padding: 1rem 0;
+    background: transparent;
   }
 
   .migration-disclaimer p {
@@ -55,5 +65,9 @@ const email = site.email || 'janeh0120@gmail.com';
 
   .migration-disclaimer a:hover {
     opacity: 0.7;
+  }
+
+  .migration-outline p + p {
+    margin-top: 1em;
   }
 </style>

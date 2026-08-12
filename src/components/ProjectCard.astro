@@ -24,40 +24,36 @@ const commentId = project.slug
 >
   {
     project.comingSoon ? (
-      <div class="relative block overflow-hidden rounded-xl bg-canvas">
+      <div class="relative block overflow-hidden bg-canvas">
         <img
           src={imageSrc}
           alt=""
-          class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+          class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:opacity-90"
           loading="lazy"
         />
-        <span
-          class="absolute top-2 right-2 rounded-full bg-canvas px-2 py-0.5 text-xs font-medium text-ink shadow-sm"
-        >
+        <span class="absolute top-2 right-2 bg-canvas px-2 py-0.5 text-xs font-medium text-ink">
           Coming soon
         </span>
       </div>
     ) : (
-      <a href={href} class="relative block overflow-hidden rounded-xl bg-canvas">
+      <a href={href} class="relative block overflow-hidden bg-canvas">
         <img
           src={imageSrc}
           alt=""
-          class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+          class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:opacity-90"
           loading="lazy"
         />
       </a>
     )
   }
-  <div class="mt-4 space-y-2">
-    <p class="text-sm text-muted">{formatProjectTags(project.tags)}</p>
+  <div class="mt-3.5 space-y-1.5">
+    <p class="project-tags">{formatProjectTags(project.tags)}</p>
     {
       project.comingSoon ? (
         <h3 class="project-title text-ink">{project.title}</h3>
       ) : (
         <a href={href} class="block">
-          <h3 class="project-title text-ink transition group-hover:opacity-70">
-            {project.title}
-          </h3>
+          <h3 class="project-title text-ink transition group-hover:opacity-70">{project.title}</h3>
         </a>
       )
     }

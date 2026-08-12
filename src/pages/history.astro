@@ -102,13 +102,13 @@ function formatDate(iso: string) {
             {versions.map((version) => {
               const summary = getVersionSummary(version.label);
               return (
-                <li class="rounded-xl border border-line p-6 md:p-8">
+                <li class="py-8">
                   <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div class="min-w-0 space-y-2">
                       <div class="flex flex-wrap items-center gap-3">
                         <h2 class="font-serif text-2xl font-normal tracking-tight">{version.label}</h2>
                         {version.isActive && (
-                          <span class="rounded-full bg-line px-2.5 py-0.5 text-xs font-medium text-ink">
+                          <span class="text-xs font-medium uppercase tracking-wide text-muted">
                             Live
                           </span>
                         )}
@@ -121,7 +121,7 @@ function formatDate(iso: string) {
                     </div>
                     <a
                       href={`${base}history?version=${version.id}`}
-                      class="inline-flex shrink-0 items-center justify-center rounded-lg border border-ink px-4 py-2 text-sm font-medium transition hover:bg-ink hover:text-white"
+                      class="inline-flex shrink-0 items-center justify-center text-sm font-medium underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink"
                     >
                       View version →
                     </a>

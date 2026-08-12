@@ -13,61 +13,61 @@ function resolveHref(href: string) {
 
 function isActive(href: string) {
   if (href === '/about') return pathname.endsWith('/about');
-  if (href === '/extra') return pathname.endsWith('/extra');
+  if (href === '/play') return pathname.endsWith('/play');
   if (href === '/history') return pathname.endsWith('/history');
-  if (href === '/#projects') {
-    return pathname === '/' || pathname === root;
-  }
   return false;
 }
 
 const linkClass = (href: string) =>
   [
-    'text-sm font-medium transition hover:opacity-70',
-    isActive(href) && 'underline decoration-ink/30 underline-offset-4',
+    'text-sm font-normal tracking-tight text-ink underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink',
+    isActive(href) && 'decoration-ink',
   ]
     .filter(Boolean)
     .join(' ');
 ---
 
-<header class="site-header sticky top-0 z-50 bg-white/70 backdrop-blur-sm">
+<header class="site-header sticky top-0 z-50 bg-canvas/85 backdrop-blur-sm">
   <div
-    class="relative mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-6 py-5 md:px-10"
+    class="relative mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-6 py-6 md:px-10 md:py-8"
   >
-    <div class="flex min-w-0 items-center gap-5 md:gap-8">
-      <a
-        href={base}
-        class="nav-logo inline-flex shrink-0 items-center transition hover:opacity-70"
-        aria-label={`${site.name} home`}
-      >
-        <span
-          class="nav-logo-mark block h-7 w-7 shrink-0 bg-ink"
-          data-logo-target
-          style={`mask: url('${base}${site.logo}') center / contain no-repeat; -webkit-mask: url('${base}${site.logo}') center / contain no-repeat;`}
-        ></span>
-      </a>
+    <a
+      href={base}
+      class="nav-logo inline-flex shrink-0 items-center transition hover:opacity-70"
+      aria-label={`${site.name} home`}
+    >
+      <span
+        class="nav-logo-mark block h-6 w-6 shrink-0 bg-ink"
+        data-logo-target
+        style={`mask: url('${base}${site.logo}') center / contain no-repeat; -webkit-mask: url('${base}${site.logo}') center / contain no-repeat;`}
+      ></span>
+    </a>
 
+    <div class="header-actions flex shrink-0 items-center gap-5 md:gap-8">
       <nav
-        class="main-nav hidden items-center gap-5 md:flex md:gap-8"
+        class="main-nav hidden items-center gap-5 md:flex md:gap-7"
         aria-label="Main"
         data-comment-id="main-nav"
       >
         {
           site.nav.map((item) => (
-            <a href={resolveHref(item.href)} class={linkClass(item.href)}>
+            <a
+              href={resolveHref(item.href)}
+              class={linkClass(item.href)}
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
+            >
               {item.label}
+              {item.external && <span aria-hidden="true"> ↗</span>}
             </a>
           ))
         }
       </nav>
-    </div>
-
-    <div class="header-actions flex shrink-0 items-center gap-2">
       <div id="comment-toggle-anchor" class="comment-toggle-anchor" data-comment-ui></div>
       <button
         type="button"
         id="mobile-nav-toggle"
-        class="mobile-nav-toggle inline-flex h-11 w-11 items-center justify-center rounded-lg border border-line bg-white text-ink transition hover:bg-line/60 md:hidden"
+        class="mobile-nav-toggle inline-flex h-11 w-11 items-center justify-center bg-transparent text-ink transition hover:opacity-60 md:hidden"
         aria-expanded="false"
         aria-controls="mobile-nav-panel"
         aria-label="Open menu"
@@ -99,7 +99,7 @@ const linkClass = (href: string) =>
 
   <nav
     id="mobile-nav-panel"
-    class="mobile-nav-panel hidden border-t border-line bg-white/95 px-6 py-4 backdrop-blur-sm md:hidden"
+    class="mobile-nav-panel hidden bg-canvas/95 px-6 py-4 backdrop-blur-sm md:hidden"
     aria-label="Main"
     hidden
   >
@@ -110,11 +110,14 @@ const linkClass = (href: string) =>
             <a
               href={resolveHref(item.href)}
               class:list={[
-                'mobile-nav-link block rounded-lg px-3 py-3 text-base font-medium transition hover:bg-line/60',
-                isActive(item.href) && 'bg-line/40',
+                'mobile-nav-link block px-0 py-3 text-base font-medium underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink',
+                isActive(item.href) && 'decoration-ink',
               ]}
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
             >
               {item.label}
+              {item.external && <span aria-hidden="true"> ↗</span>}
             </a>
           </li>
         ))

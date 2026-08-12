@@ -129,9 +129,9 @@ See **[COMMENTS_SETUP.md](./COMMENTS_SETUP.md)** for Supabase + Vercel deploy st
 |-------|-------------|
 | `/` | Home — hero, experience, project grid |
 | `/about` | About page |
-| `/extra` | Extra gallery |
+| `/play` | Play gallery |
 | `/history` | Portfolio version timeline and archived snapshots |
-| `/des-sys`, `/ixd`, `/designchall`, `/gwsk` | Case studies |
+| `/des-sys`, `/ixd`, `/gwsk`, `/migration` | Case studies |
 
 ## Environment variables
 

@@ -50,11 +50,7 @@ function imageSrc(path: string) {
       </div>
     </div>
 
-    <div class="gallery-modal-description">
-      <h2 id="modal-title" />
-      <p id="modal-description" />
-      <div class="gallery-modal-meta" id="modal-meta" />
-    </div>
+    <p class="gallery-modal-description" id="modal-description" />
   </div>
 </div>
 
@@ -71,9 +67,7 @@ function imageSrc(path: string) {
   const carouselSlides = document.getElementById('carousel-slides');
   const carouselDots = document.getElementById('carousel-dots');
   const carouselControls = document.getElementById('carousel-controls');
-  const modalTitle = document.getElementById('modal-title');
   const modalDescription = document.getElementById('modal-description');
-  const modalMeta = document.getElementById('modal-meta');
 
   function updateCarousel() {
     if (!carouselSlides) return;
@@ -132,9 +126,7 @@ function imageSrc(path: string) {
       carouselControls.hidden = item.images.length <= 1;
     }
 
-    if (modalTitle) modalTitle.textContent = item.title;
     if (modalDescription) modalDescription.textContent = item.description;
-    if (modalMeta) modalMeta.textContent = `Year: ${item.year}`;
 
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
