@@ -1,0 +1,27 @@
+---
+const base = import.meta.env.BASE_URL;
+const src = `${base}images/icons/go.svg`;
+---
+
+<span
+  class="external-link-icon"
+  aria-hidden="true"
+  style={`mask-image: url('${src}'); -webkit-mask-image: url('${src}');`}
+></span>
+
+<style>
+  .external-link-icon {
+    display: inline-block;
+    width: 0.75em;
+    height: 0.75em;
+    margin-left: 0.2em;
+    vertical-align: -0.05em;
+    background-color: currentColor;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+</style>

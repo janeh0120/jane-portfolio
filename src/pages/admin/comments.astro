@@ -42,12 +42,12 @@ const categoryLabels: Record<string, string> = {
 };
 ---
 
-<Layout title="Comments — Admin" showCommentMode={false}>
+<Layout title="Comments | Admin" showCommentMode={false}>
   <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
     {
       !authorized ? (
         <>
-          <h1 class="font-serif text-3xl font-normal tracking-tight">Admin access required</h1>
+          <h1 class="case-study-heading">Admin access required</h1>
           <p class="mt-4 text-muted">
             Add <code class="rounded bg-line px-1.5 py-0.5 text-sm">?key=YOUR_ADMIN_SECRET</code> to
             the URL.
@@ -64,8 +64,8 @@ const categoryLabels: Record<string, string> = {
         <>
           <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h1 class="font-serif text-3xl font-normal tracking-tight">Portfolio comments</h1>
-              <p class="mt-2 text-sm text-muted">Private view — not shown to visitors.</p>
+              <h1 class="case-study-heading">Portfolio comments</h1>
+              <p class="mt-2 text-sm text-muted">Private view, not shown to visitors.</p>
             </div>
             <a
               href={`${base}admin/review?key=${encodeURIComponent(key)}`}

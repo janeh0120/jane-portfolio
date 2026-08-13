@@ -13,10 +13,10 @@ export type CommentValidationResult =
 export const VALIDATION_MESSAGES: Record<CommentValidationCode, string> = {
   too_short: 'Comments need at least 3 characters.',
   inappropriate_language:
-    'Please keep feedback respectful — remove inappropriate language and try again.',
-  too_many_links: 'Too many links — max 3 per comment.',
+    'Please keep feedback respectful. Remove inappropriate language and try again.',
+  too_many_links: 'Too many links (max 3 per comment).',
   repeated_chars: 'Ease up on repeated characters.',
-  shouting: 'Most of your comment is uppercase — normal casing reads easier.',
+  shouting: 'Most of your comment is uppercase. Normal casing reads easier.',
   promo_spam: "Promotional or off-topic content isn't allowed here.",
 };
 

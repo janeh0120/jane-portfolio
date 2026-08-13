@@ -17,3 +17,6 @@ npm-debug.log*
 
 # IDE
 .astro/
+
+# Local-only media (not deployed)
+local-media/

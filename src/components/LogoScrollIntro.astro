@@ -32,11 +32,13 @@ const frames = [startEndSrc, ...midImages.map((src) => `${base}${src}`), startEn
 <script>
   const REEL_MS = 2800;
   const SETTLE_MS = 1200;
+  const SEEN_KEY = 'logo-intro-seen';
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const morph = document.getElementById('logo-intro-morph');
   const logoTarget = document.querySelector('[data-logo-target]') as HTMLElement | null;
+  const alreadySeen = sessionStorage.getItem(SEEN_KEY) === '1';
 
-  if (reduceMotion || !morph || !logoTarget) {
+  if (reduceMotion || alreadySeen || !morph || !logoTarget) {
     document.body.classList.add('logo-intro-complete');
     morph?.remove();
   } else {
@@ -83,6 +85,7 @@ const frames = [startEndSrc, ...midImages.map((src) => `${base}${src}`), startEn
     }
 
     function finish() {
+      sessionStorage.setItem(SEEN_KEY, '1');
       morph!.classList.add('is-complete');
       document.body.classList.remove('logo-intro-active', 'logo-intro-settling');
       document.body.classList.add('logo-intro-complete');

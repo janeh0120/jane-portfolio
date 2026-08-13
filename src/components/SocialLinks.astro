@@ -1,61 +1,32 @@
 ---
 import { site } from '../data/site';
 
-const iconClass = 'h-5 w-5';
+const linkClass =
+  'social-link w-fit text-meta text-ink underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink';
 ---
 
-<div class="social-links flex flex-wrap items-center gap-5" data-comment-id="social-links">
+<div class="social-links flex flex-col items-start gap-3" data-comment-id="social-links">
   {
     site.footer.links.map((link) => {
       if ('type' in link && link.type === 'email') {
         return site.email ? (
           <button
             type="button"
-            class="copy-email social-link inline-flex text-ink transition hover:opacity-70"
+            class:list={['copy-email', linkClass, 'bg-transparent p-0 text-left']}
             data-email={site.email}
             data-default-label={link.label}
             aria-label={link.label}
-            title={link.label}
           >
-            <svg class={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-              <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-              <path d="m4 7 8 6 8-6"></path>
-            </svg>
-            <span class="copy-email-status sr-only" aria-live="polite"></span>
+            <span class="copy-email-label">{link.label}</span>
           </button>
         ) : null;
       }
 
       const href = site.links[link.hrefKey];
-      const key = link.hrefKey;
 
       return (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="social-link inline-flex text-ink transition hover:opacity-70"
-          aria-label={link.label}
-          title={link.label}
-        >
-          {key === 'linkedin' && (
-            <svg class={iconClass} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM.24 8.48h4.52V23H.24V8.48zM8.34 8.48h4.33v1.98h.06c.6-1.14 2.08-2.34 4.28-2.34 4.58 0 5.42 3.02 5.42 6.94V23h-4.52v-6.66c0-1.59-.03-3.63-2.21-3.63-2.21 0-2.55 1.73-2.55 3.51V23H8.34V8.48z"></path>
-            </svg>
-          )}
-          {key === 'instagram' && (
-            <svg class={iconClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="5"></rect>
-              <circle cx="12" cy="12" r="4"></circle>
-              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"></circle>
-            </svg>
-          )}
-          {key === 'x' && (
-            <svg class={iconClass} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M18.9 2H22l-6.8 7.78L23.2 22h-6.3l-4.93-6.44L6.2 22H3.08l7.28-8.32L.8 2h6.46l4.45 5.9L18.9 2zm-1.1 18h1.72L6.35 3.9H4.5L17.8 20z"></path>
-            </svg>
-          )}
-          {!['linkedin', 'instagram', 'x'].includes(key) && <span class="text-sm font-medium">{link.label}</span>}
+        <a href={href} target="_blank" rel="noopener noreferrer" class={linkClass}>
+          {link.label}
         </a>
       );
     })
@@ -64,7 +35,7 @@ const iconClass = 'h-5 w-5';
 
 <script>
   document.querySelectorAll<HTMLButtonElement>('.copy-email').forEach((btn) => {
-    const status = btn.querySelector<HTMLElement>('.copy-email-status');
+    const label = btn.querySelector<HTMLElement>('.copy-email-label');
 
     btn.addEventListener('click', async () => {
       const email = btn.getAttribute('data-email');
@@ -72,13 +43,11 @@ const iconClass = 'h-5 w-5';
       if (!email) return;
       try {
         await navigator.clipboard.writeText(email);
-        btn.setAttribute('title', 'Copied!');
         btn.setAttribute('aria-label', 'Email copied');
-        if (status) status.textContent = 'Copied!';
+        if (label) label.textContent = 'Copied!';
         setTimeout(() => {
-          btn.setAttribute('title', defaultLabel);
           btn.setAttribute('aria-label', defaultLabel);
-          if (status) status.textContent = '';
+          if (label) label.textContent = defaultLabel;
         }, 2000);
       } catch {
         window.location.href = `mailto:${email}`;
@@ -86,17 +55,3 @@ const iconClass = 'h-5 w-5';
     });
   });
 </script>
-
-<style>
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-</style>

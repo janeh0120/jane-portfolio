@@ -1,67 +1,135 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
-import { site } from '../data/site';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 
-const email = site.email || 'janeh0120@gmail.com';
+const img = (file: string) => `images/case-studies/des-sys/${file}`;
+
+const nav = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Impact & Process', href: '#impact' },
+  { label: 'AI Workflow', href: '#workflow' },
+  { label: 'Reflection', href: '#reflection' },
+];
 ---
 
 <CaseStudyLayout
   title="Design Systems"
-  heading="Design and code shouldn't fall out of sync."
+  heading="Bridging design and code with AI"
   role="Product Designer"
-  team="Intuit Design Systems"
-  timeline="Jan 2026 – Present"
+  team="Sole designer, 1 developer, with guidance from 2 designers"
+  timeline="Jan 2026 – Mar 2026"
   projectType="Product, Design Systems"
+  nav={nav}
   commentId="case-study-des-sys"
+  heroImage={{
+    src: 'images/case study hero/dessys.png',
+    alt: 'Intuit Design Systems cover',
+    wide: true,
+  }}
 >
-  <section id="outline" data-comment-id="des-sys-outline" class="des-sys-outline">
+  <section id="overview" data-comment-id="des-sys-overview">
+    <h3>Context</h3>
     <p class="lead">
-      Through working on a product, I became a customer of the Intuit Design System (IDS)—and
-      started seeing where it fell short in real use.
+      The Intuit Design System (IDS) is a shared library of components and tokens used across
+      products. As it evolves, keeping design and code aligned gets harder. I identified gaps,
+      documented them, and carried fixes through so teams relying on the system could stay in sync.
     </p>
-    <p>
-      I identified gaps in the system, documented them clearly, and carried the fixes through so
-      design and code could stay aligned for the teams relying on IDS.
+
+    <h3>Why this matters</h3>
+    <ol>
+      <li>
+        <h2>Design handoff is less reliable</h2>
+        <p>
+          Handoff breaks down when components aren’t 1-to-1 between prototypes and implementation.
+        </p>
+      </li>
+      <li>
+        <h2>Hardcoded values bypass tokens</h2>
+        <p>
+          Hardcoded values in components skip tokens, so global theme updates never reach the UI.
+        </p>
+      </li>
+    </ol>
+
+    <h3>Opportunity</h3>
+    <p class="lead">
+      I explored how AI can help designers own more of the implementation path, finding token
+      mismatches, proposing fixes, and shipping lower-risk updates without losing quality.
     </p>
   </section>
 
-  <section data-comment-id="des-sys-nda">
-    <aside class="des-sys-disclaimer" role="note" aria-label="NDA notice">
-      <p>
-        I’m not able to publicize this work due to an NDA. If you’d like to learn more, please
-        <a href={`mailto:${email}`}>contact me personally</a> for details.
-      </p>
-    </aside>
+  <section id="impact" data-comment-id="des-sys-impact">
+    <h3>How small changes scale</h3>
+    <p class="lead">
+      I updated 3 core components across the design system. Just one component can have a large
+      systematic impact.
+    </p>
+    <p class="lead">For the checkbox component:</p>
+    <div class="case-study-stats">
+      <div class="case-study-stat">
+        <strong>355k+</strong>
+        <span>instances of checkbox in Figma</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>143</strong>
+        <span>business units use checkbox in code</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>164</strong>
+        <span>design teams use checkbox</span>
+      </div>
+    </div>
+
+    <h3>What do token adjustments look like?</h3>
+    <p class="lead">
+      Some token adjustments bring design and code into alignment, like syncing label font weight to
+      the correct component token.
+    </p>
+    <CaseStudyFigure
+      src={img('token-alignment-font-weight.png')}
+      alt="Before and after aligning checkbox label font weight between design and code"
+    />
+    <p class="lead">
+      Others update tokens to match documentation for correct usage, even when design and code were
+      already in line with each other, like swapping `--input-label` for `--text-primary` on checkbox
+      labels.
+    </p>
+    <CaseStudyFigure
+      src={img('token-alignment-input-label.png')}
+      alt="Before and after aligning input label colour token from --input-label to --text-primary"
+    />
+  </section>
+
+  <section id="workflow" data-comment-id="des-sys-workflow">
+    <h3>Audit process</h3>
+    <p class="lead">
+      Previously, identifying an issue and implementing a fix required separate design and
+      engineering workflows. Below is the workflow that designers can own in the process.
+    </p>
+    <CaseStudyFigure
+      src={img('audit-workflow-after.png')}
+      alt="Designer-owned audit workflow with AI-assisted review, Storybook preview, and PR"
+      wide
+    />
+    <p class="lead">AI didn’t replace review or decision-making.</p>
+    <p class="lead">
+      Instead, it enabled me to participate more directly in implementation, reducing dependency on
+      engineering bandwidth for lower-risk updates while maintaining quality.
+    </p>
+  </section>
+
+  <section id="reflection" data-comment-id="des-sys-reflection">
+    <h3>Reflection</h3>
+    <p class="lead">
+      Nothing is too small. Maintaining the integrity of a design system starts at the token level.
+      By leveraging AI throughout the workflow, I could move beyond spotting gaps and contribute
+      directly to documentation, implementation, validation, and shipping.
+    </p>
+
+    <h3>Next steps</h3>
+    <p class="lead">
+      Since I worked on this project, AI has advanced. I would use Figma MCP to automate the design
+      file updates for me, removing another layer of manual work and streamlining this process further.
+    </p>
   </section>
 </CaseStudyLayout>
-
-<style>
-  .des-sys-disclaimer {
-    padding: 1rem 0;
-    background: transparent;
-  }
-
-  .des-sys-disclaimer p {
-    margin: 0;
-    color: var(--color-muted);
-    font-size: 1rem;
-    line-height: 1.5;
-    font-weight: 400;
-    letter-spacing: 0;
-  }
-
-  .des-sys-disclaimer a {
-    color: var(--color-ink);
-    text-decoration: underline;
-    text-underline-offset: 0.15em;
-    transition: opacity 0.15s ease;
-  }
-
-  .des-sys-disclaimer a:hover {
-    opacity: 0.7;
-  }
-
-  .des-sys-outline p + p {
-    margin-top: 1em;
-  }
-</style>

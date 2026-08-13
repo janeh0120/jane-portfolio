@@ -3,6 +3,7 @@ import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
 import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 
 const img = (file: string) => `images/case-studies/gwsk/${file}`;
+const vid = (file: string) => `videos/gwsk/${file}`;
 
 const nav = [
   { label: 'Intro', href: '#intro' },
@@ -16,7 +17,7 @@ const nav = [
   title="GWSK"
   heading="A design studio shouldn't outgrow its identity."
   role="Design Intern"
-  team="Design Intern, Stakeholder/PM"
+  team="Stakeholder/PM"
   timeline="3.5 weeks"
   projectType="Brand Design, Web Design"
   nav={nav}
@@ -34,7 +35,7 @@ const nav = [
       transit-inspired system that brought personality and consistency back to the studio.
     </p>
     <p class="lead">
-      The result was a full brand system, reusable templates, and a redesigned site —
+      The result was a full brand system, reusable templates, and a redesigned site:
       <a
         href="https://gwsk.studio/"
         target="_blank"
@@ -53,27 +54,51 @@ const nav = [
       stays modular without feeling robotic.
     </p>
     <CaseStudyFigure
-      src={img('brand-design-system.png')}
-      alt="GWSK final brand design system in Figma with typography, colour, and layout grids"
-      caption="Brand design system"
+      src={img('gwsk-logo.png')}
+      alt="GWSK logo mark and wordmark on dark background"
+      caption="Logo"
       wide
     />
     <CaseStudyFigure
-      src={img('presentation-deck-cycle.png')}
-      alt="GWSK presentation deck iterative process diagram"
-      caption="Presentation deck — colour coded by design process"
+      src={img('brand-foundations.png')}
+      alt="GWSK brand foundations showing colour palette and typography hierarchy"
+      caption="Brand foundations"
       wide
     />
     <CaseStudyFigure
-      src={img('website-hero.png')}
-      alt="Final GWSK website redesign hero section"
-      caption="Website redesign"
+      src={img('design-process.png')}
+      alt="Transit-inspired GWSK design process map from Discover through Deliver"
+      caption="Design process"
       wide
     />
     <CaseStudyFigure
-      src={img('final-website-responsive.png')}
-      alt="GWSK redesigned website on desktop and mobile"
-      caption="Responsive website"
+      src={img('gwsk-assets.png')}
+      alt="GWSK brand assets including process step UI and presentation slide"
+      caption="Brand assets"
+      wide
+    />
+    <CaseStudyFigure
+      src={img('presentation-slides.png')}
+      alt="GWSK brand guidelines presentation slides"
+      caption="Presentation deck"
+      wide
+    />
+
+    <h3>Final website</h3>
+    <p class="lead">
+      Interactive site walks through who GWSK is, how they work, and how to book, tuned for both
+      desktop and mobile.
+    </p>
+    <CaseStudyFigure
+      src={vid('website-laptop.mp4')}
+      alt="Screen recording of the final GWSK website on laptop"
+      caption="Laptop"
+      wide
+    />
+    <CaseStudyFigure
+      src={vid('website-mobile.mp4')}
+      alt="Screen recording of the final GWSK website on mobile"
+      caption="Mobile"
       wide
     />
   </section>
@@ -81,7 +106,7 @@ const nav = [
   <section id="exploration" data-comment-id="gwsk-exploration">
     <h3>Exploration</h3>
     <p class="lead">
-      We started with moodboards from references like Pentagram, Teenage Engineering, and Bauhaus —
+      We started with moodboards from references like Pentagram, Teenage Engineering, and Bauhaus,
       looking for a language that felt systematic, but still human.
     </p>
     <CaseStudyFigure
@@ -96,8 +121,7 @@ const nav = [
     </p>
     <CaseStudyFigure
       src={img('brand-style-tile.png')}
-      alt="GWSK brand style tile with transit-inspired colour system"
-      caption="Colour accessibility testing"
+      alt="GWSK colour contrast accessibility grid across accent and grey tokens"
       wide
     />
   </section>
@@ -109,8 +133,8 @@ const nav = [
       wearing both hats to see what was actually feasible.
     </p>
     <p class="lead">
-      Next: usability testing before launch, then measure booking conversion and whether the brand
-      actually communicates how GWSK works.
+      Next: run usability testing on the live site, then measure booking conversion and whether the
+      brand actually communicates how GWSK works.
     </p>
   </section>
 </CaseStudyLayout>

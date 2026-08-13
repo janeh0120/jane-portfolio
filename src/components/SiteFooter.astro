@@ -1,6 +1,7 @@
 ---
 import { site } from '../data/site';
 import SocialLinks from './SocialLinks.astro';
+import ExternalLinkIcon from './ExternalLinkIcon.astro';
 
 interface Props {
   showSocials?: boolean;
@@ -16,49 +17,51 @@ function resolveHref(href: string) {
   return href;
 }
 
-const caseStudyLinks = site.projects
-  .filter((project) => !project.comingSoon)
-  .map((project) => ({
-    label: project.name,
-    href: `/${project.slug}`,
-    external: false,
-  }));
-
-const otherLinks = site.nav
-  .filter((item) => item.label !== 'Projects')
-  .map((item) => ({
-    label: item.label,
-    href: item.href,
-    external: Boolean(item.external) || item.href.startsWith('http'),
-  }));
-
-const pageLinks = [...caseStudyLinks, ...otherLinks];
+const pageLinks = [
+  { label: 'Projects', href: '/#projects', external: false },
+  ...site.nav
+    .filter((item) => item.label !== 'Projects')
+    .map((item) => ({
+      label: item.label,
+      href: item.href,
+      external: Boolean(item.external) || item.href.startsWith('http'),
+    })),
+];
 ---
 
 <footer data-comment-id="site-footer">
-  <div class="mx-auto flex max-w-[1400px] flex-col gap-8 px-6 py-10 md:px-10 md:py-12">
-    <nav
-      class="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-medium"
-      aria-label="Footer"
-      data-comment-id="footer-nav"
+  <div class="mx-auto max-w-[1400px] px-6 py-10 md:px-10 md:py-12">
+    <div
+      class:list={[
+        'grid gap-10',
+        showSocials ? 'sm:grid-cols-2 sm:gap-16' : '',
+      ]}
     >
+      <nav class="flex flex-col gap-3 text-meta" aria-label="Footer" data-comment-id="footer-nav">
+        {
+          pageLinks.map((item) => (
+            <a
+              href={resolveHref(item.href)}
+              class="w-fit text-ink underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink"
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
+            >
+              {item.label}
+              {item.external && <ExternalLinkIcon />}
+            </a>
+          ))
+        }
+      </nav>
+
       {
-        pageLinks.map((item) => (
-          <a
-            href={resolveHref(item.href)}
-            class="text-ink underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink"
-            target={item.external ? '_blank' : undefined}
-            rel={item.external ? 'noopener noreferrer' : undefined}
-          >
-            {item.label}
-            {item.external && <span aria-hidden="true"> ↗</span>}
-          </a>
-        ))
+        showSocials && (
+          <div class="footer-socials flex flex-col" data-comment-id="footer-socials">
+            <SocialLinks />
+          </div>
+        )
       }
-    </nav>
+    </div>
 
-    {showSocials && <SocialLinks />}
-
-    <p class="text-sm text-muted">{site.year} ® {site.name}</p>
+    <p class="mt-10 text-sm text-muted md:mt-12">{site.year} © {site.name}</p>
   </div>
 </footer>

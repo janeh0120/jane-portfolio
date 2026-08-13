@@ -4,15 +4,29 @@ import Header from '../components/Header.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SocialLinks from '../components/SocialLinks.astro';
 import { site } from '../data/site';
+
+const base = import.meta.env.BASE_URL;
+const aboutVideoSrc = `${base}videos/about/about-me.mp4`;
 ---
 
-<Layout title={`About — ${site.title}`} description={site.description}>
+<Layout title={`About | ${site.title}`} description={site.description}>
   <Header />
   <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-10 md:px-10 md:pb-32 md:pt-14" data-comment-id="about-page">
     <article class="max-w-2xl" data-comment-id="about-bio">
       <h1 class="case-study-heading text-ink">{site.about.heading}</h1>
+      <figure class="about-video mt-8 md:mt-10">
+        <video
+          src={aboutVideoSrc}
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          aria-label="Short video about Jane"
+        ></video>
+      </figure>
       <div class="about-copy mt-8 space-y-5 md:mt-10">
-        {site.about.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
+        {site.about.paragraphs.map((paragraph) => <p class="text-body text-muted">{paragraph}</p>)}
       </div>
       <div class="mt-10 md:mt-12">
         <SocialLinks />
@@ -23,11 +37,17 @@ import { site } from '../data/site';
 </Layout>
 
 <style>
+  .about-video {
+    margin: 0;
+  }
+
+  .about-video video {
+    display: block;
+    width: 100%;
+    background: #000;
+  }
+
   .about-copy p {
     margin: 0;
-    font-size: 1rem;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
-    color: var(--color-muted);
   }
 </style>

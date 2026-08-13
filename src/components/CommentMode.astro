@@ -402,10 +402,37 @@
     }
   }
 
-  function getSidebarOffset(): number {
-    if (mode !== 'comment' || !sidebar) return 0;
+  function isStackedCommentLayout(): boolean {
+    return window.matchMedia('(max-width: 900px)').matches;
+  }
+
+  function getViewportMetrics() {
+    const vv = window.visualViewport;
+    return {
+      width: vv?.width ?? window.innerWidth,
+      height: vv?.height ?? window.innerHeight,
+      offsetTop: vv?.offsetTop ?? 0,
+      offsetLeft: vv?.offsetLeft ?? 0,
+    };
+  }
+
+  function getSidebarInsets(): { right: number; bottom: number } {
+    if (mode !== 'comment' || !sidebar) return { right: 0, bottom: 0 };
     const rect = sidebar.getBoundingClientRect();
-    return rect.width > 0 && rect.left < window.innerWidth ? rect.width + 10 : 0;
+    if (rect.width <= 0 || rect.height <= 0) return { right: 0, bottom: 0 };
+
+    // Bottom sheet on small screens: reserve vertical space, not width.
+    if (isStackedCommentLayout()) {
+      const viewport = getViewportMetrics();
+      const bottomEdge = viewport.offsetTop + viewport.height;
+      return { right: 0, bottom: Math.max(0, bottomEdge - rect.top + 10) };
+    }
+
+    // Desktop side panel sits on the right of the canvas.
+    if (rect.left > window.innerWidth / 2) {
+      return { right: rect.width + 10, bottom: 0 };
+    }
+    return { right: 0, bottom: 0 };
   }
 
   function positionBox(element: HTMLElement, box: HTMLElement) {
@@ -559,11 +586,16 @@
     if (!anchor) return;
 
     const rect = anchor.getBoundingClientRect();
-    const sidebarOffset = getSidebarOffset();
+    const viewport = getViewportMetrics();
+    const insets = getSidebarInsets();
     const margin = 12;
     const gap = 10;
-    const maxRight = window.innerWidth - sidebarOffset - margin;
-    const popWidth = Math.min(POPOVER_WIDTH, maxRight - margin);
+    const minLeft = viewport.offsetLeft + margin;
+    const maxRight = viewport.offsetLeft + viewport.width - insets.right - margin;
+    const minTop = viewport.offsetTop + margin;
+    const maxBottom = viewport.offsetTop + viewport.height - insets.bottom - margin;
+    const availableWidth = Math.max(200, maxRight - minLeft);
+    const popWidth = Math.min(POPOVER_WIDTH, availableWidth);
     const popHeight = popover.getBoundingClientRect().height || 160;
 
     let top = rect.bottom + gap;
@@ -572,12 +604,15 @@
     if (left + popWidth > maxRight) {
       left = maxRight - popWidth;
     }
-    if (left < margin) left = margin;
+    if (left < minLeft) left = minLeft;
 
-    if (top + popHeight > window.innerHeight - margin) {
+    if (top + popHeight > maxBottom) {
       top = rect.top - popHeight - gap;
     }
-    if (top < margin) top = margin;
+    if (top < minTop) top = minTop;
+    if (top + popHeight > maxBottom) {
+      top = Math.max(minTop, maxBottom - popHeight);
+    }
 
     popover.style.top = `${top}px`;
     popover.style.left = `${left}px`;
@@ -922,7 +957,9 @@
     if (items.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'comment-sidebar-empty';
-      empty.textContent = 'Click any section on the page to leave feedback.';
+      empty.textContent = isStackedCommentLayout()
+        ? 'Tap any section on the page to leave feedback.'
+        : 'Click any section on the page to leave feedback.';
       sidebarList.appendChild(empty);
       return;
     }
@@ -1051,7 +1088,7 @@
     resetCategorySelect();
     setStatus('');
     positionPopover();
-    commentText.focus();
+    window.setTimeout(() => commentText.focus(), isStackedCommentLayout() ? 50 : 0);
   }
 
   function closeComposer() {
@@ -1111,7 +1148,9 @@
 
     window.requestAnimationFrame(() => {
       if (siteCanvas) siteCanvas.scrollTop = preservedScroll;
-      placeToggle(next === 'view' ? 'header' : 'sidebar', fromRect);
+      const toggleLocation =
+        next === 'view' || isStackedCommentLayout() ? 'header' : 'sidebar';
+      placeToggle(toggleLocation, fromRect);
     });
   }
 
@@ -1314,23 +1353,7 @@
     }
   });
 
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (composing && selectedTargets.length > 0) {
-        syncSelectionHighlights();
-        positionPopover();
-      } else if (activeCardId) {
-        updatePinnedHighlight();
-      } else if (previewCardId) {
-        const item = sessionComments.find((entry) => entry.id === previewCardId);
-        if (item) previewCommentTarget(item);
-      }
-    },
-    true,
-  );
-
-  siteCanvas?.addEventListener('scroll', () => {
+  function repositionFloatingUi() {
     if (composing && selectedTargets.length > 0) {
       syncSelectionHighlights();
       positionPopover();
@@ -1340,15 +1363,32 @@
       const item = sessionComments.find((entry) => entry.id === previewCardId);
       if (item) previewCommentTarget(item);
     }
+  }
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      repositionFloatingUi();
+    },
+    true,
+  );
+
+  siteCanvas?.addEventListener('scroll', () => {
+    repositionFloatingUi();
   });
 
   window.addEventListener('resize', () => {
-    if (composing && selectedTargets.length > 0) {
-      syncSelectionHighlights();
-      positionPopover();
-    } else if (activeCardId) {
-      updatePinnedHighlight();
+    if (mode === 'comment') {
+      placeToggle(isStackedCommentLayout() ? 'header' : 'sidebar');
     }
+    repositionFloatingUi();
+  });
+
+  window.visualViewport?.addEventListener('resize', () => {
+    repositionFloatingUi();
+  });
+  window.visualViewport?.addEventListener('scroll', () => {
+    repositionFloatingUi();
   });
 
   document.addEventListener('keydown', (event) => {

@@ -8,7 +8,7 @@ export type SubmissionGuardResult =
 
 export const SUBMISSION_GUARD_MESSAGES: Record<SubmissionGuardCode, string> = {
   duplicate_submit: 'You already posted this on this section. Edit it or wait a moment.',
-  burst_limited: "Slow down — you're posting too quickly. Try again in a moment.",
+  burst_limited: "Slow down. You're posting too quickly. Try again in a moment.",
   identical_flood: "You've posted this same comment many times. Try varying your feedback.",
 };
 
