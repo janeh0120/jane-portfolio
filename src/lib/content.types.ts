@@ -55,6 +55,7 @@ export type GalleryItemMeta = {
   title: string;
   description: string;
   year: string;
+  images: string[];
 };
 
 export type ChangelogEntry = {

@@ -3,90 +3,147 @@
     "slug": "hoodie",
     "title": "Hoodie designs",
     "description": "Custom hoodie graphics for community and club merch.",
-    "year": "2025-2026"
+    "year": "2025-2026",
+    "images": [
+      "images/extra/hoodie/hoodie2025.png",
+      "images/extra/hoodie/hoodie2026.png"
+    ]
   },
   {
     "slug": "zestie-festie",
     "title": "A Zestie Festie",
     "description": "Poster and identity explorations for a community art event.",
-    "year": "2023"
+    "year": "2023",
+    "images": [
+      "images/extra/zestie_festie/cultured_zestie_festie.png",
+      "images/extra/zestie_festie/zestie_festie_evanie.png",
+      "images/extra/zestie_festie/zestie_festie.png",
+      "images/extra/zestie_festie/zestie_zestie_festie.png"
+    ]
   },
   {
     "slug": "sketchbook",
     "title": "Sketchbook",
     "description": "Pages from ongoing sketch practice and visual exploration.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/sketchbook/sketchbook1.png",
+      "images/extra/sketchbook/sketchbook2.png",
+      "images/extra/sketchbook/sketchbook3.png",
+      "images/extra/sketchbook/sketchbook4.png",
+      "images/extra/sketchbook/sketchbook5.png"
+    ]
   },
   {
     "slug": "zhen",
     "title": "Zhen",
     "description": "Social graphics and campaign visuals.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/zhen/post5 copy.png",
+      "images/extra/zhen/zhen1 copy.png",
+      "images/extra/zhen/zhen3 copy.png"
+    ]
   },
   {
     "slug": "emboss",
     "title": "Emboss prints",
     "description": "Embossed print experiments with texture and relief.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/emboss/embossprint1.png",
+      "images/extra/emboss/embossprint2.png",
+      "images/extra/emboss/embossprint3.png"
+    ]
   },
   {
     "slug": "designsystemsevent",
     "title": "Design systems event",
     "description": "Motion graphic for a design systems community event.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/designsystemsevent.gif"
+    ]
   },
   {
     "slug": "minisketchbook",
     "title": "Mini sketchbook",
     "description": "A flip-through of a small handmade sketchbook.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/minisketchbook.gif"
+    ]
   },
   {
     "slug": "stopmotion",
     "title": "Stop motion",
     "description": "Short stop-motion experiment.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/stopmotion.gif"
+    ]
   },
   {
     "slug": "invitationtag",
     "title": "Invitation tag",
     "description": "Animated invitation and tag design.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/invitationtag.gif"
+    ]
   },
   {
     "slug": "ceramics",
     "title": "Ceramics",
     "description": "Handmade ceramic pieces.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/ceramics.png"
+    ]
   },
   {
     "slug": "synergy",
     "title": "Synergy",
     "description": "Brand and visual exploration.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/synergy.png"
+    ]
   },
   {
     "slug": "cityzen",
     "title": "Cityzen",
     "description": "City-inspired graphic exploration.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/cityzen.png"
+    ]
   },
   {
     "slug": "calicocafelogo",
     "title": "Calico Cafe logo",
     "description": "Logo exploration for a cafe concept.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/calicocafelogo.png"
+    ]
   },
   {
     "slug": "breski-sticker",
     "title": "Breski sticker",
     "description": "Sticker design exploration.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/breski sticker.png"
+    ]
   },
   {
     "slug": "aboutme-copy",
     "title": "About me",
     "description": "Personal about graphic.",
-    "year": ""
+    "year": "",
+    "images": [
+      "images/extra/aboutme copy.png"
+    ]
   }
 ]
