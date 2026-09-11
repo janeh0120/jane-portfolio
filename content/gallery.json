@@ -1,8 +1,36 @@
 [
   {
+    "slug": "ids-design",
+    "title": "ids design",
+    "description": "As a parting gift for my team at Intuit, I made custom keychain blindboxes for the design team and PM!",
+    "year": "",
+    "images": [
+      "images/extra/ids-design/packaging.mp4",
+      "images/extra/ids-design/charms.mp4"
+    ]
+  },
+  {
+    "slug": "shoebox-craft",
+    "title": "Shoebox craft cafe",
+    "description": "I ran a craft cafe at my apartment and designed a brand and experience for it!",
+    "year": "",
+    "images": [
+      "images/extra/shoebox-craft/recap.mp4"
+    ]
+  },
+  {
+    "slug": "toronto-tech-week",
+    "title": "Toronto Tech Week",
+    "description": "I made this Framer interaction for a Toronto tech week event I got to speak at!",
+    "year": "",
+    "images": [
+      "images/extra/toronto-tech-week/framer.mp4"
+    ]
+  },
+  {
     "slug": "hoodie",
     "title": "Hoodie designs",
-    "description": "Custom hoodie graphics for community and club merch.",
+    "description": "I won my school's design association hoodie contest twice in a row!",
     "year": "2025-2026",
     "images": [
       "images/extra/hoodie/hoodie2025.png",
@@ -12,7 +40,7 @@
   {
     "slug": "sketchbook",
     "title": "Sketchbook",
-    "description": "Pages from ongoing sketch practice and visual exploration.",
+    "description": "Some of my favourite pages from one of many sketchbooks!",
     "year": "",
     "images": [
       "images/extra/sketchbook/sketchbook1.png",
@@ -23,20 +51,29 @@
     ]
   },
   {
-    "slug": "zhen",
-    "title": "Zhen",
-    "description": "Social graphics and campaign visuals.",
+    "slug": "designsystemsevent",
+    "title": "Design systems event",
+    "description": "I ran a design systems event during my internship at Intuit and made this graphic for it!",
     "year": "",
     "images": [
-      "images/extra/zhen/post5 copy.png",
+      "images/extra/designsystemsevent.gif"
+    ]
+  },
+  {
+    "slug": "zhen",
+    "title": "Zhen",
+    "description": "I really love Chinese typography so I wanted to play around with the shape of my Chinese name \"真\" and 3D model it.",
+    "year": "",
+    "images": [
       "images/extra/zhen/zhen1 copy.png",
+      "images/extra/zhen/post5 copy.png",
       "images/extra/zhen/zhen3 copy.png"
     ]
   },
   {
     "slug": "emboss",
     "title": "Emboss prints",
-    "description": "Embossed print experiments with texture and relief.",
+    "description": "Exploration with blend modes and brushes in Photoshop!",
     "year": "",
     "images": [
       "images/extra/emboss/embossprint1.png",
@@ -45,54 +82,18 @@
     ]
   },
   {
-    "slug": "designsystemsevent",
-    "title": "Design systems event",
-    "description": "Motion graphic for a design systems community event.",
-    "year": "",
-    "images": [
-      "images/extra/designsystemsevent.gif"
-    ]
-  },
-  {
     "slug": "minisketchbook",
     "title": "Mini sketchbook",
-    "description": "A flip-through of a small handmade sketchbook.",
+    "description": "Travel highlights from many sketchbooks!",
     "year": "",
     "images": [
       "images/extra/minisketchbook.gif"
     ]
   },
   {
-    "slug": "stopmotion",
-    "title": "Stop motion",
-    "description": "Short stop-motion experiment.",
-    "year": "",
-    "images": [
-      "images/extra/stopmotion.gif"
-    ]
-  },
-  {
-    "slug": "invitationtag",
-    "title": "Invitation tag",
-    "description": "Animated invitation and tag design.",
-    "year": "",
-    "images": [
-      "images/extra/invitationtag.gif"
-    ]
-  },
-  {
-    "slug": "ceramics",
-    "title": "Ceramics",
-    "description": "Handmade ceramic pieces.",
-    "year": "",
-    "images": [
-      "images/extra/ceramics.png"
-    ]
-  },
-  {
     "slug": "synergy",
     "title": "Synergy",
-    "description": "Brand and visual exploration.",
+    "description": "For UXL's Designathon, I 3D modelled and designed graphics using Womp!",
     "year": "",
     "images": [
       "images/extra/synergy.png"
@@ -101,19 +102,28 @@
   {
     "slug": "cityzen",
     "title": "Cityzen",
-    "description": "City-inspired graphic exploration.",
+    "description": "I led the visual direction for a Protothon designathon project from the logo to UI design.",
     "year": "",
     "images": [
       "images/extra/cityzen.png"
     ]
   },
   {
-    "slug": "calicocafelogo",
-    "title": "Calico Cafe logo",
-    "description": "Logo exploration for a cafe concept.",
+    "slug": "stopmotion",
+    "title": "Stop motion",
+    "description": "Made a stop motion for my friend Kaylah's birthday. I book-bound the paper screens into a flip book as well!",
     "year": "",
     "images": [
-      "images/extra/calicocafelogo.png"
+      "images/extra/stopmotion.gif"
+    ]
+  },
+  {
+    "slug": "invitationtag",
+    "title": "Invitation tag",
+    "description": "I met up with some friends and decided to design and make a card with the itinerary!",
+    "year": "",
+    "images": [
+      "images/extra/invitationtag.gif"
     ]
   },
   {
@@ -126,19 +136,9 @@
     ]
   },
   {
-    "slug": "ids-design",
-    "title": "ids design",
-    "description": "Packaging and acrylic charms for ids design merch.",
-    "year": "",
-    "images": [
-      "images/extra/ids-design/packaging.jpg",
-      "images/extra/ids-design/charms.jpg"
-    ]
-  },
-  {
     "slug": "aboutme-copy",
     "title": "About me",
-    "description": "watercolor and pencil crayon sketch!",
+    "description": "An illustrative watercolor and pencil crayon sketch with things about me! (from my high school era)",
     "year": "",
     "images": [
       "images/extra/aboutme copy.png"

@@ -39,7 +39,7 @@ export type SiteContent = {
     heading: string;
     paragraphs: string[];
   };
-  extra: {
+  play: {
     heading: string;
   };
   footer: {

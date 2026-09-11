@@ -1,30 +1,49 @@
 ---
-import { galleryItems } from '../../lib/extra-gallery';
+import { galleryItems } from '../../lib/play-gallery';
 import { site } from '../../data/site';
 import ArrowIcon from '../ArrowIcon.astro';
 
 const base = import.meta.env.BASE_URL;
 
-function imageSrc(path: string) {
+function mediaSrc(path: string) {
   if (path.startsWith('data:') || path.startsWith('http')) return path;
   return `${base}${path}`;
+}
+
+function isVideo(path: string) {
+  return /\.(mp4|webm|mov|m4v)$/i.test(path);
 }
 ---
 
 <section class="gallery-section">
-  <h2 class="gallery-title">{site.extra.heading}</h2>
+  <h2 class="gallery-title">{site.play.heading}</h2>
   <div class="gallery-grid" id="gallery-grid">
     {
-      galleryItems.map((item) => (
-        <button
-          type="button"
-          class:list={['gallery-item', item.images.length > 1 && 'carousel']}
-          data-gallery-id={item.id}
-          aria-label={`Open ${item.title}`}
-        >
-          <img src={imageSrc(item.images[0])} alt={item.title} loading="lazy" />
-        </button>
-      ))
+      galleryItems.map((item) => {
+        const first = item.images[0];
+        return (
+          <button
+            type="button"
+            class:list={['gallery-item', item.images.length > 1 && 'carousel']}
+            data-gallery-id={item.id}
+            aria-label={`Open ${item.title}`}
+          >
+            {isVideo(first) ? (
+              <video
+                src={mediaSrc(first)}
+                muted
+                playsinline
+                loop
+                autoplay
+                preload="metadata"
+                aria-label={item.title}
+              />
+            ) : (
+              <img src={mediaSrc(first)} alt={item.title} loading="lazy" />
+            )}
+          </button>
+        );
+      })
     }
   </div>
 </section>
@@ -58,6 +77,10 @@ function imageSrc(path: string) {
     return `${base}${path}`;
   }
 
+  function isVideo(path) {
+    return /\.(mp4|webm|mov|m4v)$/i.test(path);
+  }
+
   let currentItemId = null;
   let currentSlideIndex = 0;
 
@@ -67,12 +90,30 @@ function imageSrc(path: string) {
   const carouselControls = document.getElementById('carousel-controls');
   const modalDescription = document.getElementById('modal-description');
 
+  function pauseAllVideos() {
+    carouselSlides?.querySelectorAll('video').forEach((video) => {
+      video.pause();
+    });
+  }
+
+  function playActiveVideo() {
+    const slides = carouselSlides?.querySelectorAll('.gallery-carousel-slide');
+    const active = slides?.[currentSlideIndex];
+    const video = active?.querySelector('video');
+    if (video) {
+      video.currentTime = 0;
+      void video.play().catch(() => {});
+    }
+  }
+
   function updateCarousel() {
     if (!carouselSlides) return;
     carouselSlides.style.transform = `translateX(-${currentSlideIndex * 100}%)`;
     carouselDots?.querySelectorAll('.carousel-dot').forEach((dot, index) => {
       dot.classList.toggle('active', index === currentSlideIndex);
     });
+    pauseAllVideos();
+    playActiveVideo();
   }
 
   function goToSlide(index) {
@@ -106,10 +147,14 @@ function imageSrc(path: string) {
     carouselSlides.innerHTML = '';
     carouselDots.innerHTML = '';
 
-    item.images.forEach((img, index) => {
+    item.images.forEach((media, index) => {
       const slide = document.createElement('div');
       slide.className = 'gallery-carousel-slide';
-      slide.innerHTML = `<img src="${resolveSrc(img)}" alt="Slide ${index + 1}">`;
+      if (isVideo(media)) {
+        slide.innerHTML = `<video src="${resolveSrc(media)}" muted playsinline loop controls preload="metadata"></video>`;
+      } else {
+        slide.innerHTML = `<img src="${resolveSrc(media)}" alt="Slide ${index + 1}">`;
+      }
       carouselSlides.appendChild(slide);
 
       const dot = document.createElement('button');
@@ -132,6 +177,7 @@ function imageSrc(path: string) {
   }
 
   function closeGallery() {
+    pauseAllVideos();
     modal?.classList.remove('active');
     modal?.setAttribute('aria-hidden', 'true');
     currentItemId = null;

@@ -1,17 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
-import ExtraGallery from '../components/extra/ExtraGallery.astro';
+import PlayGallery from '../components/play/PlayGallery.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { site } from '../data/site';
-import '../styles/extra.css';
+import '../styles/play.css';
 ---
 
 <Layout title={`Play | ${site.title}`}>
-  <div class="extra-page">
+  <div class="play-page">
     <Header />
     <main>
-      <ExtraGallery />
+      <PlayGallery />
     </main>
     <SiteFooter />
   </div>

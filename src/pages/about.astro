@@ -6,7 +6,7 @@ import SocialLinks from '../components/SocialLinks.astro';
 import { site } from '../data/site';
 
 const base = import.meta.env.BASE_URL;
-const aboutVideoSrc = `${base}videos/about/about-me.mp4`;
+const aboutImageSrc = `${base}images/about/about-me.jpg`;
 ---
 
 <Layout title={`About | ${site.title}`} description={site.description}>
@@ -14,16 +14,12 @@ const aboutVideoSrc = `${base}videos/about/about-me.mp4`;
   <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-10 md:px-10 md:pb-32 md:pt-14" data-comment-id="about-page">
     <article class="max-w-2xl" data-comment-id="about-bio">
       <h1 class="case-study-heading text-ink">{site.about.heading}</h1>
-      <figure class="about-video mt-8 md:mt-10">
-        <video
-          src={aboutVideoSrc}
-          autoplay
-          muted
-          loop
-          playsinline
-          preload="metadata"
-          aria-label="Short video about Jane"
-        ></video>
+      <figure class="about-media mt-8 md:mt-10">
+        <img
+          src={aboutImageSrc}
+          alt="Jane as a toddler in traditional Chinese attire"
+          loading="lazy"
+        />
       </figure>
       <div class="about-copy mt-8 space-y-5 md:mt-10">
         {site.about.paragraphs.map((paragraph) => <p class="text-body text-muted">{paragraph}</p>)}
@@ -37,14 +33,14 @@ const aboutVideoSrc = `${base}videos/about/about-me.mp4`;
 </Layout>
 
 <style>
-  .about-video {
+  .about-media {
     margin: 0;
   }
 
-  .about-video video {
+  .about-media img {
     display: block;
     width: 100%;
-    background: #000;
+    height: auto;
   }
 
   .about-copy p {
