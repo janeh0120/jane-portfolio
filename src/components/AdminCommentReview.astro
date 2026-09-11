@@ -10,46 +10,24 @@ interface SerializedComment {
   os: string;
   viewportWidth: number;
   scrollY: number;
-  upvoteCount: number;
-  createdAt: string;
-}
-
-interface SerializedVersion {
-  id: string;
-  label: string;
-  deployUrl: string | null;
-  isActive: boolean;
   createdAt: string;
 }
 
 interface Props {
   adminKey: string;
   comments: SerializedComment[];
-  versions: SerializedVersion[];
-  selectedVersionId: string;
   frameBaseUrl: string;
 }
 
-const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.props;
+const { adminKey, comments, frameBaseUrl } = Astro.props;
 ---
 
 <div class="admin-review-toolbar" data-comment-ui>
   <div class="admin-review-toolbar-left">
     <span class="admin-review-badge">Admin review</span>
-    <label class="sr-only" for="admin-version-select">Portfolio version</label>
-    <select id="admin-version-select" class="admin-review-version-select">
-      {
-        versions.map((version) => (
-          <option value={version.id} selected={version.id === selectedVersionId}>
-            {version.label}
-            {version.isActive ? ' (live)' : ''}
-          </option>
-        ))
-      }
-    </select>
   </div>
   <p class="admin-review-toolbar-meta" id="admin-review-summary">
-    {comments.length} comment{comments.length === 1 ? '' : 's'} on this version
+    {comments.length} comment{comments.length === 1 ? '' : 's'}
   </p>
 </div>
 
@@ -106,17 +84,25 @@ const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.
     bug: 'Bug',
   };
 
-  const versionSelect = document.getElementById('admin-version-select');
+  let commentItems = [...comments];
+
   const frame = document.getElementById('admin-portfolio-frame');
   const sidebarList = document.getElementById('admin-comment-list');
   const highlight = document.getElementById('admin-highlight');
   const scopePageBtn = document.getElementById('admin-scope-page');
   const scopeAllBtn = document.getElementById('admin-scope-all');
+  const summaryEl = document.getElementById('admin-review-summary');
 
   let scope = 'page';
   let activeCardId = null;
   let previewCardId = null;
   let pinnedComment = null;
+
+  function updateSummary() {
+    if (!summaryEl) return;
+    const count = commentItems.length;
+    summaryEl.textContent = `${count} comment${count === 1 ? '' : 's'}`;
+  }
 
   function categoryLabel(id) {
     return CATEGORY_LABELS[id] ?? 'No category';
@@ -232,7 +218,6 @@ const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.
   function navigateToComment(item, { pin = true } = {}) {
     if (!frame) return;
     const targetUrl = resolveFrameUrl(item.pageUrl);
-    const currentPath = pagePathFromUrl(item.pageUrl);
     let samePage = false;
 
     try {
@@ -255,10 +240,40 @@ const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.
     frame.src = targetUrl;
   }
 
+  async function deleteComment(id) {
+    if (!window.confirm('Delete this comment permanently?')) return;
+
+    try {
+      const response = await fetch(`/api/comments/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-admin-secret': adminKey,
+        },
+        body: JSON.stringify({ adminKey }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not delete comment.');
+      }
+
+      commentItems = commentItems.filter((item) => item.id !== id);
+      if (activeCardId === id) activeCardId = null;
+      if (pinnedComment?.id === id) {
+        pinnedComment = null;
+        hideHighlight();
+      }
+      updateSummary();
+      renderSidebar();
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Could not delete comment.');
+    }
+  }
+
   function filteredComments() {
-    if (scope === 'all') return comments;
+    if (scope === 'all') return commentItems;
     const path = currentFramePath();
-    return comments.filter((item) => pagePathFromUrl(item.pageUrl) === path);
+    return commentItems.filter((item) => pagePathFromUrl(item.pageUrl) === path);
   }
 
   function renderSidebar() {
@@ -270,9 +285,7 @@ const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.
       const empty = document.createElement('p');
       empty.className = 'comment-sidebar-empty';
       empty.textContent =
-        scope === 'page'
-          ? 'No comments on this page for this version.'
-          : 'No comments for this version yet.';
+        scope === 'page' ? 'No comments on this page.' : 'No comments yet.';
       sidebarList.appendChild(empty);
       return;
     }
@@ -289,11 +302,17 @@ const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.
       category.className = 'comment-sidebar-card-category-label';
       category.textContent = categoryLabel(item.category);
 
-      const upvotes = document.createElement('span');
-      upvotes.className = 'comment-sidebar-card-upvote comment-sidebar-card-upvote--readonly';
-      upvotes.textContent = `+1 · ${item.upvoteCount}`;
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'comment-sidebar-card-delete';
+      deleteBtn.setAttribute('aria-label', 'Delete comment');
+      deleteBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+      deleteBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        void deleteComment(item.id);
+      });
 
-      header.append(category, upvotes);
+      header.append(category, deleteBtn);
       card.appendChild(header);
 
       const title = document.createElement('p');
@@ -358,14 +377,6 @@ const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.
     renderSidebar();
   }
 
-  versionSelect?.addEventListener('change', () => {
-    const versionId = versionSelect.value;
-    const url = new URL(window.location.href);
-    url.searchParams.set('version', versionId);
-    url.searchParams.set('key', adminKey);
-    window.location.href = url.toString();
-  });
-
   scopePageBtn?.addEventListener('click', () => setScope('page'));
   scopeAllBtn?.addEventListener('click', () => setScope('all'));
 
@@ -374,5 +385,6 @@ const { adminKey, comments, versions, selectedVersionId, frameBaseUrl } = Astro.
   });
 
   document.body.classList.add('comment-view-comment');
+  updateSummary();
   renderSidebar();
 </script>

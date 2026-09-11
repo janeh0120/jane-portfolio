@@ -9,7 +9,6 @@ import { resolvePortfolioPreviewBase } from '../../lib/deploy-url';
 import { getVersionById, listVersions } from '../../lib/versions';
 
 const key = Astro.url.searchParams.get('key') ?? '';
-const versionParam = Astro.url.searchParams.get('version') ?? '';
 const base = import.meta.env.BASE_URL;
 const authorized = Boolean(ADMIN_SECRET && key === ADMIN_SECRET);
 
@@ -25,8 +24,7 @@ if (!ADMIN_SECRET) {
   try {
     versions = await listVersions();
     const active = versions.find((item) => item.isActive) ?? versions[0] ?? null;
-    const selectedId = versionParam || active?.id || '';
-    selectedVersion = selectedId ? await getVersionById(selectedId) : null;
+    selectedVersion = active ? await getVersionById(active.id) : null;
 
     if (selectedVersion) {
       comments = await listCommentsByVersion(selectedVersion.id);
@@ -55,16 +53,7 @@ const clientComments = comments.map((item) => ({
   os: item.os,
   viewportWidth: item.viewportWidth,
   scrollY: item.scrollY,
-  upvoteCount: item.upvoteCount ?? 0,
   createdAt: item.createdAt.toISOString(),
-}));
-
-const clientVersions = versions.map((version) => ({
-  id: version.id,
-  label: version.label,
-  deployUrl: version.deployUrl,
-  isActive: version.isActive,
-  createdAt: version.createdAt.toISOString(),
 }));
 ---
 
@@ -104,13 +93,7 @@ const clientVersions = versions.map((version) => ({
         </p>
       </main>
     ) : selectedVersion ? (
-      <AdminCommentReview
-        adminKey={key}
-        comments={clientComments}
-        versions={clientVersions}
-        selectedVersionId={selectedVersion.id}
-        frameBaseUrl={frameBaseUrl}
-      />
+      <AdminCommentReview adminKey={key} comments={clientComments} frameBaseUrl={frameBaseUrl} />
     ) : (
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
         <h1 class="case-study-heading">Version review</h1>

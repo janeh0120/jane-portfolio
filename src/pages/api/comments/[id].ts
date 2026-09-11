@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
+import { ADMIN_SECRET } from 'astro:env/server';
 import {
   CommentAuthError,
+  deleteCommentById,
   deleteCommentByVisitor,
   updateCommentByVisitor,
   type CommentCategory,
@@ -82,7 +84,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params, request }) => {
+export const DELETE: APIRoute = async ({ params, request, url }) => {
   const commentId = params.id;
   if (!commentId) return json({ error: 'Comment id is required.' }, 400);
 
@@ -94,6 +96,17 @@ export const DELETE: APIRoute = async ({ params, request }) => {
 
   try {
     const body = await request.json().catch(() => ({}));
+    const adminKey =
+      request.headers.get('x-admin-secret') ||
+      String(body.adminKey ?? '').trim() ||
+      url.searchParams.get('key') ||
+      '';
+
+    if (ADMIN_SECRET && adminKey === ADMIN_SECRET) {
+      await deleteCommentById(commentId);
+      return json({ ok: true });
+    }
+
     const visitorId = String(body.visitorId ?? '').trim().slice(0, 64);
     if (!visitorId) return json({ error: 'visitorId is required.' }, 400);
 

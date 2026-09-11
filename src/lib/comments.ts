@@ -227,6 +227,17 @@ export async function deleteCommentByVisitor(id: string, visitorId: string): Pro
   if (!data?.length) throw new CommentAuthError('FORBIDDEN', 'You can only delete your own comments.');
 }
 
+export async function deleteCommentById(id: string): Promise<void> {
+  const existing = await getCommentById(id);
+  if (!existing) throw new CommentAuthError('NOT_FOUND', 'Comment not found.');
+
+  const supabase = getSupabase();
+  const { data, error } = await supabase.from('comments').delete().eq('id', id).select('id');
+
+  if (error) throw error;
+  if (!data?.length) throw new CommentAuthError('NOT_FOUND', 'Comment not found.');
+}
+
 export async function addUpvote(commentId: string, voterFingerprint: string): Promise<number> {
   const supabase = getSupabase();
 
