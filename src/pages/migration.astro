@@ -3,6 +3,13 @@ import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
 import { site } from '../data/site';
 
 const email = site.email || 'janehoudesign@gmail.com';
+
+const nav = [
+  { label: 'Context', href: '#context' },
+  { label: 'Outcome', href: '#outcome' },
+  { label: 'Takeaways', href: '#takeaways' },
+  { label: 'Insights', href: '#insights' },
+];
 ---
 
 <CaseStudyLayout
@@ -10,26 +17,102 @@ const email = site.email || 'janehoudesign@gmail.com';
   heading="Leading design of 0 → 1 internal tooling"
   role="Product Designer"
   team="1 Product Manager, 3 Developers"
-  timeline="March 2026 – Present"
+  timeline="March 2026 – August 2026"
   projectType="Product Design"
+  nav={nav}
   commentId="case-study-migration"
 >
-  <section id="outline" data-comment-id="migration-outline" class="migration-outline">
+  <section id="context" data-comment-id="migration-context">
+    <h3>Context</h3>
     <p class="lead">
-      I joined an early-stage, startup-like beta as the sole designer, defining design direction and
-      what success looked like for an internal developer tool supporting adoption of Intuit’s unified
-      design system.
+      An internal platform shipped in beta to help developers and technical program managers (TPMs)
+      manage and run mass code migrations. I joined as the sole designer, defining design direction
+      and what success looked like.
     </p>
+  </section>
+
+  <section id="outcome" data-comment-id="migration-outcome">
+    <h3>Outcome</h3>
     <p class="lead">
-      The product helps engineers and technical program managers make code updates across 10+ teams:
-      updating dependencies, swapping hardcoded values for tokens, and more, with agents that discover
-      needed fixes and apply the changes.
-    </p>
-    <p class="lead">
-      I led 7 user testing sessions with TPMs and engineers and delivered 3 core feature sets for
+      I led 10 user tests with TPMs and engineers and delivered 6 core features for
       implementation. Early estimates suggest the migration workflows could save about a day per
       customer project, supporting AI-accelerated workflows and design-system adoption.
     </p>
+  </section>
+
+  <section id="takeaways" data-comment-id="migration-takeaways">
+    <h3>Takeaways</h3>
+    <p class="lead">
+      I learned how to navigate ambiguity in an early-stage product and establish design’s position
+      on the project with the team. I led user research when there weren’t dedicated researchers, and
+      vibe-coded design iterations in code branching from production to closely replicate the
+      end-user experience. Though I didn’t get to see the long-tail impact and continue iterating on
+      my designs, I laid the groundwork for future iteration and advocated for web analytics tracking
+      so the team could gather a clearer baseline going forward.
+    </p>
+  </section>
+
+  <section id="insights" data-comment-id="migration-insights" class="migration-insights">
+    <h3>Insights / quotes</h3>
+    <div class="migration-quotes">
+      <figure class="migration-quote">
+        <blockquote>
+          <p>
+            I can't thank you enough, Jane! You really stepped up when the team needed you. I am so
+            glad that I could rely on you. I have been stretched thin with a lot of ongoing work on
+            product, program and engineering side so I had to shift my focus and priorities and you
+            were there to help fill in and bring customer perspective/needs to the team… Your impact
+            was so high and valuable that it feels like you've been on the team for a long time and
+            not just a few months.
+          </p>
+        </blockquote>
+        <figcaption>PM</figcaption>
+      </figure>
+
+      <figure class="migration-quote">
+        <blockquote>
+          <p>
+            Thank you for helping to solve one of the largest, painful, and underappreciated aspects
+            of our work.
+          </p>
+          <p>
+            Great infrastructure is easy to overlook precisely because it works, and this product has
+            become one of those things that quietly makes everyone else's job easier. Jane took on the
+            unglamorous parts — the design decisions, the edge cases, the maintenance that never shows
+            up in a demo — and delivered something dependable enough that the rest of us get to build
+            on top of it without thinking twice. Thank you for the care and craft you put into work
+            that so many of us use every day.
+          </p>
+        </blockquote>
+        <figcaption>Prospective user</figcaption>
+      </figure>
+
+      <figure class="migration-quote">
+        <blockquote>
+          <p>
+            Your dedication to the product throughout your internship has been outstanding. You
+            consistently went above and beyond—diving deep into user needs, iterating quickly on
+            feedback, and delivering design work that made a real, measurable difference to the
+            product experience. Thank you for your hard work, creativity, and commitment.
+          </p>
+        </blockquote>
+        <figcaption>Developer on the team</figcaption>
+      </figure>
+
+      <figure class="migration-quote">
+        <blockquote>
+          <p>
+            Thanks a bunch. That was clearly a very productive collaboration & I appreciate the way
+            you took around designing the interface & thinking of user stories.
+          </p>
+          <p>
+            I really appreciate that you dive deep into understanding how the user operates, what's of
+            value to them. This drives the product forward exactly where users expect us to.
+          </p>
+        </blockquote>
+        <figcaption>Developer on the project</figcaption>
+      </figure>
+    </div>
   </section>
 
   <section data-comment-id="migration-nda">
@@ -43,6 +126,55 @@ const email = site.email || 'janehoudesign@gmail.com';
 </CaseStudyLayout>
 
 <style>
+  .migration-quotes {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .migration-quote {
+    margin: 0;
+    padding: 1.15rem 1.25rem;
+    background: #f7f7f7;
+    border: none;
+  }
+
+  .migration-quote blockquote {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+
+  .migration-quote blockquote p {
+    margin: 0;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.65;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .migration-quote blockquote p + p {
+    margin-top: 0.875rem;
+  }
+
+  .migration-quote blockquote p:first-child::before {
+    content: '“';
+  }
+
+  .migration-quote blockquote p:last-child::after {
+    content: '”';
+  }
+
+  .migration-quote figcaption {
+    margin-top: 0.75rem;
+    color: var(--color-muted);
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+
   .migration-disclaimer {
     padding: 1rem 0;
     background: transparent;
@@ -67,9 +199,5 @@ const email = site.email || 'janehoudesign@gmail.com';
 
   .migration-disclaimer a:hover {
     opacity: 0.7;
-  }
-
-  .migration-outline p + p {
-    margin-top: 1em;
   }
 </style>

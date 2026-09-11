@@ -5,6 +5,7 @@ import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import VersionHistoryView from '../components/VersionHistoryView.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
 import { getVersionSummary } from '../lib/content';
 import { listCommentsByVersion } from '../lib/comments';
 import { resolvePortfolioPreviewBase } from '../lib/deploy-url';
@@ -121,9 +122,10 @@ function formatDate(iso: string) {
                     </div>
                     <a
                       href={`${base}history?version=${version.id}`}
-                      class="inline-flex shrink-0 items-center justify-center text-sm font-medium underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink"
+                      class="inline-flex shrink-0 items-center justify-center gap-1.5 text-sm font-medium underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink"
                     >
-                      View version →
+                      View version
+                      <ArrowIcon direction="right" />
                     </a>
                   </div>
                 </li>

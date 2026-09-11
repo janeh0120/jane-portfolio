@@ -7,7 +7,7 @@ export function parseProjectTags(tags: string | string[]): string[] {
 
 export function formatProjectTags(tags: string | string[]): string {
   return parseProjectTags(tags)
-    .map((tag) => tag.toUpperCase())
+    .map((tag) => tag.charAt(0).toUpperCase() + tag.slice(1))
     .join(', ');
 }
 

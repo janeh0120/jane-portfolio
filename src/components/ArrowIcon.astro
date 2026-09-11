@@ -1,0 +1,42 @@
+---
+interface Props {
+  direction?: 'left' | 'right';
+  class?: string;
+  /** CSS size value, e.g. "14px" or "0.9em". Defaults to 1em. */
+  size?: string;
+}
+
+const { direction = 'right', class: className, size } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const src = `${base}images/icons/arrow-${direction}.png`;
+const style = [
+  size ? `--arrow-size: ${size}` : null,
+  `mask-image: url('${src}')`,
+  `-webkit-mask-image: url('${src}')`,
+]
+  .filter(Boolean)
+  .join('; ');
+---
+
+<span
+  class:list={['arrow-icon', `arrow-icon--${direction}`, className]}
+  aria-hidden="true"
+  style={style}
+></span>
+
+<style>
+  .arrow-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    width: var(--arrow-size, 1em);
+    height: var(--arrow-size, 1em);
+    vertical-align: -0.12em;
+    background-color: currentColor;
+    mask-size: contain;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    -webkit-mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+  }
+</style>

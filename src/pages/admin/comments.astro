@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
+import ArrowIcon from '../../components/ArrowIcon.astro';
 import { ADMIN_SECRET } from 'astro:env/server';
 import { listComments } from '../../lib/comments';
 
@@ -69,9 +70,10 @@ const categoryLabels: Record<string, string> = {
             </div>
             <a
               href={`${base}admin/review?key=${encodeURIComponent(key)}`}
-              class="text-sm font-medium text-ink underline decoration-ink/30 underline-offset-4"
+              class="inline-flex items-center gap-1.5 text-sm font-medium text-ink underline decoration-ink/30 underline-offset-4"
             >
-              Version review →
+              Version review
+              <ArrowIcon direction="right" />
             </a>
           </div>
 

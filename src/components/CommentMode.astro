@@ -1,3 +1,7 @@
+---
+import ArrowIcon from './ArrowIcon.astro';
+---
+
 <div data-comment-ui>
   <button
     type="button"
@@ -64,7 +68,7 @@
             aria-label="Comment category (optional)"
           ></select>
           <button type="button" class="comment-popover-send" id="comment-submit" aria-label="Post comment">
-            ↑
+            <ArrowIcon direction="right" size="14px" class="comment-popover-send-icon" />
           </button>
         </div>
       </div>

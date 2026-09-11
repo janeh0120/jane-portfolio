@@ -762,13 +762,14 @@ body.comment-mode-active [data-comment-ui] * {
   border-radius: 50%;
   background: #111;
   color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1;
   cursor: pointer;
   transition:
     transform 0.15s ease,
     opacity 0.15s ease;
+}
+
+.comment-popover-send-icon {
+  display: block;
 }
 
 .comment-popover-send:hover {

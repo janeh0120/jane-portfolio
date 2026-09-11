@@ -10,18 +10,6 @@
     ]
   },
   {
-    "slug": "zestie-festie",
-    "title": "A Zestie Festie",
-    "description": "Poster and identity explorations for a community art event.",
-    "year": "2023",
-    "images": [
-      "images/extra/zestie_festie/cultured_zestie_festie.png",
-      "images/extra/zestie_festie/zestie_festie_evanie.png",
-      "images/extra/zestie_festie/zestie_festie.png",
-      "images/extra/zestie_festie/zestie_zestie_festie.png"
-    ]
-  },
-  {
     "slug": "sketchbook",
     "title": "Sketchbook",
     "description": "Pages from ongoing sketch practice and visual exploration.",
@@ -131,16 +119,26 @@
   {
     "slug": "breski-sticker",
     "title": "Breski sticker",
-    "description": "Sticker design exploration.",
+    "description": "My friend loves stickers, so I made her custom stickers for her birthday!",
     "year": "",
     "images": [
       "images/extra/breski sticker.png"
     ]
   },
   {
+    "slug": "ids-design",
+    "title": "ids design",
+    "description": "Packaging and acrylic charms for ids design merch.",
+    "year": "",
+    "images": [
+      "images/extra/ids-design/packaging.jpg",
+      "images/extra/ids-design/charms.jpg"
+    ]
+  },
+  {
     "slug": "aboutme-copy",
     "title": "About me",
-    "description": "Personal about graphic.",
+    "description": "watercolor and pencil crayon sketch!",
     "year": "",
     "images": [
       "images/extra/aboutme copy.png"

@@ -1,36 +1,97 @@
 ---
 import { site } from '../data/site';
 
-const previous = site.experience.previous;
+const linkClass =
+  'text-ink underline decoration-ink/25 underline-offset-[3px] transition hover:decoration-ink';
+
+const { current, previous, note } = site.experience;
 ---
 
-<section class="mx-auto max-w-[1400px] px-6 pb-20 pt-5 md:px-10 md:pb-28 md:pt-6" data-comment-id="experience">
-  <p class="experience-copy max-w-2xl text-muted">
-    Currently at
-    <a
-      href={site.experience.current.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      class="text-ink underline decoration-ink/25 underline-offset-[3px] transition hover:decoration-ink"
-    >
-      {site.experience.current.label}
-    </a>,
-    previously at
-    {
-      previous.map((place, index) => (
-        <>
-          {index > 0 ? (index === previous.length - 1 ? ' and ' : ', ') : ' '}
+<section
+  class="mx-auto max-w-[1400px] px-6 pb-20 pt-5 md:px-10 md:pb-28 md:pt-6"
+  data-comment-id="experience"
+>
+  <div class="experience-list max-w-2xl">
+    <div class="experience-block">
+      <p class="experience-copy text-muted">Currently at:</p>
+      <ul class="experience-entries">
+        <li class="experience-entry experience-copy">
           <a
-            href={place.href}
+            href={current.href}
             target="_blank"
             rel="noopener noreferrer"
-            class="text-ink underline decoration-ink/25 underline-offset-[3px] transition hover:decoration-ink"
+            class={linkClass}
           >
-            {place.label}
+            {current.label}
           </a>
-        </>
-      ))
-    }.
-    {site.experience.note && <> {site.experience.note}</>}
-  </p>
+          {current.role && <span class="experience-role text-muted">{current.role}</span>}
+        </li>
+      </ul>
+    </div>
+
+    <div class="experience-block">
+      <p class="experience-copy text-muted">Previously at:</p>
+      <ul class="experience-entries">
+        {
+          previous.map((place) => (
+            <li class="experience-entry experience-copy">
+              <a
+                href={place.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class={linkClass}
+              >
+                {place.label}
+              </a>
+              {place.role && <span class="experience-role text-muted">{place.role}</span>}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {note && <p class="experience-copy experience-note text-muted">{note}</p>}
+  </div>
 </section>
+
+<style>
+  .experience-list {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .experience-block {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .experience-entries {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .experience-entry {
+    display: grid;
+    grid-template-columns: minmax(7.5rem, max-content) minmax(0, 1fr);
+    column-gap: 1rem;
+    align-items: baseline;
+  }
+
+  .experience-role {
+    font-style: normal;
+  }
+
+  .experience-note {
+    margin: 0;
+  }
+
+  @media (max-width: 480px) {
+    .experience-entry {
+      grid-template-columns: 1fr;
+      gap: 0.1rem;
+    }
+  }
+</style>

@@ -1,4 +1,6 @@
 ---
+import ArrowIcon from './ArrowIcon.astro';
+
 interface SerializedComment {
   id: string;
   pageUrl: string;
@@ -37,7 +39,10 @@ const selectedVersion = versions.find((version) => version.id === selectedVersio
 
 <div class="admin-review-toolbar" data-comment-ui>
   <div class="admin-review-toolbar-left">
-    <a href="/history" class="admin-review-badge transition hover:opacity-80">← All versions</a>
+    <a href="/history" class="admin-review-badge inline-flex items-center gap-1.5 transition hover:opacity-80">
+      <ArrowIcon direction="left" />
+      All versions
+    </a>
     <label class="sr-only" for="history-version-select">Portfolio version</label>
     <select id="history-version-select" class="admin-review-version-select">
       {
@@ -61,8 +66,9 @@ const selectedVersion = versions.find((version) => version.id === selectedVersio
     </p>
     {
       selectedVersion?.isActive ? (
-        <a href={liveSiteUrl} class="text-sm font-medium text-ink transition hover:opacity-70">
-          Open live site →
+        <a href={liveSiteUrl} class="inline-flex items-center gap-1.5 text-sm font-medium text-ink transition hover:opacity-70">
+          Open live site
+          <ArrowIcon direction="right" />
         </a>
       ) : (
         <span class="text-sm text-muted">Archived (comments are read-only)</span>

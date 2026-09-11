@@ -1,6 +1,7 @@
 ---
 import { galleryItems } from '../../lib/extra-gallery';
 import { site } from '../../data/site';
+import ArrowIcon from '../ArrowIcon.astro';
 
 const base = import.meta.env.BASE_URL;
 
@@ -22,9 +23,6 @@ function imageSrc(path: string) {
           aria-label={`Open ${item.title}`}
         >
           <img src={imageSrc(item.images[0])} alt={item.title} loading="lazy" />
-          {item.images.length > 1 && (
-            <span class="carousel-indicator">{item.images.length}</span>
-          )}
         </button>
       ))
     }
@@ -41,11 +39,11 @@ function imageSrc(path: string) {
       <div class="gallery-carousel" id="carousel-slides" />
       <div class="carousel-controls-wrap" id="carousel-controls" hidden>
         <button type="button" class="carousel-arrow prev" id="carousel-prev" aria-label="Previous slide">
-          ‹
+          <ArrowIcon direction="left" size="18px" />
         </button>
         <div class="carousel-controls" id="carousel-dots" />
         <button type="button" class="carousel-arrow next" id="carousel-next" aria-label="Next slide">
-          ›
+          <ArrowIcon direction="right" size="18px" />
         </button>
       </div>
     </div>
@@ -160,23 +158,5 @@ function imageSrc(path: string) {
     if (event.key === 'Escape') closeGallery();
     if (event.key === 'ArrowRight') nextSlide();
     if (event.key === 'ArrowLeft') previousSlide();
-  });
-
-  galleryItems.forEach((item) => {
-    if (item.images.length <= 1) return;
-    const button = document.querySelector(`[data-gallery-id="${item.id}"]`);
-    const img = button?.querySelector('img');
-    if (!button || !img) return;
-
-    let imageIndex = 0;
-    setInterval(() => {
-      if (modal?.classList.contains('active') && currentItemId === item.id) return;
-      imageIndex = (imageIndex + 1) % item.images.length;
-      img.style.opacity = '0';
-      setTimeout(() => {
-        img.src = resolveSrc(item.images[imageIndex]);
-        img.style.opacity = '1';
-      }, 300);
-    }, 4000);
   });
 </script>

@@ -30,8 +30,8 @@ export type SiteContent = {
     headline: string;
   };
   experience: {
-    current: { label: string; href: string };
-    previous: { label: string; href: string }[];
+    current: { label: string; href: string; role?: string };
+    previous: { label: string; href: string; role?: string }[];
     note?: string;
   };
   projects: Project[];

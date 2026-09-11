@@ -34,13 +34,30 @@
     }
   ],
   "hero": {
-    "headline": "I'm Jane, and I like to design products, brands & communities at a systems level."
+    "headline": "Hey I'm Jane! I care about people and want to design around them!"
   },
   "experience": {
-    "current": { "label": "Intuit", "href": "https://www.intuit.com/ca/" },
+    "current": {
+      "label": "IBM",
+      "href": "https://www.ibm.com/consulting",
+      "role": "product design consulting"
+    },
     "previous": [
-      { "label": "GWSK", "href": "https://gwsk.studio/" },
-      { "label": "Simple Ventures", "href": "https://www.simpleventures.ca/" }
+      {
+        "label": "Intuit",
+        "href": "https://www.intuit.com/ca/",
+        "role": "AI product design + design systems"
+      },
+      {
+        "label": "Simple Ventures",
+        "href": "https://www.simpleventures.ca/",
+        "role": "brand & web design"
+      },
+      {
+        "label": "GWSK",
+        "href": "https://gwsk.studio/",
+        "role": "brand & web design"
+      }
     ],
     "note": "Interested in Summer 2027 internships and part-time/contract work!"
   },
@@ -81,11 +98,8 @@
   "about": {
     "heading": "A little bit more about me!",
     "paragraphs": [
-      "Growing up in a family business, I became an eager self-starter with a strong drive for learning. I first explored design by creating social media posts, in-store displays, and managing the online presence for my family's business. That experience sparked my freelance journey on Fiverr, where I helped small businesses with graphic design.",
-      "In high school, noticing the lack of a strong design community, I founded a digital design club to introduce peers to creative tools and run workshops on free resources. Later, my involvement in hackathons inspired me to take on a leadership role as co-president of my college's hackathon club, overseeing not only design, but also development, logistics, sponsorship, and social media.",
-      "Alongside school, I volunteered my UX skills through Develop for Good, designing for a nonprofit organization, and gained professional experience interning at GWSK, a GTA-based design studio, where I contributed to visual and web design projects. I'm currently interning at Intuit on the design systems team, contributing to a system that serves products across the company.",
-      "Besides UX/product design, I love to apply my passion for design to drawing, crochet/knitting, scrapbooking, sewing, 3D modelling and more!",
-      "I'm interested in Summer 2027 internships and part-time/contract work, so feel free to connect with me!"
+      "Growing up in a family business, I’ve always had a self-starting mindset—from leading my family business’s social media and marketing strategy when there was none, to freelancing social media and design work in high school. I use that self-starting attitude to foster design community in my space, starting my own design club in high school, running my college’s flagship hackathon club, and running my own events to fill education gaps and give students industry insight.",
+      "I love when design can bridge the intersection between solving technical and people problems, and hope to leverage my visual/creative and analytical mindset in my work!"
     ]
   },
   "extra": {
