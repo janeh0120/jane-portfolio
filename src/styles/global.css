@@ -11,6 +11,7 @@
   --color-subtle: #919191;
   --color-line: #f0f0f0;
   --color-link: #111111;
+  --color-accent: #246cff;
 }
 
 @layer base {
