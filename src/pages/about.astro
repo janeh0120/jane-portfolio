@@ -13,15 +13,14 @@ const aboutImageSrc = `${base}images/about/about-me.jpg`;
   <Header />
   <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-10 md:px-10 md:pb-32 md:pt-14" data-comment-id="about-page">
     <article class="max-w-2xl" data-comment-id="about-bio">
-      <h1 class="case-study-heading text-ink">{site.about.heading}</h1>
-      <figure class="about-media mt-8 md:mt-10">
+      <figure class="about-media">
         <img
           src={aboutImageSrc}
           alt="Jane as a toddler in traditional Chinese attire"
           loading="lazy"
         />
       </figure>
-      <div class="about-copy mt-8 space-y-5 md:mt-10">
+      <div class="about-copy mt-8 space-y-2 md:mt-10">
         {site.about.paragraphs.map((paragraph) => <p class="text-body text-muted">{paragraph}</p>)}
       </div>
       <div class="mt-10 md:mt-12">
