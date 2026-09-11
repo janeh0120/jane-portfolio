@@ -23,18 +23,38 @@ if (adminReview) {
 }
 const base = import.meta.env.BASE_URL;
 const enableClarity = import.meta.env.PROD && !adminReview;
+/** Bump when favicon assets change — Safari caches icons aggressively. */
+const iconVersion = '3';
 ---
 
 <!doctype html>
 <html lang="en-CA">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/png" href={`${base}favicon-light.png`} media="(prefers-color-scheme: light)" />
-    <link rel="icon" type="image/png" href={`${base}favicon-dark.png`} media="(prefers-color-scheme: dark)" />
-    <link rel="icon" type="image/png" href={`${base}favicon.png`} />
-    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`} />
+    <link rel="icon" href={`${base}favicon.svg?v=${iconVersion}`} type="image/svg+xml" sizes="any" />
+    <link
+      rel="icon"
+      type="image/png"
+      href={`${base}favicon-light.png?v=${iconVersion}`}
+      media="(prefers-color-scheme: light)"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href={`${base}favicon-dark.png?v=${iconVersion}`}
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="alternate icon" type="image/png" href={`${base}favicon.png?v=${iconVersion}`} />
+    <link rel="shortcut icon" href={`${base}favicon.ico?v=${iconVersion}`} />
+    <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png?v=${iconVersion}`} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
     <meta name="generator" content={Astro.generator} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

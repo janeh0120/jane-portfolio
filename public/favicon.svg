@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+  <style>
+    .fg { fill: #111111; }
+    @media (prefers-color-scheme: dark) {
+      .fg { fill: #ffffff; }
+    }
+  </style>
+  <mask id="m" maskUnits="userSpaceOnUse" x="0" y="0" width="108" height="108">
+    <image width="108" height="108" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGwAAABsCAYAAACPZlfNAAADjklEQVR42u1dS67DIAyk0btX6clCTxZysrxNkaqqaRIw/jGz7CIUBhv/MCEAAAAAAAAAwBCIMUasgmJylhe2HaQXsFqCSCmlrQIgzghRIM4wWSCNAb/OqFbASFEuWZ9YlmXBKhshC6QZJMvSmXbT/Oe2bdvYF+R2U70mk2bpGmlcWIUNgEpkUoc557yu65pzzsVUn+d5vvqdx+PxyDlniE1HY2NPldV8CxZjZ8KOzp0YYwRhis4v6m9qJmyyTm6Ps0ZzqGoaRWrXdV09zGMYwgBFZ9gZFebF6Jg8qK8jX+tq9MKL+gycdRqSfhjCU5WRjtaFro32Y/UZY4mFNBTpGFCL70YD6jwGiNiDLKGzDMU4RlUjpCv4rO0AWYZIA1mo/A0mSgR+peRLqCe/0EpaTdr/E8/n89lKWHzhfr/f9+asblOU6z6cO7vV3G8N7qaU0tWEqDhxNURRECd5e4VibBHiqM+Ss/6P1BlGsTnFSOsVfTiahJSV2MsPZMm59Q4VUaZILIzblTSuiwlUKRIr43YhTeoWyWjjmgzAUqRILI5LFnjm3m2WF12FarQ2cSm1pkLKWiZdvHvO3S5lOJT5ljmbIuzbAUrteGozzb8ttMitGS/Ob69xjxa4xulmI+ysaSoVXqIe96w09KhiZiVMMoBLNe4V1XVVyqoJ6z2QVIqE4izVtI7VEnZlIOsSdmVctYSd3fFezrBe47IRdmYwb1Zij9QMezplbxKj+WE1vmezH1abvCse/0iRjvSG1osciCWOEkuUbiE0UrT+rHRNZ+r3grF2Di071UXLolEyv+XQd9GnkUvNaKmtcNEJ1bNpLqVZut5J65nX0poi6Uka2wVCL5W/Z9URdTHpnrOtnrSaPy6RIjFfW0+RCm/ZYdwpEpdNM2OMsYRlPhe0/EahBjS9vbIXilreMPRFd9zAhPMO0tBFAAhoqhLQvghd3BwEndH+XEgVtkglVCOzdLWmSCBljNJFlSLB6jMU/1CmSKAWGdQhpaWJNuidcVR3IlWXAt+L6doPJCzIP0pw5fEAPJbTEd9a33nGMI/lXCFWc23i5MEFOFPAA1PdyNsrlN/SgD8vJL+3lS0SNc/zDMnCO844wzS94QUn25iUYdUNPOOB2g6DUoY8mDHSsMqGVCNMfyOSNnwpdTBUSYUzy1CRDqRKmLgjVVkavXgg6hYcGijBWxsHAAAAAAAAAAA84R8gICpqgdpR1QAAAABJRU5ErkJggg=="/>
+  </mask>
+  <rect width="108" height="108" class="fg" mask="url(#m)"/>
+</svg>
