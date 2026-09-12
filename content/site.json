@@ -67,7 +67,7 @@
       "name": "Design Systems",
       "tags": ["design systems", "shipped"],
       "title": "Bridging design and code with AI",
-      "image": "images/case study hero/dessys.png",
+      "image": "images/case-study-heroes/dessys.png",
       "comingSoon": false
     },
     {
@@ -75,7 +75,7 @@
       "name": "Migration",
       "tags": ["product", "partially shipped"],
       "title": "Leading design of 0 → 1 internal tooling",
-      "image": "images/case study hero/intuit.png",
+      "image": "images/case-study-heroes/intuit.png",
       "comingSoon": false
     },
     {
@@ -83,7 +83,7 @@
       "name": "IXD",
       "tags": ["brand", "community"],
       "title": "Building a brand around community",
-      "image": "images/case study hero/ixdyes.png",
+      "image": "images/case-study-heroes/ixdyes.png",
       "comingSoon": false
     },
     {
@@ -91,7 +91,7 @@
       "name": "GWSK",
       "tags": ["brand", "shipped"],
       "title": "Refreshing a design studio's identity",
-      "image": "images/case study hero/gwsk.png",
+      "image": "images/case-study-heroes/gwsk.png",
       "comingSoon": false
     }
   ],
