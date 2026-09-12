@@ -1,9 +1,19 @@
+# Disabled: production is on Vercel (@astrojs/vercel).
+# This workflow kept failing after the Vercel adapter change because
+# `dist/` is no longer a GitHub Pages–ready static root, and janehou.ca
+# is served by Vercel — not GitHub Pages.
+#
+# Keeping the file for reference. Do not re-enable unless you switch back
+# to a static adapter and point the domain at GitHub Pages again.
+
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type enable-pages to run (disabled by default)'
+        required: true
 
 permissions:
   contents: read
@@ -16,6 +26,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ inputs.confirm == 'enable-pages' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,9 +38,11 @@ jobs:
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          # Vercel adapter emits static assets here, not under dist/
+          path: .vercel/output/static
 
   deploy:
+    if: ${{ inputs.confirm == 'enable-pages' }}
     needs: build
     runs-on: ubuntu-latest
     environment:

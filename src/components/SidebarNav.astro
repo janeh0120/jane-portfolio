@@ -1,0 +1,98 @@
+---
+import ArrowIcon from './ArrowIcon.astro';
+
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  nav?: NavItem[];
+  ariaLabel?: string;
+  showBack?: boolean;
+  backHref?: string;
+  backLabel?: string;
+}
+
+const {
+  nav = [],
+  ariaLabel = 'Page sections',
+  showBack = true,
+  backHref,
+  backLabel = 'Back to Home',
+} = Astro.props;
+
+const base = import.meta.env.BASE_URL;
+const home = backHref ?? base;
+const hasNav = nav.length > 0;
+---
+
+<aside class="case-study-aside lg:sticky lg:top-24 lg:self-start">
+  {
+    showBack && (
+      <a href={home} class="case-study-back text-body text-muted transition hover:text-ink">
+        <ArrowIcon direction="left" size="0.9em" class="case-study-back-icon" />
+        {backLabel}
+      </a>
+    )
+  }
+  {
+    hasNav && (
+      <nav
+        class="case-study-nav mt-6 hidden flex-col gap-3 lg:flex"
+        aria-label={ariaLabel}
+      >
+        {nav.map((item) => (
+          <a href={item.href} class="text-body text-muted transition hover:text-ink">
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    )
+  }
+</aside>
+
+<script>
+  const nav = document.querySelector('.case-study-nav');
+  if (nav) {
+    nav.querySelectorAll('a[href^="#"]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        const href = link.getAttribute('href');
+        if (!href?.startsWith('#')) return;
+
+        const target = document.getElementById(href.slice(1));
+        if (!target) return;
+
+        event.preventDefault();
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        history.replaceState(null, '', href);
+      });
+    });
+  }
+</script>
+
+<style>
+  .case-study-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .case-study-aside {
+    scroll-margin-top: 5rem;
+  }
+
+  @media (max-width: 1023px) {
+    .case-study-aside {
+      position: sticky;
+      top: 4.5rem;
+      z-index: 40;
+      margin-left: -1.5rem;
+      margin-right: -1.5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgb(255 255 255 / 92%);
+      backdrop-filter: blur(8px);
+    }
+  }
+</style>

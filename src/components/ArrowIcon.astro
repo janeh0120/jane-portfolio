@@ -1,4 +1,6 @@
 ---
+import { Icon } from 'astro-icon/components';
+
 interface Props {
   direction?: 'left' | 'right';
   class?: string;
@@ -7,22 +9,15 @@ interface Props {
 }
 
 const { direction = 'right', class: className, size } = Astro.props;
-const base = import.meta.env.BASE_URL;
-const src = `${base}images/icons/arrow-${direction}.png`;
-const style = [
-  size ? `--arrow-size: ${size}` : null,
-  `mask-image: url('${src}')`,
-  `-webkit-mask-image: url('${src}')`,
-]
-  .filter(Boolean)
-  .join('; ');
+const name = direction === 'left' ? 'lucide:arrow-left' : 'lucide:arrow-right';
 ---
 
-<span
+<Icon
+  name={name}
   class:list={['arrow-icon', `arrow-icon--${direction}`, className]}
   aria-hidden="true"
-  style={style}
-></span>
+  style={size ? `--arrow-size: ${size}` : undefined}
+/>
 
 <style>
   .arrow-icon {
@@ -31,12 +26,6 @@ const style = [
     width: var(--arrow-size, 1em);
     height: var(--arrow-size, 1em);
     vertical-align: -0.12em;
-    background-color: currentColor;
-    mask-size: contain;
-    mask-repeat: no-repeat;
-    mask-position: center;
-    -webkit-mask-size: contain;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center;
+    color: currentColor;
   }
 </style>

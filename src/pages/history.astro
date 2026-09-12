@@ -85,16 +85,16 @@ function formatDate(iso: string) {
     <Layout title="Portfolio history">
       <Header />
       <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-8 md:px-10 md:pt-12">
-        <h1 class="case-study-heading">Portfolio history</h1>
-        <p class="mt-4 max-w-2xl text-muted">
+        <h1 class="heading text-ink">Portfolio history</h1>
+        <p class="mt-4 max-w-2xl text-body text-muted">
           Browse past versions of this site and the feedback left on each one. Comments stay tied to
           the version they were written on. Open an archived version to see them in context.
         </p>
 
         {error ? (
-          <p class="mt-8 text-sm text-red-700">{error}</p>
+          <p class="mt-8 text-body text-danger">{error}</p>
         ) : versions.length === 0 ? (
-          <p class="mt-8 text-sm text-muted">
+          <p class="mt-8 text-body text-muted">
             No versions recorded yet. After you deploy, call the deploy hook to snapshot this
             portfolio (see README).
           </p>
@@ -107,22 +107,22 @@ function formatDate(iso: string) {
                   <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div class="min-w-0 space-y-2">
                       <div class="flex flex-wrap items-center gap-3">
-                        <h2 class="text-body font-semibold tracking-tight">{version.label}</h2>
+                        <h2 class="subheading text-ink">{version.label}</h2>
                         {version.isActive && (
-                          <span class="text-xs font-medium uppercase tracking-wide text-muted">
+                          <span class="text-body font-medium uppercase tracking-wide text-muted">
                             Live
                           </span>
                         )}
                       </div>
-                      <p class="text-meta text-muted">{formatDate(version.createdAt.toISOString())}</p>
+                      <p class="text-body text-muted">{formatDate(version.createdAt.toISOString())}</p>
                       {summary && <p class="max-w-2xl text-body">{summary}</p>}
                       {version.gitSha && (
-                        <p class="font-mono text-xs text-muted">{version.gitSha.slice(0, 7)}</p>
+                        <p class="font-mono text-body text-muted">{version.gitSha.slice(0, 7)}</p>
                       )}
                     </div>
                     <a
                       href={`${base}history?version=${version.id}`}
-                      class="inline-flex shrink-0 items-center justify-center gap-1.5 text-sm font-medium underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink"
+                      class="text-link inline-flex shrink-0 items-center justify-center gap-1.5 text-body font-medium text-ink"
                     >
                       View version
                       <ArrowIcon direction="right" />

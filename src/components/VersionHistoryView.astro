@@ -66,12 +66,12 @@ const selectedVersion = versions.find((version) => version.id === selectedVersio
     </p>
     {
       selectedVersion?.isActive ? (
-        <a href={liveSiteUrl} class="inline-flex items-center gap-1.5 text-sm font-medium text-ink transition hover:opacity-70">
+        <a href={liveSiteUrl} class="inline-flex items-center gap-1.5 text-body font-medium text-ink transition hover:opacity-70">
           Open live site
           <ArrowIcon direction="right" />
         </a>
       ) : (
-        <span class="text-sm text-muted">Archived (comments are read-only)</span>
+        <span class="text-body text-muted">Archived (comments are read-only)</span>
       )
     }
   </div>
@@ -79,7 +79,7 @@ const selectedVersion = versions.find((version) => version.id === selectedVersio
 
 {
   selectedVersion?.summary && (
-    <p class="bg-canvas px-4 py-3 text-sm text-muted md:hidden">
+    <p class="bg-canvas px-4 py-3 text-body text-muted md:hidden">
       {selectedVersion.summary}
     </p>
   )

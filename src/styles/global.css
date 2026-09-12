@@ -20,7 +20,29 @@
   --color-subtle: #919191;
   --color-line: #f0f0f0;
   --color-link: #111111;
+
   --color-accent: #246cff;
+  --color-accent-soft: rgb(36 108 255 / 12%);
+
+  --color-surface: #f5f5f5;
+  --color-surface-strong: #ebebeb;
+  --color-border: #e8e8e8;
+  --color-border-strong: #e0e0e0;
+  --color-danger: #b42318;
+  --color-danger-soft: #fef2f2;
+  --color-placeholder: #c8c8c8;
+
+  /* Radius — portfolio chrome stays sharp; UI chrome can soften */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-xl: 18px;
+  --radius-full: 999px;
+
+  --max-w-site: 1400px;
+  --max-w-prose: 48rem;
+  --max-w-narrow: 42rem;
 }
 
 @layer base {
@@ -62,9 +84,24 @@
     font-family: var(--font-serif);
   }
 
-  /* Display: largest page headings only (Instrument Serif) */
-  .hero-copy,
-  .case-study-heading {
+  /*
+   * Type ramp (4 steps):
+   * - hero-copy  → homepage display
+   * - heading    → page titles
+   * - subheading → section / project titles
+   * - text-body  → body, labels, meta, nav
+   */
+
+  .hero-copy {
+    margin: 0;
+    font-family: var(--font-serif);
+    font-size: clamp(2.625rem, 4.8vw, 3.75rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    font-weight: 400;
+  }
+
+  .heading {
     margin: 0;
     font-family: var(--font-serif);
     font-size: clamp(1.75rem, 3.2vw, 2.5rem);
@@ -73,12 +110,17 @@
     font-weight: 400;
   }
 
-  .hero-copy {
-    font-size: clamp(2.625rem, 4.8vw, 3.75rem);
+  .subheading {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: clamp(1.125rem, 1.8vw, 1.375rem);
+    line-height: 1.3;
+    letter-spacing: -0.02em;
+    font-weight: 600;
   }
 
-  /* Body 1: primary reading copy */
   .text-body {
+    margin: 0;
     font-family: var(--font-sans);
     font-size: 1rem;
     line-height: 1.65;
@@ -86,39 +128,128 @@
     letter-spacing: -0.01em;
   }
 
-  /* Body 2: meta / labels / supporting UI */
-  .text-meta {
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.5;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+  .text-link {
+    width: fit-content;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--color-ink) 40%, transparent);
+    text-underline-offset: 3px;
+    transition:
+      color 0.15s ease,
+      text-decoration-color 0.15s ease;
   }
 
-  .experience-copy {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.5;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+  .text-link:hover,
+  .text-link.is-hover {
+    text-decoration-color: var(--color-ink);
   }
 
-  .project-tags {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.5;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+  .text-link:focus-visible,
+  .text-link.is-focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    text-decoration-color: var(--color-ink);
   }
 
-  .project-title {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: clamp(1.125rem, 1.8vw, 1.375rem);
-    line-height: 1.3;
-    letter-spacing: -0.02em;
-    font-weight: 600;
+  .text-link[aria-current='page'],
+  .text-link.is-active {
+    font-weight: 500;
+    text-decoration-color: var(--color-ink);
+  }
+
+  .text-link[aria-current='page']:hover,
+  .text-link.is-active:hover,
+  .text-link.is-active.is-hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  /*
+   * Vertical rhythm between page sections.
+   * Prefer this parent gap over per-section py/my.
+   */
+  .section-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .section-stack {
+      gap: 7rem;
+    }
+  }
+
+  /* IconControl + comment-mode icon toggle */
+  .icon-control,
+  .comment-mode-toggle.is-icon {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: none;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .comment-mode-toggle.is-icon {
+    display: inline-flex;
+  }
+
+  .icon-control svg,
+  .comment-mode-toggle.is-icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .icon-control > svg:not(.hidden),
+  .comment-mode-toggle.is-icon > svg:not(.hidden) {
+    display: block;
+  }
+
+  .icon-control:hover,
+  .icon-control.is-hover,
+  .comment-mode-toggle.is-icon:hover,
+  .comment-mode-toggle.is-icon:active,
+  .comment-mode-toggle.is-icon.is-hover,
+  .comment-mode-toggle.is-icon[aria-pressed='true']:hover,
+  .comment-mode-toggle.is-icon[aria-pressed='true']:active {
+    color: var(--color-ink);
+    background: var(--color-border);
+  }
+
+  .icon-control:focus-visible,
+  .icon-control.is-focus,
+  .comment-mode-toggle.is-icon:focus-visible,
+  .comment-mode-toggle.is-icon.is-focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .icon-control[aria-pressed='true'],
+  .comment-mode-toggle.is-icon[aria-pressed='true'] {
+    background: transparent;
+    color: var(--color-muted);
+  }
+
+  @media (max-width: 767px) {
+    .icon-control,
+    .comment-mode-toggle.is-icon {
+      width: 36px;
+      height: 36px;
+      min-height: 36px;
+    }
   }
 }

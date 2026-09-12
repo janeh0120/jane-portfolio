@@ -1,6 +1,5 @@
 ---
 import { galleryItems } from '../../lib/play-gallery';
-import { site } from '../../data/site';
 import ArrowIcon from '../ArrowIcon.astro';
 
 const base = import.meta.env.BASE_URL;
@@ -16,7 +15,6 @@ function isVideo(path: string) {
 ---
 
 <section class="gallery-section">
-  <h2 class="gallery-title">{site.play.heading}</h2>
   <div class="gallery-grid" id="gallery-grid">
     {
       galleryItems.map((item) => {

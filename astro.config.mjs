@@ -2,6 +2,7 @@
 import { defineConfig, envField } from 'astro/config';
 import react from '@astrojs/react';
 import vercel from '@astrojs/vercel';
+import icon from 'astro-icon';
 import tailwindcss from '@tailwindcss/vite';
 
 const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined;
@@ -13,7 +14,14 @@ export default defineConfig({
   redirects: {
     '/extra': '/play',
   },
-  integrations: [react()],
+  integrations: [
+    react(),
+    icon({
+      include: {
+        lucide: ['arrow-left', 'arrow-right', 'arrow-up-right', 'menu', 'x', 'send'],
+      },
+    }),
+  ],
   adapter: vercel(),
   env: {
     schema: {

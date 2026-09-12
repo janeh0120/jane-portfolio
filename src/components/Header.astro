@@ -1,6 +1,8 @@
 ---
 import { site } from '../data/site';
 import ExternalLinkIcon from './ExternalLinkIcon.astro';
+import IconControl from './IconControl.astro';
+import { Icon } from 'astro-icon/components';
 
 const base = import.meta.env.BASE_URL;
 const root = base.endsWith('/') ? base.slice(0, -1) : base;
@@ -20,12 +22,7 @@ function isActive(href: string) {
 }
 
 const linkClass = (href: string) =>
-  [
-    'text-meta text-ink underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink',
-    isActive(href) && 'decoration-ink',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  ['text-link text-body text-ink', isActive(href) && 'is-active'].filter(Boolean).join(' ');
 ---
 
 <header class="site-header sticky top-0 z-50 bg-canvas/85 backdrop-blur-sm" data-comment-ui>
@@ -55,6 +52,7 @@ const linkClass = (href: string) =>
             <a
               href={resolveHref(item.href)}
               class={linkClass(item.href)}
+              aria-current={isActive(item.href) ? 'page' : undefined}
               target={item.external ? '_blank' : undefined}
               rel={item.external ? 'noopener noreferrer' : undefined}
             >
@@ -65,58 +63,41 @@ const linkClass = (href: string) =>
         }
       </nav>
       <div id="comment-toggle-anchor" class="comment-toggle-anchor" data-comment-ui></div>
-      <button
-        type="button"
+      <IconControl
         id="mobile-nav-toggle"
-        class="mobile-nav-toggle inline-flex h-11 w-11 items-center justify-center bg-transparent text-ink transition hover:opacity-60 md:hidden"
+        class="mobile-nav-toggle md:hidden"
+        label="Open menu"
         aria-expanded="false"
         aria-controls="mobile-nav-panel"
-        aria-label="Open menu"
         data-comment-ui
       >
-        <svg
-          class="mobile-nav-icon-open h-5 w-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.75"
-          aria-hidden="true"
-        >
-          <path d="M4 7h16M4 12h16M4 17h16" />
-        </svg>
-        <svg
-          class="mobile-nav-icon-close hidden h-5 w-5"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.75"
-          aria-hidden="true"
-        >
-          <path d="M6 6l12 12M18 6 6 18" />
-        </svg>
-      </button>
+        <Icon name="lucide:menu" class="mobile-nav-icon-open" aria-hidden="true" />
+        <Icon name="lucide:x" class="mobile-nav-icon-close hidden" aria-hidden="true" />
+      </IconControl>
     </div>
   </div>
 
   <nav
     id="mobile-nav-panel"
-    class="mobile-nav-panel hidden bg-canvas/95 px-6 py-4 backdrop-blur-sm md:hidden"
+    class="mobile-nav-panel bg-canvas/95 px-6 backdrop-blur-sm"
     aria-label="Main"
-    hidden
+    aria-hidden="true"
     data-comment-ui
   >
-    <ul class="flex flex-col gap-1">
+    <ul class="mobile-nav-panel-inner flex flex-col gap-1 py-4">
       {
         site.nav.map((item) => (
           <li>
             <a
               href={resolveHref(item.href)}
               class:list={[
-                'mobile-nav-link block px-0 py-3 text-body underline decoration-ink/40 underline-offset-[3px] transition hover:decoration-ink',
-                isActive(item.href) && 'decoration-ink',
+                'mobile-nav-link text-link block px-0 py-3 text-body text-ink',
+                isActive(item.href) && 'is-active',
               ]}
+              aria-current={isActive(item.href) ? 'page' : undefined}
               target={item.external ? '_blank' : undefined}
               rel={item.external ? 'noopener noreferrer' : undefined}
+              tabindex="-1"
             >
               {item.label}
               {item.external && <ExternalLinkIcon />}
@@ -128,21 +109,76 @@ const linkClass = (href: string) =>
   </nav>
 </header>
 
+<style>
+  @media (max-width: 767px) {
+    .mobile-nav-panel {
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow: hidden;
+      transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .mobile-nav-panel.is-open {
+      grid-template-rows: 1fr;
+    }
+
+    .mobile-nav-panel-inner {
+      min-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-0.75rem);
+      transition:
+        opacity 0.25s ease,
+        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .mobile-nav-panel.is-open .mobile-nav-panel-inner {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .mobile-nav-panel {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-nav-panel,
+    .mobile-nav-panel-inner {
+      transition: none;
+    }
+
+    .mobile-nav-panel-inner {
+      transform: none;
+    }
+  }
+</style>
+
 <script>
   const toggle = document.getElementById('mobile-nav-toggle');
   const panel = document.getElementById('mobile-nav-panel');
   const openIcon = toggle?.querySelector('.mobile-nav-icon-open');
   const closeIcon = toggle?.querySelector('.mobile-nav-icon-close');
 
+  function setLinksTabbable(open: boolean) {
+    panel?.querySelectorAll('a').forEach((link) => {
+      if (open) link.removeAttribute('tabindex');
+      else link.setAttribute('tabindex', '-1');
+    });
+  }
+
   function setOpen(open: boolean) {
     if (!toggle || !panel) return;
     toggle.setAttribute('aria-expanded', String(open));
     toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    panel.hidden = !open;
-    panel.classList.toggle('hidden', !open);
+    panel.classList.toggle('is-open', open);
+    panel.setAttribute('aria-hidden', String(!open));
     openIcon?.classList.toggle('hidden', open);
     closeIcon?.classList.toggle('hidden', !open);
     document.body.classList.toggle('mobile-nav-open', open);
+    setLinksTabbable(open);
   }
 
   toggle?.addEventListener('click', () => {

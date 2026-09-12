@@ -1,0 +1,488 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SidebarNav from '../components/SidebarNav.astro';
+import IconControl from '../components/IconControl.astro';
+import { site } from '../data/site';
+
+const sections = [
+  { id: 'colors', label: 'Colors' },
+  { id: 'typography', label: 'Typography' },
+  { id: 'layout', label: 'Layout' },
+  { id: 'borders', label: 'Borders' },
+  { id: 'radius', label: 'Radius' },
+  { id: 'buttons', label: 'Buttons' },
+  { id: 'icon-control', label: 'Icon control' },
+  { id: 'links', label: 'Links' },
+];
+
+const colors = [
+  {
+    use: 'Page background',
+    tw: 'bg-canvas',
+    token: '--color-canvas',
+    outline: true,
+  },
+  { use: 'Primary text', tw: 'text-ink', token: '--color-ink' },
+  { use: 'Secondary text', tw: 'text-muted', token: '--color-muted' },
+  { use: 'Tertiary text', tw: 'text-subtle', token: '--color-subtle' },
+  { use: 'Portfolio hairlines', tw: 'border-line', token: '--color-line' },
+  { use: 'Toolbars · panels', tw: 'bg-surface', token: '--color-surface' },
+  { use: 'Default UI outlines', tw: 'border-border', token: '--color-border' },
+  { use: 'Brand moments', tw: 'text-accent / bg-accent', token: '--color-accent' },
+  { use: 'Errors · destructive', tw: 'text-danger', token: '--color-danger' },
+  {
+    use: 'Selected · focus fills',
+    tw: 'bg-accent-soft',
+    token: '--color-accent-soft',
+    outline: true,
+  },
+  {
+    use: 'Error banners',
+    tw: 'bg-danger-soft',
+    token: '--color-danger-soft',
+    outline: true,
+  },
+];
+
+const typeStyles = [
+  {
+    className: 'hero-copy',
+    label: 'Display',
+    sample: site.hero.headline,
+  },
+  {
+    className: 'heading',
+    label: 'Heading',
+    sample: 'A design community shouldn’t graduate without a shared experience.',
+  },
+  {
+    className: 'subheading',
+    label: 'Subheading',
+    sample: 'Intuit Design System',
+  },
+  {
+    className: 'text-body',
+    label: 'Body',
+    sample:
+      'I love when design can bridge the intersection between solving technical and people problems.',
+  },
+];
+
+const borders = [
+  {
+    name: 'Line',
+    token: '--color-line',
+    detail: '1px · portfolio dividers',
+  },
+  {
+    name: 'Border',
+    token: '--color-border',
+    detail: '1px · inputs · cards',
+  },
+  {
+    name: 'Border strong',
+    token: '--color-border-strong',
+    detail: '1px · higher contrast',
+  },
+];
+
+const radii = [
+  { name: 'None', token: '--radius-none', detail: '0 · media default' },
+  { name: 'Sm', token: '--radius-sm', detail: '4px · chips' },
+  { name: 'Md', token: '--radius-md', detail: '6px · controls' },
+  { name: 'Lg', token: '--radius-lg', detail: '12px · panels' },
+  { name: 'Xl', token: '--radius-xl', detail: '18px · popovers' },
+  { name: 'Full', token: '--radius-full', detail: 'pill · circles' },
+];
+
+const widths = [
+  {
+    name: 'Site shell',
+    value: 'max-w-[1400px]',
+    use: 'Header, home, footer, design system',
+  },
+  {
+    name: 'Case study',
+    value: 'max-w-3xl',
+    use: 'Case study reading column',
+  },
+  {
+    name: 'Narrow',
+    value: 'max-w-2xl',
+    use: 'About · short intros',
+  },
+];
+
+const breakpoints = [
+  {
+    name: 'sm',
+    value: '640px',
+    use: 'Figure rows, meta grids start splitting',
+  },
+  {
+    name: 'md',
+    value: '768px',
+    use: 'Site nav expands; mobile menu hides; project grid → 2 cols; padding px-6 → px-10',
+  },
+  {
+    name: 'Comment stack',
+    value: '900px',
+    use: 'Comment sidebar drops under the canvas as a bottom sheet',
+  },
+  {
+    name: 'lg',
+    value: '1024px',
+    use: 'Case study nav becomes a sticky left rail (200px)',
+  },
+];
+
+const sectionClass = 'scroll-mt-28 md:scroll-mt-32';
+const sectionTitleClass = 'subheading text-ink';
+---
+
+<Layout title={`Design system | ${site.title}`} description="Color, type, and patterns used across this portfolio.">
+  <Header />
+  <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-6 md:px-10">
+    <div class="grid gap-8 lg:grid-cols-[200px_1fr] lg:gap-20">
+      <SidebarNav
+        nav={sections.map((item) => ({ label: item.label, href: `#${item.id}` }))}
+        ariaLabel="Design system sections"
+      />
+
+      <div class="section-stack min-w-0">
+        <h1 class="hero-copy text-ink">Design system</h1>
+
+    <section id="colors" class={sectionClass} aria-labelledby="colors-title">
+      <h2 id="colors-title" class={sectionTitleClass}>Colors</h2>
+      <ul class="mt-8 grid grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-8 lg:grid-cols-5">
+          {
+            colors.map((swatch) => (
+              <li class="grid min-w-0 gap-3">
+                <div
+                  class:list={[
+                    'size-16 sm:size-20 lg:size-28',
+                    swatch.outline && 'border border-border-strong',
+                  ]}
+                  style={`background: var(${swatch.token})`}
+                  aria-hidden="true"
+                />
+                <div class="min-w-0">
+                  <p class="text-body font-medium text-muted">{swatch.use}</p>
+                  <p class="mt-0.5 text-body text-subtle">
+                    <code class="text-[0.85em]">{swatch.tw}</code>
+                  </p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+    </section>
+
+    <section id="typography" class={sectionClass} aria-labelledby="typography-title">
+      <h2 id="typography-title" class={sectionTitleClass}>Typography</h2>
+      <div class="mt-8 grid gap-12">
+        {
+          typeStyles.map((item) => (
+            <div>
+              <p class="text-body font-medium text-muted">{item.label}</p>
+              <div class:list={[item.className, 'mt-4 text-ink']}>{item.sample}</div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="layout" class={sectionClass} aria-labelledby="layout-title">
+      <h2 id="layout-title" class={sectionTitleClass}>Layout</h2>
+      <div class="mt-8 grid gap-16">
+        <div>
+          <p class="text-body font-medium text-muted">Section stack</p>
+          <p class="mt-1 max-w-[58ch] text-body text-muted">
+            Space between page sections comes from parent
+            <code class="text-subtle">.section-stack</code> gap (5.5rem / 7rem at md+), not
+            top/bottom padding on each section.
+          </p>
+        </div>
+
+        <div>
+          <p class="text-body font-medium text-muted">Page widths</p>
+          {
+            widths.map((item) => (
+              <div>
+                <p class="text-body font-medium text-muted">{item.name}</p>
+                <p class="mt-1 max-w-[54ch] text-body text-muted">
+                  {item.use}. Use <code class="text-subtle">{item.value}</code>.
+                </p>
+                <div class="mt-4 overflow-hidden border border-border bg-surface">
+                  <div
+                    class:list={[
+                      'mx-auto border border-dashed border-border-strong bg-canvas px-4 py-6 text-center text-body text-subtle',
+                      item.value,
+                    ]}
+                  >
+                    Content
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+
+        <div>
+          <p class="text-body font-medium text-muted">Case study shell</p>
+          <p class="mt-1 max-w-[58ch] text-body text-muted">
+            Desktop (<code class="text-subtle">lg: 1024px+</code>): sticky 200px section nav +
+            <code class="text-subtle">max-w-3xl</code> article.
+            Below that, the nav collapses into a sticky horizontal bar under the header.
+          </p>
+          <div class="mt-4 grid gap-3">
+            <p class="text-body text-subtle">≥ 1024px</p>
+            <div
+              class="grid grid-cols-[72px_1fr] gap-3 border border-border bg-surface p-3 sm:grid-cols-[96px_1fr] sm:gap-4 sm:p-4"
+              aria-hidden="true"
+            >
+              <div class="flex flex-col gap-2 border border-dashed border-border-strong bg-canvas p-2">
+                <span class="text-[0.7rem] text-subtle">Back</span>
+                <span class="text-[0.7rem] text-muted">Context</span>
+                <span class="text-[0.7rem] text-muted">Outcome</span>
+                <span class="text-[0.7rem] text-muted">…</span>
+              </div>
+              <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">
+                Article · max-w-3xl
+              </div>
+            </div>
+            <p class="mt-2 text-body text-subtle">&lt; 1024px</p>
+            <div class="border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
+              <div class="mb-3 flex gap-3 overflow-hidden border border-dashed border-border-strong bg-canvas px-3 py-2">
+                <span class="shrink-0 text-[0.7rem] text-muted">Context</span>
+                <span class="shrink-0 text-[0.7rem] text-muted">Outcome</span>
+                <span class="shrink-0 text-[0.7rem] text-muted">Takeaways</span>
+                <span class="shrink-0 text-[0.7rem] text-subtle">→</span>
+              </div>
+              <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">
+                Article
+              </div>
+            </div>
+          </div>
+          <p class="mt-3 text-body text-subtle">
+            <code class="text-[0.85em]">lg:grid-cols-[200px_1fr]</code>
+            ·
+            <code class="text-[0.85em]">SidebarNav</code>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-body font-medium text-muted">Comment mode shell</p>
+          <p class="mt-1 max-w-[58ch] text-body text-muted">
+            When feedback is on, the site sits in a framed canvas beside a 300px comment sidebar.
+            At <code class="text-subtle">≤ 900px</code> the shell stacks and the sidebar becomes a
+            bottom sheet (~36–40vh).
+          </p>
+          <div class="mt-4 grid gap-3">
+            <p class="text-body text-subtle">&gt; 900px</p>
+            <div
+              class="grid grid-cols-[1fr_64px] gap-2 border border-border bg-surface p-3 sm:grid-cols-[1fr_88px] sm:gap-2.5 sm:p-4"
+              aria-hidden="true"
+            >
+              <div class="border border-dashed border-border-strong bg-canvas px-3 py-8 text-center text-body text-subtle">
+                Site canvas
+              </div>
+              <div class="flex flex-col gap-2 border border-dashed border-border-strong bg-canvas p-2">
+                <span class="text-[0.7rem] text-muted">Comments</span>
+                <span class="mt-1 h-2 w-full bg-surface" />
+                <span class="h-2 w-3/4 bg-surface" />
+                <span class="h-2 w-full bg-surface" />
+              </div>
+            </div>
+            <p class="mt-2 text-body text-subtle">≤ 900px</p>
+            <div class="flex flex-col gap-2 border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
+              <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">
+                Site canvas
+              </div>
+              <div class="border border-dashed border-border-strong bg-canvas px-3 py-3 text-center text-body text-subtle">
+                Comment sheet
+              </div>
+            </div>
+          </div>
+          <p class="mt-3 text-body text-subtle">
+            <code class="text-[0.85em]">--comment-sidebar-width: 300px</code>
+            ·
+            <code class="text-[0.85em]">comment-mode.css</code>
+          </p>
+        </div>
+
+        <div>
+          <p class="text-body font-medium text-muted">Breakpoints</p>
+          <p class="mt-1 max-w-[58ch] text-body text-muted">
+            Tailwind defaults plus one comment-mode custom cut. Device metadata treats
+            &lt;768 as mobile and &lt;1024 as tablet.
+          </p>
+          <ul class="mt-6 grid list-none gap-5 p-0 sm:grid-cols-2">
+            {
+              breakpoints.map((item) => (
+                <li class="min-w-0 border-t border-line pt-4">
+                  <p class="text-body font-medium text-muted">
+                    {item.name}
+                    <span class="mx-1.5 text-subtle">·</span>
+                    <code class="text-[0.85em] text-subtle">{item.value}</code>
+                  </p>
+                  <p class="mt-1 text-body text-muted">{item.use}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="borders" class={sectionClass} aria-labelledby="borders-title">
+      <h2 id="borders-title" class={sectionTitleClass}>Borders</h2>
+      <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3">
+        {
+          borders.map((item) => (
+            <li class="grid justify-items-start gap-4">
+              <div>
+                <p class="text-body font-medium text-muted">{item.name}</p>
+                <p class="mt-1 text-body text-muted">{item.detail}</p>
+              </div>
+              <div
+                class="size-20 bg-canvas"
+                style={`border: 2px solid var(${item.token})`}
+                aria-hidden="true"
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section id="radius" class={sectionClass} aria-labelledby="radius-title">
+      <h2 id="radius-title" class={sectionTitleClass}>Radius</h2>
+      <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3 lg:grid-cols-6">
+        {
+          radii.map((item) => (
+            <li class="grid justify-items-start gap-4">
+              <div>
+                <p class="text-body font-medium text-muted">{item.name}</p>
+                <p class="mt-1 text-body text-muted">{item.detail}</p>
+              </div>
+              <div
+                class="size-20 bg-surface"
+                style={`border-radius: var(${item.token})`}
+                aria-hidden="true"
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section id="buttons" class={sectionClass} aria-labelledby="buttons-title">
+      <h2 id="buttons-title" class={sectionTitleClass}>Buttons</h2>
+      <p class="mt-3 max-w-[58ch] text-body text-muted">
+        Surface action used in the header for comment mode. Prefer text links for navigation;
+        reserve buttons for actions.
+      </p>
+      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
+        <div class="flex flex-wrap items-end gap-8">
+          <div>
+            <p class="mb-3 text-body text-subtle">Default</p>
+            <button type="button" class="comment-mode-toggle">Leave feedback</button>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Hover</p>
+            <button type="button" class="comment-mode-toggle is-hover">Leave feedback</button>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Pressed</p>
+            <button type="button" class="comment-mode-toggle" aria-pressed="true">
+              Leave feedback
+            </button>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Focus</p>
+            <button type="button" class="comment-mode-toggle is-focus">Leave feedback</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="icon-control" class={sectionClass} aria-labelledby="icon-control-title">
+      <h2 id="icon-control-title" class={sectionTitleClass}>Icon control</h2>
+      <p class="mt-3 max-w-[58ch] text-body text-muted">
+        Icon-only actions via <code class="text-subtle">IconControl</code>. Icons are from Lucide.
+        Used for the mobile nav toggle; comment mode reuses the same styles when pressed into an
+        icon.
+      </p>
+      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
+        <div class="flex flex-wrap items-end gap-8">
+          <div>
+            <p class="mb-3 text-body text-subtle">Default</p>
+            <IconControl label="Open menu" icon="menu" />
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Hover</p>
+            <IconControl label="Open menu" icon="menu" class="is-hover" />
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Selected</p>
+            <IconControl label="Close menu" icon="x" aria-pressed="true" />
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Focus</p>
+            <IconControl label="Open menu" icon="menu" class="is-focus" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="links" class={sectionClass} aria-labelledby="links-title">
+      <h2 id="links-title" class={sectionTitleClass}>Links</h2>
+      <p class="mt-3 max-w-[58ch] text-body text-muted">
+        Header, footer, and inline navigation. Use <code class="text-subtle">.text-link</code>. The
+        current page uses <code class="text-subtle">aria-current="page"</code> — no separate page
+        heading needed.
+      </p>
+      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
+        <div class="flex flex-wrap items-end gap-10">
+          <div>
+            <p class="mb-3 text-body text-subtle">Default</p>
+            <a href="/about" class="text-link text-body text-ink">About</a>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Hover</p>
+            <a href="/about" class="text-link is-hover text-body text-ink">About</a>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Selected</p>
+            <a
+              href="/about"
+              class="text-link is-active text-body text-ink"
+              aria-current="page"
+            >
+              About
+            </a>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Focus</p>
+            <a href="/about" class="text-link is-focus text-body text-ink">About</a>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Copied</p>
+            <span
+              class="text-link text-body font-medium text-accent"
+              style="text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent)"
+            >
+              Copied!
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+      </div>
+    </div>
+  </main>
+  <SiteFooter />
+</Layout>

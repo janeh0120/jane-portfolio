@@ -61,20 +61,19 @@ const clientComments = comments.map((item) => ({
   {
     !authorized ? (
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
-        <h1 class="case-study-heading">Admin access required</h1>
-        <p class="mt-4 text-muted">
-          Add <code class="rounded bg-line px-1.5 py-0.5 text-sm">?key=YOUR_ADMIN_SECRET</code> to the
-          URL.
+        <h1 class="heading text-ink">Admin access required</h1>
+        <p class="mt-4 text-body text-muted">
+          Add <code class="rounded bg-line px-1.5 py-0.5">?key=YOUR_ADMIN_SECRET</code> to the URL.
         </p>
         {!ADMIN_SECRET && (
-          <p class="mt-4 text-sm text-red-700">
-            <code class="rounded bg-line px-1 py-0.5 text-xs">ADMIN_SECRET</code> is not set on this
-            server. Add it in Vercel Environment Variables and redeploy.
+          <p class="mt-4 text-body text-danger">
+            <code class="rounded bg-line px-1 py-0.5">ADMIN_SECRET</code> is not set on this server.
+            Add it in Vercel Environment Variables and redeploy.
           </p>
         )}
-        <p class="mt-4 text-sm text-muted">
+        <p class="mt-4 text-body text-muted">
           Example:{' '}
-          <code class="break-all rounded bg-line px-1.5 py-0.5 text-xs">
+          <code class="break-all rounded bg-line px-1.5 py-0.5">
             {Astro.url.origin}
             {base}admin/review?key=…
           </code>
@@ -82,22 +81,22 @@ const clientComments = comments.map((item) => ({
       </main>
     ) : error ? (
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
-        <h1 class="case-study-heading">Version review</h1>
-        <p class="mt-6 text-sm text-red-700">{error}</p>
-        <p class="mt-4 text-sm text-muted">
+        <h1 class="heading text-ink">Version review</h1>
+        <p class="mt-6 text-body text-danger">{error}</p>
+        <p class="mt-4 text-body text-muted">
           On Vercel, open <strong>Settings → Environment Variables</strong> and add{' '}
-          <code class="rounded bg-line px-1 py-0.5 text-xs">SUPABASE_URL</code>,{' '}
-          <code class="rounded bg-line px-1 py-0.5 text-xs">SUPABASE_SERVICE_ROLE_KEY</code>, and{' '}
-          <code class="rounded bg-line px-1 py-0.5 text-xs">ADMIN_SECRET</code> (same values as your
-          local <code class="rounded bg-line px-1 py-0.5 text-xs">.env</code>), then redeploy.
+          <code class="rounded bg-line px-1 py-0.5">SUPABASE_URL</code>,{' '}
+          <code class="rounded bg-line px-1 py-0.5">SUPABASE_SERVICE_ROLE_KEY</code>, and{' '}
+          <code class="rounded bg-line px-1 py-0.5">ADMIN_SECRET</code> (same values as your local{' '}
+          <code class="rounded bg-line px-1 py-0.5">.env</code>), then redeploy.
         </p>
       </main>
     ) : selectedVersion ? (
       <AdminCommentReview adminKey={key} comments={clientComments} frameBaseUrl={frameBaseUrl} />
     ) : (
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
-        <h1 class="case-study-heading">Version review</h1>
-        <p class="mt-6 text-sm text-muted">
+        <h1 class="heading text-ink">Version review</h1>
+        <p class="mt-6 text-body text-muted">
           No portfolio versions yet. Deploy the site or run the deploy hook to create one.
         </p>
       </main>

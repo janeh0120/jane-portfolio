@@ -31,7 +31,7 @@ const commentId = project.slug
           class="aspect-[16/10] w-full object-cover transition duration-500 group-hover:opacity-90"
           loading="lazy"
         />
-        <span class="absolute top-2 right-2 bg-canvas px-2 py-0.5 text-xs font-medium text-ink">
+        <span class="absolute top-2 right-2 bg-canvas px-2 py-0.5 text-body font-medium text-ink">
           Coming soon
         </span>
       </div>
@@ -47,13 +47,13 @@ const commentId = project.slug
     )
   }
   <div class="mt-3.5 space-y-1.5">
-    <p class="project-tags text-muted">{formatProjectTags(project.tags)}</p>
+    <p class="text-body text-muted">{formatProjectTags(project.tags)}</p>
     {
       project.comingSoon ? (
-        <h3 class="project-title text-ink">{project.title}</h3>
+        <h3 class="subheading text-ink">{project.title}</h3>
       ) : (
         <a href={href} class="block">
-          <h3 class="project-title text-ink transition group-hover:opacity-70">{project.title}</h3>
+          <h3 class="subheading text-ink transition group-hover:opacity-70">{project.title}</h3>
         </a>
       )
     }

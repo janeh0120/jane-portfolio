@@ -76,6 +76,8 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
 <div class="comment-mode-highlight" id="admin-highlight" hidden data-comment-ui></div>
 
 <script define:vars={{ adminKey, comments, frameBaseUrl }}>
+  import { lucideSvg } from '../lib/lucide-svg';
+
   const CATEGORY_LABELS = {
     '': 'No category',
     accessibility: 'Accessibility',
@@ -306,7 +308,7 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
       deleteBtn.type = 'button';
       deleteBtn.className = 'comment-sidebar-card-delete';
       deleteBtn.setAttribute('aria-label', 'Delete comment');
-      deleteBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>`;
+      deleteBtn.innerHTML = lucideSvg('x', 14);
       deleteBtn.addEventListener('click', (event) => {
         event.stopPropagation();
         void deleteComment(item.id);

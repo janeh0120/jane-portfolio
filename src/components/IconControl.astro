@@ -1,0 +1,25 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'button'> {
+  /** Accessible name (required). */
+  label: string;
+  /** Lucide icon id without the `lucide:` prefix, e.g. `menu`. Ignored when a slot is provided. */
+  icon?: string;
+  class?: string;
+}
+
+const { label, icon, class: className, type = 'button', ...rest } = Astro.props;
+---
+
+<button
+  type={type}
+  class:list={['icon-control', 'inline-flex', className]}
+  aria-label={label}
+  {...rest}
+>
+  <slot>
+    {icon ? <Icon name={`lucide:${icon}`} aria-hidden="true" /> : null}
+  </slot>
+</button>

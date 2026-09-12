@@ -1,56 +1,37 @@
 ---
 import { site } from '../data/site';
 
-const linkClass =
-  'text-ink underline decoration-ink/25 underline-offset-[3px] transition hover:decoration-ink';
-
-const { current, previous, note } = site.experience;
+const linkClass = 'text-link text-body text-ink';
+const { current, previous } = site.experience;
 ---
 
-<section
-  class="mx-auto max-w-[1400px] px-6 pb-20 pt-5 md:px-10 md:pb-28 md:pt-6"
-  data-comment-id="experience"
->
-  <div class="experience-list max-w-2xl">
-    <div class="experience-block">
-      <p class="experience-copy text-muted">Currently at:</p>
-      <ul class="experience-entries">
-        <li class="experience-entry experience-copy">
-          <a
-            href={current.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class={linkClass}
-          >
-            {current.label}
-          </a>
-          {current.role && <span class="experience-role text-muted">{current.role}</span>}
-        </li>
-      </ul>
-    </div>
+<section class="experience-list max-w-2xl" data-comment-id="experience" aria-label="Experience">
+  <div class="experience-block">
+    <p class="text-body text-muted">Currently at:</p>
+    <ul class="experience-entries">
+      <li class="experience-entry text-body">
+        <a href={current.href} target="_blank" rel="noopener noreferrer" class={linkClass}>
+          {current.label}
+        </a>
+        {current.role && <span class="experience-role text-muted">{current.role}</span>}
+      </li>
+    </ul>
+  </div>
 
-    <div class="experience-block">
-      <p class="experience-copy text-muted">Previously at:</p>
-      <ul class="experience-entries">
-        {
-          previous.map((place) => (
-            <li class="experience-entry experience-copy">
-              <a
-                href={place.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                class={linkClass}
-              >
-                {place.label}
-              </a>
-              {place.role && <span class="experience-role text-muted">{place.role}</span>}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-
-    {note && <p class="experience-copy experience-note text-muted">{note}</p>}
+  <div class="experience-block">
+    <p class="text-body text-muted">Previously at:</p>
+    <ul class="experience-entries">
+      {
+        previous.map((place) => (
+          <li class="experience-entry text-body">
+            <a href={place.href} target="_blank" rel="noopener noreferrer" class={linkClass}>
+              {place.label}
+            </a>
+            {place.role && <span class="experience-role text-muted">{place.role}</span>}
+          </li>
+        ))
+      }
+    </ul>
   </div>
 </section>
 
@@ -62,7 +43,7 @@ const { current, previous, note } = site.experience;
 
   .experience-block {
     display: grid;
-    gap: 0.45rem;
+    gap: 0;
   }
 
   .experience-entries {
@@ -82,10 +63,6 @@ const { current, previous, note } = site.experience;
 
   .experience-role {
     font-style: normal;
-  }
-
-  .experience-note {
-    margin: 0;
   }
 
   @media (max-width: 480px) {

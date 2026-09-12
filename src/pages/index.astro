@@ -12,9 +12,13 @@ import SiteFooter from '../components/SiteFooter.astro';
   <LogoScrollIntro />
   <Header />
   <div class="home-intro-content" id="home-intro-content">
-    <main>
-      <Hero />
-      <Experience />
+    <main class="section-stack">
+      <section
+        class="home-intro mx-auto grid w-full max-w-[1400px] gap-4 px-6 pt-10 md:gap-5 md:px-10 md:pt-14"
+      >
+        <Hero />
+        <Experience />
+      </section>
       <ProjectGrid />
     </main>
     <SiteFooter />
