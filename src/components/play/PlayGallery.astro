@@ -19,6 +19,8 @@ function isVideo(path: string) {
     {
       galleryItems.map((item) => {
         const first = item.images[0];
+        const preview = item.thumb ?? first;
+        const previewIsVideo = !item.thumb && isVideo(first);
         return (
           <button
             type="button"
@@ -26,18 +28,21 @@ function isVideo(path: string) {
             data-gallery-id={item.id}
             aria-label={`Open ${item.title}`}
           >
-            {isVideo(first) ? (
+            {previewIsVideo ? (
               <video
                 src={mediaSrc(first)}
                 muted
                 playsinline
-                loop
-                autoplay
                 preload="metadata"
                 aria-label={item.title}
               />
             ) : (
-              <img src={mediaSrc(first)} alt={item.title} loading="lazy" />
+              <img
+                src={mediaSrc(preview)}
+                alt={item.title}
+                loading="lazy"
+                decoding="async"
+              />
             )}
           </button>
         );

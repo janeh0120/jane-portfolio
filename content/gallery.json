@@ -7,7 +7,8 @@
     "images": [
       "images/extra/ids-design/packaging.mp4",
       "images/extra/ids-design/charms.mp4"
-    ]
+    ],
+    "thumb": "images/play-thumbs/ids-design.webp"
   },
   {
     "slug": "shoebox-craft",
@@ -16,7 +17,8 @@
     "year": "",
     "images": [
       "images/extra/shoebox-craft/recap.mp4"
-    ]
+    ],
+    "thumb": "images/play-thumbs/shoebox-craft.webp"
   },
   {
     "slug": "toronto-tech-week",
@@ -25,7 +27,8 @@
     "year": "",
     "images": [
       "images/extra/toronto-tech-week/framer.mp4"
-    ]
+    ],
+    "thumb": "images/play-thumbs/toronto-tech-week.webp"
   },
   {
     "slug": "hoodie",
@@ -35,7 +38,8 @@
     "images": [
       "images/extra/hoodie/hoodie2025.png",
       "images/extra/hoodie/hoodie2026.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/hoodie.webp"
   },
   {
     "slug": "sketchbook",
@@ -48,7 +52,8 @@
       "images/extra/sketchbook/sketchbook3.png",
       "images/extra/sketchbook/sketchbook4.png",
       "images/extra/sketchbook/sketchbook5.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/sketchbook.webp"
   },
   {
     "slug": "designsystemsevent",
@@ -57,7 +62,8 @@
     "year": "",
     "images": [
       "images/extra/designsystemsevent.gif"
-    ]
+    ],
+    "thumb": "images/play-thumbs/designsystemsevent.webp"
   },
   {
     "slug": "zhen",
@@ -68,7 +74,8 @@
       "images/extra/zhen/zhen1 copy.png",
       "images/extra/zhen/post5 copy.png",
       "images/extra/zhen/zhen3 copy.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/zhen.webp"
   },
   {
     "slug": "emboss",
@@ -79,7 +86,8 @@
       "images/extra/emboss/embossprint1.png",
       "images/extra/emboss/embossprint2.png",
       "images/extra/emboss/embossprint3.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/emboss.webp"
   },
   {
     "slug": "minisketchbook",
@@ -88,7 +96,8 @@
     "year": "",
     "images": [
       "images/extra/minisketchbook.gif"
-    ]
+    ],
+    "thumb": "images/play-thumbs/minisketchbook.webp"
   },
   {
     "slug": "synergy",
@@ -97,7 +106,8 @@
     "year": "",
     "images": [
       "images/extra/synergy.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/synergy.webp"
   },
   {
     "slug": "cityzen",
@@ -106,7 +116,8 @@
     "year": "",
     "images": [
       "images/extra/cityzen.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/cityzen.webp"
   },
   {
     "slug": "stopmotion",
@@ -115,7 +126,8 @@
     "year": "",
     "images": [
       "images/extra/stopmotion.gif"
-    ]
+    ],
+    "thumb": "images/play-thumbs/stopmotion.webp"
   },
   {
     "slug": "invitationtag",
@@ -124,7 +136,8 @@
     "year": "",
     "images": [
       "images/extra/invitationtag.gif"
-    ]
+    ],
+    "thumb": "images/play-thumbs/invitationtag.webp"
   },
   {
     "slug": "breski-sticker",
@@ -133,7 +146,8 @@
     "year": "",
     "images": [
       "images/extra/breski sticker.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/breski-sticker.webp"
   },
   {
     "slug": "aboutme-copy",
@@ -142,6 +156,7 @@
     "year": "",
     "images": [
       "images/extra/aboutme copy.png"
-    ]
+    ],
+    "thumb": "images/play-thumbs/aboutme-copy.webp"
   }
 ]

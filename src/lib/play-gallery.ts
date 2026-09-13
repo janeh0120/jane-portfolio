@@ -10,6 +10,7 @@ export function buildGalleryItems(): GalleryItem[] {
     description: item.description,
     year: item.year,
     images: item.images ?? [],
+    thumb: item.thumb,
   }));
 }
 

@@ -106,3 +106,18 @@ body.logo-intro-complete .home-intro-content {
     transition: none;
   }
 }
+
+/* No JS / scripting disabled — never leave homepage content hidden */
+@media (scripting: none) {
+  .logo-intro-morph {
+    display: none !important;
+  }
+
+  .site-header,
+  .nav-logo-mark,
+  .home-intro-content {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+}

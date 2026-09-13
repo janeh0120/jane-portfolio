@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "thumbs:play": "node scripts/generate-play-thumbs.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.0",
@@ -25,5 +26,9 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwindcss": "^4.3.0"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "^5.3.0",
+    "sharp": "^0.35.4"
   }
 }

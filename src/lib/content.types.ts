@@ -56,6 +56,8 @@ export type GalleryItemMeta = {
   description: string;
   year: string;
   images: string[];
+  /** Lightweight grid preview; modal still uses `images`. */
+  thumb?: string;
 };
 
 export type ChangelogEntry = {
