@@ -1,0 +1,232 @@
+/* Dark stage for the hi-BM rebus. Tokens override the site theme on this page only. */
+html:has(body.theme-dark),
+body.theme-dark {
+  --color-canvas: #282828;
+  --color-ink: #f5f5f5;
+  --color-muted: #b3b3b3;
+  --color-subtle: #8a8a8a;
+  --color-line: #3a3a3a;
+  --color-link: #f5f5f5;
+  --color-surface: #333333;
+  --color-surface-strong: #3a3a3a;
+  --color-border: #3f3f3f;
+  --color-border-strong: #4a4a4a;
+}
+
+body.theme-dark::after {
+  mix-blend-mode: overlay;
+  opacity: 0.18;
+}
+
+body.theme-dark ::selection {
+  background: rgb(255 255 255 / 16%);
+}
+
+body.theme-dark .comment-mode-toggle:not(.is-icon) {
+  background: transparent;
+  color: var(--color-muted);
+}
+
+body.theme-dark .comment-mode-toggle:not(.is-icon):hover,
+body.theme-dark .comment-mode-toggle:not(.is-icon).is-hover,
+body.theme-dark .comment-mode-toggle[aria-pressed='true']:not(.is-icon) {
+  background: var(--color-border);
+  color: var(--color-ink);
+}
+
+.hi-bm-page {
+  min-height: 100%;
+}
+
+.hi-bm-page .site-header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.hi-bm-stage {
+  box-sizing: border-box;
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 5.5rem 1.5rem 4rem;
+}
+
+.hi-bm {
+  --hi-bm-size: clamp(4.25rem, 13.5vw, 10.25rem);
+  --hi-bm-gap: calc(var(--hi-bm-size) * 0.3);
+  width: min(100%, 58rem);
+  color: #fff;
+}
+
+.hi-bm--modal {
+  --hi-bm-size: clamp(3.25rem, 10vw, 7.5rem);
+}
+
+.hi-bm-rebus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--hi-bm-gap);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hi-bm-rebus:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 14px;
+}
+
+.hi-bm-slot {
+  position: relative;
+  flex: 0 0 auto;
+  height: var(--hi-bm-size);
+  overflow: visible;
+}
+
+.hi-bm-slot--morph {
+  width: calc(var(--hi-bm-size) * 1.201);
+}
+
+.hi-bm-slot--bee {
+  width: calc(var(--hi-bm-size) * 1.626);
+}
+
+.hi-bm-slot--m {
+  width: calc(var(--hi-bm-size) * 1.336);
+}
+
+.hi-bm-glyph {
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  -webkit-mask-image: var(--hi-bm-src);
+  mask-image: var(--hi-bm-src);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  pointer-events: none;
+}
+
+.hi-bm-glyph--eye {
+  --hi-bm-src: var(--hi-bm-eye);
+  transform-origin: 50% 52%;
+}
+
+.hi-bm:not(.is-hi):not(.is-blink) .hi-bm-slot--morph:hover .hi-bm-glyph--eye {
+  opacity: 0.4;
+}
+
+.hi-bm-glyph--hi {
+  --hi-bm-src: var(--hi-bm-hi);
+  transform-origin: 48% 92%;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.hi-bm-glyph--bee {
+  --hi-bm-src: var(--hi-bm-bee);
+}
+
+.hi-bm-glyph--m {
+  --hi-bm-src: var(--hi-bm-m);
+}
+
+.hi-bm.is-hi .hi-bm-glyph--eye {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.hi-bm.is-hi .hi-bm-glyph--hi {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hi-bm.is-blink:not(.is-hi) .hi-bm-glyph--eye,
+.hi-bm.is-blink.is-hi .hi-bm-glyph--hi {
+  transform: scaleY(0.06);
+}
+
+.hi-bm.is-ready .hi-bm-slot {
+  animation: hi-bm-settle 1.05s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hi-bm.is-ready .hi-bm-slot--bee {
+  animation-delay: 70ms;
+}
+
+.hi-bm.is-ready .hi-bm-slot--m {
+  animation-delay: 130ms;
+}
+
+.hi-bm-glyph--eye,
+.hi-bm-glyph--hi {
+  transition:
+    transform 0.16s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.2s ease,
+    visibility 0.01s linear;
+}
+
+.hi-bm.is-waving:not(.is-blink) .hi-bm-glyph--hi {
+  animation: hi-bm-wave 0.95s cubic-bezier(0.37, 0, 0.63, 1);
+}
+
+@keyframes hi-bm-settle {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hi-bm-wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  18% {
+    transform: rotate(18deg);
+  }
+  36% {
+    transform: rotate(-10deg);
+  }
+  54% {
+    transform: rotate(16deg);
+  }
+  72% {
+    transform: rotate(-6deg);
+  }
+  88% {
+    transform: rotate(8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hi-bm.is-ready .hi-bm-slot,
+  .hi-bm.is-waving:not(.is-blink) .hi-bm-glyph--hi,
+  .hi-bm-glyph--eye,
+  .hi-bm-glyph--hi {
+    animation: none;
+    transition: none;
+  }
+}

@@ -1,6 +1,7 @@
 ---
 import { galleryItems } from '../../lib/play-gallery';
 import ArrowIcon from '../ArrowIcon.astro';
+import HiBmRebus from '../HiBmRebus.astro';
 
 const base = import.meta.env.BASE_URL;
 
@@ -20,7 +21,7 @@ function isVideo(path: string) {
       galleryItems.map((item) => {
         const first = item.images[0];
         const preview = item.thumb ?? first;
-        const previewIsVideo = !item.thumb && isVideo(first);
+        const previewIsVideo = Boolean(first) && !item.thumb && isVideo(first);
         return (
           <button
             type="button"
@@ -57,6 +58,10 @@ function isVideo(path: string) {
       ×
     </button>
 
+    <div class="gallery-interactive" id="gallery-interactive" hidden>
+      <HiBmRebus autostart={false} class="hi-bm--modal" />
+    </div>
+
     <div class="gallery-carousel-container">
       <div class="gallery-carousel" id="carousel-slides" />
       <div class="carousel-controls-wrap" id="carousel-controls" hidden>
@@ -92,6 +97,8 @@ function isVideo(path: string) {
   const carouselDots = document.getElementById('carousel-dots');
   const carouselControls = document.getElementById('carousel-controls');
   const modalDescription = document.getElementById('modal-description');
+  const interactiveMount = document.getElementById('gallery-interactive');
+  const interactiveRoot = interactiveMount?.querySelector('[data-hi-bm]');
 
   function pauseAllVideos() {
     carouselSlides?.querySelectorAll('video').forEach((video) => {
@@ -128,16 +135,28 @@ function isVideo(path: string) {
 
   function nextSlide() {
     const item = galleryItems.find((i) => i.id === currentItemId);
-    if (!item) return;
+    if (!item?.images?.length) return;
     currentSlideIndex = (currentSlideIndex + 1) % item.images.length;
     updateCarousel();
   }
 
   function previousSlide() {
     const item = galleryItems.find((i) => i.id === currentItemId);
-    if (!item) return;
+    if (!item?.images?.length) return;
     currentSlideIndex = (currentSlideIndex - 1 + item.images.length) % item.images.length;
     updateCarousel();
+  }
+
+  function openInteractive() {
+    modal?.classList.add('is-interactive');
+    if (interactiveMount) interactiveMount.hidden = false;
+    interactiveRoot?.dispatchEvent(new Event('hi-bm:play'));
+  }
+
+  function closeInteractive() {
+    interactiveRoot?.dispatchEvent(new Event('hi-bm:stop'));
+    if (interactiveMount) interactiveMount.hidden = true;
+    modal?.classList.remove('is-interactive');
   }
 
   function openGallery(itemId) {
@@ -149,6 +168,17 @@ function isVideo(path: string) {
 
     carouselSlides.innerHTML = '';
     carouselDots.innerHTML = '';
+
+    if (item.interactive === 'hi-bm') {
+      if (carouselControls) carouselControls.hidden = true;
+      if (modalDescription) modalDescription.textContent = item.description;
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+      openInteractive();
+      return;
+    }
+
+    closeInteractive();
 
     item.images.forEach((media, index) => {
       const slide = document.createElement('div');
@@ -181,6 +211,7 @@ function isVideo(path: string) {
 
   function closeGallery() {
     pauseAllVideos();
+    closeInteractive();
     modal?.classList.remove('active');
     modal?.setAttribute('aria-hidden', 'true');
     currentItemId = null;

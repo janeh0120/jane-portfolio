@@ -58,6 +58,8 @@ export type GalleryItemMeta = {
   images: string[];
   /** Lightweight grid preview; modal still uses `images`. */
   thumb?: string;
+  /** Live component shown in the modal instead of a media carousel. */
+  interactive?: 'hi-bm';
 };
 
 export type ChangelogEntry = {

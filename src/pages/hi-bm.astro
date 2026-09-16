@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import HiBmRebus from '../components/HiBmRebus.astro';
+import { site } from '../data/site';
+---
+
+<Layout
+  title={`hi BM | ${site.title}`}
+  description="A live IBM rebus: the eye becomes a wave, reading hi BM."
+  theme="dark"
+>
+  <div class="hi-bm-page">
+    <Header />
+    <main class="hi-bm-stage">
+      <HiBmRebus />
+    </main>
+  </div>
+</Layout>

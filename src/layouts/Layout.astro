@@ -9,6 +9,7 @@ interface Props {
   description?: string;
   showCommentMode?: boolean;
   adminReview?: boolean;
+  theme?: 'light' | 'dark';
 }
 
 const {
@@ -16,6 +17,7 @@ const {
   description = site.description,
   showCommentMode = true,
   adminReview = false,
+  theme = 'light',
 } = Astro.props;
 
 if (adminReview) {
@@ -79,6 +81,7 @@ const iconVersion = '3';
   <body
     class:list={[
       'min-h-screen text-ink antialiased',
+      theme === 'dark' && 'theme-dark',
       adminReview
         ? 'comment-feedback-root admin-review-root comment-view-comment'
         : showCommentMode

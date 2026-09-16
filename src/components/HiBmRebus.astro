@@ -1,0 +1,162 @@
+---
+import '../styles/hi-bm.css';
+
+interface Props {
+  autostart?: boolean;
+  class?: string;
+}
+
+const { autostart = true, class: className } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const eyeSrc = `${base}images/hi-bm/eye.png`;
+const beeSrc = `${base}images/hi-bm/bee.png`;
+const hiSrc = `${base}images/hi-bm/hi.png`;
+const mSrc = `${base}images/hi-bm/m.png`;
+---
+
+<div
+  class:list={['hi-bm', className]}
+  data-hi-bm
+  data-hi-bm-autostart={autostart ? 'true' : 'false'}
+  style={`--hi-bm-eye: url('${eyeSrc}'); --hi-bm-bee: url('${beeSrc}'); --hi-bm-hi: url('${hiSrc}'); --hi-bm-m: url('${mSrc}');`}
+>
+  <button
+    type="button"
+    class="hi-bm-rebus"
+    data-hi-bm-trigger
+    aria-label="IBM rebus. The eye becomes a waving hand, reading hi BM. Click to wave."
+  >
+    <span class="hi-bm-slot hi-bm-slot--morph" data-hi-bm-morph>
+      <span class="hi-bm-glyph hi-bm-glyph--eye" aria-hidden="true"></span>
+      <span class="hi-bm-glyph hi-bm-glyph--hi" aria-hidden="true"></span>
+    </span>
+    <span class="hi-bm-slot hi-bm-slot--bee">
+      <span class="hi-bm-glyph hi-bm-glyph--bee" aria-hidden="true"></span>
+    </span>
+    <span class="hi-bm-slot hi-bm-slot--m">
+      <span class="hi-bm-glyph hi-bm-glyph--m" aria-hidden="true"></span>
+    </span>
+  </button>
+</div>
+
+<script>
+  const BLINK_MS = 150;
+  const OPEN_MS = 220;
+  const WAVE_MS = 950;
+  const HOLD_IBM_MS = 1800;
+  const HOLD_HI_MS = 2400;
+  const SETTLE_MS = 1100;
+
+  function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function wait(ms: number, token: { cancelled: boolean }) {
+    return new Promise<boolean>((resolve) => {
+      window.setTimeout(() => resolve(!token.cancelled), ms);
+    });
+  }
+
+  function initHiBm(root: HTMLElement) {
+    const trigger = root.querySelector<HTMLButtonElement>('[data-hi-bm-trigger]');
+    if (!trigger) return;
+
+    const autostart = root.dataset.hiBmAutostart !== 'false';
+    let run = { cancelled: false };
+    let showingHi = false;
+    let looping = false;
+
+    function cancelRun() {
+      run.cancelled = true;
+      run = { cancelled: false };
+      return run;
+    }
+
+    function resetVisual() {
+      showingHi = false;
+      root.classList.remove('is-hi', 'is-blink', 'is-waving', 'is-ready');
+    }
+
+    async function blinkTo(next: 'eye' | 'hi', token: { cancelled: boolean }) {
+      root.classList.add('is-blink');
+      root.classList.remove('is-waving');
+      if (!(await wait(BLINK_MS, token))) return false;
+      showingHi = next === 'hi';
+      root.classList.toggle('is-hi', showingHi);
+      if (!(await wait(32, token))) return false;
+      root.classList.remove('is-blink');
+      return wait(OPEN_MS, token);
+    }
+
+    async function wave(token: { cancelled: boolean }) {
+      root.classList.remove('is-waving');
+      void root.offsetWidth;
+      root.classList.add('is-waving');
+      if (!(await wait(WAVE_MS, token))) return false;
+      if (!token.cancelled) root.classList.remove('is-waving');
+      return !token.cancelled;
+    }
+
+    async function greet(token: { cancelled: boolean }) {
+      if (!showingHi) {
+        if (!(await blinkTo('hi', token))) return false;
+      }
+      return wave(token);
+    }
+
+    async function loop(token: { cancelled: boolean }) {
+      if (looping || prefersReducedMotion()) return;
+      looping = true;
+      while (!token.cancelled) {
+        if (!(await wait(HOLD_IBM_MS, token))) break;
+        if (!(await greet(token))) break;
+        if (!(await wait(HOLD_HI_MS, token))) break;
+        if (!(await blinkTo('eye', token))) break;
+      }
+      looping = false;
+    }
+
+    function playFromUser() {
+      const token = cancelRun();
+      looping = false;
+      void greet(token).then(async (ok) => {
+        if (!ok || token.cancelled || prefersReducedMotion()) return;
+        if (!(await wait(HOLD_HI_MS, token))) return;
+        if (!(await blinkTo('eye', token))) return;
+        void loop(token);
+      });
+    }
+
+    function play() {
+      const token = cancelRun();
+      looping = false;
+      resetVisual();
+      void root.offsetWidth;
+      root.classList.add('is-ready');
+
+      if (prefersReducedMotion()) {
+        showingHi = true;
+        root.classList.add('is-hi');
+        return;
+      }
+
+      window.setTimeout(() => {
+        if (!token.cancelled) void loop(token);
+      }, SETTLE_MS);
+    }
+
+    function stop() {
+      cancelRun();
+      looping = false;
+      resetVisual();
+    }
+
+    root.addEventListener('hi-bm:play', play);
+    root.addEventListener('hi-bm:stop', stop);
+    trigger.addEventListener('click', playFromUser);
+
+    if (autostart) play();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-hi-bm]').forEach(initHiBm);
+</script>

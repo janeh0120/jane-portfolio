@@ -1,5 +1,14 @@
 [
   {
+    "slug": "hi-bm",
+    "title": "hi BM",
+    "description": "A live take on the IBM rebus as I join IBM — the eye becomes a wave so it reads hi BM.",
+    "year": "2026",
+    "images": [],
+    "thumb": "images/play-thumbs/hi-bm.webp",
+    "interactive": "hi-bm"
+  },
+  {
     "slug": "ids-design",
     "title": "ids design",
     "description": "As a parting gift for my team at Intuit, I made custom keychain blindboxes for the design team and PM!",

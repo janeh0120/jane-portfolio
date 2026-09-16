@@ -233,6 +233,28 @@
   order: 1;
 }
 
+.gallery-interactive {
+  display: none;
+  box-sizing: border-box;
+  width: min(92vw, 1100px);
+  max-height: 75vh;
+  aspect-ratio: 16 / 9;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+  background: #282828;
+  overflow: visible;
+  order: 1;
+}
+
+.gallery-modal.is-interactive .gallery-interactive {
+  display: grid;
+}
+
+.gallery-modal.is-interactive .gallery-carousel-container {
+  display: none;
+}
+
 .gallery-carousel {
   display: flex;
   width: 100%;

@@ -11,6 +11,7 @@ export function buildGalleryItems(): GalleryItem[] {
     year: item.year,
     images: item.images ?? [],
     thumb: item.thumb,
+    interactive: item.interactive,
   }));
 }
 
