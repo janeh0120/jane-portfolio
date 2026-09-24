@@ -1,19 +1,43 @@
-@import "@fontsource/instrument-sans/400.css";
-@import "@fontsource/instrument-sans/500.css";
-@import "@fontsource/instrument-sans/600.css";
-@import "@fontsource/instrument-sans/700.css";
-@import "@fontsource/instrument-sans/400-italic.css";
-@import "@fontsource/instrument-sans/500-italic.css";
-@import "@fontsource/instrument-serif/400.css";
-@import "@fontsource/instrument-serif/400-italic.css";
-
 @import "tailwindcss";
 
+@font-face {
+  font-family: "TeX Gyre Heros";
+  src: url("/fonts/texgyreheros-regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TeX Gyre Heros";
+  src: url("/fonts/texgyreheros-italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TeX Gyre Heros";
+  src: url("/fonts/texgyreheros-bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TeX Gyre Heros";
+  src: url("/fonts/texgyreheros-bolditalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 @theme {
-  --font-sans: "Instrument Sans", Helvetica, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --font-sans: "TeX Gyre Heros", Helvetica, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "TeX Gyre Heros", Helvetica, "Helvetica Neue", Arial, sans-serif;
   --font-instrument: var(--font-sans);
 
+  --color-page: #f0f0f1;
   --color-canvas: #ffffff;
   --color-ink: #111111;
   --color-muted: #555555;
@@ -31,14 +55,18 @@
   --color-danger: #b42318;
   --color-danger-soft: #fef2f2;
   --color-placeholder: #c8c8c8;
+  --color-bar: rgb(255 255 255 / 72%);
+  --color-bar-strong: rgb(255 255 255 / 82%);
+  --color-hairline: rgb(17 17 17 / 8%);
 
-  /* Radius — portfolio chrome stays sharp; UI chrome can soften */
+  /* One corner radius for every border */
   --radius-none: 0;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 12px;
-  --radius-xl: 18px;
-  --radius-full: 999px;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.5rem;
+  --radius-card: 0.5rem;
+  --radius-full: 0.5rem;
 
   --max-w-site: 1400px;
   --max-w-prose: 48rem;
@@ -48,12 +76,13 @@
 @layer base {
   html {
     font-family: var(--font-sans);
-    background: var(--color-canvas);
+    background: var(--color-page);
     color: var(--color-ink);
   }
 
   body {
     margin: 0;
+    font-size: 0.875rem;
   }
 
   body::after {
@@ -95,34 +124,34 @@
   .hero-copy {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: clamp(2.625rem, 4.8vw, 3.75rem);
+    font-size: clamp(2.5rem, calc(4.8vw - 2px), 3.625rem);
     line-height: 1.2;
-    letter-spacing: -0.02em;
-    font-weight: 400;
+    letter-spacing: -0.04em;
+    font-weight: 700;
   }
 
   .heading {
     margin: 0;
     font-family: var(--font-serif);
-    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
+    font-size: clamp(1.625rem, calc(3.2vw - 2px), 2.375rem);
     line-height: 1.2;
-    letter-spacing: -0.02em;
-    font-weight: 400;
+    letter-spacing: -0.04em;
+    font-weight: 700;
   }
 
   .subheading {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: clamp(1.125rem, 1.8vw, 1.375rem);
+    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
     line-height: 1.3;
-    letter-spacing: -0.02em;
-    font-weight: 600;
+    letter-spacing: -0.04em;
+    font-weight: 700;
   }
 
   .text-body {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     line-height: 1.65;
     font-weight: 400;
     letter-spacing: -0.01em;
@@ -180,8 +209,7 @@
   }
 
   /* IconControl + comment-mode icon toggle */
-  .icon-control,
-  .comment-mode-toggle.is-icon {
+  .icon-control {
     position: relative;
     z-index: 1;
     flex-shrink: 0;
@@ -192,7 +220,7 @@
     min-height: 32px;
     padding: 0;
     border: none;
-    border-radius: 0;
+    border-radius: var(--radius-card);
     background: transparent;
     color: var(--color-muted);
     font: inherit;
@@ -206,28 +234,44 @@
 
   .comment-mode-toggle.is-icon {
     display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-card);
+    background: #000;
+    color: #fff;
+    font-size: 24px;
+    line-height: 1;
+    box-shadow: none;
+    transition:
+      background 0.3s ease,
+      transform 0.3s ease;
   }
 
-  .icon-control svg,
-  .comment-mode-toggle.is-icon svg {
+  .icon-control svg {
     width: 16px;
     height: 16px;
   }
 
-  .icon-control > svg:not(.hidden),
-  .comment-mode-toggle.is-icon > svg:not(.hidden) {
+  .icon-control > svg:not(.hidden) {
     display: block;
   }
 
   .icon-control:hover,
-  .icon-control.is-hover,
-  .comment-mode-toggle.is-icon:hover,
-  .comment-mode-toggle.is-icon:active,
-  .comment-mode-toggle.is-icon.is-hover,
-  .comment-mode-toggle.is-icon[aria-pressed='true']:hover,
-  .comment-mode-toggle.is-icon[aria-pressed='true']:active {
+  .icon-control.is-hover {
     color: var(--color-ink);
     background: var(--color-border);
+  }
+
+  .comment-mode-toggle.is-icon:hover:not(.is-animating),
+  .comment-mode-toggle.is-icon:active:not(.is-animating) {
+    background: #333;
+    color: #fff;
+    transform: rotate(90deg);
   }
 
   .icon-control:focus-visible,
@@ -238,18 +282,134 @@
     outline-offset: 2px;
   }
 
-  .icon-control[aria-pressed='true'],
-  .comment-mode-toggle.is-icon[aria-pressed='true'] {
+  .icon-control[aria-pressed='true'] {
     background: transparent;
     color: var(--color-muted);
   }
 
+  .comment-mode-toggle.is-icon[aria-pressed='true'] {
+    background: #000;
+    color: #fff;
+  }
+
   @media (max-width: 767px) {
-    .icon-control,
-    .comment-mode-toggle.is-icon {
+    .icon-control {
       width: 36px;
       height: 36px;
       min-height: 36px;
     }
   }
+}
+
+@property --circle-turn {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@property --wheel-step {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 24deg;
+}
+
+@property --wheel-radius {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 1400px;
+}
+
+@property --angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* Shared inset so the menu and page cards line up */
+.page-frame {
+  width: min(1400px, calc(100% - 2rem));
+  margin-inline: auto;
+}
+
+@media (min-width: 768px) {
+  .page-frame {
+    width: min(1400px, calc(100% - 3rem));
+  }
+}
+
+.surface-card {
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  padding: 1.75rem 1.35rem;
+}
+
+@media (min-width: 768px) {
+  .surface-card {
+    padding: 2.5rem 2.25rem;
+  }
+}
+
+.project-card-media {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--color-canvas);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .project-card,
+  .case-study-content > section,
+  .about-card {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition:
+      opacity 0.7s ease,
+      transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .project-card.is-revealed,
+  .case-study-content > section.is-revealed,
+  .about-card.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (scripting: none) {
+  .project-card,
+  .case-study-content > section,
+  .about-card {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+html.theme-dark {
+  color-scheme: dark;
+  --color-page: #141414;
+  --color-canvas: #1c1c1c;
+  --color-ink: #f3f3f3;
+  --color-muted: #a8a8a8;
+  --color-subtle: #8d8d8d;
+  --color-line: #2a2a2a;
+  --color-link: #f3f3f3;
+  --color-surface: #262626;
+  --color-surface-strong: #303030;
+  --color-border: #3a3a3a;
+  --color-border-strong: #4a4a4a;
+  --color-danger: #ff8d85;
+  --color-danger-soft: #3a1d1b;
+  --color-placeholder: #5c5c5c;
+  --color-bar: rgb(28 28 28 / 78%);
+  --color-bar-strong: rgb(28 28 28 / 88%);
+  --color-hairline: rgb(255 255 255 / 12%);
+}
+
+html.theme-dark body::after {
+  mix-blend-mode: overlay;
+  opacity: 0.18;
+}
+
+html.theme-dark ::selection {
+  background: rgb(255 255 255 / 16%);
 }

@@ -1,0 +1,226 @@
+---
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+
+const img = (file: string) => `images/case-studies/dex/${file}`;
+
+const nav = [
+  { label: 'TLDR', href: '#tldr' },
+  { label: 'Context', href: '#context' },
+  { label: 'Features', href: '#features' },
+  { label: 'Tech stack', href: '#tech' },
+  { label: 'Future', href: '#future' },
+];
+---
+
+<CaseStudyLayout
+  title="Dex"
+  heading="We hacked the sensors in a laptop, helping kids practice OT exercises at home."
+  role="Designer"
+  team="Keyaan Vegdani"
+  timeline="Hack the North 2026"
+  projectType="Product, Hackathon"
+  nav={nav}
+  commentId="case-study-dex"
+  heroImage={{
+    src: 'images/case-study-heroes/dex.png',
+    alt: 'Dex logo, hand character, and story cards for Sep 19, Sep 20, and Tomorrow',
+    wide: true,
+  }}
+>
+
+  <section id="tldr" data-comment-id="dex-tldr">
+    <h3>TLDR</h3>
+    <p class="lead">
+      We hacked the sensors in a laptop, helping kids practice OT exercises at home. Dex turns a
+      MacBook into a daily occupational therapy partner.
+    </p>
+    <p class="lead">
+      Built with Keyaan Vegdani at
+      <a
+        href="https://devpost.com/software/htn-2026"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="font-medium underline decoration-ink/30 underline-offset-4"
+      >
+        Hack the North 2026
+      </a>.
+    </p>
+  </section>
+
+  <section id="context" data-comment-id="dex-context">
+    <h3>Context</h3>
+    <p class="lead">
+      Meet Harry, a grade three student whose teachers think his dexterity skills are well below
+      average.
+    </p>
+    <CaseStudyFigure
+      src={img('harry.svg')}
+      alt="Placeholder for Meet Harry"
+      placeholder
+      wide
+    />
+    <p class="lead">
+      Even with weekly OT sessions, Harry faces 6 days without active support. At-home activities
+      are expensive and time-consuming for busy parents.
+    </p>
+    <CaseStudyFigure
+      src={img('gap.svg')}
+      alt="Placeholder for the six days without support"
+      placeholder
+      wide
+    />
+
+    <h3>But you’re probably asking... why?</h3>
+    <p class="lead">
+      Dex is a short, fun, daily “Wordle-like” experience for practicing common OT exercises at
+      home. We mapped those exercises onto sensors already in the laptop, then wrapped each one in
+      a story so Harry stays with it.
+    </p>
+    <p class="lead">
+      When the day’s task is done, Harry can replay earlier lessons.
+    </p>
+  </section>
+
+  <section id="features" data-comment-id="dex-features">
+    <h3>Features</h3>
+    <p class="lead">Your daily practice is here, Harry.</p>
+
+    <div class="dex-grid">
+      <div class="dex-feature">
+        <h2>Pincer grasp</h2>
+        <p>Strengthening finger grip using the laptop hinge.</p>
+        <CaseStudyFigure
+          src={img('pincer.svg')}
+          alt="Placeholder for the pincer grasp exercise on the laptop hinge"
+          placeholder
+        />
+      </div>
+      <div class="dex-feature">
+        <h2>Developing hand strength</h2>
+        <p>Applying a varying amount of pressure to the trackpad.</p>
+        <CaseStudyFigure
+          src={img('strength.svg')}
+          alt="Placeholder for the trackpad pressure exercise"
+          placeholder
+        />
+      </div>
+      <div class="dex-feature">
+        <h2>Coordination + motor planning</h2>
+        <p>Understanding how spatial movement works by rotating the laptop.</p>
+        <CaseStudyFigure
+          src={img('coordination.svg')}
+          alt="Placeholder for the laptop rotation exercise"
+          placeholder
+        />
+      </div>
+      <div class="dex-feature">
+        <h2>Annunciation development</h2>
+        <p>Blowing into the mic of the laptop, working mouth muscles.</p>
+        <CaseStudyFigure
+          src={img('annunciation.svg')}
+          alt="Placeholder for the microphone blowing exercise"
+          placeholder
+        />
+      </div>
+    </div>
+
+    <h3>Daily stories</h3>
+    <p class="lead">
+      The interactions become a story Harry can come back to. Sep 19 is Grocery Day. Sep 20 is It’s
+      Celebratin’ Time. After the task, yesterday’s lesson is still there. Then he can unlock
+      tomorrow.
+    </p>
+
+    <div class="dex-grid">
+      <div class="dex-feature">
+        <h2>Grocery Day</h2>
+        <p>Sep 19</p>
+        <CaseStudyFigure
+          src={img('grocery.svg')}
+          alt="Placeholder for the Grocery Day story"
+          placeholder
+        />
+      </div>
+      <div class="dex-feature">
+        <h2>It’s Celebratin’ Time</h2>
+        <p>Sep 20</p>
+        <CaseStudyFigure
+          src={img('celebration.svg')}
+          alt="Placeholder for the It’s Celebratin’ Time story"
+          placeholder
+        />
+      </div>
+      <div class="dex-feature">
+        <h2>Try yesterday’s lesson</h2>
+        <p>This time, why don’t you try yesterday’s lesson?</p>
+        <CaseStudyFigure
+          src={img('replay.svg')}
+          alt="Placeholder for replaying yesterday’s lesson"
+          placeholder
+        />
+      </div>
+      <div class="dex-feature">
+        <h2>Unlock tomorrow</h2>
+        <p>Tomorrow</p>
+        <CaseStudyFigure
+          src={img('tomorrow.svg')}
+          alt="Placeholder for unlocking tomorrow’s lesson"
+          placeholder
+        />
+      </div>
+    </div>
+  </section>
+
+  <section id="tech" data-comment-id="dex-tech">
+    <h3>Tech stack</h3>
+    <p class="lead">Illustrations and prototyping. Built in Swift with AI.</p>
+    <CaseStudyFigure
+      src={img('build.svg')}
+      alt="Placeholder for the Swift build and illustrations"
+      placeholder
+      wide
+    />
+  </section>
+
+  <section id="future" data-comment-id="dex-future">
+    <h3>Future considerations</h3>
+    <p class="lead">
+      Dex could scale to support stroke survivors and people with Parkinson’s, by enabling
+      practitioner monitoring, customizable exercises, and accessibility-based personalization.
+    </p>
+    <CaseStudyFigure
+      src={img('future.svg')}
+      alt="Placeholder for how Dex could scale beyond kids"
+      placeholder
+      wide
+    />
+  </section>
+</CaseStudyLayout>
+
+<style>
+  .dex-grid {
+    display: grid;
+    gap: 1.75rem;
+    margin-top: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .dex-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem 1.25rem;
+    }
+  }
+
+  .dex-feature h2 {
+    margin-bottom: 0.35rem;
+  }
+
+  .dex-feature p {
+    color: var(--color-muted);
+  }
+
+  .dex-feature :global(.case-study-figure) {
+    margin-top: 0.875rem;
+  }
+</style>

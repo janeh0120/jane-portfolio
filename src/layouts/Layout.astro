@@ -31,6 +31,30 @@ const iconVersion = '3';
 <html lang="en-CA">
   <head>
     <meta charset="utf-8" />
+    <script is:inline>
+      (function () {
+        var media = window.matchMedia('(prefers-color-scheme: dark)');
+        function apply(theme) {
+          if (theme !== 'light' && theme !== 'dark' && theme !== 'system') theme = 'system';
+          var root = document.documentElement;
+          root.dataset.theme = theme;
+          var dark = theme === 'dark' || (theme === 'system' && media.matches);
+          root.classList.toggle('theme-dark', dark);
+          try {
+            localStorage.setItem('theme', theme);
+          } catch (e) {}
+        }
+        window.__setTheme = apply;
+        var stored = 'system';
+        try {
+          stored = localStorage.getItem('theme') || 'system';
+        } catch (e) {}
+        apply(stored);
+        media.addEventListener('change', function () {
+          if (document.documentElement.dataset.theme === 'system') apply('system');
+        });
+      })();
+    </script>
     <link rel="icon" href={`${base}favicon.svg?v=${iconVersion}`} type="image/svg+xml" sizes="any" />
     <link
       rel="icon"
@@ -100,5 +124,28 @@ const iconVersion = '3';
       )
     }
     {showCommentMode && !adminReview && <CommentMode />}
+    <script>
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const targets = document.querySelectorAll<HTMLElement>(
+        '.project-card, .case-study-content > section, .about-card',
+      );
+
+      if (reduceMotion || !('IntersectionObserver' in window)) {
+        targets.forEach((el) => el.classList.add('is-revealed'));
+      } else {
+        const root = document.getElementById('site-canvas');
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add('is-revealed');
+              observer.unobserve(entry.target);
+            });
+          },
+          { root, rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+        );
+        targets.forEach((el) => observer.observe(el));
+      }
+    </script>
   </body>
 </html>

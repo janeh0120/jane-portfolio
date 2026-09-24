@@ -2,4 +2,18 @@
 import { site } from '../data/site';
 ---
 
-<h1 class="hero-copy max-w-3xl text-ink" data-comment-id="hero-intro">{site.hero.headline}</h1>
+<div class="home-hero">
+  <h1 class="hero-copy text-ink" data-comment-id="hero-intro">{site.hero.headline}</h1>
+  {site.hero.subhead && <p class="text-body text-ink">{site.hero.subhead}</p>}
+</div>
+
+<style>
+  .home-hero {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .home-hero p {
+    max-width: 22rem;
+  }
+</style>

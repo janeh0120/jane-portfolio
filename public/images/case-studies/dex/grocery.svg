@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-label="Grocery Day">
+  <rect width="1600" height="1000" fill="#ececec"/>
+  <rect x="16" y="16" width="1568" height="968" fill="none" stroke="#bdbdbd" stroke-width="6" stroke-dasharray="18 14"/>
+  <text x="800" y="500" text-anchor="middle" dominant-baseline="middle" fill="#6f6f6f" font-family="sans-serif" font-size="96">Grocery Day</text>
+</svg>

@@ -9,7 +9,8 @@ interface Props {
 const { project } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const imageSrc = `${base}${project.image}`;
-const href = project.slug ? `${base}${project.slug}` : undefined;
+const href = project.href ?? (project.slug ? `${base}${project.slug}` : undefined);
+const external = Boolean(href?.startsWith('http'));
 const tagList = parseProjectTags(project.tags).join(',');
 const commentId = project.slug
   ? `project-${project.slug}`
@@ -24,7 +25,7 @@ const commentId = project.slug
 >
   {
     project.comingSoon ? (
-      <div class="relative block overflow-hidden bg-canvas">
+      <div class="project-card-media relative block">
         <img
           src={imageSrc}
           alt={project.title}
@@ -36,7 +37,12 @@ const commentId = project.slug
         </span>
       </div>
     ) : (
-      <a href={href} class="relative block overflow-hidden bg-canvas">
+      <a
+        href={href}
+        class="project-card-media relative block"
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noopener noreferrer' : undefined}
+      >
         <img
           src={imageSrc}
           alt={project.title}

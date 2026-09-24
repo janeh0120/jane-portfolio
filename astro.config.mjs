@@ -18,7 +18,21 @@ export default defineConfig({
     react(),
     icon({
       include: {
-        lucide: ['arrow-left', 'arrow-right', 'arrow-up-right', 'menu', 'x', 'send'],
+        lucide: [
+          'arrow-left',
+          'arrow-right',
+          'arrow-up-right',
+          'check',
+          'instagram',
+          'linkedin',
+          'mail',
+          'menu',
+          'monitor',
+          'moon',
+          'send',
+          'sun',
+          'x',
+        ],
       },
     }),
   ],

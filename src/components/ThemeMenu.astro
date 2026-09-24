@@ -1,0 +1,206 @@
+---
+import { Icon } from 'astro-icon/components';
+
+const options = [
+  { id: 'dark', label: 'Dark', icon: 'lucide:moon' },
+  { id: 'light', label: 'Light', icon: 'lucide:sun' },
+  { id: 'system', label: 'System', icon: 'lucide:monitor' },
+] as const;
+---
+
+<div class="theme-menu" data-theme-menu data-theme="system">
+  <button
+    type="button"
+    class="theme-menu-button"
+    aria-haspopup="menu"
+    aria-expanded="false"
+    aria-controls="theme-menu-list"
+  >
+    <span class="theme-menu-icons" aria-hidden="true">
+      {
+        options.map((option) => (
+          <span class="theme-menu-glyph" data-theme-glyph={option.id}>
+            <Icon name={option.icon} />
+          </span>
+        ))
+      }
+    </span>
+    <span data-theme-label>System</span>
+  </button>
+  <div class="theme-menu-popover" id="theme-menu-list" role="menu" hidden>
+    {
+      options.map((option) => (
+        <button
+          type="button"
+          class="theme-menu-option"
+          role="menuitemradio"
+          data-theme-choice={option.id}
+          aria-checked="false"
+        >
+          <Icon name="lucide:check" class="theme-menu-check" aria-hidden="true" />
+          <Icon name={option.icon} aria-hidden="true" />
+          {option.label}
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .theme-menu {
+    position: relative;
+  }
+
+  .theme-menu-button,
+  .theme-menu-option {
+    font: inherit;
+    color: var(--color-ink);
+    cursor: pointer;
+  }
+
+  .theme-menu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: none;
+    border-radius: var(--radius-card);
+    background: var(--color-surface-strong);
+    padding: 0.45rem 0.9rem 0.45rem 0.75rem;
+  }
+
+  .theme-menu-button:hover,
+  .theme-menu-button[aria-expanded='true'] {
+    background: var(--color-border);
+  }
+
+  .theme-menu-button:focus-visible,
+  .theme-menu-option:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .theme-menu-icons :global(svg),
+  .theme-menu-option :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+    display: block;
+  }
+
+  .theme-menu-glyph {
+    display: none;
+  }
+
+  .theme-menu[data-theme='dark'] [data-theme-glyph='dark'],
+  .theme-menu[data-theme='light'] [data-theme-glyph='light'],
+  .theme-menu[data-theme='system'] [data-theme-glyph='system'] {
+    display: block;
+  }
+
+  .theme-menu-popover {
+    position: absolute;
+    right: 0;
+    bottom: calc(100% + 0.55rem);
+    z-index: 30;
+    --menu-pad: 0.4rem;
+    min-width: 11.5rem;
+    padding: var(--menu-pad);
+    border: 1px solid var(--color-hairline);
+    border-radius: calc(var(--radius-card) + var(--menu-pad) + 1px);
+    background: var(--color-canvas);
+    box-shadow: 0 16px 40px rgb(0 0 0 / 14%);
+  }
+
+  .theme-menu-popover[hidden] {
+    display: none;
+  }
+
+  .theme-menu-option {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    border: none;
+    border-radius: var(--radius-card);
+    background: transparent;
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+  }
+
+  .theme-menu-option[aria-checked='true'] {
+    background: var(--color-surface);
+  }
+
+  .theme-menu-check {
+    opacity: 0;
+  }
+
+  .theme-menu-option[aria-checked='true'] .theme-menu-check {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  const labels: Record<string, string> = {
+    dark: 'Dark',
+    light: 'Light',
+    system: 'System',
+  };
+
+  function currentTheme() {
+    const theme = document.documentElement.dataset.theme;
+    return theme === 'light' || theme === 'dark' || theme === 'system' ? theme : 'system';
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-theme-menu]').forEach((menu) => {
+    const button = menu.querySelector<HTMLButtonElement>('.theme-menu-button');
+    const popover = menu.querySelector<HTMLElement>('.theme-menu-popover');
+    const label = menu.querySelector<HTMLElement>('[data-theme-label]');
+    const options = menu.querySelectorAll<HTMLButtonElement>('[data-theme-choice]');
+    if (!button || !popover || !label) return;
+
+    function paint() {
+      const theme = currentTheme();
+      menu.dataset.theme = theme;
+      label.textContent = labels[theme];
+      button.setAttribute('aria-label', `Color mode, ${labels[theme]}`);
+      options.forEach((option) => {
+        option.setAttribute('aria-checked', String(option.dataset.themeChoice === theme));
+      });
+    }
+
+    function setOpen(open: boolean) {
+      button.setAttribute('aria-expanded', String(open));
+      popover.hidden = !open;
+    }
+
+    button.addEventListener('click', () => {
+      setOpen(button.getAttribute('aria-expanded') !== 'true');
+    });
+
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        const choice = option.dataset.themeChoice;
+        const setTheme = (window as Window & { __setTheme?: (theme: string) => void }).__setTheme;
+        if (choice && setTheme) setTheme(choice);
+        paint();
+        setOpen(false);
+        button.focus();
+      });
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!menu.contains(event.target as Node)) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        button.focus();
+      }
+    });
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    media.addEventListener('change', paint);
+    paint();
+  });
+</script>

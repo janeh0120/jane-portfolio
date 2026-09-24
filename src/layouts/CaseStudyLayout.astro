@@ -47,9 +47,9 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
 <Layout title={`${title} | Jane Hou's Portfolio`}>
   <Header />
-  <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-6 md:px-10">
+  <main class="page-frame pb-24 pt-6 md:pt-8">
     <div class="grid gap-8 lg:grid-cols-[200px_1fr] lg:gap-20">
-      <SidebarNav nav={nav} ariaLabel="Case study" />
+      <SidebarNav nav={nav} ariaLabel="Case study" backLabel="Back" />
 
       <article class="min-w-0 max-w-3xl" data-comment-id={studyCommentId}>
         <h1 class="heading text-ink">{heading}</h1>
@@ -106,19 +106,24 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     margin: 0;
   }
 
+  .case-study-hero :global(img),
+  .case-study-hero :global(video) {
+    border-radius: var(--radius-card);
+  }
+
   .case-study-content :global(h2) {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: clamp(1.125rem, 1.8vw, 1.375rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
     line-height: 1.3;
   }
 
   .case-study-content :global(h3) {
     margin: 0 0 0.75rem;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.65;
     letter-spacing: -0.01em;
@@ -134,7 +139,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   .case-study-content :global(.lead) {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     line-height: 1.65;
     font-weight: 400;
     letter-spacing: -0.01em;
@@ -171,9 +176,9 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
   .case-study-content :global(ol li h2) {
     font-family: var(--font-sans);
-    font-size: clamp(1.125rem, 1.8vw, 1.375rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
     line-height: 1.3;
     margin: 0 0 0.35rem;
     color: var(--color-ink);
@@ -182,7 +187,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   .case-study-content :global(ol li p),
   .case-study-content :global(ol li .lead) {
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.65;
     letter-spacing: -0.01em;
@@ -204,18 +209,18 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   .case-study-content :global(.case-study-figure img) {
     display: block;
     width: 100%;
-    border-radius: 0;
+    border-radius: var(--radius-card);
     background: transparent;
   }
 
   .case-study-content :global(.case-study-figure--wide img) {
-    border-radius: 0;
+    border-radius: var(--radius-card);
   }
 
   .case-study-content :global(.case-study-figure video) {
     display: block;
     width: 100%;
-    border-radius: 0;
+    border-radius: var(--radius-card);
     background: var(--color-ink);
   }
 
@@ -226,7 +231,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   .case-study-content :global(.case-study-figure figcaption) {
     margin-top: 0.5rem;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     line-height: 1.65;
     letter-spacing: -0.01em;
     color: var(--color-muted);
@@ -264,9 +269,9 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   .case-study-content :global(.case-study-stat strong) {
     display: block;
     font-family: var(--font-sans);
-    font-size: clamp(1.125rem, 1.8vw, 1.375rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
     color: var(--color-ink);
   }
 
@@ -274,7 +279,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     display: block;
     margin-top: 0.25rem;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     line-height: 1.65;
     letter-spacing: -0.01em;
     color: var(--color-muted);
@@ -284,7 +289,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     margin: 0.75rem 0 0;
     padding-left: 1.25rem;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     line-height: 1.65;
     letter-spacing: -0.01em;
     color: var(--color-ink);
@@ -297,7 +302,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     margin: 0.75rem 0 0;
     padding-left: 1.25rem;
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.875rem;
     line-height: 1.65;
     letter-spacing: -0.01em;
     color: var(--color-ink);

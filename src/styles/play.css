@@ -39,7 +39,7 @@
 }
 
 .play-hero h1 {
-  font-size: clamp(3rem, 8vw, 5rem);
+  font-size: clamp(2.875rem, calc(8vw - 2px), 4.875rem);
   font-weight: 400;
   letter-spacing: -0.04em;
   margin-bottom: 16px;
@@ -48,7 +48,7 @@
 
 .play-hero p {
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.875rem;
   line-height: 1.65;
   color: rgb(0 0 0 / 70%);
   margin-bottom: 48px;
@@ -65,8 +65,8 @@
 
 .play-button {
   padding: 14px 32px;
-  border-radius: 0;
-  font-size: 14px;
+  border-radius: var(--radius-card);
+  font-size: 12px;
   font-weight: 600;
   text-decoration: none;
   letter-spacing: 0.05em;
@@ -102,7 +102,7 @@
   }
 
 .gallery-title {
-  font-size: 2rem;
+  font-size: 1.875rem;
   font-weight: 400;
   letter-spacing: -0.03em;
   text-align: center;
@@ -117,7 +117,7 @@
 
 .gallery-item {
   background: transparent;
-  border-radius: 0;
+  border-radius: var(--radius-card);
   overflow: hidden;
   cursor: pointer;
   position: relative;
@@ -173,7 +173,7 @@
 
 .gallery-modal-content {
   background: transparent;
-  border-radius: 0;
+  border-radius: var(--radius-card);
   max-width: min(1100px, 100%);
   width: fit-content;
   max-height: 90vh;
@@ -191,7 +191,7 @@
   padding: 0 8px;
   text-align: center;
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.65;
   letter-spacing: -0.01em;
@@ -208,7 +208,7 @@
   border: none;
   width: 40px;
   height: 40px;
-  border-radius: 0;
+  border-radius: var(--radius-card);
   font-size: 24px;
   cursor: pointer;
   z-index: 3010;
@@ -280,7 +280,7 @@
 .carousel-dot {
   width: 8px;
   height: 8px;
-  border-radius: 0;
+  border-radius: var(--radius-card);
   background: rgb(255 255 255 / 50%);
   border: none;
   padding: 0;
@@ -291,7 +291,7 @@
 .carousel-dot.active {
   background: white;
   width: 24px;
-  border-radius: 0;
+  border-radius: var(--radius-card);
 }
 
 .carousel-arrow {
@@ -303,7 +303,7 @@
   border: none;
   width: 40px;
   height: 40px;
-  border-radius: 0;
+  border-radius: var(--radius-card);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -352,7 +352,7 @@
 }
 
 .play-footer-links a {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   text-decoration: none;
   color: #000;
@@ -367,7 +367,7 @@
 }
 
 .play-footer-credit {
-  font-size: 12px;
+  font-size: 10px;
   color: rgb(0 0 0 / 60%);
   letter-spacing: 0.05em;
 }

@@ -11,6 +11,7 @@ export type Project = {
   title: string;
   image: string;
   comingSoon: boolean;
+  href?: string;
 };
 
 export type SiteContent = {
@@ -28,6 +29,7 @@ export type SiteContent = {
   nav: NavItem[];
   hero: {
     headline: string;
+    subhead?: string;
   };
   experience: {
     current: { label: string; href: string; role?: string };

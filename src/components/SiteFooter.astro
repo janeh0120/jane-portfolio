@@ -1,7 +1,7 @@
 ---
 import { site } from '../data/site';
-import SocialLinks from './SocialLinks.astro';
 import ExternalLinkIcon from './ExternalLinkIcon.astro';
+import ThemeMenu from './ThemeMenu.astro';
 
 interface Props {
   showSocials?: boolean;
@@ -17,57 +17,243 @@ function resolveHref(href: string) {
   return href;
 }
 
-const pageLinks = [
-  { label: 'Projects', href: '/#projects', external: false },
-  ...site.nav
-    .filter((item) => item.label !== 'Projects')
-    .map((item) => ({
-      label: item.label,
-      href: item.href,
-      external: Boolean(item.external) || item.href.startsWith('http'),
-    })),
+const pages = [
+  { label: 'About', href: '/about', external: false },
+  { label: 'Work', href: '/#projects', external: false },
+  { label: 'Play', href: '/play', external: false },
+  { label: 'Resume', href: site.links.resume, external: true },
+  { label: 'Design system', href: '/design-system', external: false },
+];
+
+const contact = [
+  { label: 'LinkedIn', href: site.links.linkedin },
+  { label: 'X', href: site.links.x },
+  { label: 'Instagram', href: site.links.instagram },
 ];
 ---
 
 <footer data-comment-id="site-footer">
-  <div class="mx-auto flex max-w-[1400px] flex-col gap-16 px-6 py-10 md:gap-20 md:px-10 md:py-12">
-    <div
-      class:list={[
-        'grid gap-10',
-        showSocials ? 'sm:grid-cols-2 sm:gap-16' : '',
-      ]}
-    >
-      <nav class="flex flex-col gap-3 text-body" aria-label="Footer" data-comment-id="footer-nav">
-        {
-          pageLinks.map((item) => (
-            <a
-              href={resolveHref(item.href)}
-              class="text-link text-ink"
-              target={item.external ? '_blank' : undefined}
-              rel={item.external ? 'noopener noreferrer' : undefined}
-            >
-              {item.label}
-              {item.external && <ExternalLinkIcon />}
-            </a>
-          ))
-        }
-      </nav>
-
-      {
-        showSocials && (
-          <div class="footer-socials flex flex-col" data-comment-id="footer-socials">
-            <SocialLinks />
-          </div>
-        )
-      }
+  <div class="page-frame footer">
+    <div class="footer-card">
+      <div class="footer-top">
+        <div class="footer-cta" data-comment-id="footer-feedback">
+          <p class="text-body">
+            Thanks for stopping by. Would love your feedback on my portfolio!
+          </p>
+          <button type="button" class="footer-feedback" data-leave-feedback>
+            Leave feedback
+          </button>
+        </div>
+        <div class="footer-columns">
+          <nav class="footer-column" aria-label="Pages" data-comment-id="footer-nav">
+            {
+              pages.map((item) => (
+                <a
+                  href={resolveHref(item.href)}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
+                >
+                  {item.label}
+                  {item.external && <ExternalLinkIcon />}
+                </a>
+              ))
+            }
+          </nav>
+          {
+            showSocials && (
+              <nav class="footer-column" aria-label="Contact" data-comment-id="footer-socials">
+                {site.email && (
+                  <button
+                    type="button"
+                    class="copy-email"
+                    data-email={site.email}
+                    data-default-label="Email"
+                    aria-label="Copy email"
+                  >
+                    <span data-email-label>Email</span>
+                  </button>
+                )}
+                {contact.map((item) => (
+                  <a href={item.href} target="_blank" rel="noopener noreferrer">
+                    {item.label}
+                    <ExternalLinkIcon />
+                  </a>
+                ))}
+              </nav>
+            )
+          }
+        </div>
+      </div>
     </div>
 
-    <p class="text-body text-muted">
-      Built with Astro, React, TypeScript, Supabase, and Vercel using Cursor.
-      {' '}
-      <a href={resolveHref('/design-system')} class="text-link text-ink">Design system</a>
-      {' '}
-      built with Tailwind.
-    </p>
+    <div class="footer-meta">
+      <p>© {site.year} {site.name}</p>
+      <ThemeMenu />
+    </div>
   </div>
 </footer>
+
+<style>
+  .footer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-top: 1.5rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .footer-card {
+    padding: 1.5rem 1.35rem;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+    background: var(--color-canvas);
+  }
+
+  @media (min-width: 768px) {
+    .footer-card {
+      padding: 1.75rem;
+    }
+  }
+
+  .footer-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 2rem 3rem;
+  }
+
+  .footer-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    max-width: 22rem;
+  }
+
+  .footer-cta p {
+    color: var(--color-ink);
+  }
+
+  .footer-feedback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--radius-card);
+    background: var(--color-surface);
+    color: var(--color-muted);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.2;
+    cursor: pointer;
+    transition:
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+
+  .footer-feedback:hover {
+    color: var(--color-ink);
+    background: var(--color-surface-strong);
+  }
+
+  .footer-feedback:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  .footer-columns {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    justify-content: end;
+    gap: 1.5rem 3.5rem;
+  }
+
+  @media (max-width: 640px) {
+    .footer-top {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .footer-columns {
+      justify-content: start;
+    }
+  }
+
+  .footer-column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .footer-column a,
+  .footer-column button {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .footer-column button {
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .footer-column a:hover,
+  .footer-column button:hover,
+  .footer-column button.is-copied {
+    color: var(--color-ink);
+  }
+
+  .footer-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    padding: 0.15rem 0.35rem 0.35rem;
+    color: var(--color-muted);
+  }
+
+  .footer-meta p {
+    margin: 0;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-leave-feedback]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const toggle = document.getElementById('comment-mode-toggle');
+      if (!toggle || toggle.getAttribute('aria-pressed') === 'true') return;
+      toggle.click();
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.footer .copy-email').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const email = btn.getAttribute('data-email');
+      const defaultLabel = btn.getAttribute('data-default-label') ?? 'Email';
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        const label = btn.querySelector('[data-email-label]');
+        btn.setAttribute('aria-label', 'Email copied');
+        btn.classList.add('is-copied');
+        if (label) label.textContent = 'Copied';
+        setTimeout(() => {
+          btn.setAttribute('aria-label', `Copy ${defaultLabel.toLowerCase()}`);
+          btn.classList.remove('is-copied');
+          if (label) label.textContent = defaultLabel;
+        }, 2000);
+      } catch {
+        window.location.href = `mailto:${email}`;
+      }
+    });
+  });
+</script>

@@ -1,7 +1,7 @@
 {
   "name": "Jane Hou",
   "title": "Jane Hou's Portfolio",
-  "description": "Hey I'm Jane! I care about people and want to design around them!",
+  "description": "I care about people and want to design around them.",
   "email": "janehoudesign@gmail.com",
   "year": 2026,
   "logo": "images/my-logo.png",
@@ -34,42 +34,35 @@
     }
   ],
   "hero": {
-    "headline": "Hey I'm Jane! I care about people and want to design around them!"
+    "headline": "Hi I'm Jane Hou!",
+    "subhead": "I care about people and want to design around them."
   },
   "experience": {
     "current": {
       "label": "IBM",
       "href": "https://www.ibm.com/consulting",
-      "role": "product design consulting"
+      "role": "Product Design Consulting"
     },
     "previous": [
       {
         "label": "Intuit",
         "href": "https://www.intuit.com/ca/",
-        "role": "AI product design + design systems"
-      },
-      {
-        "label": "Simple Ventures",
-        "href": "https://www.simpleventures.ca/",
-        "role": "brand & web design"
+        "role": "AI Product Design & Design Systems"
       },
       {
         "label": "GWSK",
         "href": "https://gwsk.studio/",
-        "role": "brand & web design"
+        "role": "Brand & Web Design"
+      },
+      {
+        "label": "Simple Ventures",
+        "href": "https://www.simpleventures.ca/",
+        "role": "Brand & Web Design"
       }
     ],
     "note": "Interested in Summer 2027 internships and part-time/contract work!"
   },
   "projects": [
-    {
-      "slug": "des-sys",
-      "name": "Design Systems",
-      "tags": ["design systems", "shipped"],
-      "title": "Bridging design and code with AI",
-      "image": "images/case-study-heroes/dessys.png",
-      "comingSoon": false
-    },
     {
       "slug": "migration",
       "name": "Migration",
@@ -79,19 +72,28 @@
       "comingSoon": false
     },
     {
+      "slug": "dex",
+      "name": "Dex",
+      "tags": ["product", "brand", "hackathon"],
+      "title": "Hacking laptop sensors into daily OT practice",
+      "image": "images/case-study-heroes/dex.png",
+      "href": "https://devpost.com/software/htn-2026",
+      "comingSoon": false
+    },
+    {
+      "slug": "des-sys",
+      "name": "Design Systems",
+      "tags": ["design systems", "shipped"],
+      "title": "Bridging design and code with AI",
+      "image": "images/case-study-heroes/dessys.png",
+      "comingSoon": false
+    },
+    {
       "slug": "ixd",
       "name": "IXD",
       "tags": ["brand", "community"],
       "title": "Building a brand around community",
       "image": "images/case-study-heroes/ixdyes.png",
-      "comingSoon": false
-    },
-    {
-      "slug": "gwsk",
-      "name": "GWSK",
-      "tags": ["brand", "shipped"],
-      "title": "Refreshing a design studio's identity",
-      "image": "images/case-study-heroes/gwsk.png",
       "comingSoon": false
     }
   ],

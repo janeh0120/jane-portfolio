@@ -1105,8 +1105,6 @@ import ArrowIcon from './ArrowIcon.astro';
     setStatus('');
   }
 
-  const CLOSE_ICON = lucideSvg('x', 16);
-
   function updateModeToggle(next: 'view' | 'comment') {
     if (!modeToggleBtn) return;
 
@@ -1117,7 +1115,7 @@ import ArrowIcon from './ArrowIcon.astro';
     if (isComment) {
       modeToggleBtn.setAttribute('aria-label', 'Exit feedback');
       modeToggleBtn.title = 'Exit feedback';
-      modeToggleBtn.innerHTML = CLOSE_ICON;
+      modeToggleBtn.textContent = '×';
     } else {
       modeToggleBtn.removeAttribute('aria-label');
       modeToggleBtn.removeAttribute('title');

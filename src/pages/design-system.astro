@@ -89,12 +89,8 @@ const borders = [
 ];
 
 const radii = [
-  { name: 'None', token: '--radius-none', detail: '0 · media default' },
-  { name: 'Sm', token: '--radius-sm', detail: '4px · chips' },
-  { name: 'Md', token: '--radius-md', detail: '6px · controls' },
-  { name: 'Lg', token: '--radius-lg', detail: '12px · panels' },
-  { name: 'Xl', token: '--radius-xl', detail: '18px · popovers' },
-  { name: 'Full', token: '--radius-full', detail: 'pill · circles' },
+  { name: 'None', token: '--radius-none', detail: '0 · full-bleed frames' },
+  { name: 'Corner', token: '--radius-card', detail: '0.5rem · controls and cards' },
 ];
 
 const widths = [
@@ -144,7 +140,7 @@ const sectionTitleClass = 'subheading text-ink';
 
 <Layout title={`Design system | ${site.title}`} description="Color, type, and patterns used across this portfolio.">
   <Header />
-  <main class="mx-auto max-w-[1400px] px-6 pb-24 pt-6 md:px-10">
+  <main class="page-frame pb-24 pt-6 md:pt-8">
     <div class="grid gap-8 lg:grid-cols-[200px_1fr] lg:gap-20">
       <SidebarNav
         nav={sections.map((item) => ({ label: item.label, href: `#${item.id}` }))}
@@ -165,7 +161,7 @@ const sectionTitleClass = 'subheading text-ink';
                     'size-16 sm:size-20 lg:size-28',
                     swatch.outline && 'border border-border-strong',
                   ]}
-                  style={`background: var(${swatch.token})`}
+                  style={`background: var(${swatch.token}); border-radius: var(--radius-card)`}
                   aria-hidden="true"
                 />
                 <div class="min-w-0">
@@ -349,7 +345,7 @@ const sectionTitleClass = 'subheading text-ink';
               </div>
               <div
                 class="size-20 bg-canvas"
-                style={`border: 2px solid var(${item.token})`}
+                style={`border: 2px solid var(${item.token}); border-radius: var(--radius-card)`}
                 aria-hidden="true"
               />
             </li>
@@ -360,6 +356,10 @@ const sectionTitleClass = 'subheading text-ink';
 
     <section id="radius" class={sectionClass} aria-labelledby="radius-title">
       <h2 id="radius-title" class={sectionTitleClass}>Radius</h2>
+      <p class="mt-3 max-w-[58ch] text-body text-muted">
+        Controls, cards, and media use one corner. A shell around a nested control adds its padding
+        to that radius, so the two curves share a center.
+      </p>
       <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3 lg:grid-cols-6">
         {
           radii.map((item) => (
@@ -486,3 +486,9 @@ const sectionTitleClass = 'subheading text-ink';
   </main>
   <SiteFooter />
 </Layout>
+
+<style>
+  main :global(.border) {
+    border-radius: var(--radius-card);
+  }
+</style>
