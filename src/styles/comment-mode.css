@@ -5,8 +5,17 @@ body.comment-feedback-root {
   --comment-accent: var(--color-accent, #246cff);
   --comment-accent-soft: var(--color-accent-soft, rgb(36 108 255 / 12%));
   --comment-shell-padding: 0px;
+  --comment-motion: 0.7s;
+  --comment-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --header-offset: 1rem;
   background: var(--comment-frame-bg);
   margin: 0;
+}
+
+@media (min-width: 768px) {
+  body.comment-feedback-root {
+    --header-offset: 1.5rem;
+  }
 }
 
 .site-shell {
@@ -20,7 +29,9 @@ body.comment-feedback-root .site-shell {
   display: flex;
   align-items: stretch;
   gap: 0;
-  transition: gap 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    gap var(--comment-motion) var(--comment-ease),
+    padding var(--comment-motion) var(--comment-ease);
 }
 
 body.comment-view-comment .site-shell {
@@ -50,7 +61,23 @@ body.comment-feedback-root:not(.admin-review-root) .site-shell {
   overflow: clip;
   flex: 1 1 auto;
   min-width: 0;
-  transition: flex 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    flex var(--comment-motion) var(--comment-ease),
+    border-radius var(--comment-motion) var(--comment-ease);
+}
+
+body.comment-view-comment:not(.admin-review-root) .site-canvas {
+  --nav-radius: calc(var(--radius-card) + var(--bar-inset) + var(--border-width));
+  --frame-gap: 1rem;
+  border-radius: calc(
+    var(--nav-radius) + max(var(--frame-gap), (100% - 1400px) / 2) + var(--border-width)
+  );
+}
+
+@media (min-width: 768px) {
+  body.comment-view-comment:not(.admin-review-root) .site-canvas {
+    --frame-gap: 1.5rem;
+  }
 }
 
 body.comment-view-only .site-shell {
@@ -63,6 +90,7 @@ body.comment-view-comment .site-canvas {
 }
 
 body.comment-feedback-root:not(.admin-review-root) .site-canvas {
+  border: var(--border-width) solid var(--color-hairline);
   min-height: 0;
   height: auto;
   max-height: 100%;
@@ -103,7 +131,7 @@ body.comment-sidebar-interacting.comment-mode-active .site-canvas * {
   align-items: center;
   justify-content: center;
   min-height: 32px;
-  padding: 6px 12px;
+  padding: 8px 12px 4px;
   border: none;
   border-radius: var(--radius-card);
   background: var(--color-surface);
@@ -143,14 +171,8 @@ body.comment-sidebar-interacting.comment-mode-active .site-canvas * {
 }
 
 .comment-mode-toggle.is-icon {
-  width: 40px;
-  height: 40px;
-  min-height: 40px;
   padding: 0;
-  border-radius: var(--radius-card);
-  background: #000;
-  color: #fff;
-  font-size: 24px;
+  font-size: 0;
   line-height: 1;
 }
 
@@ -161,11 +183,6 @@ body.comment-sidebar-interacting.comment-mode-active .site-canvas * {
   transform: rotate(90deg);
 }
 
-.comment-mode-toggle.is-icon[aria-pressed='true'] {
-  background: #000;
-  color: #fff;
-}
-
 .comment-mode-toggle.is-animating {
   z-index: 10070;
 }
@@ -173,7 +190,7 @@ body.comment-sidebar-interacting.comment-mode-active .site-canvas * {
 @media (max-width: 767px) {
   .comment-mode-toggle:not(.is-icon) {
     min-height: 36px;
-    padding: 7px 12px;
+    padding: 9px 12px 5px;
     font-size: 0.875rem;
   }
 }
@@ -193,9 +210,9 @@ body.comment-sidebar-interacting.comment-mode-active .site-canvas * {
   border: none;
   border-radius: 0;
   transition:
-    width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-    min-width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.24s ease;
+    width var(--comment-motion) var(--comment-ease),
+    min-width var(--comment-motion) var(--comment-ease),
+    opacity 0.5s ease;
 }
 
 body.comment-view-comment .comment-sidebar {
@@ -222,8 +239,8 @@ body.comment-feedback-root.comment-view-comment:not(.admin-review-root) .comment
   opacity: 0;
   transform: translateX(8px);
   transition:
-    opacity 0.24s ease,
-    transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity 0.5s ease,
+    transform var(--comment-motion) var(--comment-ease);
 }
 
 body.comment-view-comment .comment-sidebar-panel {
@@ -248,6 +265,16 @@ body.comment-view-only .comment-sidebar-panel {
   flex-direction: column;
   gap: 12px;
   padding: 16px 8px 0 4px;
+}
+
+@media (min-width: 901px) {
+  .comment-sidebar-header {
+    /* Sit the title and close icon on the same line as the nav bar. */
+    padding-top: calc(
+      var(--header-offset) + var(--border-width) +
+        (1.2rem + 24px + (var(--border-width) * 2) - 24px) / 2
+    );
+  }
 }
 
 .comment-sidebar-header-row {
@@ -377,7 +404,7 @@ body.comment-view-only .comment-sidebar-panel {
   padding: 12px 12px 10px;
   text-align: left;
   background: var(--color-canvas);
-  border: 1px solid var(--color-border);
+  border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-card);
   cursor: default;
   overflow-wrap: anywhere;
@@ -462,8 +489,9 @@ body.comment-view-only .comment-sidebar-panel {
 }
 
 .comment-sidebar-card-delete:hover {
-  background: var(--color-danger-soft);
-  color: var(--color-danger);
+  background: #333;
+  color: #fff;
+  transform: rotate(90deg);
 }
 
 @media (hover: none), (max-width: 900px) {
@@ -931,7 +959,6 @@ body.comment-mode-active [data-comment-ui] * {
 
   .site-canvas {
     min-height: calc(100dvh - (var(--comment-shell-padding) * 2));
-    border-radius: 0;
   }
 }
 

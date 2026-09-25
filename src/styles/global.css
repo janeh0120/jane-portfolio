@@ -75,6 +75,9 @@
 
 @layer base {
   html {
+    /* Nav, comment cards, and the page frame */
+    --border-width: 0.5px;
+    --bar-inset: 0.6rem;
     font-family: var(--font-sans);
     background: var(--color-page);
     color: var(--color-ink);
@@ -232,24 +235,15 @@
       background 0.15s ease;
   }
 
-  .comment-mode-toggle.is-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    min-height: 40px;
-    padding: 0;
-    border: none;
-    border-radius: var(--radius-card);
-    background: #000;
-    color: #fff;
-    font-size: 24px;
-    line-height: 1;
-    box-shadow: none;
-    transition:
-      background 0.3s ease,
-      transform 0.3s ease;
+  .icon-control.is-dismiss {
+    width: 24px;
+    height: 24px;
+    min-height: 24px;
+  }
+
+  .icon-control.is-dismiss svg {
+    width: 14px;
+    height: 14px;
   }
 
   .icon-control svg {
@@ -267,17 +261,16 @@
     background: var(--color-border);
   }
 
-  .comment-mode-toggle.is-icon:hover:not(.is-animating),
-  .comment-mode-toggle.is-icon:active:not(.is-animating) {
+  .icon-control.is-dismiss:hover,
+  .icon-control.is-dismiss.is-hover,
+  .icon-control.is-dismiss:active {
     background: #333;
     color: #fff;
     transform: rotate(90deg);
   }
 
   .icon-control:focus-visible,
-  .icon-control.is-focus,
-  .comment-mode-toggle.is-icon:focus-visible,
-  .comment-mode-toggle.is-icon.is-focus {
+  .icon-control.is-focus {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
@@ -285,11 +278,6 @@
   .icon-control[aria-pressed='true'] {
     background: transparent;
     color: var(--color-muted);
-  }
-
-  .comment-mode-toggle.is-icon[aria-pressed='true'] {
-    background: #000;
-    color: #fff;
   }
 
   @media (max-width: 767px) {

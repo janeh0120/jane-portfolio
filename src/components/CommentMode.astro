@@ -3,21 +3,25 @@ import ArrowIcon from './ArrowIcon.astro';
 ---
 
 <div data-comment-ui>
-  <button
-    type="button"
-    class="comment-mode-toggle"
-    id="comment-mode-toggle"
-    aria-pressed="false"
-  >
-    Leave feedback
-  </button>
-
   <aside class="comment-sidebar" id="comment-sidebar" data-comment-ui aria-label="Comments">
     <div class="comment-sidebar-panel">
       <div class="comment-sidebar-header">
         <div class="comment-sidebar-header-row">
           <span class="comment-sidebar-title">Comments</span>
-          <div id="comment-sidebar-toggle-anchor" class="comment-sidebar-toggle-anchor" data-comment-ui></div>
+          <div id="comment-sidebar-toggle-anchor" class="comment-sidebar-toggle-anchor" data-comment-ui>
+            <button
+              type="button"
+              class="icon-control is-dismiss comment-mode-exit"
+              id="comment-mode-exit"
+              aria-label="Exit feedback"
+              title="Exit feedback"
+              data-comment-ui
+            >
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 6 6 18M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
         </div>
         <!-- Public "All" comments UI — re-enable via PUBLIC_COMMENTS_ENABLED in the script below -->
         <div class="comment-sidebar-tabs" id="comment-sidebar-tabs" role="tablist" aria-label="Comment list" hidden>
@@ -165,7 +169,6 @@ import ArrowIcon from './ArrowIcon.astro';
     }
   }
 
-  const modeToggleBtn = document.getElementById('comment-mode-toggle');
   const sidebar = document.getElementById('comment-sidebar');
   const sidebarList = document.getElementById('comment-sidebar-list');
   const highlightsRoot = document.getElementById('comment-highlights');
@@ -180,6 +183,10 @@ import ArrowIcon from './ArrowIcon.astro';
   const scopeTabs = document.getElementById('comment-sidebar-tabs');
   const siteShell = document.getElementById('site-shell');
   const siteCanvas = document.getElementById('site-canvas');
+
+  if (siteShell && sidebar && sidebar.parentElement !== siteShell) {
+    siteShell.appendChild(sidebar);
+  }
 
   const SELECTOR_SEP = '\n';
 
@@ -1105,36 +1112,16 @@ import ArrowIcon from './ArrowIcon.astro';
     setStatus('');
   }
 
-  function updateModeToggle(next: 'view' | 'comment') {
-    if (!modeToggleBtn) return;
-
-    const isComment = next === 'comment';
-    modeToggleBtn.setAttribute('aria-pressed', String(isComment));
-    modeToggleBtn.classList.toggle('is-icon', isComment);
-
-    if (isComment) {
-      modeToggleBtn.setAttribute('aria-label', 'Exit feedback');
-      modeToggleBtn.title = 'Exit feedback';
-      modeToggleBtn.textContent = '×';
-    } else {
-      modeToggleBtn.removeAttribute('aria-label');
-      modeToggleBtn.removeAttribute('title');
-      modeToggleBtn.textContent = 'Leave feedback';
-    }
-  }
-
-  function setMode(next: 'view' | 'comment', options: { animate?: boolean } = {}) {
-    const { animate = true } = options;
-    const toggle = modeToggleBtn;
-    const fromRect =
-      animate && toggle && toggle.isConnected ? toggle.getBoundingClientRect() : undefined;
+  function setMode(next: 'view' | 'comment') {
     const preservedScroll = getPageScrollY();
 
     mode = next;
     document.body.classList.toggle('comment-view-only', next === 'view');
     document.body.classList.toggle('comment-view-comment', next === 'comment');
     document.body.classList.toggle('comment-mode-active', next === 'comment');
-    updateModeToggle(next);
+    document.dispatchEvent(
+      new CustomEvent('portfolio:comment-mode', { detail: { mode: next } }),
+    );
 
     if (next === 'view') {
       hoveredElement = null;
@@ -1150,9 +1137,6 @@ import ArrowIcon from './ArrowIcon.astro';
 
     window.requestAnimationFrame(() => {
       if (siteCanvas) siteCanvas.scrollTop = preservedScroll;
-      const toggleLocation =
-        next === 'view' || isStackedCommentLayout() ? 'header' : 'sidebar';
-      placeToggle(toggleLocation, fromRect);
     });
   }
 
@@ -1208,53 +1192,22 @@ import ArrowIcon from './ArrowIcon.astro';
     renderSidebar();
   }
 
-  function placeToggle(location: 'header' | 'sidebar', fromRect?: DOMRect) {
-    const toggle = modeToggleBtn;
-    const anchor =
-      location === 'sidebar'
-        ? document.getElementById('comment-sidebar-toggle-anchor')
-        : document.getElementById('comment-toggle-anchor');
-
-    if (!toggle || !anchor) return;
-
-    const shouldAnimate = Boolean(fromRect);
-
-    if (toggle.parentElement !== anchor) {
-      anchor.appendChild(toggle);
-    }
-
-    if (!shouldAnimate || !fromRect) return;
-
-    const last = toggle.getBoundingClientRect();
-    const dx = fromRect.left - last.left;
-    const dy = fromRect.top - last.top;
-
-    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
-
-    toggle.classList.add('is-animating');
-    toggle.style.transition = 'none';
-    toggle.style.transform = `translate(${dx}px, ${dy}px)`;
-
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
-        toggle.style.transition = 'transform 0.32s cubic-bezier(0.4, 0, 0.2, 1)';
-        toggle.style.transform = '';
-      });
-    });
-
-    const cleanup = () => {
-      toggle.classList.remove('is-animating');
-      toggle.style.transition = '';
-      toggle.style.transform = '';
-    };
-
-    toggle.addEventListener('transitionend', cleanup, { once: true });
-    window.setTimeout(cleanup, 400);
-  }
-
-  modeToggleBtn?.addEventListener('click', () => {
-    setMode(mode === 'comment' ? 'view' : 'comment');
+  document.addEventListener('portfolio:leave-feedback', () => {
+    if (mode !== 'comment') setMode('comment');
   });
+
+  document.addEventListener(
+    'click',
+    (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (!target.closest('#comment-mode-exit')) return;
+      event.preventDefault();
+      setMode('view');
+    },
+    true,
+  );
+
   if (PUBLIC_COMMENTS_ENABLED) {
     scopeMineBtn?.addEventListener('click', () => setSidebarScope('mine'));
     scopeAllBtn?.addEventListener('click', () => setSidebarScope('all'));
@@ -1380,9 +1333,6 @@ import ArrowIcon from './ArrowIcon.astro';
   });
 
   window.addEventListener('resize', () => {
-    if (mode === 'comment') {
-      placeToggle(isStackedCommentLayout() ? 'header' : 'sidebar');
-    }
     repositionFloatingUi();
   });
 
@@ -1459,12 +1409,7 @@ import ArrowIcon from './ArrowIcon.astro';
     }
   });
 
-  if (siteShell && sidebar && sidebar.parentElement !== siteShell) {
-    siteShell.appendChild(sidebar);
-  }
-
-  placeToggle('header');
   sessionComments = loadSessionComments();
   initCategorySelect();
-  setMode('view', { animate: false });
+  setMode('view');
 </script>

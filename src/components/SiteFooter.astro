@@ -2,6 +2,7 @@
 import { site } from '../data/site';
 import ExternalLinkIcon from './ExternalLinkIcon.astro';
 import ThemeMenu from './ThemeMenu.astro';
+import LeaveFeedbackButton from './react/LeaveFeedbackButton';
 
 interface Props {
   showSocials?: boolean;
@@ -40,9 +41,7 @@ const contact = [
           <p class="text-body">
             Thanks for stopping by. Would love your feedback on my portfolio!
           </p>
-          <button type="button" class="footer-feedback" data-leave-feedback>
-            Leave feedback
-          </button>
+          <LeaveFeedbackButton client:load openOnly />
         </div>
         <div class="footer-columns">
           <nav class="footer-column" aria-label="Pages" data-comment-id="footer-nav">
@@ -134,36 +133,6 @@ const contact = [
     color: var(--color-ink);
   }
 
-  .footer-feedback {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 32px;
-    padding: 6px 12px;
-    border: none;
-    border-radius: var(--radius-card);
-    background: var(--color-surface);
-    color: var(--color-muted);
-    font: inherit;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.2;
-    cursor: pointer;
-    transition:
-      color 0.15s ease,
-      background 0.15s ease;
-  }
-
-  .footer-feedback:hover {
-    color: var(--color-ink);
-    background: var(--color-surface-strong);
-  }
-
-  .footer-feedback:focus-visible {
-    outline: 2px solid var(--color-ink);
-    outline-offset: 2px;
-  }
-
   .footer-columns {
     display: grid;
     grid-template-columns: repeat(2, max-content);
@@ -227,14 +196,6 @@ const contact = [
 </style>
 
 <script>
-  document.querySelectorAll<HTMLButtonElement>('[data-leave-feedback]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const toggle = document.getElementById('comment-mode-toggle');
-      if (!toggle || toggle.getAttribute('aria-pressed') === 'true') return;
-      toggle.click();
-    });
-  });
-
   document.querySelectorAll<HTMLButtonElement>('.footer .copy-email').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const email = btn.getAttribute('data-email');

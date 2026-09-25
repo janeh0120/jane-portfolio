@@ -4,6 +4,7 @@ import Header from '../components/Header.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SidebarNav from '../components/SidebarNav.astro';
 import IconControl from '../components/IconControl.astro';
+import LeaveFeedbackButton from '../components/react/LeaveFeedbackButton';
 import { site } from '../data/site';
 
 const sections = [
@@ -335,6 +336,15 @@ const sectionTitleClass = 'subheading text-ink';
 
     <section id="borders" class={sectionClass} aria-labelledby="borders-title">
       <h2 id="borders-title" class={sectionTitleClass}>Borders</h2>
+      <p class="mt-3 max-w-[58ch] text-body text-muted">
+        The nav bar, comment cards, and page frame use a 0.5px border. Dividers and inputs stay
+        1px.
+      </p>
+      <div
+        class="mt-6 h-16 w-40 bg-canvas"
+        style="border: var(--border-width) solid var(--color-hairline); border-radius: var(--radius-card)"
+        aria-hidden="true"
+      ></div>
       <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3">
         {
           borders.map((item) => (
@@ -358,7 +368,8 @@ const sectionTitleClass = 'subheading text-ink';
       <h2 id="radius-title" class={sectionTitleClass}>Radius</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
         Controls, cards, and media use one corner. A shell around a nested control adds its padding
-        to that radius, so the two curves share a center.
+        to that radius, so the two curves share a center. In comment mode the page frame corner is
+        the nav radius plus the space between the frame edge and the nav.
       </p>
       <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3 lg:grid-cols-6">
         {
@@ -382,28 +393,15 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="buttons" class={sectionClass} aria-labelledby="buttons-title">
       <h2 id="buttons-title" class={sectionTitleClass}>Buttons</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Surface action used in the header for comment mode. Prefer text links for navigation;
+        Leave feedback uses <code class="text-subtle">LeaveFeedbackButton</code> (React Bits SpecularButton
+        via <code class="text-subtle">ogl</code>) in the header and footer. Prefer text links for navigation;
         reserve buttons for actions.
       </p>
       <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
         <div class="flex flex-wrap items-end gap-8">
           <div>
-            <p class="mb-3 text-body text-subtle">Default</p>
-            <button type="button" class="comment-mode-toggle">Leave feedback</button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Hover</p>
-            <button type="button" class="comment-mode-toggle is-hover">Leave feedback</button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Pressed</p>
-            <button type="button" class="comment-mode-toggle" aria-pressed="true">
-              Leave feedback
-            </button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Focus</p>
-            <button type="button" class="comment-mode-toggle is-focus">Leave feedback</button>
+            <p class="mb-3 text-body text-subtle">Leave feedback</p>
+            <LeaveFeedbackButton client:load />
           </div>
         </div>
       </div>
@@ -413,8 +411,8 @@ const sectionTitleClass = 'subheading text-ink';
       <h2 id="icon-control-title" class={sectionTitleClass}>Icon control</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
         Icon-only actions via <code class="text-subtle">IconControl</code>. Icons are from Lucide.
-        Used for the mobile nav toggle; comment mode reuses the same styles when pressed into an
-        icon.
+        Used for the mobile nav toggle and the comment-mode exit control
+        (<code class="text-subtle">is-dismiss</code>).
       </p>
       <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
         <div class="flex flex-wrap items-end gap-8">

@@ -9,7 +9,12 @@ const { current, previous } = site.experience;
   <div class="experience-block">
     <p class="text-body text-muted">Currently</p>
     <p class="text-body text-ink">
-      <a href={current.href} target="_blank" rel="noopener noreferrer" class={linkClass}>{current.label}</a>{current.role ? `, ${current.role}` : ''}
+      <a href={current.href} target="_blank" rel="noopener noreferrer" class={linkClass}>{current.label}</a>
+      {
+        current.role ? (
+          <span class="experience-role">, {current.role.toLowerCase()}</span>
+        ) : null
+      }
     </p>
   </div>
 
@@ -19,7 +24,10 @@ const { current, previous } = site.experience;
       {
         previous.map((place) => (
           <li class="text-body text-ink">
-            <a href={place.href} target="_blank" rel="noopener noreferrer" class={linkClass}>{place.label}</a>{place.role ? `, ${place.role}` : ''}
+            <a href={place.href} target="_blank" rel="noopener noreferrer" class={linkClass}>
+              {place.label}
+            </a>
+            {place.role ? <span class="experience-role">, {place.role.toLowerCase()}</span> : null}
           </li>
         ))
       }
@@ -45,5 +53,9 @@ const { current, previous } = site.experience;
     list-style: none;
     display: grid;
     gap: 0.15rem;
+  }
+
+  .experience-role {
+    color: var(--color-muted);
   }
 </style>
