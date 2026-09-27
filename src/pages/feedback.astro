@@ -1,6 +1,5 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
-import LeaveFeedbackButton from '../components/react/LeaveFeedbackButton';
 import FeedbackDemoReel from '../components/react/FeedbackDemoReel';
 
 const img = (file: string) => `images/case-studies/feedback/${file}`;
@@ -17,6 +16,8 @@ const nav = [
   title="Inline feedback"
   heading="Make inline comments on my portfolio"
   role="Product designer & engineer"
+  team="Astro, React, Supabase, Vercel, Cursor"
+  teamLabel="Built with"
   timeline="May 2026 – present"
   projectType="Product"
   nav={nav}
@@ -25,21 +26,16 @@ const nav = [
   <FeedbackDemoReel slot="hero" client:visible />
 
   <section id="problem" data-comment-id="feedback-need">
-    <h3>Problem</h3>
-    <h2>
+    <h3><span class="tag">Problem</span></h3>
+    <h1 class="heading text-ink">
       Portfolio reviewers and I want to keep track of portfolio feedback inline, so I can remember
       where each comment was left and collect async feedback more easily.
-    </h2>
+    </h1>
   </section>
 
   <section id="solution" data-comment-id="feedback-feature">
-    <h3>Solution</h3>
-    <h2>User view</h2>
-    <p class="feedback-view-desc">Users can make and edit comments.</p>
-    <div class="feedback-try">
-      <LeaveFeedbackButton client:load />
-      <p class="text-body text-muted">Try it — Leave feedback, then click any section.</p>
-    </div>
+    <h3><span class="tag">Solution</span></h3>
+    <h1 class="heading text-ink">Users can make and edit comments.</h1>
     <figure class="case-study-figure case-study-figure--wide feedback-video">
       <video
         class="feedback-video__media"
@@ -52,8 +48,7 @@ const nav = [
         aria-label="Leaving comments: selecting a section of the portfolio, writing a comment, and choosing a category"
       ></video>
     </figure>
-    <h2>Internal view</h2>
-    <p class="feedback-view-desc">I can review and resolve comments after making updates.</p>
+    <h1 class="heading text-ink">I can review and resolve comments after making updates.</h1>
     <figure class="case-study-figure case-study-figure--wide feedback-video">
       <video
         class="feedback-video__media"
@@ -69,59 +64,101 @@ const nav = [
   </section>
 
   <section id="decisions" data-comment-id="feedback-decisions">
-    <h3>Design decisions</h3>
+    <h3><span class="tag">Design decisions</span></h3>
     <ol>
-      <li>
-        <h2>Guardrails</h2>
-        <p>
-          Curse words and comments under a minimum word count aren’t allowed, and both show an error
-          message. Comments are visible to me but stay anonymous. The only information tracked is
-          device type, time, and viewport width.
-        </p>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h1>Guardrails</h1>
+          <p>
+            Curse words and comments under a minimum word count aren’t allowed. Comments are visible to me but stay anonymous.
+          </p>
+        </div>
+        <figure class="case-study-figure decision-figure">
+          <img
+            src={media('error.png')}
+            alt="Comment composer showing a validation error: Comments need at least 3 characters"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
       </li>
-      <li>
-        <h2>Public commenting</h2>
-        <p>
-          I decided against making comments public to keep the scope narrow and focused on my
-          problem statement. Public comments would also be more complex to design around as I
-          update my portfolio and create multiple versions. Another honest downside: recruiters
-          could see negative comments on my work.
-        </p>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h1>Public commenting</h1>
+          <p>
+            I decided against making comments public to keep the scope narrow and focused on my
+            problem statement. It would also be more complex to design around as I
+            make updates, creating multiple versions.
+          </p>
+        </div>
+        <figure class="case-study-figure decision-figure">
+          <img
+            src={media('likes.png')}
+            alt="Mockup of a public comment card with a 34-like count, illustrating what public comments could look like"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
       </li>
-      <li>
-        <h2>Web builder vs. fully custom</h2>
-        <p>
-          A web builder like Framer can’t give comments stable markup to anchor to, a server to keep
-          keys private, or deploy hooks to pin each comment to a site version. Building it myself
-          solved all three, and hosting on Vercel and Supabase’s free tiers costs nothing beyond my
-          domain, instead of a monthly site plan.
-        </p>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h1>Web builder vs. fully custom</h1>
+          <p>
+            A web builder like Framer can’t give comments stable markup to anchor to, a server to keep
+            keys private, or deploy hooks to pin each comment to a site version.
+          </p>
+        </div>
+        <figure class="case-study-figure decision-figure">
+          <img
+            src={media('framer-vs-cursor.png')}
+            alt="Framer app icon versus Cursor app icon, comparing a web builder to building it myself"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
       </li>
-      <li>
-        <h2>Existing tools</h2>
-        <p>
-          I came across Agentation’s comment component after building this feature and looked into
-          using it. It’s strong as a local tool for reviewing your own work and handing notes to an
-          agent (localStorage / MCP), but it doesn’t let visitors leave comments that persist, get
-          reviewed in an admin view, and stay pinned to the version they were left on — which is
-          what I needed.
-        </p>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h1>Existing tools</h1>
+          <p>
+            <a
+              href="https://www.agentation.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-medium underline decoration-ink/30 underline-offset-4"
+            >
+              Agentation
+            </a> is a strong local tool for reviewing your own work and handing notes to an
+            agent (copy-paste / MCP), but it doesn’t let visitors leave comments that persist, get
+            reviewed in an admin view, and stay pinned to the version they were left on.
+          </p>
+        </div>
+        <figure class="case-study-figure decision-figure">
+          <img
+            src={media('agentation.png')}
+            alt="Agentation documentation page showing its annotation and feedback-to-agent workflow"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
       </li>
     </ol>
   </section>
 </CaseStudyLayout>
 
 <style>
-  .feedback-try {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem 1rem;
-    margin-top: 1.25rem;
+  h3 .tag {
+    margin-left: calc(var(--dropdown-pad) * -2);
   }
 
-  .feedback-try p {
-    margin: 0;
+  /* Match the page title's .heading style; overrides the shared section-h1 size */
+  #problem .heading,
+  #solution .heading {
+    font-family: var(--font-serif);
+    font-size: clamp(1.625rem, calc(3.2vw - 2px), 2.375rem);
+    line-height: 1.2;
+    letter-spacing: -0.04em;
+    font-weight: 700;
   }
 
   .feedback-video {
@@ -130,11 +167,15 @@ const nav = [
     background: #1e4fd6 url('/images/case-studies/feedback/blue-bg.jpg') center / cover;
   }
 
+  .case-study-figure.feedback-video {
+    margin-top: 1rem;
+  }
+
   section .feedback-view-desc {
     margin-top: 0.35rem;
   }
 
-  .feedback-video + h2 {
+  .feedback-video + h1 {
     margin-top: 2.75rem;
   }
 
@@ -143,6 +184,29 @@ const nav = [
     border-radius: calc(var(--radius-card) * 0.75);
     background: var(--color-surface);
     box-shadow: 0 12px 40px rgb(0 20 80 / 35%);
+  }
+
+  .decision-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .decision-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+
+  .decision-figure {
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .decision-figure {
+      margin-top: 0;
+    }
   }
 </style>
 

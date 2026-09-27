@@ -430,7 +430,7 @@
   line-height: 1;
   color: var(--color-ink);
   white-space: nowrap;
-  background: var(--color-surface-strong);
+  background: var(--color-border-strong);
   border-radius: var(--radius-card);
   /* The font's descender space sits the text high; trim to cap height so padding is even */
   text-box: trim-both cap alphabetic;

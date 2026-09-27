@@ -61,7 +61,7 @@ const hasNav = nav.length > 0;
     const updateBack = () => {
       const scrolled = (canvas?.scrollTop ?? 0) > 0 || window.scrollY > 0;
       const stuckTop = parseFloat(getComputedStyle(aside).top) || 0;
-      const stuck = compact.matches && scrolled && aside.getBoundingClientRect().top <= stuckTop + 1;
+      const stuck = compact.matches && scrolled && aside.getBoundingClientRect().top <= stuckTop + 6;
       back.classList.toggle('is-secondary', stuck);
       back.classList.toggle('is-tertiary', !stuck);
     };
@@ -90,7 +90,9 @@ const hasNav = nav.length > 0;
 </script>
 
 <style>
-  .case-study-back {
+  /* Flush with content when it's plain text; once it has a visible pill (is-secondary),
+     let it sit inset like every other pill control (header bar, tags) instead of overhanging the edge. */
+  .case-study-back.is-tertiary {
     margin-left: calc(-0.75rem - var(--border-width));
   }
 

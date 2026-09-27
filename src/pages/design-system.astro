@@ -624,9 +624,11 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="tag" class={sectionClass} aria-labelledby="tag-title">
       <h2 id="tag-title" class={sectionTitleClass}>Tag</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Read-only label with the same type and
-        <code class="text-subtle">--color-surface-strong</code> fill as the dropdown trigger, but no
-        chevron or hover because it can't be changed. Padding is
+        Read-only label with the same type as the dropdown trigger, but no chevron or hover because
+        it can't be changed. Fill is
+        <code class="text-subtle">--color-border-strong</code>, a step darker than the dropdown
+        trigger's <code class="text-subtle">--color-surface-strong</code> so it still reads against
+        the page background without a hover state to lean on. Padding is
         <code class="text-subtle">--dropdown-pad</code> (doubled on the sides), and the text box is
         trimmed to cap height so the label sits optically centered. Use <code class="text-subtle">.tag</code>. Shows
         the category on read-only comment cards. Add <code class="text-subtle">is-count</code> for a
