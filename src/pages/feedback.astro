@@ -1,10 +1,10 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
-import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 import LeaveFeedbackButton from '../components/react/LeaveFeedbackButton';
 import FeedbackDemoReel from '../components/react/FeedbackDemoReel';
 
 const img = (file: string) => `images/case-studies/feedback/${file}`;
+const media = (file: string) => `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}${img(file)}`;
 
 const nav = [
   { label: 'Problem', href: '#problem' },
@@ -34,17 +34,38 @@ const nav = [
 
   <section id="solution" data-comment-id="feedback-feature">
     <h3>Solution</h3>
-    <h2>User view (leaving comments)</h2>
+    <h2>User view</h2>
+    <p class="feedback-view-desc">Users can make and edit comments.</p>
     <div class="feedback-try">
       <LeaveFeedbackButton client:load />
       <p class="text-body text-muted">Try it — Leave feedback, then click any section.</p>
     </div>
-    <CaseStudyFigure
-      src={img('composer.png')}
-      alt="Inline comment composer on a selected page section"
-      wide
-    />
-    <h2>My view (resolving comments with updates)</h2>
+    <figure class="case-study-figure case-study-figure--wide feedback-video">
+      <video
+        class="feedback-video__media"
+        src={media('user-view.mp4')}
+        poster={media('user-view-poster.jpg')}
+        muted
+        loop
+        playsinline
+        preload="none"
+        aria-label="Leaving comments: selecting a section of the portfolio, writing a comment, and choosing a category"
+      ></video>
+    </figure>
+    <h2>Internal view</h2>
+    <p class="feedback-view-desc">I can review and resolve comments after making updates.</p>
+    <figure class="case-study-figure case-study-figure--wide feedback-video">
+      <video
+        class="feedback-video__media"
+        src={media('admin-view.mp4')}
+        poster={media('admin-view-poster.jpg')}
+        muted
+        loop
+        playsinline
+        preload="none"
+        aria-label="Admin review: selecting a comment highlights the section it was left on"
+      ></video>
+    </figure>
   </section>
 
   <section id="decisions" data-comment-id="feedback-decisions">
@@ -68,7 +89,16 @@ const nav = [
         </p>
       </li>
       <li>
-        <h2>The build</h2>
+        <h2>Web builder vs. fully custom</h2>
+        <p>
+          A web builder like Framer can’t give comments stable markup to anchor to, a server to keep
+          keys private, or deploy hooks to pin each comment to a site version. Building it myself
+          solved all three, and hosting on Vercel and Supabase’s free tiers costs nothing beyond my
+          domain, instead of a monthly site plan.
+        </p>
+      </li>
+      <li>
+        <h2>Existing tools</h2>
         <p>
           I came across Agentation’s comment component after building this feature and looked into
           using it. It’s strong as a local tool for reviewing your own work and handing notes to an
@@ -93,4 +123,46 @@ const nav = [
   .feedback-try p {
     margin: 0;
   }
+
+  .feedback-video {
+    padding: clamp(1rem, 5%, 2.5rem);
+    border-radius: var(--radius-card);
+    background: #1e4fd6 url('/images/case-studies/feedback/blue-bg.jpg') center / cover;
+  }
+
+  section .feedback-view-desc {
+    margin-top: 0.35rem;
+  }
+
+  .feedback-video + h2 {
+    margin-top: 2.75rem;
+  }
+
+  .feedback-video .feedback-video__media {
+    aspect-ratio: 2766 / 1638;
+    border-radius: calc(var(--radius-card) * 0.75);
+    background: var(--color-surface);
+    box-shadow: 0 12px 40px rgb(0 20 80 / 35%);
+  }
 </style>
+
+<script>
+  const videos = document.querySelectorAll<HTMLVideoElement>('.feedback-video__media');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (reduceMotion.matches) {
+    videos.forEach((video) => (video.controls = true));
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) void video.play().catch(() => {});
+          else video.pause();
+        }
+      },
+      { threshold: 0.4 },
+    );
+    videos.forEach((video) => observer.observe(video));
+  }
+</script>
