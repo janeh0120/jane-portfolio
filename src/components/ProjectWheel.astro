@@ -1,6 +1,7 @@
 ---
 import { site } from '../data/site';
 import { formatProjectTags } from '../utils/tags';
+import FeedbackDemoReel from './react/FeedbackDemoReel';
 
 const base = import.meta.env.BASE_URL;
 const projects = site.projects;
@@ -33,7 +34,11 @@ function commentId(project: (typeof projects)[number]) {
               {project.comingSoon || !href ? (
                 <div class="wheel-card-link">
                   <div class="project-card-media">
-                    <img src={imageSrc} alt={project.title} class="wheel-card-image" />
+                    {project.slug === 'feedback' ? (
+                      <FeedbackDemoReel client:visible aspect="16/10" />
+                    ) : (
+                      <img src={imageSrc} alt={project.title} class="wheel-card-image" />
+                    )}
                   </div>
                   <p class="text-body text-muted">{formatProjectTags(project.tags)}</p>
                   <h3 class="subheading text-ink">{project.title}</h3>
@@ -46,7 +51,11 @@ function commentId(project: (typeof projects)[number]) {
                   rel={external ? 'noopener noreferrer' : undefined}
                 >
                   <div class="project-card-media">
-                    <img src={imageSrc} alt="" class="wheel-card-image" />
+                    {project.slug === 'feedback' ? (
+                      <FeedbackDemoReel client:visible aspect="16/10" />
+                    ) : (
+                      <img src={imageSrc} alt="" class="wheel-card-image" />
+                    )}
                   </div>
                   <p class="text-body text-muted">{formatProjectTags(project.tags)}</p>
                   <h3 class="subheading text-ink">{project.title}</h3>
@@ -63,7 +72,6 @@ function commentId(project: (typeof projects)[number]) {
 <style>
   .project-wheel {
     --wheel-step: 24deg;
-    --wheel-radius: 920px;
     position: relative;
     min-height: 0;
     height: 100%;
@@ -73,13 +81,16 @@ function commentId(project: (typeof projects)[number]) {
   .project-wheel-scene {
     position: absolute;
     inset: 0;
+    container-type: inline-size;
   }
 
   .project-wheel-rotor {
+    /* Declared inside the scene so cqw measures the scene; spacing scales with card width */
+    --wheel-radius: 240cqw;
     position: absolute;
     top: 50%;
     left: 0;
-    width: min(100%, 24rem);
+    width: 100%;
     height: 0;
   }
 
@@ -119,7 +130,8 @@ function commentId(project: (typeof projects)[number]) {
     display: block;
   }
 
-  .wheel-card-link:hover .wheel-card-image {
+  .wheel-card-link:hover .wheel-card-image,
+  .wheel-card-link:hover :global(.feedback-demo-reel) {
     opacity: 0.92;
   }
 
@@ -253,8 +265,10 @@ function commentId(project: (typeof projects)[number]) {
     const stageTop = stageRect.top - viewTop + scroller.scrollTop;
     const pin = stage.querySelector<HTMLElement>('.home-stage-pin');
     const stick = pin ? parseFloat(getComputedStyle(pin).top) || 0 : 0;
-    const travel = Math.max(stage.offsetHeight - viewHeight, 1);
-    const progress = Math.min(1, Math.max(0, (scroller.scrollTop - (stageTop - stick)) / travel));
+    const start = Math.max(0, stageTop - stick);
+    const end = stageTop - stick + stage.offsetHeight - viewHeight;
+    const travel = Math.max(end - start, 1);
+    const progress = Math.min(1, Math.max(0, (scroller.scrollTop - start) / travel));
     const step = stepDegrees();
     const spin = -progress * (cards.length - 1) * step;
     rotor.style.setProperty('--circle-turn', `${spin}deg`);
@@ -284,6 +298,7 @@ function commentId(project: (typeof projects)[number]) {
     };
     (canvas ?? window).addEventListener('scroll', requestUpdate, { passive: true });
     window.addEventListener('resize', requestUpdate);
+    document.getElementById('home-intro-content')?.addEventListener('transitionend', requestUpdate);
     update();
 
     if (!reduceMotion && window.location.hash === '#projects') {

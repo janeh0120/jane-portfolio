@@ -63,11 +63,11 @@ const linkClass = (href: string) =>
         }
       </nav>
       <div id="comment-toggle-anchor" class="comment-toggle-anchor" data-comment-ui>
-        <LeaveFeedbackButton client:load id="comment-mode-toggle" />
+        <LeaveFeedbackButton client:load id="comment-mode-toggle" hideInCommentMode />
       </div>
       <IconControl
         id="mobile-nav-toggle"
-        class="mobile-nav-toggle md:hidden"
+        class="mobile-nav-toggle"
         label="Open menu"
         aria-expanded="false"
         aria-controls="mobile-nav-panel"
@@ -180,6 +180,10 @@ const linkClass = (href: string) =>
   }
 
   @media (min-width: 768px) {
+    :global(.mobile-nav-toggle) {
+      display: none;
+    }
+
     .mobile-nav-panel {
       display: none;
     }

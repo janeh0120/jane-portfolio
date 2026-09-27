@@ -64,6 +64,14 @@
   },
   "projects": [
     {
+      "slug": "feedback",
+      "name": "Inline feedback",
+      "tags": ["product", "shipped"],
+      "title": "Make inline comments on my portfolio",
+      "image": "images/case-studies/feedback/blue-bg.jpg",
+      "comingSoon": false
+    },
+    {
       "slug": "migration",
       "name": "Migration",
       "tags": ["product", "partially shipped"],
@@ -74,7 +82,7 @@
     {
       "slug": "dex",
       "name": "Dex",
-      "tags": ["product", "brand", "hackathon"],
+      "tags": ["product", "brand", "hackathon", "Hack the North Semi-finalist"],
       "title": "Hacking laptop sensors into daily OT practice",
       "image": "images/case-study-heroes/dex.png",
       "href": "https://devpost.com/software/htn-2026",
@@ -91,7 +99,7 @@
     {
       "slug": "ixd",
       "name": "IXD",
-      "tags": ["brand", "community"],
+      "tags": ["brand", "community", "RGD Student Awards Honourable Mention"],
       "title": "Building a brand around community",
       "image": "images/case-study-heroes/ixdyes.png",
       "comingSoon": false

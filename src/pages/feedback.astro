@@ -1,0 +1,96 @@
+---
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+import LeaveFeedbackButton from '../components/react/LeaveFeedbackButton';
+import FeedbackDemoReel from '../components/react/FeedbackDemoReel';
+
+const img = (file: string) => `images/case-studies/feedback/${file}`;
+
+const nav = [
+  { label: 'Problem', href: '#problem' },
+  { label: 'Solution', href: '#solution' },
+  { label: 'Design decisions', href: '#decisions' },
+];
+---
+
+<CaseStudyLayout
+  title="Inline feedback"
+  heading="Make inline comments on my portfolio"
+  role="Product designer & engineer"
+  timeline="May 2026 – present"
+  projectType="Product"
+  nav={nav}
+  commentId="case-study-feedback"
+>
+  <FeedbackDemoReel slot="hero" client:visible />
+
+  <section id="problem" data-comment-id="feedback-need">
+    <h3>Problem</h3>
+    <h2>
+      Portfolio reviewers and I want to keep track of portfolio feedback inline, so I can remember
+      where each comment was left and collect async feedback more easily.
+    </h2>
+  </section>
+
+  <section id="solution" data-comment-id="feedback-feature">
+    <h3>Solution</h3>
+    <h2>User view (leaving comments)</h2>
+    <div class="feedback-try">
+      <LeaveFeedbackButton client:load />
+      <p class="text-body text-muted">Try it — Leave feedback, then click any section.</p>
+    </div>
+    <CaseStudyFigure
+      src={img('composer.png')}
+      alt="Inline comment composer on a selected page section"
+      wide
+    />
+    <h2>My view (resolving comments with updates)</h2>
+  </section>
+
+  <section id="decisions" data-comment-id="feedback-decisions">
+    <h3>Design decisions</h3>
+    <ol>
+      <li>
+        <h2>Guardrails</h2>
+        <p>
+          Curse words and comments under a minimum word count aren’t allowed, and both show an error
+          message. Comments are visible to me but stay anonymous. The only information tracked is
+          device type, time, and viewport width.
+        </p>
+      </li>
+      <li>
+        <h2>Public commenting</h2>
+        <p>
+          I decided against making comments public to keep the scope narrow and focused on my
+          problem statement. Public comments would also be more complex to design around as I
+          update my portfolio and create multiple versions. Another honest downside: recruiters
+          could see negative comments on my work.
+        </p>
+      </li>
+      <li>
+        <h2>The build</h2>
+        <p>
+          I came across Agentation’s comment component after building this feature and looked into
+          using it. It’s strong as a local tool for reviewing your own work and handing notes to an
+          agent (localStorage / MCP), but it doesn’t let visitors leave comments that persist, get
+          reviewed in an admin view, and stay pinned to the version they were left on — which is
+          what I needed.
+        </p>
+      </li>
+    </ol>
+  </section>
+</CaseStudyLayout>
+
+<style>
+  .feedback-try {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .feedback-try p {
+    margin: 0;
+  }
+</style>

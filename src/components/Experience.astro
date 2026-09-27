@@ -1,61 +1,90 @@
 ---
 import { site } from '../data/site';
 
-const linkClass = 'text-link text-body text-ink';
 const { current, previous } = site.experience;
+const rows = [
+  { ...current, when: current.years ?? 'Currently' },
+  ...previous.map((place, index) => ({
+    ...place,
+    when: place.years ?? (index === 0 ? 'Previously' : ''),
+  })),
+];
 ---
 
 <section class="experience-list" data-comment-id="experience" aria-label="Experience">
-  <div class="experience-block">
-    <p class="text-body text-muted">Currently</p>
-    <p class="text-body text-ink">
-      <a href={current.href} target="_blank" rel="noopener noreferrer" class={linkClass}>{current.label}</a>
-      {
-        current.role ? (
-          <span class="experience-role">, {current.role.toLowerCase()}</span>
-        ) : null
-      }
-    </p>
-  </div>
-
-  <div class="experience-block">
-    <p class="text-body text-muted">Previously</p>
-    <ul class="experience-entries">
-      {
-        previous.map((place) => (
-          <li class="text-body text-ink">
-            <a href={place.href} target="_blank" rel="noopener noreferrer" class={linkClass}>
-              {place.label}
-            </a>
-            {place.role ? <span class="experience-role">, {place.role.toLowerCase()}</span> : null}
-          </li>
-        ))
-      }
-    </ul>
-  </div>
+  <ul class="experience-rows">
+    {
+      rows.map((row) => (
+        <li class="experience-row text-body">
+          <span class="experience-when">{row.when}</span>
+          <a href={row.href} target="_blank" rel="noopener noreferrer" class="experience-place text-link text-ink">
+            {row.label}
+          </a>
+          {row.role ? <span class="experience-role">{row.role.toLowerCase()}</span> : null}
+        </li>
+      ))
+    }
+  </ul>
 </section>
 
 <style>
   .experience-list {
-    display: grid;
-    gap: 1.35rem;
-    max-width: 22rem;
+    container-type: inline-size;
   }
 
-  .experience-block {
-    display: grid;
-    gap: 0.2rem;
-  }
-
-  .experience-entries {
+  /* Narrow: label beside a stacked company and role */
+  .experience-rows {
     margin: 0;
     padding: 0;
     list-style: none;
     display: grid;
-    gap: 0.15rem;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 2rem;
+    row-gap: 0.85rem;
+  }
+
+  .experience-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: auto auto;
+    row-gap: 0.1rem;
+    line-height: 1.4;
+  }
+
+  .experience-when {
+    grid-row: 1 / span 2;
+    color: var(--color-subtle);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .experience-place {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .experience-role {
+    grid-column: 2;
     color: var(--color-muted);
+  }
+
+  /* Wide: label, company, and role on one line */
+  @container (min-width: 28rem) {
+    .experience-rows {
+      grid-template-columns: max-content max-content minmax(0, 1fr);
+      row-gap: 0.4rem;
+    }
+
+    .experience-row {
+      grid-template-rows: auto;
+    }
+
+    .experience-when {
+      grid-row: auto;
+    }
+
+    .experience-role {
+      grid-column: 3;
+    }
   }
 </style>

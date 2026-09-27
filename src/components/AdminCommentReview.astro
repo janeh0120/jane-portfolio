@@ -20,16 +20,8 @@ interface Props {
 }
 
 const { adminKey, comments, frameBaseUrl } = Astro.props;
+const reviewData = JSON.stringify({ adminKey, comments, frameBaseUrl }).replace(/</g, '\\u003c');
 ---
-
-<div class="admin-review-toolbar" data-comment-ui>
-  <div class="admin-review-toolbar-left">
-    <span class="admin-review-badge">Admin review</span>
-  </div>
-  <p class="admin-review-toolbar-meta" id="admin-review-summary">
-    {comments.length} comment{comments.length === 1 ? '' : 's'}
-  </p>
-</div>
 
 <div id="admin-site-shell" class="site-shell admin-review-shell">
   <div id="admin-site-canvas" class="site-canvas admin-review-canvas">
@@ -56,6 +48,7 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
             aria-selected="true"
           >
             This page
+            <span class="tag is-count" id="admin-scope-page-count"></span>
           </button>
           <button
             type="button"
@@ -65,6 +58,7 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
             aria-selected="false"
           >
             All pages
+            <span class="tag is-count" id="admin-scope-all-count">{comments.length}</span>
           </button>
         </div>
       </div>
@@ -75,8 +69,14 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
 
 <div class="comment-mode-highlight" id="admin-highlight" hidden data-comment-ui></div>
 
-<script define:vars={{ adminKey, comments, frameBaseUrl }}>
+<script type="application/json" id="admin-review-data" set:html={reviewData}></script>
+
+<script>
   import { lucideSvg } from '../lib/lucide-svg';
+
+  const { adminKey, comments, frameBaseUrl } = JSON.parse(
+    document.getElementById('admin-review-data')?.textContent ?? '{}',
+  );
 
   const CATEGORY_LABELS = {
     '': 'No category',
@@ -93,18 +93,13 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
   const highlight = document.getElementById('admin-highlight');
   const scopePageBtn = document.getElementById('admin-scope-page');
   const scopeAllBtn = document.getElementById('admin-scope-all');
-  const summaryEl = document.getElementById('admin-review-summary');
+  const pageCountEl = document.getElementById('admin-scope-page-count');
+  const allCountEl = document.getElementById('admin-scope-all-count');
 
   let scope = 'page';
   let activeCardId = null;
   let previewCardId = null;
   let pinnedComment = null;
-
-  function updateSummary() {
-    if (!summaryEl) return;
-    const count = commentItems.length;
-    summaryEl.textContent = `${count} comment${count === 1 ? '' : 's'}`;
-  }
 
   function categoryLabel(id) {
     return CATEGORY_LABELS[id] ?? 'No category';
@@ -153,17 +148,29 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
     }
   }
 
-  function positionHighlightForElement(element) {
+  function placeHighlight(element, mode) {
     if (!highlight || !frame) return;
     const frameRect = frame.getBoundingClientRect();
     const elRect = element.getBoundingClientRect();
+    const top = Math.max(frameRect.top + elRect.top, frameRect.top);
+    const left = Math.max(frameRect.left + elRect.left, frameRect.left);
+    const bottom = Math.min(frameRect.top + elRect.bottom, frameRect.bottom);
+    const right = Math.min(frameRect.left + elRect.right, frameRect.right);
+    if (bottom <= top || right <= left) {
+      highlight.hidden = true;
+      return;
+    }
     highlight.hidden = false;
-    highlight.classList.add('is-pinned');
-    highlight.classList.remove('is-preview');
-    highlight.style.top = `${frameRect.top + elRect.top}px`;
-    highlight.style.left = `${frameRect.left + elRect.left}px`;
-    highlight.style.width = `${elRect.width}px`;
-    highlight.style.height = `${elRect.height}px`;
+    highlight.classList.toggle('is-pinned', mode === 'pinned');
+    highlight.classList.toggle('is-preview', mode === 'preview');
+    highlight.style.top = `${top}px`;
+    highlight.style.left = `${left}px`;
+    highlight.style.width = `${right - left}px`;
+    highlight.style.height = `${bottom - top}px`;
+  }
+
+  function positionHighlightForElement(element) {
+    placeHighlight(element, 'pinned');
   }
 
   function hideHighlight() {
@@ -172,49 +179,85 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
     highlight.classList.remove('is-pinned', 'is-preview');
   }
 
-  function tryHighlightComment(item) {
-    if (!canAccessFrameDocument()) {
-      hideHighlight();
-      return;
+  function findFrameTarget(item) {
+    if (!canAccessFrameDocument()) return null;
+    const win = frame.contentWindow;
+    let target = null;
+    try {
+      target = frame.contentDocument?.querySelector(item.selector);
+    } catch {
+      return null;
     }
-    const doc = frame.contentDocument;
-    const target = doc?.querySelector(item.selector);
-    if (target instanceof HTMLElement) {
+    // Frame nodes belong to the iframe's realm, so the parent's HTMLElement never matches.
+    return win && target instanceof win.HTMLElement ? target : null;
+  }
+
+  function tryHighlightComment(item) {
+    const target = findFrameTarget(item);
+    if (target) {
       positionHighlightForElement(target);
     } else {
       hideHighlight();
     }
   }
 
+  function findScroller(element) {
+    const doc = element.ownerDocument;
+    const win = doc.defaultView;
+    for (let node = element.parentElement; node && node !== doc.body; node = node.parentElement) {
+      const { overflowY } = win.getComputedStyle(node);
+      if (/(auto|scroll)/.test(overflowY) && node.scrollHeight > node.clientHeight) return node;
+    }
+    return doc.scrollingElement ?? doc.documentElement;
+  }
+
   function scrollFrameToComment(item) {
     try {
-      frame?.contentWindow?.scrollTo({ top: item.scrollY, behavior: 'smooth' });
+      const doc = frame?.contentDocument;
+      if (!doc) return;
+      const target = findFrameTarget(item);
+      if (!target) {
+        const scroller = doc.getElementById('site-canvas') ?? doc.scrollingElement;
+        scroller?.scrollTo({ top: item.scrollY, behavior: 'smooth' });
+        return;
+      }
+      const scroller = findScroller(target);
+      const isRoot = scroller === doc.scrollingElement || scroller === doc.documentElement;
+      const view = isRoot
+        ? { top: 0, bottom: doc.defaultView.innerHeight }
+        : scroller.getBoundingClientRect();
+      const rect = target.getBoundingClientRect();
+      if (rect.top >= view.top && rect.bottom <= view.bottom) return;
+      const viewHeight = view.bottom - view.top;
+      const offset = rect.height < viewHeight ? (viewHeight - rect.height) / 2 : 24;
+      scroller.scrollTo({
+        top: scroller.scrollTop + rect.top - view.top - offset,
+        behavior: 'smooth',
+      });
     } catch {
       /* cross-origin: scroll may be blocked */
     }
   }
 
   function onFrameReady(item, { pin = true } = {}) {
-    scrollFrameToComment(item);
     if (pin) {
       pinnedComment = item;
-      tryHighlightComment(item);
-      attachFrameScrollListener();
+      trackPinnedHighlight();
     }
+    scrollFrameToComment(item);
   }
 
-  let scrollListenerAttached = false;
+  // The page animates elements (intro, wheel) without scroll events, so follow the target per frame.
+  let trackingFrame = 0;
 
-  function attachFrameScrollListener() {
-    if (scrollListenerAttached || !canAccessFrameDocument()) return;
-    frame?.contentWindow?.addEventListener(
-      'scroll',
-      () => {
-        if (pinnedComment) tryHighlightComment(pinnedComment);
-      },
-      { passive: true },
-    );
-    scrollListenerAttached = true;
+  function trackPinnedHighlight() {
+    cancelAnimationFrame(trackingFrame);
+    const tick = () => {
+      if (!pinnedComment) return;
+      if (previewCardId === null) tryHighlightComment(pinnedComment);
+      trackingFrame = requestAnimationFrame(tick);
+    };
+    tick();
   }
 
   function navigateToComment(item, { pin = true } = {}) {
@@ -265,22 +308,23 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
         pinnedComment = null;
         hideHighlight();
       }
-      updateSummary();
       renderSidebar();
     } catch (error) {
       window.alert(error instanceof Error ? error.message : 'Could not delete comment.');
     }
   }
 
-  function filteredComments() {
-    if (scope === 'all') return commentItems;
+  function pageComments() {
     const path = currentFramePath();
     return commentItems.filter((item) => pagePathFromUrl(item.pageUrl) === path);
   }
 
   function renderSidebar() {
     if (!sidebarList) return;
-    const items = filteredComments();
+    const onPage = pageComments();
+    const items = scope === 'all' ? commentItems : onPage;
+    if (pageCountEl) pageCountEl.textContent = String(onPage.length);
+    if (allCountEl) allCountEl.textContent = String(commentItems.length);
     sidebarList.innerHTML = '';
 
     if (items.length === 0) {
@@ -300,13 +344,9 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
       const header = document.createElement('div');
       header.className = 'comment-sidebar-card-header';
 
-      const category = document.createElement('span');
-      category.className = 'comment-sidebar-card-category-label';
-      category.textContent = categoryLabel(item.category);
-
       const deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
-      deleteBtn.className = 'comment-sidebar-card-delete';
+      deleteBtn.className = 'icon-control is-dismiss is-destructive inline-flex comment-sidebar-card-delete';
       deleteBtn.setAttribute('aria-label', 'Delete comment');
       deleteBtn.innerHTML = lucideSvg('x', 14);
       deleteBtn.addEventListener('click', (event) => {
@@ -314,13 +354,21 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
         void deleteComment(item.id);
       });
 
-      header.append(category, deleteBtn);
-      card.appendChild(header);
-
       const title = document.createElement('p');
       title.className = 'comment-sidebar-card-title';
       title.textContent = item.elementDisplayName;
-      card.appendChild(title);
+
+      if (item.category) {
+        const category = document.createElement('span');
+        category.className = 'tag comment-sidebar-card-category-label';
+        category.textContent = categoryLabel(item.category);
+        header.append(category, deleteBtn);
+        card.append(header, title);
+      } else {
+        header.classList.add('has-title');
+        header.append(title, deleteBtn);
+        card.appendChild(header);
+      }
 
       const body = document.createElement('p');
       body.className = 'comment-sidebar-card-body';
@@ -341,21 +389,8 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
 
       card.addEventListener('mouseenter', () => {
         previewCardId = item.id;
-        if (canAccessFrameDocument()) {
-          const doc = frame.contentDocument;
-          const target = doc?.querySelector(item.selector);
-          if (target instanceof HTMLElement) {
-            const frameRect = frame.getBoundingClientRect();
-            const elRect = target.getBoundingClientRect();
-            highlight.hidden = false;
-            highlight.classList.add('is-preview');
-            highlight.classList.remove('is-pinned');
-            highlight.style.top = `${frameRect.top + elRect.top}px`;
-            highlight.style.left = `${frameRect.left + elRect.left}px`;
-            highlight.style.width = `${elRect.width}px`;
-            highlight.style.height = `${elRect.height}px`;
-          }
-        }
+        const target = findFrameTarget(item);
+        if (target) placeHighlight(target, 'preview');
       });
 
       card.addEventListener('mouseleave', () => {
@@ -382,11 +417,8 @@ const { adminKey, comments, frameBaseUrl } = Astro.props;
   scopePageBtn?.addEventListener('click', () => setScope('page'));
   scopeAllBtn?.addEventListener('click', () => setScope('all'));
 
-  frame?.addEventListener('load', () => {
-    if (scope === 'page') renderSidebar();
-  });
+  frame?.addEventListener('load', renderSidebar);
 
   document.body.classList.add('comment-view-comment');
-  updateSummary();
   renderSidebar();
 </script>

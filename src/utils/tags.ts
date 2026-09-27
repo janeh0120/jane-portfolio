@@ -6,7 +6,10 @@ export function parseProjectTags(tags: string | string[]): string[] {
 }
 
 export function formatProjectTags(tags: string | string[]): string {
-  return parseProjectTags(tags)
+  const list = Array.isArray(tags) ? tags : tags.split(',');
+  return list
+    .map((tag) => tag.trim())
+    .filter(Boolean)
     .map((tag) => tag.charAt(0).toUpperCase() + tag.slice(1))
     .join(', ');
 }

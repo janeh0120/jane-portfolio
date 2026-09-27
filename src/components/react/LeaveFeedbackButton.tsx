@@ -31,14 +31,17 @@ const themeProps = {
 export type LeaveFeedbackButtonProps = {
   id?: string;
   className?: string;
-  /** When true, clicking only opens comment mode if it is not already open. */
-  openOnly?: boolean;
+  /**
+   * Hide this control while comment mode is open (nav only).
+   * Other instances stay visible, keep the “Leave feedback” label, and disable.
+   */
+  hideInCommentMode?: boolean;
 };
 
 export default function LeaveFeedbackButton({
   id,
   className = '',
-  openOnly = false,
+  hideInCommentMode = false,
 }: LeaveFeedbackButtonProps) {
   const [theme, setTheme] = useState<Theme>('light');
   const [inCommentMode, setInCommentMode] = useState(false);
@@ -86,43 +89,41 @@ export default function LeaveFeedbackButton({
   }, []);
 
   const onClick: MouseEventHandler<HTMLButtonElement> = () => {
-    if (openOnly && document.body.classList.contains('comment-view-comment')) return;
+    if (document.body.classList.contains('comment-view-comment')) return;
     document.dispatchEvent(new CustomEvent('portfolio:leave-feedback'));
   };
 
   const colors = themeProps[theme];
+  const hidden = hideInCommentMode && inCommentMode;
+  const disabled = !hideInCommentMode && inCommentMode;
+
+  if (hidden) return null;
 
   return (
-    <span
-      className="leave-feedback-wrap"
-      hidden={inCommentMode}
-      aria-hidden={inCommentMode}
-      style={inCommentMode ? { display: 'none' } : undefined}
+    <SpecularButton
+      id={id}
+      className={className}
+      size="sm"
+      radius={8}
+      tint={colors.tint}
+      tintOpacity={colors.tintOpacity}
+      blur={0}
+      textColor={colors.textColor}
+      lineColor={colors.lineColor}
+      baseColor={colors.baseColor}
+      intensity={1}
+      shineSize={10}
+      shineFade={40}
+      thickness={1}
+      speed={0.35}
+      followMouse
+      proximity={250}
+      autoAnimate={false}
+      disabled={disabled}
+      aria-pressed={inCommentMode}
+      onClick={onClick}
     >
-      <SpecularButton
-        id={id}
-        className={className}
-        size="sm"
-        radius={8}
-        tint={colors.tint}
-        tintOpacity={colors.tintOpacity}
-        blur={0}
-        textColor={colors.textColor}
-        lineColor={colors.lineColor}
-        baseColor={colors.baseColor}
-        intensity={1}
-        shineSize={10}
-        shineFade={40}
-        thickness={1}
-        speed={0.35}
-        followMouse
-        proximity={250}
-        autoAnimate={false}
-        aria-pressed={inCommentMode}
-        onClick={onClick}
-      >
-        Leave feedback
-      </SpecularButton>
-    </span>
+      Leave feedback
+    </SpecularButton>
   );
 }

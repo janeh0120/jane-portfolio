@@ -44,7 +44,7 @@ const selectedVersion = versions.find((version) => version.id === selectedVersio
       All versions
     </a>
     <label class="sr-only" for="history-version-select">Portfolio version</label>
-    <select id="history-version-select" class="admin-review-version-select">
+    <select id="history-version-select" class="dropdown-trigger admin-review-version-select" data-dropdown>
       {
         versions.map((version) => (
           <option value={version.id} selected={version.id === selectedVersionId}>
@@ -316,15 +316,17 @@ const selectedVersion = versions.find((version) => version.id === selectedVersio
       const header = document.createElement('div');
       header.className = 'comment-sidebar-card-header';
 
-      const category = document.createElement('span');
-      category.className = 'comment-sidebar-card-category-label';
-      category.textContent = categoryLabel(item.category);
+      if (item.category) {
+        const category = document.createElement('span');
+        category.className = 'tag comment-sidebar-card-category-label';
+        category.textContent = categoryLabel(item.category);
+        header.appendChild(category);
+      }
 
       const upvotes = document.createElement('span');
       upvotes.className = 'comment-sidebar-card-upvote comment-sidebar-card-upvote--readonly';
       upvotes.textContent = `+1 · ${item.upvoteCount}`;
-
-      header.append(category, upvotes);
+      header.appendChild(upvotes);
       card.appendChild(header);
 
       const title = document.createElement('p');

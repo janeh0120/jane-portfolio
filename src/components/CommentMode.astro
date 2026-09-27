@@ -1,5 +1,5 @@
 ---
-import ArrowIcon from './ArrowIcon.astro';
+import IconControl from './IconControl.astro';
 ---
 
 <div data-comment-ui>
@@ -11,7 +11,7 @@ import ArrowIcon from './ArrowIcon.astro';
           <div id="comment-sidebar-toggle-anchor" class="comment-sidebar-toggle-anchor" data-comment-ui>
             <button
               type="button"
-              class="icon-control is-dismiss comment-mode-exit"
+              class="icon-control is-dismiss comment-mode-exit inline-flex"
               id="comment-mode-exit"
               aria-label="Exit feedback"
               title="Exit feedback"
@@ -66,15 +66,17 @@ import ArrowIcon from './ArrowIcon.astro';
           ></textarea>
         </div>
         <div class="comment-popover-footer">
-          <select
-            id="comment-category-select"
-            class="comment-popover-category-select"
-            aria-label="Comment category (optional)"
-          ></select>
-          <button type="button" class="comment-popover-send" id="comment-submit" aria-label="Post comment">
-            <ArrowIcon direction="right" size="14px" class="comment-popover-send-icon" />
-          </button>
+          <div class="comment-popover-footer-inner">
+            <div class="comment-popover-footer-row">
+              <select
+                id="comment-category-select"
+                class="comment-popover-category-select"
+                aria-label="Comment category (optional)"
+              ></select>
+            </div>
+          </div>
         </div>
+        <IconControl label="Post comment" icon="arrow-right" id="comment-submit" class="is-primary comment-popover-send" />
       </div>
       <p class="comment-popover-status" id="comment-status" aria-live="polite" hidden></p>
     </div>
@@ -83,6 +85,7 @@ import ArrowIcon from './ArrowIcon.astro';
 
 <script>
   import { lucideSvg } from '../lib/lucide-svg';
+  import { enhanceSelect } from '../lib/dropdown';
   import {
     getCommentTargetLabel,
     getElementLabel,
@@ -173,6 +176,7 @@ import ArrowIcon from './ArrowIcon.astro';
   const sidebarList = document.getElementById('comment-sidebar-list');
   const highlightsRoot = document.getElementById('comment-highlights');
   const popover = document.getElementById('comment-popover');
+  const popoverCard = popover?.querySelector<HTMLElement>('.comment-popover-card') ?? null;
   const chipsEl = document.getElementById('comment-target-chips');
   const categoriesEl = document.getElementById('comment-category-select') as HTMLSelectElement | null;
   const commentText = document.getElementById('comment-text') as HTMLTextAreaElement | null;
@@ -520,16 +524,18 @@ import ArrowIcon from './ArrowIcon.astro';
       chip.title = getCommentTargetLabel(element);
       chip.setAttribute('aria-label', `Remove ${tag} from selection`);
 
+      const icon = document.createElement('span');
+      icon.className = 'comment-popover-chip-icon';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.innerHTML =
+        `<span class="comment-popover-chip-target">${lucideSvg('square-mouse-pointer', 14)}</span>` +
+        `<span class="comment-popover-chip-remove">${lucideSvg('x', 14)}</span>`;
+
       const label = document.createElement('span');
       label.className = 'comment-popover-chip-label';
       label.textContent = tag;
 
-      const remove = document.createElement('span');
-      remove.className = 'comment-popover-chip-remove';
-      remove.setAttribute('aria-hidden', 'true');
-      remove.innerHTML = lucideSvg('x', 10);
-
-      chip.append(label, remove);
+      chip.append(icon, label);
       chip.addEventListener('mousedown', (event) => event.preventDefault());
       chip.addEventListener('click', (event) => {
         event.preventDefault();
@@ -642,6 +648,11 @@ import ArrowIcon from './ArrowIcon.astro';
     if (composing) positionPopover();
   }
 
+  function syncComposeExpanded() {
+    const expanded = Boolean(commentText?.value) || selectedCategory !== '';
+    popoverCard?.classList.toggle('is-expanded', expanded);
+  }
+
   function clearSelection() {
     for (const element of selectedTargets) {
       element.classList.remove('comment-mode-selected');
@@ -694,35 +705,13 @@ import ArrowIcon from './ArrowIcon.astro';
       select.appendChild(option);
     }
 
-    select.addEventListener('mousedown', (event) => event.stopPropagation());
-    select.addEventListener('click', (event) => event.stopPropagation());
     return select;
   }
 
-  function syncCategorySelectWidth() {
-    if (!categoriesEl) return;
-
-    const label = categoriesEl.options[categoriesEl.selectedIndex]?.textContent ?? '';
-    const probe = document.createElement('span');
-    const styles = getComputedStyle(categoriesEl);
-
-    probe.textContent = label;
-    probe.style.cssText = [
-      'position:absolute',
-      'visibility:hidden',
-      'white-space:nowrap',
-      `font-family:${styles.fontFamily}`,
-      `font-size:${styles.fontSize}`,
-      `font-weight:${styles.fontWeight}`,
-      `letter-spacing:${styles.letterSpacing}`,
-    ].join(';');
-
-    document.body.appendChild(probe);
-    const textWidth = probe.getBoundingClientRect().width;
-    probe.remove();
-
-    // left pad 6 + text + gap 2 + chevron 12 + right pad 4
-    categoriesEl.style.width = `${Math.ceil(textWidth + 24)}px`;
+  function enhanceCardCategorySelect(select: HTMLSelectElement) {
+    const trigger = enhanceSelect(select);
+    trigger.addEventListener('mousedown', (event) => event.stopPropagation());
+    trigger.addEventListener('click', (event) => event.stopPropagation());
   }
 
   function initCategorySelect() {
@@ -737,17 +726,16 @@ import ArrowIcon from './ArrowIcon.astro';
 
     categoriesEl.addEventListener('change', () => {
       selectedCategory = categoriesEl.value as CategoryId;
-      syncCategorySelectWidth();
+      syncComposeExpanded();
     });
 
-    syncCategorySelectWidth();
+    enhanceSelect(categoriesEl);
   }
 
   function resetCategorySelect() {
     if (!categoriesEl) return;
     categoriesEl.value = '';
     selectedCategory = '';
-    syncCategorySelectWidth();
   }
 
   async function deleteComment(id: string) {
@@ -891,10 +879,6 @@ import ArrowIcon from './ArrowIcon.astro';
       const header = document.createElement('div');
       header.className = 'comment-sidebar-card-header';
 
-      const category = document.createElement('span');
-      category.className = 'comment-sidebar-card-category-label';
-      category.textContent = categoryLabel(item.category);
-
       const upvoteBtn = document.createElement('button');
       upvoteBtn.type = 'button';
       upvoteBtn.className = 'comment-sidebar-card-upvote';
@@ -907,7 +891,13 @@ import ArrowIcon from './ArrowIcon.astro';
         void upvoteComment(item.id);
       });
 
-      header.append(category, upvoteBtn);
+      if (item.category) {
+        const category = document.createElement('span');
+        category.className = 'tag comment-sidebar-card-category-label';
+        category.textContent = categoryLabel(item.category);
+        header.appendChild(category);
+      }
+      header.appendChild(upvoteBtn);
       card.appendChild(header);
 
       const title = document.createElement('p');
@@ -1000,7 +990,7 @@ import ArrowIcon from './ArrowIcon.astro';
 
       const deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
-      deleteBtn.className = 'comment-sidebar-card-delete';
+      deleteBtn.className = 'icon-control is-dismiss is-destructive inline-flex comment-sidebar-card-delete';
       deleteBtn.setAttribute('aria-label', 'Delete comment');
       deleteBtn.innerHTML = lucideSvg('x', 14);
       deleteBtn.addEventListener('click', (event) => {
@@ -1009,6 +999,7 @@ import ArrowIcon from './ArrowIcon.astro';
       });
 
       header.append(categorySelect, deleteBtn);
+      enhanceCardCategorySelect(categorySelect);
       card.appendChild(header);
 
       const title = document.createElement('p');
@@ -1097,6 +1088,7 @@ import ArrowIcon from './ArrowIcon.astro';
     commentText.value = '';
     resizeTextarea();
     resetCategorySelect();
+    syncComposeExpanded();
     setStatus('');
     positionPopover();
     window.setTimeout(() => commentText.focus(), isStackedCommentLayout() ? 50 : 0);
@@ -1196,6 +1188,10 @@ import ArrowIcon from './ArrowIcon.astro';
     if (mode !== 'comment') setMode('comment');
   });
 
+  document.addEventListener('portfolio:exit-feedback', () => {
+    if (mode === 'comment') setMode('view');
+  });
+
   document.addEventListener(
     'click',
     (event) => {
@@ -1290,8 +1286,15 @@ import ArrowIcon from './ArrowIcon.astro';
 
   commentText?.addEventListener('input', () => {
     resizeTextarea();
+    syncComposeExpanded();
     if (statusEl?.classList.contains('error')) setStatus('');
   });
+
+  if (popoverCard) {
+    new ResizeObserver(() => {
+      if (composing) positionPopover();
+    }).observe(popoverCard);
+  }
 
   commentText?.addEventListener('blur', (event) => {
     if (!composing) return;

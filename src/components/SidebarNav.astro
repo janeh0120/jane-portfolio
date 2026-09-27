@@ -30,7 +30,7 @@ const hasNav = nav.length > 0;
 <aside class="case-study-aside lg:sticky lg:top-24 lg:self-start">
   {
     showBack && (
-      <a href={home} class="case-study-back text-body text-muted transition hover:text-ink">
+      <a href={home} class="button is-tertiary case-study-back">
         <ArrowIcon direction="left" size="0.9em" class="case-study-back-icon" />
         {backLabel}
       </a>
@@ -53,6 +53,23 @@ const hasNav = nav.length > 0;
 </aside>
 
 <script>
+  const aside = document.querySelector<HTMLElement>('.case-study-aside');
+  const back = aside?.querySelector<HTMLElement>('.case-study-back');
+  if (aside && back) {
+    const compact = window.matchMedia('(max-width: 1023px)');
+    const canvas = document.getElementById('site-canvas');
+    const updateBack = () => {
+      const scrolled = (canvas?.scrollTop ?? 0) > 0 || window.scrollY > 0;
+      const stuckTop = parseFloat(getComputedStyle(aside).top) || 0;
+      const stuck = compact.matches && scrolled && aside.getBoundingClientRect().top <= stuckTop + 1;
+      back.classList.toggle('is-secondary', stuck);
+      back.classList.toggle('is-tertiary', !stuck);
+    };
+    document.addEventListener('scroll', updateBack, { capture: true, passive: true });
+    compact.addEventListener('change', updateBack);
+    updateBack();
+  }
+
   const nav = document.querySelector('.case-study-nav');
   if (nav) {
     nav.querySelectorAll('a[href^="#"]').forEach((link) => {
@@ -74,9 +91,7 @@ const hasNav = nav.length > 0;
 
 <style>
   .case-study-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
+    margin-left: calc(-0.75rem - var(--border-width));
   }
 
   .case-study-aside {
@@ -88,11 +103,12 @@ const hasNav = nav.length > 0;
       position: sticky;
       top: 4.5rem;
       z-index: 40;
-      margin-left: -1.5rem;
-      margin-right: -1.5rem;
-      padding: 0.75rem 1.5rem;
-      background: color-mix(in srgb, var(--color-page) 92%, transparent);
-      backdrop-filter: blur(8px);
+      padding-block: 0.75rem;
+      pointer-events: none;
+    }
+
+    .case-study-back {
+      pointer-events: auto;
     }
   }
 </style>

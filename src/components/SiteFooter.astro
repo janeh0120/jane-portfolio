@@ -38,10 +38,10 @@ const contact = [
     <div class="footer-card">
       <div class="footer-top">
         <div class="footer-cta" data-comment-id="footer-feedback">
-          <p class="text-body">
+          <p class="subheading text-ink">
             Thanks for stopping by. Would love your feedback on my portfolio!
           </p>
-          <LeaveFeedbackButton client:load openOnly />
+          <LeaveFeedbackButton client:load />
         </div>
         <div class="footer-columns">
           <nav class="footer-column" aria-label="Pages" data-comment-id="footer-nav">
@@ -49,6 +49,7 @@ const contact = [
               pages.map((item) => (
                 <a
                   href={resolveHref(item.href)}
+                  class="text-link text-body text-muted"
                   target={item.external ? '_blank' : undefined}
                   rel={item.external ? 'noopener noreferrer' : undefined}
                 >
@@ -64,7 +65,7 @@ const contact = [
                 {site.email && (
                   <button
                     type="button"
-                    class="copy-email"
+                    class="copy-email text-link text-body text-muted"
                     data-email={site.email}
                     data-default-label="Email"
                     aria-label="Copy email"
@@ -73,7 +74,12 @@ const contact = [
                   </button>
                 )}
                 {contact.map((item) => (
-                  <a href={item.href} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={item.href}
+                    class="text-link text-body text-muted"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {item.label}
                     <ExternalLinkIcon />
                   </a>
@@ -129,10 +135,6 @@ const contact = [
     max-width: 22rem;
   }
 
-  .footer-cta p {
-    color: var(--color-ink);
-  }
-
   .footer-columns {
     display: grid;
     grid-template-columns: repeat(2, max-content);
@@ -160,11 +162,7 @@ const contact = [
 
   .footer-column a,
   .footer-column button {
-    color: var(--color-muted);
-    font-size: 0.875rem;
-    line-height: 1.4;
     text-align: left;
-    text-decoration: none;
   }
 
   .footer-column button {
@@ -172,6 +170,7 @@ const contact = [
     border: none;
     background: transparent;
     cursor: pointer;
+    font: inherit;
   }
 
   .footer-column a:hover,

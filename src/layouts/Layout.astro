@@ -125,6 +125,10 @@ const iconVersion = '3';
     }
     {showCommentMode && !adminReview && <CommentMode />}
     <script>
+      import { enhanceSelects } from '../lib/dropdown';
+
+      enhanceSelects();
+
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const targets = document.querySelectorAll<HTMLElement>(
         '.project-card, .case-study-content > section, .about-card',

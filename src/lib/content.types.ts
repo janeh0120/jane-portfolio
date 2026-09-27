@@ -32,8 +32,8 @@ export type SiteContent = {
     subhead?: string;
   };
   experience: {
-    current: { label: string; href: string; role?: string };
-    previous: { label: string; href: string; role?: string }[];
+    current: { label: string; href: string; role?: string; years?: string };
+    previous: { label: string; href: string; role?: string; years?: string }[];
     note?: string;
   };
   projects: Project[];

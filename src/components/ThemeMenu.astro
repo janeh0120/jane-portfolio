@@ -27,18 +27,20 @@ const options = [
     </span>
     <span data-theme-label>System</span>
   </button>
-  <div class="theme-menu-popover" id="theme-menu-list" role="menu" hidden>
+  <div class="dropdown-menu theme-menu-popover" id="theme-menu-list" role="menu" hidden>
     {
       options.map((option) => (
         <button
           type="button"
-          class="theme-menu-option"
+          class="dropdown-option"
           role="menuitemradio"
           data-theme-choice={option.id}
           aria-checked="false"
         >
-          <Icon name="lucide:check" class="theme-menu-check" aria-hidden="true" />
-          <Icon name={option.icon} aria-hidden="true" />
+          <span class="dropdown-check" aria-hidden="true">
+            <Icon name="lucide:check" />
+          </span>
+          <Icon name={option.icon} class="theme-menu-option-icon" aria-hidden="true" />
           {option.label}
         </button>
       ))
@@ -70,7 +72,7 @@ const options = [
 
   .theme-menu-button:hover,
   .theme-menu-button[aria-expanded='true'] {
-    background: var(--color-border);
+    background: var(--color-border-strong);
   }
 
   .theme-menu-button:focus-visible,
@@ -101,45 +103,17 @@ const options = [
     right: 0;
     bottom: calc(100% + 0.55rem);
     z-index: 30;
-    --menu-pad: 0.4rem;
     min-width: 11.5rem;
-    padding: var(--menu-pad);
-    border: 1px solid var(--color-hairline);
-    border-radius: calc(var(--radius-card) + var(--menu-pad) + 1px);
-    background: var(--color-canvas);
-    box-shadow: 0 16px 40px rgb(0 0 0 / 14%);
   }
 
   .theme-menu-popover[hidden] {
     display: none;
   }
-
-  .theme-menu-option {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    width: 100%;
-    border: none;
-    border-radius: var(--radius-card);
-    background: transparent;
-    padding: 0.6rem 0.75rem;
-    text-align: left;
-  }
-
-  .theme-menu-option[aria-checked='true'] {
-    background: var(--color-surface);
-  }
-
-  .theme-menu-check {
-    opacity: 0;
-  }
-
-  .theme-menu-option[aria-checked='true'] .theme-menu-check {
-    opacity: 1;
-  }
 </style>
 
 <script>
+  import { attachDropdownHighlight } from '../lib/dropdown';
+
   const labels: Record<string, string> = {
     dark: 'Dark',
     light: 'Light',
@@ -157,6 +131,7 @@ const options = [
     const label = menu.querySelector<HTMLElement>('[data-theme-label]');
     const options = menu.querySelectorAll<HTMLButtonElement>('[data-theme-choice]');
     if (!button || !popover || !label) return;
+    attachDropdownHighlight(popover);
 
     function paint() {
       const theme = currentTheme();
