@@ -21,23 +21,29 @@ const MAX_EDGE = 900;
 const WEBP_QUALITY = 72;
 
 const VIDEO_RE = /\.(mp4|webm|mov|m4v)$/i;
+const GIF_RE = /\.gif$/i;
+// GIFs keep their animation in the grid; smaller and lighter so they stay quick to load.
+const ANIMATED_MAX_EDGE = 600;
+const ANIMATED_WEBP_QUALITY = 60;
 
 async function writeImageThumb(srcAbs, outAbs) {
-  const image = sharp(srcAbs, { animated: false, pages: 1 });
+  const animated = GIF_RE.test(srcAbs);
+  const maxEdge = animated ? ANIMATED_MAX_EDGE : MAX_EDGE;
+  const image = sharp(srcAbs, animated ? { animated: true } : { animated: false, pages: 1 });
   const meta = await image.metadata();
-  const width = meta.width ?? MAX_EDGE;
-  const height = meta.height ?? MAX_EDGE;
-  const scale = Math.min(1, MAX_EDGE / Math.max(width, height));
+  const width = meta.width ?? maxEdge;
+  // For animated images, metadata height spans every frame stacked; use one frame's height.
+  const height = (animated ? meta.pageHeight : meta.height) ?? maxEdge;
+  const scale = Math.min(1, maxEdge / Math.max(width, height));
 
-  await image
-    .rotate()
+  await (animated ? image : image.rotate())
     .resize({
       width: Math.round(width * scale),
       height: Math.round(height * scale),
       fit: 'inside',
       withoutEnlargement: true,
     })
-    .webp({ quality: WEBP_QUALITY, effort: 4 })
+    .webp({ quality: animated ? ANIMATED_WEBP_QUALITY : WEBP_QUALITY, effort: 4 })
     .toFile(outAbs);
 }
 
