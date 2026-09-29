@@ -1,10 +1,21 @@
 ---
 import { site } from '../data/site';
 
+interface Props {
+  /** Labels of previous roles to list first, in order. */
+  order?: string[];
+}
+
+const { order = [] } = Astro.props;
 const { current, previous } = site.experience;
+const rank = (label: string) => {
+  const i = order.indexOf(label);
+  return i === -1 ? order.length : i;
+};
+const sortedPrevious = [...previous].sort((a, b) => rank(a.label) - rank(b.label));
 const rows = [
   { ...current, when: current.years ?? 'Currently' },
-  ...previous.map((place, index) => ({
+  ...sortedPrevious.map((place, index) => ({
     ...place,
     when: place.years ?? (index === 0 ? 'Previously' : ''),
   })),

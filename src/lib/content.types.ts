@@ -37,6 +37,12 @@ export type SiteContent = {
     note?: string;
   };
   projects: Project[];
+  /** Overrides for the /brand homepage. */
+  brand?: {
+    subhead?: string;
+    /** Experience labels to list first, in order. */
+    experienceOrder?: string[];
+  };
   about: {
     heading: string;
     paragraphs: string[];

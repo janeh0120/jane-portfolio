@@ -105,6 +105,10 @@
       "comingSoon": false
     }
   ],
+  "brand": {
+    "subhead": "I care about people and want to design brands around them.",
+    "experienceOrder": ["GWSK", "Simple Ventures"]
+  },
   "about": {
     "heading": "A little bit more about me!",
     "paragraphs": [

@@ -1,0 +1,441 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Experience from '../components/Experience.astro';
+import ExternalLinkIcon from '../components/ExternalLinkIcon.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { site } from '../data/site';
+import { brandWork } from '../data/brand-work';
+
+const base = import.meta.env.BASE_URL;
+const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
+---
+
+<Layout title="Brand | Jane Hou's Portfolio">
+  <Header />
+  <main class="brand text-body">
+    <section class="brand-strip brand-intro page-frame" data-comment-id="brand-intro">
+      <Hero subhead={site.brand?.subhead} />
+      <Experience order={site.brand?.experienceOrder} />
+    </section>
+
+    {
+      brandWork.map((project, projectIndex) => (
+        <section
+          class="brand-project"
+          id={project.slug}
+          data-comment-id={`brand-${project.slug}`}
+          data-color-modes={project.colorModes ? '' : undefined}
+          data-mode={project.colorModes ? 'light' : undefined}
+        >
+          <div class="brand-gallery">
+            {project.colorModes && (
+              <div class="brand-mode-toggle" role="group" aria-label="Illustration colour mode">
+                <span class="brand-mode-thumb" aria-hidden="true" />
+                <button type="button" class="brand-mode-option" data-mode-choice="light" aria-pressed="true">
+                  Light
+                </button>
+                <button type="button" class="brand-mode-option" data-mode-choice="dark" aria-pressed="false">
+                  Dark
+                </button>
+              </div>
+            )}
+            <div class="brand-row" tabindex="0" role="region" aria-label={`${project.title} images`}>
+              {project.media.map((item, index) => {
+                const src = `${base}${item.src}`;
+                const style = `aspect-ratio: ${item.width} / ${item.height}`;
+                return item.youtubeId ? (
+                  <iframe
+                    class="brand-media brand-embed"
+                    style={style}
+                    src={`https://www.youtube-nocookie.com/embed/${item.youtubeId}?rel=0`}
+                    title={item.alt}
+                    loading="lazy"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen
+                  />
+                ) : isVideo(item.src) ? (
+                  <video
+                    class="brand-media"
+                    style={style}
+                    src={src}
+                    aria-label={item.alt}
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                    preload="metadata"
+                    data-brand-video
+                  />
+                ) : item.darkSrc ? (
+                  <div class="brand-media brand-media--themed" style={style} role="img" aria-label={item.alt}>
+                    <img class="brand-mode-light" src={src} alt="" width={item.width} height={item.height} loading="lazy" decoding="async" />
+                    <img class="brand-mode-dark" src={`${base}${item.darkSrc}`} alt="" width={item.width} height={item.height} loading="lazy" decoding="async" />
+                  </div>
+                ) : (
+                  <img
+                    class="brand-media"
+                    style={style}
+                    src={src}
+                    alt={item.alt}
+                    width={item.width}
+                    height={item.height}
+                    loading={projectIndex === 0 && index < 3 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                );
+              })}
+            </div>
+          </div>
+
+          <div class="brand-strip page-frame">
+            <div class="brand-meta">
+              <h2 class="text-ink brand-title">{project.title}</h2>
+              <dl class="brand-details">
+                {project.details.map((detail) => (
+                  <div>
+                    <dt class="text-muted">{detail.label}</dt>
+                    <dd class="text-ink">{detail.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <div class="brand-body">
+              {project.description.map((paragraph) => <p class="text-ink">{paragraph}</p>)}
+              {project.link && (
+                <a href={project.link.href} target="_blank" rel="noopener noreferrer" class="text-link text-body text-ink brand-link">
+                  {project.link.label}
+                  <ExternalLinkIcon />
+                </a>
+              )}
+            </div>
+          </div>
+        </section>
+      ))
+    }
+  </main>
+  <SiteFooter />
+</Layout>
+
+<style>
+  /* Full-width page; text strips use .page-frame, image rows bleed to both screen edges.
+     --gutter matches .page-frame's side margin so rows start and end in line with the text. */
+  .brand {
+    --brand-row-height: clamp(18rem, 62svh, 40rem);
+    --gutter: max(1.5rem, calc((100% - 1400px) / 2));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7rem;
+    padding-block: 2.5rem 7rem;
+  }
+
+  /* Two halves, like a spread: left for who/what, right for the story */
+  .brand-strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem;
+  }
+
+  /* Experience list hugs its text instead of filling the column. Its layout switch is a
+     container query, so this strip becomes the container and the list is free to shrink. */
+  .brand-intro {
+    container-type: inline-size;
+  }
+
+  .brand-intro :global(.experience-list) {
+    container-type: normal;
+    justify-self: start;
+    align-self: start;
+    width: max-content;
+    max-width: 100%;
+  }
+
+  .brand-project {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    scroll-margin-top: 7rem;
+  }
+
+  /* Images keep their natural proportions at one height; extras scroll sideways */
+  .brand-row {
+    display: flex;
+    gap: 0.5rem;
+    height: var(--brand-row-height);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    padding: 0 var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    box-sizing: content-box;
+  }
+
+  .brand-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .brand-row:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  .brand-media {
+    flex: none;
+    display: block;
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    border-radius: var(--radius-card);
+    background: var(--color-surface-strong);
+    scroll-snap-align: start;
+  }
+
+  /* Light and dark artwork stacked; the section's data-mode picks which shows */
+  .brand-media--themed {
+    position: relative;
+    display: grid;
+    overflow: hidden;
+  }
+
+  .brand-media--themed img {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 320ms ease;
+  }
+
+  [data-mode='light'] .brand-mode-dark,
+  [data-mode='dark'] .brand-mode-light {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-media--themed img {
+      transition: none;
+    }
+  }
+
+  /* Holds the toggle in place over the row while the images scroll underneath */
+  .brand-gallery {
+    position: relative;
+    min-width: 0;
+  }
+
+  .brand-embed {
+    border: 0;
+    background: #000;
+  }
+
+  .brand-mode-toggle {
+    --toggle-pad: 0.25rem;
+    position: absolute;
+    top: 0.75rem;
+    left: calc(var(--gutter) + 0.75rem);
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: var(--toggle-pad);
+    border-radius: 999px;
+    background: var(--color-bar-strong);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
+  }
+
+  /* Pill that slides between the two options */
+  .brand-mode-thumb {
+    position: absolute;
+    top: var(--toggle-pad);
+    bottom: var(--toggle-pad);
+    left: var(--toggle-pad);
+    width: calc(50% - var(--toggle-pad));
+    border-radius: 999px;
+    background: var(--color-ink);
+    transition: transform 320ms cubic-bezier(0.3, 0.7, 0.2, 1);
+  }
+
+  [data-mode='dark'] .brand-mode-thumb {
+    transform: translateX(100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .brand-mode-thumb {
+      transition: none;
+    }
+  }
+
+  .brand-mode-option {
+    position: relative;
+    padding: 0.3rem 0.9rem;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-muted);
+    font: inherit;
+    cursor: pointer;
+    transition: color 200ms ease;
+  }
+
+  .brand-mode-option:hover {
+    color: var(--color-ink);
+  }
+
+  /* Selected label sits on the ink pill, so it takes the canvas colour */
+  .brand-mode-option[aria-pressed='true'] {
+    color: var(--color-canvas);
+  }
+
+  .brand-mode-option:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .brand-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+    align-content: start;
+  }
+
+  .brand-meta p,
+  .brand-title {
+    margin: 0;
+  }
+
+  /* Same type as the homepage intro (Hero.astro) */
+  .brand-title {
+    align-self: start;
+    font-family: var(--font-sans);
+    font-size: clamp(1.75rem, calc(3.4vw - 2px), 2.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+  }
+
+
+  .brand-body {
+    display: grid;
+    gap: 0.875rem;
+    align-content: start;
+    max-width: 38rem;
+  }
+
+  .brand-body p {
+    margin: 0;
+  }
+
+  /* Label above value, stacked down the column */
+  .brand-details {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    margin: 0;
+  }
+
+  .brand-details dd {
+    margin: 0;
+  }
+
+  .brand-link {
+    justify-self: start;
+  }
+
+  @media (max-width: 767px) {
+    .brand {
+      --brand-row-height: 16rem;
+      --gutter: 1rem;
+      gap: 4.5rem;
+      padding-top: 1rem;
+    }
+
+    .brand-strip {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.5rem;
+    }
+
+    .brand-meta {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.75rem;
+    }
+  }
+</style>
+
+<script>
+  // Light/dark toggle: follows the site's colour mode, flips once on its own as a hint,
+  // and the viewer can switch it any time.
+  const root = document.documentElement;
+  // The page scrolls inside #site-canvas when it's a scroll container; measure visibility against it.
+  const canvas = document.getElementById('site-canvas');
+  const viewRoot = canvas && /auto|scroll/.test(getComputedStyle(canvas).overflowY) ? canvas : null;
+  const siteMode = () => (root.classList.contains('theme-dark') ? 'dark' : 'light');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-color-modes]').forEach((section) => {
+    const options = section.querySelectorAll<HTMLButtonElement>('[data-mode-choice]');
+    let touched = false;
+
+    const setMode = (mode: string) => {
+      section.dataset.mode = mode;
+      options.forEach((option) => option.setAttribute('aria-pressed', String(option.dataset.modeChoice === mode)));
+    };
+
+    options.forEach((option) =>
+      option.addEventListener('click', () => {
+        touched = true;
+        setMode(option.dataset.modeChoice ?? 'light');
+      }),
+    );
+
+    setMode(siteMode());
+    let lastSiteMode = siteMode();
+    new MutationObserver(() => {
+      const mode = siteMode();
+      if (mode === lastSiteMode) return;
+      lastSiteMode = mode;
+      setMode(mode);
+    }).observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    // Hint: a second after the illustrations come into view, flip to the other mode once.
+    if (!reduceMotion) {
+      const hint = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          hint.disconnect();
+          window.setTimeout(() => {
+            if (!touched) setMode(section.dataset.mode === 'dark' ? 'light' : 'dark');
+          }, 1000);
+        },
+        { root: viewRoot, threshold: 0.5 },
+      );
+      const row = section.querySelector('.brand-row');
+      if (row) hint.observe(row);
+    }
+  });
+
+  const videos = [...document.querySelectorAll<HTMLVideoElement>('video[data-brand-video]')];
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Respect reduced motion: don't autoplay; give the viewer controls instead.
+    videos.forEach((video) => {
+      video.pause();
+      video.controls = true;
+    });
+  } else {
+    // Browsers pause muted autoplay video once it leaves view and don't reliably resume it
+    // inside a sideways-scrolling row, so play only while visible.
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(({ target, isIntersecting }) => {
+        const video = target as HTMLVideoElement;
+        // If the browser still blocks autoplay (e.g. Low Power Mode), offer a play button instead of a frozen frame.
+        if (isIntersecting) video.play().catch(() => (video.controls = true));
+        else video.pause();
+      });
+    }, { root: viewRoot });
+    videos.forEach((video) => observer.observe(video));
+  }
+</script>

@@ -1,7 +1,12 @@
 ---
 import { site } from '../data/site';
 
-const intro = [site.hero.headline, site.hero.subhead].filter(Boolean).join(' ');
+interface Props {
+  subhead?: string;
+}
+
+const { subhead = site.hero.subhead } = Astro.props;
+const intro = [site.hero.headline, subhead].filter(Boolean).join(' ');
 ---
 
 <div class="home-hero">
