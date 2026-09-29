@@ -5,6 +5,8 @@ interface Props {
   wide?: boolean;
   src?: string;
   placeholder?: boolean;
+  /** Play a video like a GIF: muted, looping, no controls. */
+  loop?: boolean;
 }
 
 const {
@@ -13,6 +15,7 @@ const {
   wide = false,
   src = 'images/placeholders/case-study-filler.png',
   placeholder = false,
+  loop = false,
 } = Astro.props;
 const base = import.meta.env.BASE_URL;
 const imageSrc = src.startsWith('http') ? src : `${base}${src.replace(/^\//, '')}`;
@@ -22,9 +25,23 @@ const isVideo = /\.(mp4|webm|mov)$/i.test(src);
 <figure class:list={['case-study-figure', wide && 'case-study-figure--wide', placeholder && 'case-study-figure--placeholder']}>
   {
     isVideo ? (
-      <video src={imageSrc} controls muted playsinline preload="metadata" />
+      loop ? (
+        <video src={imageSrc} autoplay loop muted playsinline preload="metadata" aria-label={alt} data-gif-video />
+      ) : (
+        <video src={imageSrc} controls muted playsinline preload="metadata" />
+      )
     ) : (
       <img src={imageSrc} alt={alt} loading="lazy" decoding="async" />
     )
   }
 </figure>
+
+<script>
+  // Reduced motion: don't autoplay looping videos; give the viewer a play button instead.
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLVideoElement>('video[data-gif-video]').forEach((video) => {
+      video.pause();
+      video.controls = true;
+    });
+  }
+</script>

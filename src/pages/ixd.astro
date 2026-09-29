@@ -6,9 +6,8 @@ const img = (file: string) => `images/case-studies/ixd/${file}`;
 
 const nav = [
   { label: 'Intro', href: '#intro' },
-  { label: 'Visuals', href: '#visuals' },
   { label: 'Exploration', href: '#exploration' },
-  { label: 'Reflection', href: '#reflection' },
+  { label: 'Takeaways', href: '#takeaways' },
 ];
 ---
 
@@ -16,8 +15,8 @@ const nav = [
   title="IXD"
   heading="A design community shouldn't graduate without a shared experience."
   role="Creative Director, Designer"
-  team="Figma, Figma Weave, Photoshop"
-  teamLabel="Tools"
+  team="RGD Student Awards Honourable Mention"
+  teamLabel="Recognition"
   timeline="1 week"
   projectType="Brand, Community"
   nav={nav}
@@ -30,21 +29,15 @@ const nav = [
 >
   <section id="intro" data-comment-id="ixd-intro">
     <h3>Intro</h3>
-    <p class="lead">
-      My program didn’t have a year-end show. I designed an experience-led event concept to give
-      graduating interaction designers a shared moment.
+    <p class="heading text-ink">
+      For the first time since COVID, my program didn’t have a year-end show. I took a hoodie design
+      that won the popular vote among students in my program and used it to build a brand concept
+      for a year-end show I’d run if our faculty doesn’t hold one.
     </p>
-    <p class="lead">
-      It started with a hoodie design students already loved, then grew into a full brand system for
-      the night.
-    </p>
-  </section>
-
-  <section id="visuals" data-comment-id="ixd-visuals">
-    <h3>Visuals</h3>
-    <p class="lead">
-      Minimal, bold, and honest. Typography stays quiet so graphic moments and interactive
-      touchpoints can lead.
+    <p class="heading text-ink">
+      The concept stems from our collective struggle to explain what interaction design means to
+      others. Its brand touchpoints consider not just the visual design, but how the audience
+      interacts with it.
     </p>
 
     <div class="case-study-figure-row">
@@ -61,7 +54,8 @@ const nav = [
     </div>
 
     <CaseStudyFigure
-      src={img('tote-bag.png')}
+      src={img('tote-bag.mp4')}
+      loop
       alt="Black tote bag with IXD lattice icons, pin, and Best in Show ribbon"
       caption="Tote bag for collecting pins and awards"
       wide
@@ -74,7 +68,8 @@ const nav = [
         caption="Grad name tag"
       />
       <CaseStudyFigure
-        src={img('portfolio-keychain.png')}
+        src={img('portfolio-keychain.mp4')}
+        loop
         alt="Portfolio keychain and ID holder clipped to jeans with ixd? yes tag"
         caption="Portfolio keychain + event tag"
       />
@@ -105,7 +100,8 @@ const nav = [
       wide
     />
     <CaseStudyFigure
-      src={img('sticker-sheet.png')}
+      src={img('sticker-sheet.mp4')}
+      loop
       alt="IXD sticker sheet and year end party photo sticker"
       caption="Stickers and keepsakes"
       wide
@@ -122,15 +118,37 @@ const nav = [
     />
   </section>
 
-  <section id="reflection" data-comment-id="ixd-reflection">
-    <h3>Reflection</h3>
-    <p class="lead">
-      Don’t wait for permission. Design the community experience you want to see, then find the
-      tools to get there.
-    </p>
-    <p class="lead">
-      Next: pitch faculty and sponsors, and build it with peers. An event this size needs a
-      community behind it.
+  <section id="takeaways" data-comment-id="ixd-takeaways">
+    <h3>Takeaways</h3>
+    <p class="heading text-ink">
+      Don’t wait for permission to create the kind of design you want to see. Design is a powerful
+      tool for communicating a vision and supporting the causes I find meaningful.
     </p>
   </section>
 </CaseStudyLayout>
+
+<style>
+  /* Match the inline feedback case study's statements (the page title's .heading style);
+     overrides the shared case-study paragraph size */
+  #intro .heading,
+  #takeaways .heading {
+    font-family: var(--font-serif);
+    font-size: clamp(1.625rem, calc(3.2vw - 2px), 2.375rem);
+    line-height: 1.2;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+  }
+
+  #intro .heading + .heading {
+    margin-top: 1.25rem;
+  }
+
+  /* Stack images with the same 1rem gap used between side-by-side images */
+  #intro :global(:is(.case-study-figure, .case-study-figure-row) + :is(.case-study-figure, .case-study-figure-row)) {
+    margin-top: 1rem;
+  }
+
+  #intro :global(.case-study-figure-row > .case-study-figure) {
+    margin-top: 0;
+  }
+</style>
