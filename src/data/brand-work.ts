@@ -59,10 +59,10 @@ export const brandWork: BrandProject[] = [
         height: 1024,
       },
       {
-        src: ixd('tote-bag.png'),
+        src: ixd('tote-bag.mp4'),
         alt: 'Black tote bag with IXD lattice icons, pin, and Best in Show ribbon',
-        width: 1024,
-        height: 576,
+        width: 1920,
+        height: 1080,
       },
       {
         src: ixd('name-tag.png'),
@@ -71,10 +71,10 @@ export const brandWork: BrandProject[] = [
         height: 1024,
       },
       {
-        src: ixd('portfolio-keychain.png'),
+        src: ixd('portfolio-keychain.mp4'),
         alt: 'Portfolio keychain and ID holder clipped to jeans with ixd? yes tag',
-        width: 910,
-        height: 1024,
+        width: 960,
+        height: 1080,
       },
       {
         src: ixd('connect-the-dots.png'),
@@ -101,10 +101,10 @@ export const brandWork: BrandProject[] = [
         height: 576,
       },
       {
-        src: ixd('sticker-sheet.png'),
+        src: ixd('sticker-sheet.mp4'),
         alt: 'IXD sticker sheet and year end party photo sticker',
-        width: 1024,
-        height: 576,
+        width: 1920,
+        height: 1080,
       },
     ],
   },
