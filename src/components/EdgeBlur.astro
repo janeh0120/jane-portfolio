@@ -1,0 +1,68 @@
+---
+/**
+ * Progressive blur at the top and bottom edges of the viewport.
+ * Six stacked backdrop-blur layers at doubling strengths, each masked to its own overlapping band,
+ * so content softens smoothly as it scrolls under an edge. The page's existing grain (body::after)
+ * shows through, giving the grainy look — no extra grain layer, which read as a darker bar.
+ * Purely decorative: pointer-events none, and browsers without backdrop-filter simply show nothing.
+ */
+const layers = [1, 2, 4, 8, 16, 32];
+---
+
+<div class="edge-blur edge-blur--top" aria-hidden="true">
+  {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
+</div>
+<div class="edge-blur edge-blur--bottom" aria-hidden="true">
+  {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
+</div>
+
+<style>
+  .edge-blur {
+    position: fixed;
+    left: 0;
+    right: 0;
+    /* above page content and the homepage lens (z 5), below the footer (z 10) and nav (z 50) */
+    z-index: 8;
+    pointer-events: none;
+  }
+
+  .edge-blur--top {
+    top: 0;
+    height: clamp(6rem, 14vh, 9rem);
+    /* strongest at the very top edge */
+    --edge-direction: 0deg;
+  }
+
+  .edge-blur--bottom {
+    bottom: 0;
+    height: clamp(4.5rem, 10vh, 7rem);
+    --edge-direction: 180deg;
+  }
+
+  .edge-blur-layer {
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+  }
+
+  /* Each layer covers its own slice; slices overlap so the blur ramps smoothly toward the edge */
+  .edge-blur-layer:nth-child(1) {
+    mask-image: linear-gradient(var(--edge-direction), transparent 12.5%, #000 25%, #000 37.5%, transparent 50%);
+  }
+  .edge-blur-layer:nth-child(2) {
+    mask-image: linear-gradient(var(--edge-direction), transparent 25%, #000 37.5%, #000 50%, transparent 62.5%);
+  }
+  .edge-blur-layer:nth-child(3) {
+    mask-image: linear-gradient(var(--edge-direction), transparent 37.5%, #000 50%, #000 62.5%, transparent 75%);
+  }
+  .edge-blur-layer:nth-child(4) {
+    mask-image: linear-gradient(var(--edge-direction), transparent 50%, #000 62.5%, #000 75%, transparent 87.5%);
+  }
+  .edge-blur-layer:nth-child(5) {
+    mask-image: linear-gradient(var(--edge-direction), transparent 62.5%, #000 75%, #000 87.5%, transparent);
+  }
+  .edge-blur-layer:nth-child(6) {
+    mask-image: linear-gradient(var(--edge-direction), transparent 75%, #000 87.5%, #000);
+  }
+</style>

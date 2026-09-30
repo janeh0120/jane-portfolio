@@ -3,6 +3,7 @@ import '../styles/global.css';
 import '../styles/comment-mode.css';
 import { site } from '../data/site';
 import CommentMode from '../components/CommentMode.astro';
+import EdgeBlur from '../components/EdgeBlur.astro';
 
 interface Props {
   title?: string;
@@ -132,6 +133,7 @@ const iconVersion = '3';
         <div id="site-shell" class="site-shell">
           <div id="site-canvas" class="site-canvas">
             <slot />
+            <EdgeBlur />
           </div>
         </div>
       ) : (
