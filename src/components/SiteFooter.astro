@@ -99,6 +99,12 @@ const contact = [
 </footer>
 
 <style>
+  /* Sit above decorative page layers (e.g. the homepage lens effect) */
+  footer {
+    position: relative;
+    z-index: 10;
+  }
+
   .footer {
     display: flex;
     flex-direction: column;

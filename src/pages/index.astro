@@ -4,9 +4,8 @@ import Header from '../components/Header.astro';
 import LogoScrollIntro from '../components/LogoScrollIntro.astro';
 import Hero from '../components/Hero.astro';
 import Experience from '../components/Experience.astro';
-import ProjectWheel from '../components/ProjectWheel.astro';
+import ProjectColumn from '../components/ProjectColumn.astro';
 import SiteFooter from '../components/SiteFooter.astro';
-import { site } from '../data/site';
 ---
 
 <Layout>
@@ -14,20 +13,14 @@ import { site } from '../data/site';
   <Header />
   <div class="home-intro-content" id="home-intro-content">
     <main>
-      <section
-        id="projects"
-        class="home-stage page-frame"
-        data-home-stage
-        data-comment-id="project-grid"
-        style={`--wheel-count: ${site.projects.length}`}
-      >
-        <div class="home-stage-pin">
+      <section id="projects" class="home-layout page-frame" data-comment-id="project-grid">
+        <div class="home-copy-pin">
           <div class="home-copy">
             <Hero />
             <Experience />
           </div>
-          <ProjectWheel />
         </div>
+        <ProjectColumn />
       </section>
     </main>
     <SiteFooter />
@@ -35,78 +28,46 @@ import { site } from '../data/site';
 </Layout>
 
 <style>
-  .home-stage {
-    --home-header-offset: 5.55rem;
-    height: calc(100svh + (var(--wheel-count) - 1) * 78svh);
-  }
-
-  .home-stage-pin {
-    position: sticky;
-    top: var(--home-header-offset);
+  .home-layout {
+    --home-header-offset: 6.55rem;
     display: grid;
     grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
     gap: 2.5rem;
-    align-items: stretch;
+    align-items: start;
+  }
+
+  /* Intro and experience stay put, centred vertically, while the projects scroll past */
+  .home-copy-pin {
+    position: sticky;
+    top: var(--home-header-offset);
     height: calc(100svh - var(--home-header-offset));
+    display: flex;
+    align-items: center;
   }
 
   .home-copy {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     gap: 2.5rem;
-    min-height: 0;
-    padding-block: 3rem 7rem;
-  }
-
-  @media (min-width: 768px) {
-    .home-stage {
-      --home-header-offset: 6.55rem;
-    }
+    padding-block: 3rem;
   }
 
   @media (max-width: 767px) {
-    .home-stage {
-      height: auto;
-    }
-
-    .home-stage-pin {
-      position: static;
+    .home-layout {
+      --home-header-offset: 5.55rem;
       display: flex;
       flex-direction: column;
-      height: auto;
       gap: 1.5rem;
-      padding-bottom: 1rem;
+    }
+
+    .home-copy-pin {
+      position: static;
+      height: auto;
     }
 
     .home-copy {
-      justify-content: flex-start;
       gap: 1.5rem;
       padding-block: 0.35rem 0;
-    }
-  }
-
-  @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-    .home-stage {
-      height: auto;
-    }
-
-    .home-stage-pin {
-      position: static;
-      height: auto;
-      display: grid;
-      padding-block: 1.5rem 3rem;
-    }
-  }
-
-  @media (min-width: 768px) and (scripting: none) {
-    .home-stage {
-      height: auto;
-    }
-
-    .home-stage-pin {
-      position: static;
-      height: auto;
     }
   }
 </style>
