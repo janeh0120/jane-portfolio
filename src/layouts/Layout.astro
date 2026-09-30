@@ -55,6 +55,18 @@ const iconVersion = '3';
         });
       })();
     </script>
+    <script is:inline>
+      // Scroll-reveal hides content until JS fades it in. Only opt in once JS is running,
+      // and if the reveal script hasn't started within 3s (blocked, failed, or slow),
+      // drop the opt-in so nothing stays invisible.
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('reveal-ready');
+        setTimeout(function () {
+          if (!root.hasAttribute('data-reveal-active')) root.classList.remove('reveal-ready');
+        }, 3000);
+      })();
+    </script>
     <link rel="icon" href={`${base}favicon.svg?v=${iconVersion}`} type="image/svg+xml" sizes="any" />
     <link
       rel="icon"
@@ -72,6 +84,9 @@ const iconVersion = '3';
     <link rel="shortcut icon" href={`${base}favicon.ico?v=${iconVersion}`} />
     <link rel="apple-touch-icon" href={`${base}apple-touch-icon.png?v=${iconVersion}`} />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Nearly all text uses regular or bold; fetch them early to shorten the font swap -->
+    <link rel="preload" href={`${base}fonts/texgyreheros-regular.woff2`} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={`${base}fonts/texgyreheros-bold.woff2`} as="font" type="font/woff2" crossorigin />
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -127,8 +142,14 @@ const iconVersion = '3';
     <script>
       import { enhanceSelects } from '../lib/dropdown';
 
-      enhanceSelects();
+      // A failure here shouldn't stop content from being revealed below.
+      try {
+        enhanceSelects();
+      } catch (error) {
+        console.error(error);
+      }
 
+      document.documentElement.setAttribute('data-reveal-active', '');
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const targets = document.querySelectorAll<HTMLElement>(
         '.project-card, .case-study-content > section, .about-card',

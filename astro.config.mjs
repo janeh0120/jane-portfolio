@@ -11,6 +11,11 @@ const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
 export default defineConfig({
   site: vercelUrl ?? 'http://localhost:4321',
   base: '/',
+  // Ship CSS inside each page's HTML so styling can't fail on a separate request
+  // (extensions, flaky networks, and proxies were leaving some visitors with an unstyled page).
+  build: {
+    inlineStylesheets: 'always',
+  },
   redirects: {
     '/extra': '/play',
   },

@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 4321
+    },
+    {
+      "name": "static-build",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4400", "--directory", ".vercel/output/static"],
+      "port": 4400
     }
   ]
 }
