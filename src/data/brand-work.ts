@@ -145,13 +145,13 @@ export const brandWork: BrandProject[] = [
     media: [
       { src: gwsk('gwsk-logo.png'), alt: 'GWSK logo mark and wordmark on dark background', width: 1920, height: 1080 },
       {
-        src: gwsk('gwsk-assets.png'),
+        src: gwsk('gwsk-assets.webp'),
         alt: 'GWSK brand assets including process step UI and presentation slide',
         width: 1920,
         height: 1080,
       },
       {
-        src: gwsk('presentation-slides.png'),
+        src: gwsk('presentation-slides.webp'),
         alt: 'GWSK brand guidelines presentation slides',
         width: 1920,
         height: 1080,

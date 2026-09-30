@@ -21,13 +21,13 @@ const MAX_EDGE = 900;
 const WEBP_QUALITY = 72;
 
 const VIDEO_RE = /\.(mp4|webm|mov|m4v)$/i;
-const GIF_RE = /\.gif$/i;
-// GIFs keep their animation in the grid; smaller and lighter so they stay quick to load.
+// Animated images (GIF or animated WebP) keep their animation in the grid;
+// smaller and lighter so they stay quick to load.
 const ANIMATED_MAX_EDGE = 600;
 const ANIMATED_WEBP_QUALITY = 60;
 
 async function writeImageThumb(srcAbs, outAbs) {
-  const animated = GIF_RE.test(srcAbs);
+  const animated = ((await sharp(srcAbs, { animated: true }).metadata()).pages ?? 1) > 1;
   const maxEdge = animated ? ANIMATED_MAX_EDGE : MAX_EDGE;
   const image = sharp(srcAbs, animated ? { animated: true } : { animated: false, pages: 1 });
   const meta = await image.metadata();
