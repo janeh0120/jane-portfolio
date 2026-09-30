@@ -158,14 +158,17 @@ export function startProjectLens(column: HTMLElement): () => void {
     ctx.clearColor(0, 0, 0, 0);
     canvas = ctx.canvas as HTMLCanvasElement;
     canvas.setAttribute('aria-hidden', 'true');
-    Object.assign(canvas.style, {
-      position: 'fixed',
-      inset: '0',
-      width: '100vw',
-      height: '100vh',
-      pointerEvents: 'none',
-      zIndex: '5',
-    });
+    // The page scrolls inside #site-canvas (which shrinks beside the comments sidebar in comment
+    // mode). Stick the lens to that container's visible area, so it matches its width and rounded
+    // corners and never covers the sidebar. Without it, fall back to covering the viewport.
+    const host = document.getElementById('site-canvas');
+    Object.assign(
+      canvas.style,
+      host
+        ? // height 0 until the first frame sizes it, so the canvas never pushes the page down
+          { position: 'sticky', top: '0', display: 'block', width: '100%', height: '0px', marginBottom: '0px', pointerEvents: 'none', zIndex: '5' }
+        : { position: 'fixed', inset: '0', width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: '5' },
+    );
 
     const quad = new Geometry(ctx, {
       position: { size: 2, data: new Float32Array([-0.5, -0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5]) },
@@ -248,8 +251,21 @@ export function startProjectLens(column: HTMLElement): () => void {
       frame = 0;
       if (stopped) return;
       try {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
+        // Visible area the lens covers, and its top-left corner in viewport coordinates
+        let w = window.innerWidth;
+        let h = window.innerHeight;
+        let ox = 0;
+        let oy = 0;
+        if (host) {
+          const box = host.getBoundingClientRect();
+          w = host.clientWidth;
+          h = host.clientHeight;
+          ox = box.left + host.clientLeft;
+          oy = box.top + host.clientTop;
+          // sticky to the top of the scroll area without taking up space in the page flow
+          canvas!.style.height = `${h}px`;
+          canvas!.style.marginBottom = `-${h}px`;
+        }
         const dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(MAX_BUFFER_PIXELS / (w * h)));
         renderer.dpr = dpr;
         renderer.setSize(w, h);
@@ -263,7 +279,8 @@ export function startProjectLens(column: HTMLElement): () => void {
         const zonePx = h * ZONE;
         const handover: Card[] = [];
         for (const card of cards) {
-          const rect = card.media.getBoundingClientRect();
+          const r = card.media.getBoundingClientRect();
+          const rect = { left: r.left - ox, top: r.top - oy, bottom: r.bottom - oy, width: r.width, height: r.height };
           const inZone = rect.top < zonePx || rect.bottom > h - zonePx;
           const onScreen = rect.bottom > 0 && rect.top < h;
           const drawGl = visible && card.ready && inZone && onScreen;
@@ -278,14 +295,14 @@ export function startProjectLens(column: HTMLElement): () => void {
           // Captions fade out as they reach a lens zone (images are what pass through the lens)
           if (card.caption) {
             const c = card.caption.getBoundingClientRect();
-            const edge = Math.min(c.top, h - c.bottom);
+            const edge = Math.min(c.top - oy, h - (c.bottom - oy));
             card.caption.style.opacity = visible ? String(Math.max(0, Math.min(1, edge / zonePx))) : '';
           }
         }
 
         const col = column.getBoundingClientRect();
         lensProgram.uniforms.uViewport.value = [w, h];
-        lensProgram.uniforms.uCenterX.value = col.left + col.width / 2;
+        lensProgram.uniforms.uCenterX.value = col.left - ox + col.width / 2;
         lensProgram.uniforms.uHalfWidth.value = col.width / 2;
         lensProgram.uniforms.uPage.value = pageColor();
 
@@ -312,6 +329,12 @@ export function startProjectLens(column: HTMLElement): () => void {
     on(scroller, 'scroll', requestRender, { passive: true });
     on(window, 'scroll', requestRender, { passive: true });
     on(window, 'resize', requestRender);
+    // Comment mode resizes the page area without resizing the window
+    if (host && 'ResizeObserver' in window) {
+      const ro = new ResizeObserver(() => requestRender());
+      ro.observe(host);
+      listeners.push(() => ro.disconnect());
+    }
     on(canvas, 'webglcontextlost', (event) => {
       event.preventDefault();
       stop();
@@ -320,14 +343,16 @@ export function startProjectLens(column: HTMLElement): () => void {
     // Pause entirely (and show plain HTML) while the column is off screen.
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      canvas!.style.display = visible ? '' : 'none';
+      canvas!.style.display = visible ? 'block' : 'none';
       requestRender();
     });
     io.observe(column);
     listeners.push(() => io.disconnect());
 
-    // Same stacking context as the nav (z-index 50) and footer so both stay above the lens.
-    (document.getElementById('site-canvas') ?? document.body).appendChild(canvas);
+    // First child of the scroll area (so it can stick to its top), in the same stacking context as
+    // the nav (z-index 50) and footer so both stay above the lens.
+    if (host) host.prepend(canvas);
+    else document.body.appendChild(canvas);
     requestRender();
   } catch (error) {
     stop();

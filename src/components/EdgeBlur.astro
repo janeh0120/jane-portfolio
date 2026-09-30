@@ -1,42 +1,51 @@
 ---
 /**
- * Progressive blur at the top and bottom edges of the viewport.
+ * Progressive blur at the top or bottom edge of the page.
  * Six stacked backdrop-blur layers at doubling strengths, each masked to its own overlapping band,
  * so content softens smoothly as it scrolls under an edge. The page's existing grain (body::after)
  * shows through, giving the grainy look — no extra grain layer, which read as a darker bar.
+ *
+ * Rendered as the first (top) and last (bottom) child of the page's scroll container and made
+ * sticky there, so it matches that container exactly: its width, its rounded corners in comment
+ * mode, and it never covers the comments sidebar beside it.
  * Purely decorative: pointer-events none, and browsers without backdrop-filter simply show nothing.
  */
+interface Props {
+  edge: 'top' | 'bottom';
+}
+
+const { edge } = Astro.props;
 const layers = [1, 2, 4, 8, 16, 32];
 ---
 
-<div class="edge-blur edge-blur--top" aria-hidden="true">
-  {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
-</div>
-<div class="edge-blur edge-blur--bottom" aria-hidden="true">
+<div class:list={['edge-blur', `edge-blur--${edge}`]} aria-hidden="true">
   {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
 </div>
 
 <style>
   .edge-blur {
-    position: fixed;
-    left: 0;
-    right: 0;
+    position: sticky;
+    display: block;
+    width: 100%;
+    height: var(--edge-height);
     /* above page content and the homepage lens (z 5), below the footer (z 10) and nav (z 50) */
     z-index: 8;
     pointer-events: none;
   }
 
+  /* Sticky to the top of the scroll container without taking up space in the page flow */
   .edge-blur--top {
+    --edge-height: clamp(6rem, 14vh, 9rem);
+    --edge-direction: 0deg; /* strongest at the very top */
     top: 0;
-    height: clamp(6rem, 14vh, 9rem);
-    /* strongest at the very top edge */
-    --edge-direction: 0deg;
+    margin-bottom: calc(-1 * var(--edge-height));
   }
 
   .edge-blur--bottom {
-    bottom: 0;
-    height: clamp(4.5rem, 10vh, 7rem);
+    --edge-height: clamp(4.5rem, 10vh, 7rem);
     --edge-direction: 180deg;
+    bottom: 0;
+    margin-top: calc(-1 * var(--edge-height));
   }
 
   .edge-blur-layer {

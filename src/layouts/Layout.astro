@@ -132,8 +132,9 @@ const iconVersion = '3';
       ) : showCommentMode ? (
         <div id="site-shell" class="site-shell">
           <div id="site-canvas" class="site-canvas">
+            <EdgeBlur edge="top" />
             <slot />
-            <EdgeBlur />
+            <EdgeBlur edge="bottom" />
           </div>
         </div>
       ) : (
