@@ -1037,3 +1037,22 @@ body.comment-mode-active [data-comment-ui] * {
     transform: none !important;
   }
 }
+
+/*
+ * iOS Safari zooms into any text field smaller than 16px when it's focused, then leaves the page
+ * zoomed in and shifted sideways after the keyboard closes. Keep comment fields at 16px on touch
+ * screens so tapping them never zooms. (Deliberately not using maximum-scale=1 in the viewport meta:
+ * that would block pinch-zoom for everyone, which hurts accessibility.)
+ */
+@media (hover: none) and (pointer: coarse) {
+  .comment-popover-card {
+    --comment-compose-size: 16px;
+    --comment-compose-line: 24px;
+  }
+
+  .comment-popover-compose textarea,
+  .comment-popover-category-select,
+  .comment-sidebar-card-body-input {
+    font-size: 16px;
+  }
+}
