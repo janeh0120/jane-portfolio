@@ -68,15 +68,15 @@
       "name": "Inline feedback",
       "tags": ["product", "shipped"],
       "title": "Make inline comments on my portfolio",
-      "image": "images/case-studies/feedback/blue-bg.jpg",
+      "image": "images/case-study-heroes/feedback-demo.webp",
       "comingSoon": false
     },
     {
       "slug": "migration",
       "name": "Migration",
-      "tags": ["product", "partially shipped"],
+      "tags": ["Intuit", "product", "partially shipped"],
       "title": "Leading design of 0 → 1 internal tooling",
-      "image": "images/case-study-heroes/intuit.png",
+      "image": "images/case-study-heroes/migration-reel.webp",
       "comingSoon": false
     },
     {

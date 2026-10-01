@@ -1,6 +1,7 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
 import { site } from '../data/site';
+import MigrationReel from '../components/react/MigrationReel';
 
 const email = site.email || 'janehoudesign@gmail.com';
 
@@ -16,12 +17,14 @@ const nav = [
   title="Migration Dashboard"
   heading="Leading design of 0 → 1 internal tooling"
   role="Product Designer"
+  company="Intuit"
   team="1 Product Manager, 3 Developers"
   timeline="March 2026 – August 2026"
   projectType="Product Design"
   nav={nav}
   commentId="case-study-migration"
 >
+  <MigrationReel slot="hero" client:visible />
   <section id="context" data-comment-id="migration-context">
     <h3>Context</h3>
     <p class="heading text-ink">

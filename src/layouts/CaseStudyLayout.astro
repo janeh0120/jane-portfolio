@@ -21,6 +21,8 @@ interface Props {
   title: string;
   heading: string;
   role: string;
+  /** Where the work was done, as plain text (no logos). */
+  company?: string;
   team?: string;
   teamLabel?: string;
   timeline: string;
@@ -34,6 +36,7 @@ const {
   title,
   heading,
   role,
+  company,
   team,
   teamLabel = 'Team',
   timeline,
@@ -73,7 +76,13 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
           )
         }
 
-        <dl class="mt-10 grid gap-6 sm:grid-cols-2 md:grid-cols-4">
+        <dl class:list={['mt-10 grid gap-6 sm:grid-cols-2', company ? 'md:grid-cols-5' : 'md:grid-cols-4']}>
+          {company && (
+            <div>
+              <dt class="text-body text-muted">Company:</dt>
+              <dd class="mt-1 text-body text-ink">{company}</dd>
+            </div>
+          )}
           <div>
             <dt class="text-body text-muted">Role:</dt>
             <dd class="mt-1 text-body text-ink">{role}</dd>
@@ -110,7 +119,8 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
   .case-study-hero :global(img),
   .case-study-hero :global(video),
-  .case-study-hero :global(.feedback-demo-reel) {
+  .case-study-hero :global(.feedback-demo-reel),
+  .case-study-hero :global(.migration-reel) {
     border-radius: var(--radius-card);
   }
 

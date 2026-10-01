@@ -7,7 +7,6 @@
  */
 import { site } from '../data/site';
 import { formatProjectTags } from '../utils/tags';
-import FeedbackDemoReel from './react/FeedbackDemoReel';
 
 const base = import.meta.env.BASE_URL;
 const projects = site.projects;
@@ -27,11 +26,9 @@ function commentId(project: (typeof projects)[number]) {
       const imageSrc = `${base}${project.image}`;
       const media = (
         <div class="project-card-media" data-lens-src={imageSrc}>
-          {project.slug === 'feedback' ? (
-            <FeedbackDemoReel client:visible aspect="16/10" />
-          ) : (
-            <img src={imageSrc} alt={href ? '' : project.title} class="project-column-image" />
-          )}
+          {/* Stills only: the lens swaps any card touching the top/bottom zones for a flat image, and at
+              typical viewport heights a card never clears both, so live demos here would never be seen. */}
+          <img src={imageSrc} alt={href ? '' : project.title} class="project-column-image" />
         </div>
       );
       const caption = (
@@ -100,8 +97,7 @@ function commentId(project: (typeof projects)[number]) {
     transition: opacity 0.25s ease;
   }
 
-  .project-column-link:hover .project-column-image,
-  .project-column-link:hover :global(.feedback-demo-reel) {
+  .project-column-link:hover .project-column-image {
     opacity: 0.92;
   }
 

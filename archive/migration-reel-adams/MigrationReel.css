@@ -1,0 +1,412 @@
+.migration-reel {
+  --font-sans: 'TeX Gyre Heros', Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  --blue: #217ee8;
+  /* every headline in the reel shares one size */
+  --heading-size: 36px;
+  --heading-tracking: -0.03em;
+  /* the folder that sits inline in "Code migrations [folder] are simple." */
+  --inline-folder: 2.6em;
+
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-card, 0.5rem);
+  background-color: #14181b;
+  isolation: isolate;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.migration-reel[data-aspect='16/10'] {
+  aspect-ratio: 16 / 10;
+}
+
+.migration-reel__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.migration-reel__canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  color: #fff;
+}
+
+.migration-reel:not([data-ready]) .migration-reel__canvas {
+  visibility: hidden;
+}
+
+.migration-reel__canvas svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ------------------------------------------------------------ intro sentence */
+
+.migration-reel__intro {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  font-size: var(--heading-size);
+  font-weight: 700;
+  letter-spacing: var(--heading-tracking);
+  white-space: nowrap;
+}
+
+.migration-reel__intro [data-intro-word] {
+  display: inline-block;
+}
+
+.migration-reel__intro-folder {
+  display: inline-block;
+  width: var(--inline-folder);
+  height: calc(var(--inline-folder) * 279 / 380);
+}
+
+/* ------------------------------------------------------------ folder ⇄ window */
+
+.migration-reel__fly-tile {
+  position: absolute;
+  z-index: 4;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 6%);
+  transform-origin: 50% 50%;
+  visibility: hidden;
+  will-change: left, top, width, height, transform;
+}
+
+.migration-reel__canvas .migration-reel__fly {
+  position: absolute;
+  z-index: 4;
+  color: var(--blue);
+  transform-origin: 50% 50%;
+  visibility: hidden;
+  will-change: left, top, width, height, transform;
+}
+
+.migration-reel__morph {
+  position: absolute;
+  z-index: 2;
+  transform-origin: 50% 50%;
+  will-change: left, top, width, height, transform;
+}
+
+.migration-reel__hero {
+  position: absolute;
+  z-index: 4;
+  color: #f4c4e6;
+  transform-origin: 50% 50%;
+  visibility: hidden;
+  will-change: left, top, width, height, transform;
+}
+
+.migration-reel__canvas .migration-reel__hero .migration-reel__chip-sparkle {
+  opacity: 1;
+}
+
+.migration-reel__window {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #ececec;
+  box-shadow: 0 30px 80px rgb(0 0 0 / 45%);
+}
+
+.migration-reel__dots {
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  display: flex;
+  gap: 9px;
+}
+
+.migration-reel__dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #9a9a9a;
+}
+
+.migration-reel__window-body {
+  position: absolute;
+  left: 50%;
+  width: 392px;
+  margin-left: -196px;
+  display: grid;
+  justify-items: start;
+  gap: 9px;
+  color: #111;
+}
+
+.migration-reel__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-left: 12px;
+  padding: 5px 10px 5px 8px;
+  border-radius: 6px;
+  font-size: 14.5px;
+  font-weight: 400;
+  color: #222;
+}
+
+.migration-reel__chip-folder {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: calc(20px * 279 / 380);
+  color: var(--blue);
+}
+
+.migration-reel__canvas .migration-reel__chip-sparkle {
+  position: absolute;
+  top: 53%;
+  left: 42%;
+  width: 26%;
+  height: auto;
+  aspect-ratio: 1;
+  color: #1a1a1a;
+  opacity: 0;
+}
+
+.migration-reel__canvas .migration-reel__chip-sparkle--small {
+  top: 40%;
+  left: 65%;
+  width: 16%;
+}
+
+/* TeX Gyre Heros sits high in its line box; nudge text down so its capitals centre optically on
+   the icons and pills beside it. */
+.migration-reel__optical {
+  position: relative;
+  top: 0.115em;
+}
+
+.migration-reel__prompt {
+  width: 100%;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 5%);
+  overflow: hidden;
+}
+
+.migration-reel__input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 50px;
+  padding: 0 10px 0 22px;
+  font-size: 17.5px;
+}
+
+.migration-reel__input-text {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.migration-reel__placeholder {
+  color: #111;
+}
+
+.migration-reel__caret {
+  width: 1.5px;
+  height: 20px;
+  margin-left: 1px;
+  background: var(--blue);
+}
+
+.migration-reel__send {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 29px;
+  height: 29px;
+  border-radius: 8px;
+  background: #a8a8a8;
+  transition: background-color 0.15s ease;
+}
+
+.migration-reel__send svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.migration-reel__status {
+  overflow: hidden;
+  height: 0;
+  border-top: 0.5px solid #efefef;
+  background: #fafafa;
+}
+
+.migration-reel__status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 22px;
+  font-size: 13.5px;
+  color: #8a8a8a;
+}
+
+.migration-reel__dot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 3px);
+  gap: 2.5px;
+}
+
+.migration-reel__dot-grid i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #8a8a8a;
+}
+
+.migration-reel__shimmer {
+  /* gradient and its position are driven from the reel's timeline */
+  background-repeat: repeat-x;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.migration-reel__canvas .migration-reel__check {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: #8a8a8a;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------------------ folders */
+
+.migration-reel__pool {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.migration-reel__pool-folder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--blue);
+  visibility: hidden;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+/* ------------------------------------------------------------ headlines */
+
+.migration-reel__headline {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  margin: 0;
+  font-size: var(--heading-size);
+  font-weight: 700;
+  letter-spacing: var(--heading-tracking);
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 55%);
+  visibility: hidden;
+}
+
+.migration-reel__strip {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  font-size: var(--heading-size);
+  font-weight: 700;
+  letter-spacing: var(--heading-tracking);
+  line-height: 1;
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+.migration-reel__word {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  text-shadow: 0 2px 18px rgb(0 0 0 / 55%);
+}
+
+.migration-reel__rest {
+  display: inline-block;
+  width: 0;
+  white-space: pre;
+}
+
+.migration-reel__letter {
+  display: inline-block;
+  opacity: 0;
+}
+
+.migration-reel__canvas .migration-reel__sparkle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--blue);
+  opacity: 0;
+}
+
+.migration-reel__slot-folder {
+  --folder: var(--blue);
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* same as STACK_FOLDER in the component: the size the swarm folders arrive at */
+  width: 32px;
+  height: calc(32px * 279 / 380);
+  margin-left: -16px;
+  opacity: 0;
+}
+
+.migration-reel__slot-front,
+.migration-reel__slot-stack {
+  position: absolute;
+  inset: 0;
+  color: var(--folder);
+}
+
+.migration-reel__slot-stack {
+  opacity: 0;
+  filter: brightness(0.8);
+}
+
+.migration-reel__slot-stack + .migration-reel__slot-stack {
+  filter: brightness(0.9);
+}
+
+.migration-reel__slot-front {
+  filter: drop-shadow(0 2px 6px rgb(0 0 0 / 30%));
+}
