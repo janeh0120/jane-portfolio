@@ -11,6 +11,27 @@
     "thumb": "images/play-thumbs/ids-design.webp"
   },
   {
+    "slug": "ids-illustrations",
+    "title": "Intuit Design System illustrations",
+    "description": "Illustrations for the Intuit Design System documentation site that use analogies to communicate the concept of design systems, each designed in both light and dark mode.",
+    "year": "",
+    "images": [
+      "images/case-studies/ids-illustrations/site-light.png",
+      "images/case-studies/ids-illustrations/hero-light.webp",
+      "images/case-studies/ids-illustrations/foundations-light.png",
+      "images/case-studies/ids-illustrations/theming-light.png",
+      "images/case-studies/ids-illustrations/components-light.png"
+    ],
+    "darkImages": [
+      "images/case-studies/ids-illustrations/site-dark.png",
+      "images/case-studies/ids-illustrations/hero-dark.webp",
+      "images/case-studies/ids-illustrations/foundations-dark.png",
+      "images/case-studies/ids-illustrations/theming-dark.png",
+      "images/case-studies/ids-illustrations/components-dark.png"
+    ],
+    "thumb": "images/play-thumbs/ids-illustrations.webp"
+  },
+  {
     "slug": "shoebox-craft",
     "title": "Shoebox craft cafe",
     "description": "I ran a craft cafe at my apartment and designed a brand and experience for it!",
@@ -68,7 +89,7 @@
   {
     "slug": "zhen",
     "title": "Zhen",
-    "description": "I really love Chinese typography so I wanted to play around with the shape of my Chinese name \"真\" and 3D model it.",
+    "description": "I really love Chinese typography so I wanted to play around with the shape of my Chinese name \"\u771f\" and 3D model it.",
     "year": "",
     "images": [
       "images/extra/zhen/zhen1 copy.webp",

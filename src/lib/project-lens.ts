@@ -72,6 +72,7 @@ const lensFragment = /* glsl */ `
   uniform float uHalfWidth; // half the column width, CSS px
   uniform float uZone;      // zone height as a fraction of the viewport
   uniform vec3 uPage;       // page background colour (0..1), for compositing split channels
+  uniform float uStrength;  // scales magnification, colour split and flare (1 = full)
   varying vec2 vUv;
 
   vec4 scene(vec2 px) {
@@ -83,7 +84,7 @@ const lensFragment = /* glsl */ `
     vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uViewport;     // CSS px, y down
     float edgeDist = min(px.y, uViewport.y - px.y) / uViewport.y;
     float e = 1.0 - smoothstep(0.0, uZone, edgeDist);   // 0 in the middle, 1 at the screen edge
-    float e2 = e * e;
+    float e2 = e * e * uStrength;
 
     // Fisheye: magnify horizontally around the column axis, more toward the edge.
     float dx = px.x - uCenterX;
@@ -106,6 +107,11 @@ const lensFragment = /* glsl */ `
   }
 `;
 
+export type LensOptions = {
+  /** How strong the warp is, from 0 (none) to 1 (the homepage's full effect). */
+  strength?: number;
+};
+
 type Card = {
   media: HTMLElement;
   caption: HTMLElement | null;
@@ -125,7 +131,7 @@ function assertLinked(gl: WebGLRenderingContext, program: Program, name: string)
  * Starts the lens over the given column. Throws if WebGL or the shaders are unavailable, in which
  * case nothing on the page has been changed. Returns a function that removes the lens.
  */
-export function startProjectLens(column: HTMLElement): () => void {
+export function startProjectLens(column: HTMLElement, { strength = 1 }: LensOptions = {}): () => void {
   const cards: Card[] = [];
   let canvas: HTMLCanvasElement | undefined;
   let gl: WebGLRenderingContext | undefined;
@@ -189,6 +195,7 @@ export function startProjectLens(column: HTMLElement): () => void {
         uCenterX: { value: 0 },
         uHalfWidth: { value: 1 },
         uZone: { value: ZONE },
+        uStrength: { value: strength },
         uPage: { value: [0.94, 0.94, 0.945] },
       },
     });

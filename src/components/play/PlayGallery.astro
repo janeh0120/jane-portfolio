@@ -26,6 +26,7 @@ function isVideo(path: string) {
             type="button"
             class:list={['gallery-item', item.images.length > 1 && 'carousel']}
             data-gallery-id={item.id}
+            data-lens-src={previewIsVideo ? undefined : mediaSrc(preview)}
             aria-label={`Open ${item.title}`}
           >
             {previewIsVideo ? (
@@ -71,8 +72,20 @@ function isVideo(path: string) {
     </div>
 
     <p class="gallery-modal-description" id="modal-description" />
+    <div class="gallery-mode-toggle" id="modal-mode-toggle" role="group" aria-label="Illustration colour mode" hidden>
+      <span class="gallery-mode-thumb" aria-hidden="true"></span>
+      <button type="button" class="gallery-mode-option" data-mode-choice="light" aria-pressed="true">Light</button>
+      <button type="button" class="gallery-mode-option" data-mode-choice="dark" aria-pressed="false">Dark</button>
+    </div>
   </div>
 </div>
+
+<script>
+  import { enhanceWithLens } from '../../lib/lens-enhance';
+
+  // Same top/bottom lens warp as the homepage, toned down; the gallery is complete without it.
+  enhanceWithLens(document.getElementById('gallery-grid'), { strength: 0.4 });
+</script>
 
 <script define:vars={{ galleryItems, base }}>
   function resolveSrc(path) {
@@ -92,6 +105,32 @@ function isVideo(path: string) {
   const carouselDots = document.getElementById('carousel-dots');
   const carouselControls = document.getElementById('carousel-controls');
   const modalDescription = document.getElementById('modal-description');
+  const modeToggle = document.getElementById('modal-mode-toggle');
+  const modeButtons = modeToggle ? [...modeToggle.querySelectorAll('[data-mode-choice]')] : [];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let modeTouched = false;
+  let modeHintTimer = 0;
+
+  // Light/dark toggle for items with dark versions: follows the site's colour mode, flips once
+  // on its own as a hint, and the viewer can switch it any time (like the /brand page).
+  const siteMode = () => (document.documentElement.classList.contains('theme-dark') ? 'dark' : 'light');
+
+  function setMode(mode) {
+    if (!modal) return;
+    modal.dataset.mode = mode;
+    modeButtons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.modeChoice === mode)));
+  }
+
+  modeButtons.forEach((button) =>
+    button.addEventListener('click', () => {
+      modeTouched = true;
+      setMode(button.dataset.modeChoice);
+    }),
+  );
+
+  new MutationObserver(() => {
+    if (modeToggle && !modeToggle.hidden) setMode(siteMode());
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
   function pauseAllVideos() {
     carouselSlides?.querySelectorAll('video').forEach((video) => {
@@ -149,12 +188,16 @@ function isVideo(path: string) {
 
     carouselSlides.innerHTML = '';
     carouselDots.innerHTML = '';
+    const themed = Array.isArray(item.darkImages) && item.darkImages.length === item.images.length;
 
     item.images.forEach((media, index) => {
       const slide = document.createElement('div');
       slide.className = 'gallery-carousel-slide';
+      const darkMedia = themed ? item.darkImages[index] : null;
       if (isVideo(media)) {
         slide.innerHTML = `<video src="${resolveSrc(media)}" muted playsinline loop controls preload="metadata"></video>`;
+      } else if (darkMedia) {
+        slide.innerHTML = `<div class="gallery-themed"><img class="gallery-mode-light" src="${resolveSrc(media)}" alt="Slide ${index + 1}"><img class="gallery-mode-dark" src="${resolveSrc(darkMedia)}" alt=""></div>`;
       } else {
         slide.innerHTML = `<img src="${resolveSrc(media)}" alt="Slide ${index + 1}">`;
       }
@@ -174,12 +217,27 @@ function isVideo(path: string) {
 
     if (modalDescription) modalDescription.textContent = item.description;
 
+    clearTimeout(modeHintTimer);
+    if (modeToggle) modeToggle.hidden = !themed;
+    if (themed) {
+      modeTouched = false;
+      setMode(siteMode());
+      if (!reduceMotion) {
+        modeHintTimer = setTimeout(() => {
+          if (!modeTouched && currentItemId === itemId) setMode(modal.dataset.mode === 'dark' ? 'light' : 'dark');
+        }, 1000);
+      }
+    } else {
+      delete modal.dataset.mode;
+    }
+
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
     updateCarousel();
   }
 
   function closeGallery() {
+    clearTimeout(modeHintTimer);
     pauseAllVideos();
     modal?.classList.remove('active');
     modal?.setAttribute('aria-hidden', 'true');

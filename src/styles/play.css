@@ -258,6 +258,87 @@
   background: #000;
 }
 
+/* Light and dark versions stacked in one slide; the modal's data-mode picks which shows */
+.gallery-themed {
+  display: grid;
+}
+
+.gallery-themed img {
+  grid-area: 1 / 1;
+  transition: opacity 320ms ease;
+}
+
+.gallery-modal[data-mode='light'] .gallery-mode-dark,
+.gallery-modal[data-mode='dark'] .gallery-mode-light {
+  opacity: 0;
+}
+
+/* Light/dark toggle under the description (sits on the dark modal backdrop) */
+.gallery-mode-toggle {
+  --toggle-pad: 0.25rem;
+  position: relative;
+  order: 3;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 12px;
+  padding: var(--toggle-pad);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 14%);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+}
+
+.gallery-mode-toggle[hidden] {
+  display: none;
+}
+
+.gallery-mode-thumb {
+  position: absolute;
+  top: var(--toggle-pad);
+  bottom: var(--toggle-pad);
+  left: var(--toggle-pad);
+  width: calc(50% - var(--toggle-pad));
+  border-radius: 999px;
+  background: #fff;
+  transition: transform 320ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.gallery-modal[data-mode='dark'] .gallery-mode-thumb {
+  transform: translateX(100%);
+}
+
+.gallery-mode-option {
+  position: relative;
+  padding: 0.3rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(255 255 255 / 72%);
+  font: inherit;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.gallery-mode-option:hover {
+  color: #fff;
+}
+
+.gallery-mode-option[aria-pressed='true'] {
+  color: #111;
+}
+
+.gallery-mode-option:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-themed img,
+  .gallery-mode-thumb {
+    transition: none;
+  }
+}
+
 .carousel-controls-wrap {
   position: absolute;
   inset: 0;

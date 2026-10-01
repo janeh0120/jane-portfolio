@@ -64,6 +64,8 @@ export type GalleryItemMeta = {
   description: string;
   year: string;
   images: string[];
+  /** Dark-mode versions of `images`, in the same order. Adds a light/dark toggle to the modal. */
+  darkImages?: string[];
   /** Lightweight grid preview; modal still uses `images`. */
   thumb?: string;
 };

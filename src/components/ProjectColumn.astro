@@ -119,25 +119,7 @@ function commentId(project: (typeof projects)[number]) {
 </style>
 
 <script>
-  // Progressive enhancement: the lens loads after the page is up, only where it can run well,
-  // and any failure (download, WebGL, shader, runtime) leaves the plain HTML column in place.
-  const column = document.querySelector<HTMLElement>('[data-project-column]');
-  const wide = window.matchMedia('(min-width: 768px)');
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  import { enhanceWithLens } from '../lib/lens-enhance';
 
-  async function enhance() {
-    if (!column || !wide.matches || reduceMotion.matches) return;
-    try {
-      const { startProjectLens } = await import('../lib/project-lens');
-      startProjectLens(column);
-    } catch (error) {
-      console.warn('Lens effect unavailable; showing the standard layout.', error);
-    }
-  }
-
-  const whenIdle = (fn: () => void) =>
-    'requestIdleCallback' in window ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 200);
-
-  if (document.readyState === 'complete') whenIdle(enhance);
-  else window.addEventListener('load', () => whenIdle(enhance), { once: true });
+  enhanceWithLens(document.querySelector<HTMLElement>('[data-project-column]'));
 </script>
