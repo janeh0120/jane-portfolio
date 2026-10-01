@@ -1,5 +1,6 @@
 .play-page {
-  overflow-x: hidden;
+  /* clip, not hidden: hidden makes this a scroll container, which breaks the sticky nav */
+  overflow-x: clip;
 }
 
 .play-page h1 {
