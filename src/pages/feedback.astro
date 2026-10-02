@@ -26,16 +26,16 @@ const nav = [
   <FeedbackDemoReel slot="hero" client:visible />
 
   <section id="problem" data-comment-id="feedback-need">
-    <h3><span class="tag">Problem</span></h3>
-    <h1 class="heading text-ink">
+    <h2><span class="tag">Problem</span></h2>
+    <p class="heading text-ink">
       Portfolio reviewers and I want to keep track of portfolio feedback inline, so I can remember
       where each comment was left and collect async feedback more easily.
-    </h1>
+    </p>
   </section>
 
   <section id="solution" data-comment-id="feedback-feature">
-    <h3><span class="tag">Solution</span></h3>
-    <h1 class="heading text-ink">Users can make and edit comments.</h1>
+    <h2><span class="tag">Solution</span></h2>
+    <h3 class="heading text-ink">Users can make and edit comments.</h3>
     <figure class="case-study-figure case-study-figure--wide feedback-video">
       <video
         class="feedback-video__media"
@@ -48,7 +48,7 @@ const nav = [
         aria-label="Leaving comments: selecting a section of the portfolio, writing a comment, and choosing a category"
       ></video>
     </figure>
-    <h1 class="heading text-ink">I can review and resolve comments after making updates.</h1>
+    <h3 class="heading text-ink">I can review and resolve comments after making updates.</h3>
     <figure class="case-study-figure case-study-figure--wide feedback-video">
       <video
         class="feedback-video__media"
@@ -64,11 +64,11 @@ const nav = [
   </section>
 
   <section id="decisions" data-comment-id="feedback-decisions">
-    <h3><span class="tag">Design decisions</span></h3>
+    <h2><span class="tag">Design decisions</span></h2>
     <ol>
       <li class="decision-row">
         <div class="decision-text">
-          <h1>Guardrails</h1>
+          <h3>Guardrails</h3>
           <p>
             Curse words and comments under a minimum word count aren’t allowed. Comments are visible to me but stay anonymous.
           </p>
@@ -84,7 +84,7 @@ const nav = [
       </li>
       <li class="decision-row">
         <div class="decision-text">
-          <h1>Public commenting</h1>
+          <h3>Public commenting</h3>
           <p>
             I decided against making comments public to keep the scope narrow and focused on my
             problem statement. It would also be more complex to design around as I
@@ -102,7 +102,7 @@ const nav = [
       </li>
       <li class="decision-row">
         <div class="decision-text">
-          <h1>Web builder vs. fully custom</h1>
+          <h3>Web builder vs. fully custom</h3>
           <p>
             A web builder like Framer can’t give comments stable markup to anchor to, a server to keep
             keys private, or deploy hooks to pin each comment to a site version.
@@ -119,7 +119,7 @@ const nav = [
       </li>
       <li class="decision-row">
         <div class="decision-text">
-          <h1>Existing tools</h1>
+          <h3>Existing tools</h3>
           <p>
             <a
               href="https://www.agentation.com"
@@ -147,11 +147,11 @@ const nav = [
 </CaseStudyLayout>
 
 <style>
-  h3 .tag {
+  h2 .tag {
     margin-left: calc(var(--dropdown-pad) * -2);
   }
 
-  /* Match the page title's .heading style; overrides the shared section-h1 size */
+  /* Match the page title's .heading style; overrides the shared section-heading size */
   #problem .heading,
   #solution .heading {
     font-family: var(--font-serif);
@@ -175,7 +175,7 @@ const nav = [
     margin-top: 0.35rem;
   }
 
-  .feedback-video + h1 {
+  .feedback-video + h3 {
     margin-top: 2.75rem;
   }
 
