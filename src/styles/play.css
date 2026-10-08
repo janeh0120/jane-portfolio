@@ -163,6 +163,26 @@
   animation: play-fade-in 0.3s ease-out;
 }
 
+/* While the image flies between the grid and the overlay, the script animates the backdrop and
+   content itself (see PlayGallery), so the plain fade-in is switched off and both start hidden. */
+.gallery-modal.active.is-morphing {
+  animation: none;
+  background: transparent;
+}
+
+.gallery-modal.is-morphing .gallery-modal-content {
+  opacity: 0;
+}
+
+/* The copy of the grid image that flies to and from the overlay */
+.gallery-flyer {
+  position: fixed;
+  z-index: 3005;
+  margin: 0;
+  object-fit: cover;
+  pointer-events: none;
+}
+
 @keyframes play-fade-in {
   from {
     opacity: 0;

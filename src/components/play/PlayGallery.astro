@@ -234,13 +234,147 @@ function isVideo(path: string) {
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
     updateCarousel();
+    void morphOpen(itemId);
   }
 
-  function closeGallery() {
+  // Opening and closing morph between the grid and the overlay: a copy of the grid image flies to
+  // (or from) the overlay image's spot while the backdrop darkens (or clears) behind it. A copy is used
+  // because the carousel clips its slides. Skipped for reduced motion, video previews, or anything
+  // not ready in time, which fall back to the plain fade.
+  const MORPH_MS = 460;
+  const MORPH_EASE = 'cubic-bezier(0.3, 0.7, 0.2, 1)';
+  const modalContent = modal?.querySelector('.gallery-modal-content');
+  let morphing = false;
+
+  function gridButton(itemId) {
+    return document.querySelector(`[data-gallery-id="${itemId}"]`);
+  }
+
+  function slideMedia(index) {
+    return carouselSlides?.querySelectorAll('.gallery-carousel-slide')[index]?.querySelector('.gallery-themed, img, video') ?? null;
+  }
+
+  // Resolves true once the overlay media has a size to fly to, false if it isn't ready in time.
+  function mediaReady(media) {
+    const img = media.tagName === 'IMG' ? media : media.querySelector('img');
+    const loaded = img
+      ? img.complete && img.naturalWidth
+        ? Promise.resolve()
+        : img.decode()
+      : new Promise((resolve) => {
+          if (media.readyState >= 1) resolve();
+          else media.addEventListener('loadedmetadata', resolve, { once: true });
+        });
+    const timeout = new Promise((resolve) => setTimeout(() => resolve(false), 400));
+    return Promise.race([loaded.then(() => true, () => false), timeout]);
+  }
+
+  function onScreen(rect) {
+    return rect.width > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
+  }
+
+  function flyImage(image, from, to, radii) {
+    const flyer = image.cloneNode(false);
+    flyer.removeAttribute('loading');
+    flyer.className = 'gallery-flyer';
+    document.body.appendChild(flyer);
+    const frame = (rect, radius) => ({
+      left: `${rect.left}px`,
+      top: `${rect.top}px`,
+      width: `${rect.width}px`,
+      height: `${rect.height}px`,
+      borderRadius: radius,
+    });
+    const flight = flyer.animate([frame(from, radii[0]), frame(to, radii[1])], {
+      duration: MORPH_MS,
+      easing: MORPH_EASE,
+      fill: 'forwards',
+    });
+    return flight.finished.then(() => flyer);
+  }
+
+  async function morphOpen(itemId) {
+    const button = gridButton(itemId);
+    const source = button?.querySelector('img');
+    const target = slideMedia(0);
+    if (reduceMotion || !modal || !modalContent || !source || !target || !onScreen(source.getBoundingClientRect())) return;
+
+    morphing = true;
+    modal.classList.add('is-morphing');
+    if (!(await mediaReady(target)) || currentItemId !== itemId) {
+      modal.classList.remove('is-morphing');
+      morphing = false;
+      return;
+    }
+
+    target.style.opacity = '0';
+    button.style.visibility = 'hidden';
+    const backdrop = modal.animate([{ backgroundColor: 'rgb(0 0 0 / 0%)' }, { backgroundColor: 'rgb(0 0 0 / 90%)' }], {
+      duration: MORPH_MS,
+      easing: MORPH_EASE,
+      fill: 'both',
+    });
+    const content = modalContent.animate([{ opacity: 0 }, { opacity: 1 }], {
+      duration: MORPH_MS * 0.6,
+      delay: MORPH_MS * 0.4,
+      easing: 'ease-out',
+      fill: 'both',
+    });
+    const radius = getComputedStyle(button).borderRadius;
+    const flyer = await flyImage(source, source.getBoundingClientRect(), target.getBoundingClientRect(), [radius, '0px']);
+
+    target.style.opacity = '';
+    button.style.visibility = '';
+    modal.classList.remove('is-morphing');
+    backdrop.cancel();
+    content.cancel();
+    flyer.remove();
+    morphing = false;
+  }
+
+  async function morphClose(itemId) {
+    const button = gridButton(itemId);
+    const source = button?.querySelector('img');
+    // Only the first slide is the image in the grid, so other slides just fade out.
+    const target = currentSlideIndex === 0 ? slideMedia(0) : null;
+    if (reduceMotion || !modal || !modalContent || !source || !target) return;
+    const home = source.getBoundingClientRect();
+    if (!onScreen(home)) return;
+
+    morphing = true;
+    const from = target.getBoundingClientRect();
+    target.style.opacity = '0';
+    button.style.visibility = 'hidden';
+    modal.classList.add('is-morphing');
+    const backdrop = modal.animate([{ backgroundColor: 'rgb(0 0 0 / 90%)' }, { backgroundColor: 'rgb(0 0 0 / 0%)' }], {
+      duration: MORPH_MS,
+      easing: MORPH_EASE,
+      fill: 'both',
+    });
+    const content = modalContent.animate([{ opacity: 1 }, { opacity: 0 }], {
+      duration: MORPH_MS * 0.4,
+      easing: 'ease-out',
+      fill: 'both',
+    });
+    const radius = getComputedStyle(button).borderRadius;
+    const flyer = await flyImage(source, from, home, ['0px', radius]);
+
+    button.style.visibility = '';
+    flyer.remove();
+    target.style.opacity = '';
+    backdrop.cancel();
+    content.cancel();
+    modal.classList.remove('is-morphing');
+    morphing = false;
+  }
+
+  async function closeGallery() {
+    if (!modal?.classList.contains('active') || morphing) return;
     clearTimeout(modeHintTimer);
     pauseAllVideos();
-    modal?.classList.remove('active');
-    modal?.setAttribute('aria-hidden', 'true');
+    await morphClose(currentItemId);
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
     currentItemId = null;
     currentSlideIndex = 0;
   }
@@ -261,7 +395,7 @@ function isVideo(path: string) {
   });
 
   document.addEventListener('keydown', (event) => {
-    if (!modal?.classList.contains('active')) return;
+    if (!modal?.classList.contains('active') || morphing) return;
     if (event.key === 'Escape') closeGallery();
     if (event.key === 'ArrowRight') nextSlide();
     if (event.key === 'ArrowLeft') previousSlide();
