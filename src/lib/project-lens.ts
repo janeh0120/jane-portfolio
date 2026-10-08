@@ -182,7 +182,7 @@ export function startProjectLens(column: HTMLElement, { strength = 1 }: LensOpti
     });
     const cardsScene = new Transform();
     let target = new RenderTarget(ctx, { width: 1, height: 1 });
-    const radius = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--radius-card')) * 16 || 8;
+    const radius = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--radius-base')) * 16 || 8;
 
     const lensProgram = new Program(ctx, {
       vertex: lensVertex,

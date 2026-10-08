@@ -12,7 +12,7 @@
   overflow: hidden;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: var(--radius-card, 0.5rem);
+  border-radius: var(--radius-base, 0.5rem);
   background-color: #14181b;
   isolation: isolate;
   font-family: var(--font-sans);

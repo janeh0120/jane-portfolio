@@ -47,7 +47,7 @@ body.admin-review-root {
   color: var(--color-muted);
   background: var(--color-canvas);
   border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
 }
 
 .admin-review-toolbar-meta {

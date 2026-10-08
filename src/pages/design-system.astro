@@ -24,45 +24,22 @@ const sections = [
 
 const dropdownOptions = ['Category', 'Accessibility', 'Content', 'Visual design', 'Bug'];
 
-const dropdownTokens = [
-  { part: 'Menu fill', token: '--color-canvas' },
-  { part: 'Menu outline', token: '--color-border · --border-width' },
-  { part: 'Hover · keyboard focus', token: '--color-surface' },
-  { part: 'Hover motion', token: 'Slides 0.2s cubic-bezier(0.22, 1, 0.36, 1) · none with reduced motion' },
-  { part: 'Option corner', token: '--radius-card' },
-  { part: 'Menu padding', token: '--dropdown-pad (4px) · also the tag padding' },
-  { part: 'Menu corner', token: '--radius-card + --dropdown-pad + --border-width' },
-  { part: 'Trigger fill', token: '--color-surface-strong → --color-border-strong on hover' },
-];
-
 const colors = [
-  {
-    use: 'Page background',
-    tw: 'bg-canvas',
-    token: '--color-canvas',
-    outline: true,
-  },
-  { use: 'Primary text', tw: 'text-ink', token: '--color-ink' },
-  { use: 'Secondary text', tw: 'text-muted', token: '--color-muted' },
-  { use: 'Tertiary text', tw: 'text-subtle', token: '--color-subtle' },
-  { use: 'Portfolio hairlines', tw: 'border-line', token: '--color-line' },
-  { use: 'Toolbars · panels', tw: 'bg-surface', token: '--color-surface' },
-  { use: 'Default UI outlines', tw: 'border-border', token: '--color-border' },
-  { use: 'Icon control hover', tw: 'bg-hover', token: '--color-hover' },
-  { use: 'Brand moments', tw: 'text-accent / bg-accent', token: '--color-accent' },
-  { use: 'Errors · destructive', tw: 'text-danger', token: '--color-danger' },
-  {
-    use: 'Selected · focus fills',
-    tw: 'bg-accent-soft',
-    token: '--color-accent-soft',
-    outline: true,
-  },
-  {
-    use: 'Error banners',
-    tw: 'bg-danger-soft',
-    token: '--color-danger-soft',
-    outline: true,
-  },
+  { use: 'Page background', token: '--color-canvas', outline: true },
+  { use: 'Primary text', token: '--color-ink' },
+  { use: 'Secondary text', token: '--color-muted' },
+  { use: 'Tertiary text', token: '--color-subtle' },
+  { use: 'Dividers', token: '--color-line', outline: true },
+  { use: 'Panels', token: '--color-surface' },
+  { use: 'Outlines', token: '--color-border' },
+  { use: 'Control fill', token: '--color-fill' },
+  { use: 'Hover', token: '--color-hover' },
+  { use: 'Subtle hover', token: '--color-hover-subtle', outline: true },
+  { use: 'Floating surface', token: '--color-glass', outline: true },
+  { use: 'Accent', token: '--color-accent' },
+  { use: 'Selected · focus fill', token: '--color-accent-soft', outline: true },
+  { use: 'Errors', token: '--color-danger' },
+  { use: 'Error background', token: '--color-danger-soft', outline: true },
 ];
 
 const typeStyles = [
@@ -109,48 +86,20 @@ const borders = [
 
 const radii = [
   { name: 'None', token: '--radius-none', detail: '0 · full-bleed frames' },
-  { name: 'Corner', token: '--radius-card', detail: '0.5rem · controls and cards' },
+  { name: 'Corner', token: '--radius-base', detail: '0.5rem · controls and cards' },
 ];
 
 const widths = [
-  {
-    name: 'Site shell',
-    value: 'max-w-[1400px]',
-    use: 'Header, home, footer, design system',
-  },
-  {
-    name: 'Case study',
-    value: 'max-w-3xl',
-    use: 'Case study reading column',
-  },
-  {
-    name: 'Narrow',
-    value: 'max-w-2xl',
-    use: 'About · short intros',
-  },
+  { name: 'Site', px: 1400 },
+  { name: 'Case study', px: 768 },
+  { name: 'About', px: 672 },
 ];
 
 const breakpoints = [
-  {
-    name: 'sm',
-    value: '640px',
-    use: 'Figure rows, meta grids start splitting',
-  },
-  {
-    name: 'md',
-    value: '768px',
-    use: 'Site nav expands; mobile menu hides; project grid → 2 cols; padding px-6 → px-10',
-  },
-  {
-    name: 'Comment stack',
-    value: '900px',
-    use: 'Comment sidebar drops under the canvas as a bottom sheet',
-  },
-  {
-    name: 'lg',
-    value: '1024px',
-    use: 'Case study nav becomes a sticky left rail (200px)',
-  },
+  { name: 'Mobile', px: 0 },
+  { name: 'Tablet', px: 768 },
+  { name: 'Comments stack', px: 900 },
+  { name: 'Desktop', px: 1024 },
 ];
 
 const sectionClass = 'scroll-mt-28 md:scroll-mt-32';
@@ -167,32 +116,29 @@ const sectionTitleClass = 'subheading text-ink';
       />
 
       <div class="section-stack min-w-0">
-        <h1 class="hero-copy text-ink">Design system</h1>
+        <div>
+          <h1 class="hero-copy text-ink">Design system</h1>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            Built with Astro, Tailwind, and React and adapted to light and dark mode.
+          </p>
+        </div>
 
     <section id="colors" class={sectionClass} aria-labelledby="colors-title">
       <h2 id="colors-title" class={sectionTitleClass}>Colors</h2>
-      <ul class="mt-8 grid grid-cols-3 gap-x-4 gap-y-6 sm:gap-x-6 sm:gap-y-8 lg:grid-cols-5">
-          {
-            colors.map((swatch) => (
-              <li class="grid min-w-0 gap-3">
-                <div
-                  class:list={[
-                    'size-16 sm:size-20 lg:size-28',
-                    swatch.outline && 'border border-border-strong',
-                  ]}
-                  style={`background: var(${swatch.token}); border-radius: var(--radius-card)`}
-                  aria-hidden="true"
-                />
-                <div class="min-w-0">
-                  <p class="text-body font-medium text-muted">{swatch.use}</p>
-                  <p class="mt-0.5 text-body text-subtle">
-                    <code class="text-[0.85em]">{swatch.tw}</code>
-                  </p>
-                </div>
-              </li>
-            ))
-          }
-        </ul>
+      <ul class="mt-8 grid list-none grid-cols-1 gap-x-8 gap-y-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          colors.map((swatch) => (
+            <li class="flex min-w-0 items-center gap-3">
+              <div
+                class:list={['size-10 shrink-0', swatch.outline && 'border border-border-strong']}
+                style={`background: var(${swatch.token}); border-radius: var(--radius-base)`}
+                aria-hidden="true"
+              />
+              <p class="text-body text-muted">{swatch.use}</p>
+            </li>
+          ))
+        }
+      </ul>
     </section>
 
     <section id="typography" class={sectionClass} aria-labelledby="typography-title">
@@ -213,141 +159,74 @@ const sectionTitleClass = 'subheading text-ink';
       <h2 id="layout-title" class={sectionTitleClass}>Layout</h2>
       <div class="mt-8 grid gap-16">
         <div>
-          <p class="text-body font-medium text-muted">Section stack</p>
-          <p class="mt-1 max-w-[58ch] text-body text-muted">
-            Space between page sections comes from parent
-            <code class="text-subtle">.section-stack</code> gap (5.5rem / 7rem at md+), not
-            top/bottom padding on each section.
-          </p>
-        </div>
-
-        <div>
           <p class="text-body font-medium text-muted">Page widths</p>
-          {
-            widths.map((item) => (
-              <div>
-                <p class="text-body font-medium text-muted">{item.name}</p>
-                <p class="mt-1 max-w-[54ch] text-body text-muted">
-                  {item.use}. Use <code class="text-subtle">{item.value}</code>.
-                </p>
-                <div class="mt-4 overflow-hidden border border-border bg-surface">
-                  <div
-                    class:list={[
-                      'mx-auto border border-dashed border-border-strong bg-canvas px-4 py-6 text-center text-body text-subtle',
-                      item.value,
-                    ]}
-                  >
-                    Content
-                  </div>
+          <div class="mt-4 grid gap-3 border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
+            {
+              widths.map((item) => (
+                <div
+                  class="border border-dashed border-border-strong bg-canvas flex justify-between gap-3 px-3 py-3 text-body"
+                  style={`width: ${(item.px / 1400) * 100}%`}
+                >
+                  <span class="text-muted">{item.name}</span>
+                  <span class="text-subtle">{item.px}px</span>
                 </div>
-              </div>
-            ))
-          }
-        </div>
-
-        <div>
-          <p class="text-body font-medium text-muted">Case study shell</p>
-          <p class="mt-1 max-w-[58ch] text-body text-muted">
-            Desktop (<code class="text-subtle">lg: 1024px+</code>): sticky 200px section nav +
-            <code class="text-subtle">max-w-3xl</code> article.
-            Below that, the nav collapses into a sticky horizontal bar under the header.
-          </p>
-          <div class="mt-4 grid gap-3">
-            <p class="text-body text-subtle">≥ 1024px</p>
-            <div
-              class="grid grid-cols-[72px_1fr] gap-3 border border-border bg-surface p-3 sm:grid-cols-[96px_1fr] sm:gap-4 sm:p-4"
-              aria-hidden="true"
-            >
-              <div class="flex flex-col gap-2 border border-dashed border-border-strong bg-canvas p-2">
-                <span class="text-[0.7rem] text-subtle">Back</span>
-                <span class="text-[0.7rem] text-muted">Context</span>
-                <span class="text-[0.7rem] text-muted">Outcome</span>
-                <span class="text-[0.7rem] text-muted">…</span>
-              </div>
-              <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">
-                Article · max-w-3xl
-              </div>
-            </div>
-            <p class="mt-2 text-body text-subtle">&lt; 1024px</p>
-            <div class="border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
-              <div class="mb-3 flex gap-3 overflow-hidden border border-dashed border-border-strong bg-canvas px-3 py-2">
-                <span class="shrink-0 text-[0.7rem] text-muted">Context</span>
-                <span class="shrink-0 text-[0.7rem] text-muted">Outcome</span>
-                <span class="shrink-0 text-[0.7rem] text-muted">Takeaways</span>
-                <span class="shrink-0 text-[0.7rem] text-subtle">→</span>
-              </div>
-              <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">
-                Article
-              </div>
-            </div>
+              ))
+            }
           </div>
-          <p class="mt-3 text-body text-subtle">
-            <code class="text-[0.85em]">lg:grid-cols-[200px_1fr]</code>
-            ·
-            <code class="text-[0.85em]">SidebarNav</code>
-          </p>
-        </div>
-
-        <div>
-          <p class="text-body font-medium text-muted">Comment mode shell</p>
-          <p class="mt-1 max-w-[58ch] text-body text-muted">
-            When feedback is on, the site sits in a framed canvas beside a 300px comment sidebar.
-            At <code class="text-subtle">≤ 900px</code> the shell stacks and the sidebar becomes a
-            bottom sheet (~36–40vh).
-          </p>
-          <div class="mt-4 grid gap-3">
-            <p class="text-body text-subtle">&gt; 900px</p>
-            <div
-              class="grid grid-cols-[1fr_64px] gap-2 border border-border bg-surface p-3 sm:grid-cols-[1fr_88px] sm:gap-2.5 sm:p-4"
-              aria-hidden="true"
-            >
-              <div class="border border-dashed border-border-strong bg-canvas px-3 py-8 text-center text-body text-subtle">
-                Site canvas
-              </div>
-              <div class="flex flex-col gap-2 border border-dashed border-border-strong bg-canvas p-2">
-                <span class="text-[0.7rem] text-muted">Comments</span>
-                <span class="mt-1 h-2 w-full bg-surface" />
-                <span class="h-2 w-3/4 bg-surface" />
-                <span class="h-2 w-full bg-surface" />
-              </div>
-            </div>
-            <p class="mt-2 text-body text-subtle">≤ 900px</p>
-            <div class="flex flex-col gap-2 border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
-              <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">
-                Site canvas
-              </div>
-              <div class="border border-dashed border-border-strong bg-canvas px-3 py-3 text-center text-body text-subtle">
-                Comment sheet
-              </div>
-            </div>
-          </div>
-          <p class="mt-3 text-body text-subtle">
-            <code class="text-[0.85em]">--comment-sidebar-width: 300px</code>
-            ·
-            <code class="text-[0.85em]">comment-mode.css</code>
-          </p>
         </div>
 
         <div>
           <p class="text-body font-medium text-muted">Breakpoints</p>
-          <p class="mt-1 max-w-[58ch] text-body text-muted">
-            Tailwind defaults plus one comment-mode custom cut. Device metadata treats
-            &lt;768 as mobile and &lt;1024 as tablet.
-          </p>
-          <ul class="mt-6 grid list-none gap-5 p-0 sm:grid-cols-2">
+          <div class="mt-4 grid grid-cols-4 border border-border bg-surface" aria-hidden="true">
             {
-              breakpoints.map((item) => (
-                <li class="min-w-0 border-t border-line pt-4">
-                  <p class="text-body font-medium text-muted">
-                    {item.name}
-                    <span class="mx-1.5 text-subtle">·</span>
-                    <code class="text-[0.85em] text-subtle">{item.value}</code>
-                  </p>
-                  <p class="mt-1 text-body text-muted">{item.use}</p>
-                </li>
+              breakpoints.map((item, index) => (
+                <div class:list={['px-3 py-3', index > 0 && 'border-l border-dashed border-border-strong']}>
+                  <p class="text-body text-muted">{item.name}</p>
+                  <p class="text-body text-subtle">{item.px === 0 ? '0' : `${item.px}px`}</p>
+                </div>
               ))
             }
-          </ul>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-body font-medium text-muted">Case study</p>
+          <div class="mt-4 grid gap-6 sm:grid-cols-[2fr_1fr]">
+            <div>
+              <p class="mb-2 text-body text-subtle">Desktop</p>
+              <div class="grid grid-cols-[72px_1fr] gap-3 border border-border bg-surface p-3 sm:grid-cols-[96px_1fr] sm:p-4" aria-hidden="true">
+                <div class="border border-dashed border-border-strong bg-canvas px-2 py-6 text-center text-body text-subtle">Nav</div>
+                <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">Article</div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-2 text-body text-subtle">Mobile</p>
+              <div class="grid gap-3 border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
+                <div class="border border-dashed border-border-strong bg-canvas px-3 py-2 text-center text-body text-subtle">Nav</div>
+                <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">Article</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="text-body font-medium text-muted">Comment mode</p>
+          <div class="mt-4 grid gap-6 sm:grid-cols-[2fr_1fr]">
+            <div>
+              <p class="mb-2 text-body text-subtle">Desktop</p>
+              <div class="grid grid-cols-[1fr_72px] gap-3 border border-border bg-surface p-3 sm:grid-cols-[1fr_96px] sm:p-4" aria-hidden="true">
+                <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">Site</div>
+                <div class="border border-dashed border-border-strong bg-canvas px-2 py-6 text-center text-body text-subtle">Comments</div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-2 text-body text-subtle">Mobile</p>
+              <div class="grid gap-3 border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
+                <div class="border border-dashed border-border-strong bg-canvas px-3 py-6 text-center text-body text-subtle">Site</div>
+                <div class="border border-dashed border-border-strong bg-canvas px-3 py-2 text-center text-body text-subtle">Comments</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -360,7 +239,7 @@ const sectionTitleClass = 'subheading text-ink';
       </p>
       <div
         class="mt-6 h-16 w-40 bg-canvas"
-        style="border: var(--border-width) solid var(--color-hairline); border-radius: var(--radius-card)"
+        style="border: var(--border-width) solid var(--color-hairline); border-radius: var(--radius-base)"
         aria-hidden="true"
       ></div>
       <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3">
@@ -373,7 +252,7 @@ const sectionTitleClass = 'subheading text-ink';
               </div>
               <div
                 class="size-20 bg-canvas"
-                style={`border: 2px solid var(${item.token}); border-radius: var(--radius-card)`}
+                style={`border: 2px solid var(${item.token}); border-radius: var(--radius-base)`}
                 aria-hidden="true"
               />
             </li>
@@ -411,80 +290,102 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="buttons" class={sectionClass} aria-labelledby="buttons-title">
       <h2 id="buttons-title" class={sectionTitleClass}>Buttons</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Leave feedback uses <code class="text-subtle">LeaveFeedbackButton</code> (React Bits SpecularButton
-        via <code class="text-subtle">ogl</code>). The nav instance hides in comment mode; footer and
-        in-page instances stay labeled “Leave feedback” and use the disabled state. Prefer text links for
-        navigation; reserve buttons for actions.
+        Leave feedback is the site's one call to action. Use it to invite visitors to comment on the
+        page.
       </p>
-      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
-        <div class="flex flex-wrap items-end gap-8">
+      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
           <div>
             <p class="mb-3 text-body text-subtle">Default</p>
             <LeaveFeedbackButton client:load />
           </div>
           <div>
+            <p class="mb-3 text-body text-subtle">Hover</p>
+            <LeaveFeedbackButton client:load previewState="hover" />
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Active</p>
+            <LeaveFeedbackButton client:load previewState="active" />
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Focus</p>
+            <LeaveFeedbackButton client:load previewState="focus" />
+          </div>
+          <div>
             <p class="mb-3 text-body text-subtle">Disabled</p>
-            <SpecularButton
-              client:load
-              size="sm"
-              radius={8}
-              tint="#f5f5f5"
-              tintOpacity={1}
-              textColor="#555555"
-              lineColor="#111111"
-              baseColor="#e8e8e8"
-              disabled
-            >
-              Leave feedback
-            </SpecularButton>
+            <LeaveFeedbackButton client:load previewState="disabled" />
           </div>
         </div>
       </div>
       <p class="mt-8 max-w-[58ch] text-body text-muted">
-        Text buttons use <code class="text-subtle">.button</code> with the dropdown trigger's padding and
-        type. <code class="text-subtle">is-tertiary</code> is muted text that fills with
-        <code class="text-subtle">--color-hover</code> on hover, for low-emphasis actions like Back.
-        <code class="text-subtle">is-secondary</code> sits on the header's frosted
-        <code class="text-subtle">--color-bar</code> with a <code class="text-subtle">--color-hairline</code>
-        border, for when the button floats over content. Back switches from tertiary to secondary once
-        it sticks under the header on smaller screens.
+        Text buttons are for lower-emphasis actions, like Back. Use tertiary when the button sits in
+        the page flow, and secondary when it floats over content.
       </p>
-      <div class="mt-6 border border-border bg-surface p-4 sm:p-6">
-        <div class="flex flex-wrap items-end gap-8">
-          <div>
-            <p class="mb-3 text-body text-subtle">Tertiary</p>
-            <button type="button" class="button is-tertiary">
-              <ArrowIcon direction="left" size="0.9em" />
-              Back
-            </button>
+      <div class="mt-6 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+        <div>
+          <p class="mb-5 text-body font-medium text-ink">Tertiary</p>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+            <div>
+              <p class="mb-3 text-body text-subtle">Default</p>
+              <button type="button" class="button is-tertiary">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Hover</p>
+              <button type="button" class="button is-tertiary is-hover" tabindex="-1">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Active</p>
+              <button type="button" class="button is-tertiary is-hover is-pressed" tabindex="-1">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Focus</p>
+              <button type="button" class="button is-tertiary is-focus" tabindex="-1">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
           </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Tertiary hover</p>
-            <button type="button" class="button is-tertiary is-hover" tabindex="-1">
-              <ArrowIcon direction="left" size="0.9em" />
-              Back
-            </button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Secondary</p>
-            <button type="button" class="button is-secondary">
-              <ArrowIcon direction="left" size="0.9em" />
-              Back
-            </button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Secondary hover</p>
-            <button type="button" class="button is-secondary is-hover" tabindex="-1">
-              <ArrowIcon direction="left" size="0.9em" />
-              Back
-            </button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Focus</p>
-            <button type="button" class="button is-tertiary is-focus" tabindex="-1">
-              <ArrowIcon direction="left" size="0.9em" />
-              Back
-            </button>
+        </div>
+        <div>
+          <p class="mb-5 text-body font-medium text-ink">Secondary</p>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+            <div>
+              <p class="mb-3 text-body text-subtle">Default</p>
+              <button type="button" class="button is-secondary">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Hover</p>
+              <button type="button" class="button is-secondary is-hover" tabindex="-1">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Active</p>
+              <button type="button" class="button is-secondary is-hover is-pressed" tabindex="-1">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Focus</p>
+              <button type="button" class="button is-secondary is-focus" tabindex="-1">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -493,63 +394,101 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="icon-control" class={sectionClass} aria-labelledby="icon-control-title">
       <h2 id="icon-control-title" class={sectionTitleClass}>Icon control</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Icon-only actions via <code class="text-subtle">IconControl</code>. Icons are from Lucide.
-        Used for the mobile nav toggle and the comment-mode exit control
-        (<code class="text-subtle">is-dismiss</code>). Hover fills with
-        <code class="text-subtle">--color-hover</code>; dismiss controls also rotate the × a quarter
-        turn. Use
-        <code class="text-subtle">is-primary</code> for the one main action in a surface, like posting a
-        comment: <code class="text-subtle">--color-ink</code> fill with a
-        <code class="text-subtle">--color-canvas</code> icon. Use
-        <code class="text-subtle">is-destructive</code> for actions that remove something, like deleting
-        a comment: hover fills with <code class="text-subtle">--color-danger-soft</code> and tints the icon
-        <code class="text-subtle">--color-danger</code>.
+        For compact actions where the icon speaks for itself, like opening the menu. Use dismiss to
+        close something, primary for the one main action in a surface, and destructive for actions
+        that delete something.
       </p>
-      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
-        <div class="flex flex-wrap items-end gap-8">
-          <div>
-            <p class="mb-3 text-body text-subtle">Default</p>
-            <IconControl label="Open menu" icon="menu" />
+      <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+        <div>
+          <p class="mb-5 text-body font-medium text-ink">Standard</p>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+            <div>
+              <p class="mb-3 text-body text-subtle">Default</p>
+              <IconControl label="Open menu" icon="menu" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Hover</p>
+              <IconControl label="Open menu" icon="menu" class="is-hover" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Active</p>
+              <IconControl label="Open menu" icon="menu" class="is-hover is-pressed" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Focus</p>
+              <IconControl label="Open menu" icon="menu" class="is-focus" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Selected</p>
+              <IconControl label="Close menu" icon="x" aria-pressed="true" />
+            </div>
           </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Hover</p>
-            <IconControl label="Open menu" icon="menu" class="is-hover" />
+        </div>
+        <div>
+          <p class="mb-5 text-body font-medium text-ink">Dismiss</p>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+            <div>
+              <p class="mb-3 text-body text-subtle">Default</p>
+              <IconControl label="Close" icon="x" class="is-dismiss" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Hover</p>
+              <IconControl label="Close" icon="x" class="is-dismiss is-hover" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Active</p>
+              <IconControl label="Close" icon="x" class="is-dismiss is-hover is-pressed" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Focus</p>
+              <IconControl label="Close" icon="x" class="is-dismiss is-focus" />
+            </div>
           </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Selected</p>
-            <IconControl label="Close menu" icon="x" aria-pressed="true" />
+        </div>
+        <div>
+          <p class="mb-5 text-body font-medium text-ink">Primary</p>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+            <div>
+              <p class="mb-3 text-body text-subtle">Default</p>
+              <IconControl label="Post comment" icon="arrow-right" class="is-primary" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Hover</p>
+              <IconControl label="Post comment" icon="arrow-right" class="is-primary is-hover" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Active</p>
+              <IconControl label="Post comment" icon="arrow-right" class="is-primary is-hover is-pressed" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Focus</p>
+              <IconControl label="Post comment" icon="arrow-right" class="is-primary is-focus" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Disabled</p>
+              <IconControl label="Post comment" icon="arrow-right" class="is-primary" disabled />
+            </div>
           </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Focus</p>
-            <IconControl label="Open menu" icon="menu" class="is-focus" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Dismiss</p>
-            <IconControl label="Close" icon="x" class="is-dismiss" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Dismiss hover</p>
-            <IconControl label="Close" icon="x" class="is-dismiss is-hover" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Primary</p>
-            <IconControl label="Post comment" icon="arrow-right" class="is-primary" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Primary hover</p>
-            <IconControl label="Post comment" icon="arrow-right" class="is-primary is-hover" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Primary disabled</p>
-            <IconControl label="Post comment" icon="arrow-right" class="is-primary" disabled />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Destructive</p>
-            <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Destructive hover</p>
-            <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-hover" />
+        </div>
+        <div>
+          <p class="mb-5 text-body font-medium text-ink">Destructive</p>
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+            <div>
+              <p class="mb-3 text-body text-subtle">Default</p>
+              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Hover</p>
+              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-hover" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Active</p>
+              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-hover is-pressed" />
+            </div>
+            <div>
+              <p class="mb-3 text-body text-subtle">Focus</p>
+              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-focus" />
+            </div>
           </div>
         </div>
       </div>
@@ -558,18 +497,12 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="dropdown" class={sectionClass} aria-labelledby="dropdown-title">
       <h2 id="dropdown-title" class={sectionTitleClass}>Dropdown</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Replaces the OS menu so fills and hover match the site. Add
-        <code class="text-subtle">data-dropdown</code> to a <code class="text-subtle">&lt;select&gt;</code>
-        (or call <code class="text-subtle">enhanceSelect</code>); the select stays the source of truth
-        for <code class="text-subtle">value</code> and <code class="text-subtle">change</code>. The menu
-        corner is concentric with its options. One shared fill slides between options as you hover
-        or arrow through them (<code class="text-subtle">attachDropdownHighlight</code>). Used for the
-        color mode menu, comment categories, and the history version picker.
+        For picking one option from a short list, like a comment's category or the color mode.
       </p>
-      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
-        <div class="flex flex-wrap items-start gap-8">
+      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+        <div class="flex flex-wrap items-start gap-x-14 gap-y-10">
           <div>
-            <p class="mb-3 text-body text-subtle">Try it</p>
+            <p class="mb-3 text-body text-subtle">Default</p>
             <select class="dropdown-trigger" data-dropdown aria-label="Category">
               {dropdownOptions.map((option, index) => (
                 <option value={index === 0 ? '' : option}>{option}</option>
@@ -581,8 +514,16 @@ const sectionTitleClass = 'subheading text-ink';
             <button type="button" class="dropdown-trigger is-hover" tabindex="-1">Category</button>
           </div>
           <div>
+            <p class="mb-3 text-body text-subtle">Active</p>
+            <button type="button" class="dropdown-trigger is-pressed" tabindex="-1">Category</button>
+          </div>
+          <div>
             <p class="mb-3 text-body text-subtle">Focus</p>
             <button type="button" class="dropdown-trigger is-focus" tabindex="-1">Category</button>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Disabled</p>
+            <button type="button" class="dropdown-trigger" disabled>Category</button>
           </div>
           <div>
             <p class="mb-3 text-body text-subtle">Open</p>
@@ -607,53 +548,23 @@ const sectionTitleClass = 'subheading text-ink';
           </div>
         </div>
       </div>
-      <dl class="mt-6 grid max-w-2xl gap-x-6 gap-y-2 sm:grid-cols-[12rem_1fr]">
-        {
-          dropdownTokens.map((item) => (
-            <>
-              <dt class="text-body text-muted">{item.part}</dt>
-              <dd class="m-0 text-body text-ink">
-                <code>{item.token}</code>
-              </dd>
-            </>
-          ))
-        }
-      </dl>
     </section>
 
     <section id="tag" class={sectionClass} aria-labelledby="tag-title">
       <h2 id="tag-title" class={sectionTitleClass}>Tag</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Read-only label with the same type as the dropdown trigger, but no chevron or hover because
-        it can't be changed. Fill is
-        <code class="text-subtle">--color-border-strong</code>, a step darker than the dropdown
-        trigger's <code class="text-subtle">--color-surface-strong</code> so it still reads against
-        the page background without a hover state to lean on. Padding is
-        <code class="text-subtle">--dropdown-pad</code> (doubled on the sides), and the text box is
-        trimmed to cap height so the label sits optically centered. Use <code class="text-subtle">.tag</code>. Shows
-        the category on read-only comment cards. Add <code class="text-subtle">is-count</code> for a
-        compact number next to a label, like the comment totals on each admin review tab; it takes
-        its text color from the parent so it dims with an inactive tab.
+        For showing a value that can't be changed, like a comment's category. Use count for a number
+        next to a label, like the total on a tab.
       </p>
-      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
-        <div class="flex flex-wrap items-start gap-8">
+      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+        <div class="flex flex-wrap items-start gap-x-14 gap-y-10">
           <div>
             <p class="mb-3 text-body text-subtle">Tag</p>
             <span class="tag">Accessibility</span>
           </div>
           <div>
-            <p class="mb-3 text-body text-subtle">Next to a dropdown</p>
-            <div class="flex items-center gap-3">
-              <span class="tag">Visual design</span>
-              <button type="button" class="dropdown-trigger" tabindex="-1">Visual design</button>
-            </div>
-          </div>
-          <div>
             <p class="mb-3 text-body text-subtle">Count</p>
-            <div class="flex items-center gap-4 text-body">
-              <span class="inline-flex items-center gap-1.5 text-ink">This page <span class="tag is-count">6</span></span>
-              <span class="inline-flex items-center gap-1.5 text-subtle">All pages <span class="tag is-count">7</span></span>
-            </div>
+            <span class="tag is-count text-ink">6</span>
           </div>
         </div>
       </div>
@@ -662,12 +573,11 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="links" class={sectionClass} aria-labelledby="links-title">
       <h2 id="links-title" class={sectionTitleClass}>Links</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Header, footer, and inline navigation. Use <code class="text-subtle">.text-link</code>. The
-        current page uses <code class="text-subtle">aria-current="page"</code> — no separate page
-        heading needed.
+        For moving between pages in the header, footer, and body copy. Selected marks the page you're
+        on, and copied confirms something was copied to the clipboard.
       </p>
-      <div class="mt-8 border border-border bg-surface p-4 sm:p-6">
-        <div class="flex flex-wrap items-end gap-10">
+      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+        <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
           <div>
             <p class="mb-3 text-body text-subtle">Default</p>
             <a href="/about" class="text-link text-body text-ink">About</a>
@@ -675,6 +585,14 @@ const sectionTitleClass = 'subheading text-ink';
           <div>
             <p class="mb-3 text-body text-subtle">Hover</p>
             <a href="/about" class="text-link is-hover text-body text-ink">About</a>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Active</p>
+            <a href="/about" class="text-link is-pressed text-body text-ink">About</a>
+          </div>
+          <div>
+            <p class="mb-3 text-body text-subtle">Focus</p>
+            <a href="/about" class="text-link is-focus text-body text-ink">About</a>
           </div>
           <div>
             <p class="mb-3 text-body text-subtle">Selected</p>
@@ -685,10 +603,6 @@ const sectionTitleClass = 'subheading text-ink';
             >
               About
             </a>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Focus</p>
-            <a href="/about" class="text-link is-focus text-body text-ink">About</a>
           </div>
           <div>
             <p class="mb-3 text-body text-subtle">Copied</p>
@@ -710,7 +624,18 @@ const sectionTitleClass = 'subheading text-ink';
 
 <style>
   main :global(.border) {
-    border-radius: var(--radius-card);
+    border-radius: var(--radius-base);
+  }
+
+  /* Rounder than the controls inside; not tied to the padding */
+  main .showcase-card {
+    border-radius: calc(var(--radius-base) + 1rem);
+  }
+
+  @media (min-width: 640px) {
+    main .showcase-card {
+      border-radius: calc(var(--radius-base) + 1.5rem);
+    }
   }
 </style>
 

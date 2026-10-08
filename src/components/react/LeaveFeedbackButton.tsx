@@ -36,12 +36,15 @@ export type LeaveFeedbackButtonProps = {
    * Other instances stay visible, keep the “Leave feedback” label, and disable.
    */
   hideInCommentMode?: boolean;
+  /** Pin a state for the design system page. */
+  previewState?: 'hover' | 'active' | 'focus' | 'disabled';
 };
 
 export default function LeaveFeedbackButton({
   id,
   className = '',
   hideInCommentMode = false,
+  previewState,
 }: LeaveFeedbackButtonProps) {
   const [theme, setTheme] = useState<Theme>('light');
   const [inCommentMode, setInCommentMode] = useState(false);
@@ -95,14 +98,16 @@ export default function LeaveFeedbackButton({
 
   const colors = themeProps[theme];
   const hidden = hideInCommentMode && inCommentMode;
-  const disabled = !hideInCommentMode && inCommentMode;
+  const disabled = previewState === 'disabled' || (!hideInCommentMode && inCommentMode);
+  const stateClass =
+    previewState === 'active' ? 'is-pressed' : previewState === 'focus' ? 'is-focus' : '';
 
   if (hidden) return null;
 
   return (
     <SpecularButton
       id={id}
-      className={className}
+      className={[className, stateClass].filter(Boolean).join(' ')}
       size="sm"
       radius={8}
       tint={colors.tint}
@@ -118,7 +123,7 @@ export default function LeaveFeedbackButton({
       speed={0.35}
       followMouse
       proximity={250}
-      autoAnimate={false}
+      autoAnimate={previewState === 'hover' || previewState === 'active'}
       disabled={disabled}
       aria-pressed={inCommentMode}
       onClick={onClick}

@@ -189,8 +189,8 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
     height: 100%;
     width: auto;
     object-fit: cover;
-    border-radius: var(--radius-card);
-    background: var(--color-surface-strong);
+    border-radius: var(--radius-base);
+    background: var(--color-fill);
     scroll-snap-align: start;
   }
 
@@ -241,7 +241,7 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
     grid-template-columns: 1fr 1fr;
     padding: var(--toggle-pad);
     border-radius: 999px;
-    background: var(--color-bar-strong);
+    background: var(--color-glass-hover);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 1px 3px rgb(0 0 0 / 12%);

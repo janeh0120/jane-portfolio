@@ -139,8 +139,8 @@ const linkClass = (href: string) =>
     padding: 0.6rem;
     padding-left: 1.1rem;
     border: var(--border-width, 0.5px) solid var(--color-hairline);
-    border-radius: calc(var(--radius-card) + 0.6rem + var(--border-width, 0.5px));
-    background: var(--color-bar);
+    border-radius: var(--radius-panel);
+    background: var(--color-glass);
     backdrop-filter: blur(40px) saturate(1.5);
     -webkit-backdrop-filter: blur(40px) saturate(1.5);
   }
@@ -157,8 +157,8 @@ const linkClass = (href: string) =>
       grid-template-rows: 1fr;
       margin-top: 0.5rem;
       border: var(--border-width) solid var(--color-hairline);
-      border-radius: var(--radius-card);
-      background: var(--color-bar-strong);
+      border-radius: var(--radius-base);
+      background: var(--color-glass-hover);
       backdrop-filter: blur(40px) saturate(1.5);
       -webkit-backdrop-filter: blur(40px) saturate(1.5);
     }

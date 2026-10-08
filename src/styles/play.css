@@ -66,7 +66,7 @@
 
 .play-button {
   padding: 14px 32px;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
@@ -118,7 +118,7 @@
 
 .gallery-item {
   background: transparent;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   overflow: hidden;
   cursor: pointer;
   position: relative;
@@ -174,7 +174,7 @@
 
 .gallery-modal-content {
   background: transparent;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   max-width: min(1100px, 100%);
   width: fit-content;
   max-height: 90vh;
@@ -209,7 +209,7 @@
   border: none;
   width: 40px;
   height: 40px;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   font-size: 24px;
   cursor: pointer;
   z-index: 3010;
@@ -362,7 +362,7 @@
 .carousel-dot {
   width: 8px;
   height: 8px;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   background: rgb(255 255 255 / 50%);
   border: none;
   padding: 0;
@@ -373,7 +373,7 @@
 .carousel-dot.active {
   background: white;
   width: 24px;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
 }
 
 .carousel-arrow {
@@ -385,7 +385,7 @@
   border: none;
   width: 40px;
   height: 40px;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   display: inline-flex;
   align-items: center;
   justify-content: center;

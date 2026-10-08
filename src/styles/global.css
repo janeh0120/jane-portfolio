@@ -49,15 +49,17 @@
   --color-accent-soft: rgb(36 108 255 / 12%);
 
   --color-surface: #f5f5f5;
-  --color-surface-strong: #ebebeb;
+  /* Controls at rest, hover/pressed/open, and hover inside menus or on white */
+  --color-fill: #ebebeb;
+  --color-hover: #e0e0e0;
+  --color-hover-subtle: #f5f5f5;
   --color-border: #e8e8e8;
   --color-border-strong: #e0e0e0;
-  --color-hover: #e5e5e5;
   --color-danger: #b42318;
   --color-danger-soft: #fef2f2;
   --color-placeholder: #c8c8c8;
-  --color-bar: rgb(255 255 255 / 72%);
-  --color-bar-strong: rgb(255 255 255 / 82%);
+  --color-glass: rgb(255 255 255 / 72%);
+  --color-glass-hover: rgb(255 255 255 / 82%);
   --color-hairline: rgb(17 17 17 / 8%);
 
   /* One corner radius for every border */
@@ -66,7 +68,7 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.5rem;
-  --radius-card: 0.5rem;
+  --radius-base: 0.5rem;
   --radius-full: 0.5rem;
 
   --max-w-site: 1400px;
@@ -79,8 +81,10 @@
     /* Nav, comment cards, and the page frame */
     --border-width: 0.5px;
     --bar-inset: 0.6rem;
-    /* Dropdown menu inset; also the tag padding */
-    --dropdown-pad: 4px;
+    /* Floating panels (nav, footer card): the corner plus the inset to the controls inside */
+    --radius-panel: calc(var(--radius-base) + var(--bar-inset) + var(--border-width));
+    /* Small inset: menu padding, tag padding */
+    --space-inset: 4px;
     font-family: var(--font-sans);
     background: var(--color-page);
     color: var(--color-ink);
@@ -185,6 +189,12 @@
     text-decoration-color: var(--color-ink);
   }
 
+  .text-link:active,
+  .text-link.is-pressed {
+    color: var(--color-muted);
+    text-decoration-color: var(--color-muted);
+  }
+
   .text-link[aria-current='page'],
   .text-link.is-active {
     font-weight: 500;
@@ -227,7 +237,7 @@
     min-height: 32px;
     padding: 0;
     border: none;
-    border-radius: var(--radius-card);
+    border-radius: var(--radius-base);
     background: transparent;
     color: var(--color-muted);
     font: inherit;
@@ -236,7 +246,8 @@
     box-shadow: none;
     transition:
       color 0.15s ease,
-      background 0.15s ease;
+      background 0.15s ease,
+      transform 0.15s ease;
   }
 
   .icon-control.is-dismiss {
@@ -265,10 +276,19 @@
     background: var(--color-hover);
   }
 
+  .icon-control:active:not(:disabled),
+  .icon-control.is-pressed {
+    transform: scale(0.92);
+  }
+
   .icon-control.is-dismiss:hover,
-  .icon-control.is-dismiss.is-hover,
-  .icon-control.is-dismiss:active {
+  .icon-control.is-dismiss.is-hover {
     transform: rotate(90deg);
+  }
+
+  .icon-control.is-dismiss:active,
+  .icon-control.is-dismiss.is-pressed {
+    transform: rotate(90deg) scale(0.92);
   }
 
   .icon-control.is-primary {
@@ -353,7 +373,7 @@
 .surface-card {
   background: var(--color-canvas);
   border: 1px solid var(--color-hairline);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   padding: 1.75rem 1.35rem;
 }
 
@@ -365,7 +385,7 @@
 
 .project-card-media {
   overflow: hidden;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   background: var(--color-canvas);
 }
 
@@ -382,12 +402,14 @@
   color: var(--color-ink);
   text-align: left;
   white-space: nowrap;
-  background: var(--color-surface-strong);
+  background: var(--color-fill);
   border: none;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   appearance: none;
   cursor: pointer;
-  transition: background-color 0.12s ease;
+  transition:
+    background-color 0.12s ease,
+    transform 0.15s ease;
 }
 
 .dropdown-trigger::after {
@@ -406,13 +428,19 @@
 .dropdown-trigger:hover,
 .dropdown-trigger.is-hover,
 .dropdown-trigger[aria-expanded="true"] {
-  background-color: var(--color-border-strong);
+  background-color: var(--color-hover);
 }
 
 .dropdown-trigger:focus-visible,
 .dropdown-trigger.is-focus {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+.dropdown-trigger:active:not(:disabled),
+.dropdown-trigger.is-pressed {
+  background-color: var(--color-hover);
+  transform: scale(0.97);
 }
 
 .dropdown-trigger:disabled {
@@ -425,19 +453,19 @@
 .tag {
   display: inline-block;
   min-width: 0;
-  padding: var(--dropdown-pad) calc(var(--dropdown-pad) * 2);
+  padding: var(--space-inset) calc(var(--space-inset) * 2);
   font-size: 0.875rem;
   line-height: 1;
   color: var(--color-ink);
   white-space: nowrap;
-  background: var(--color-border-strong);
-  border-radius: var(--radius-card);
+  background: var(--color-fill);
+  border-radius: var(--radius-base);
   /* The font's descender space sits the text high; trim to cap height so padding is even */
   text-box: trim-both cap alphabetic;
 }
 
 .tag.is-count {
-  padding: var(--dropdown-pad) calc(var(--dropdown-pad) * 1.5);
+  padding: var(--space-inset) calc(var(--space-inset) * 1.5);
   font-size: 0.75rem;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
@@ -460,16 +488,22 @@
   text-decoration: none;
   background: transparent;
   border: var(--border-width) solid transparent;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   cursor: pointer;
   transition:
     color 0.15s ease,
     background-color 0.15s ease,
-    border-color 0.15s ease;
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.button:active:not(:disabled),
+.button.is-pressed {
+  transform: scale(0.97);
 }
 
 .button.is-secondary {
-  background: var(--color-bar);
+  background: var(--color-glass);
   border-color: var(--color-hairline);
   backdrop-filter: blur(40px) saturate(1.5);
   -webkit-backdrop-filter: blur(40px) saturate(1.5);
@@ -477,7 +511,7 @@
 
 .button.is-secondary:hover,
 .button.is-secondary.is-hover {
-  background: var(--color-bar-strong);
+  background: var(--color-glass-hover);
 }
 
 .button.is-tertiary {
@@ -501,14 +535,14 @@
   min-width: 10rem;
   max-height: min(20rem, calc(100vh - 16px));
   overflow-y: auto;
-  padding: var(--dropdown-pad);
+  padding: var(--space-inset);
   box-sizing: border-box;
   font-family: var(--font-sans);
   font-size: 0.875rem;
   color: var(--color-ink);
   background: var(--color-canvas);
   border: var(--border-width) solid var(--color-border);
-  border-radius: calc(var(--radius-card) + var(--dropdown-pad) + var(--border-width));
+  border-radius: calc(var(--radius-base) + var(--space-inset) + var(--border-width));
   box-shadow: 0 12px 32px rgb(0 0 0 / 14%);
 }
 
@@ -531,14 +565,14 @@
   white-space: nowrap;
   background: transparent;
   border: none;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   cursor: pointer;
   user-select: none;
 }
 
 .dropdown-option:hover,
 .dropdown-option.is-active {
-  background: var(--color-surface);
+  background: var(--color-hover-subtle);
 }
 
 .dropdown-option[aria-disabled="true"] {
@@ -550,12 +584,12 @@
 .dropdown-highlight {
   position: absolute;
   top: 0;
-  left: var(--dropdown-pad);
-  right: var(--dropdown-pad);
+  left: var(--space-inset);
+  right: var(--space-inset);
   z-index: 0;
   height: 0;
-  border-radius: var(--radius-card);
-  background: var(--color-surface);
+  border-radius: var(--radius-base);
+  background: var(--color-hover-subtle);
   opacity: 0;
   pointer-events: none;
   transition:
@@ -676,15 +710,16 @@ html.theme-dark {
   --color-line: #2a2a2a;
   --color-link: #f3f3f3;
   --color-surface: #262626;
-  --color-surface-strong: #303030;
+  --color-fill: #303030;
+  --color-hover: #4a4a4a;
+  --color-hover-subtle: #262626;
   --color-border: #3a3a3a;
   --color-border-strong: #4a4a4a;
-  --color-hover: #262626;
   --color-danger: #ff8d85;
   --color-danger-soft: #3a1d1b;
   --color-placeholder: #5c5c5c;
-  --color-bar: rgb(28 28 28 / 78%);
-  --color-bar-strong: rgb(28 28 28 / 88%);
+  --color-glass: rgb(28 28 28 / 78%);
+  --color-glass-hover: rgb(28 28 28 / 88%);
   --color-hairline: rgb(255 255 255 / 12%);
 }
 

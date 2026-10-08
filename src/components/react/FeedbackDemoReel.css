@@ -1,5 +1,5 @@
 .feedback-demo-reel {
-  --radius-card: 0.5rem;
+  --radius-base: 0.5rem;
   --border-width: 0.5px;
   --color-canvas: #ffffff;
   --color-ink: #111111;
@@ -18,7 +18,7 @@
   overflow: hidden;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   background-color: #1e4fd6;
   background-size: cover;
   background-position: center;
@@ -79,7 +79,7 @@
   width: auto !important;
   height: auto !important;
   z-index: 0 !important;
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-base);
   background: rgb(255 255 255 / 16%) !important;
   border: 2px solid #ffffff !important;
   box-sizing: border-box !important;
