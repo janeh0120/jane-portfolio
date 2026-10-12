@@ -4,6 +4,8 @@ import ArrowIcon from './ArrowIcon.astro';
 interface NavItem {
   label: string;
   href: string;
+  /** Shown indented under this item, as a subsection. */
+  children?: NavItem[];
 }
 
 interface Props {
@@ -27,7 +29,7 @@ const home = backHref ?? base;
 const hasNav = nav.length > 0;
 ---
 
-<aside class="case-study-aside lg:sticky lg:top-24 lg:self-start">
+<aside class="case-study-aside lg:sticky lg:self-start">
   {
     showBack && (
       <a href={home} class="button is-tertiary case-study-back">
@@ -42,11 +44,26 @@ const hasNav = nav.length > 0;
         class="case-study-nav mt-6 hidden flex-col gap-3 lg:flex"
         aria-label={ariaLabel}
       >
-        {nav.map((item) => (
-          <a href={item.href} class="text-body text-muted transition hover:text-ink">
-            {item.label}
-          </a>
-        ))}
+        {nav.map((item) =>
+          item.children?.length ? (
+            <div class="case-study-nav-group">
+              <a href={item.href} class="section-nav-link text-body text-muted transition hover:text-ink">
+                {item.label}
+              </a>
+              <div class="case-study-nav-children">
+                {item.children.map((child) => (
+                  <a href={child.href} class="section-nav-link text-body text-muted transition hover:text-ink">
+                    {child.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <a href={item.href} class="section-nav-link text-body text-muted transition hover:text-ink">
+              {item.label}
+            </a>
+          ),
+        )}
       </nav>
     )
   }
@@ -86,6 +103,36 @@ const hasNav = nav.length > 0;
         history.replaceState(null, '', href);
       });
     });
+
+    // The current section: the last one whose top has scrolled past a line just under the sticky
+    // nav (or the last one, at the bottom of the page). Its link gets the dot (.is-current).
+    const links = [...nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+    const sections = links.map((link) => document.getElementById(link.hash.slice(1)));
+    const scroller = document.getElementById('site-canvas');
+    const LINE = 140;
+    let frame = 0;
+
+    const markCurrent = () => {
+      frame = 0;
+      let current = -1;
+      sections.forEach((section, index) => {
+        if (section && section.getBoundingClientRect().top <= LINE) current = index;
+      });
+      const box = scroller ?? document.documentElement;
+      if (box.scrollTop + box.clientHeight >= box.scrollHeight - 2) current = sections.length - 1;
+      links.forEach((link, index) => {
+        const isCurrent = index === current;
+        link.classList.toggle('is-current', isCurrent);
+        if (isCurrent) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    const requestMark = () => {
+      if (!frame) frame = requestAnimationFrame(markCurrent);
+    };
+    (scroller ?? window).addEventListener('scroll', requestMark, { passive: true });
+    window.addEventListener('resize', requestMark);
+    markCurrent();
   }
 </script>
 
@@ -100,17 +147,51 @@ const hasNav = nav.length > 0;
     scroll-margin-top: 5rem;
   }
 
+  .case-study-nav-group,
+  .case-study-nav-children {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  /* Subsection links sit indented under their group, with a hairline marking the group */
+  .case-study-nav-children {
+    margin-left: var(--space-1);
+    padding-left: var(--space-3);
+    border-left: 1px solid var(--color-border-strong);
+  }
+
+  /* Once the nav bar hugs its contents (768px up), the back button sticks level with it, centred on
+     the same line: it is about as tall as the bar's controls, so it centres when it sits the bar's
+     inset (space-2) below where the bar starts (--header-offset). */
+  .case-study-aside {
+    --back-top: calc(var(--header-offset, 1rem) + var(--space-2));
+  }
+
+  @media (min-width: 1024px) {
+    .case-study-aside {
+      top: var(--back-top);
+    }
+  }
+
   @media (max-width: 1023px) {
     .case-study-aside {
       position: sticky;
       top: 4.5rem;
       z-index: 40;
-      padding-block: 0.75rem;
+      padding-block: var(--space-3);
       pointer-events: none;
     }
 
     .case-study-back {
       pointer-events: auto;
+    }
+  }
+
+  /* (The aside's own top padding comes off, so the button itself lands on the line) */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .case-study-aside {
+      top: calc(var(--back-top) - var(--space-3));
     }
   }
 </style>

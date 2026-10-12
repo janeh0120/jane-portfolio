@@ -4,89 +4,145 @@ import Header from '../components/Header.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import SidebarNav from '../components/SidebarNav.astro';
 import IconControl from '../components/IconControl.astro';
+import ThemeMenu from '../components/ThemeMenu.astro';
 import ArrowIcon from '../components/ArrowIcon.astro';
 import LeaveFeedbackButton from '../components/react/LeaveFeedbackButton';
 import SpecularButton from '../components/react/SpecularButton';
 import { site } from '../data/site';
+import { galleryItems } from '../lib/play-gallery';
+import '../styles/play.css';
+import globalCss from '../styles/global.css?raw';
 
 const sections = [
   { id: 'colors', label: 'Colors' },
   { id: 'typography', label: 'Typography' },
   { id: 'layout', label: 'Layout' },
-  { id: 'borders', label: 'Borders' },
-  { id: 'radius', label: 'Radius' },
-  { id: 'buttons', label: 'Buttons' },
-  { id: 'icon-control', label: 'Icon control' },
-  { id: 'dropdown', label: 'Dropdown' },
-  { id: 'tag', label: 'Tag' },
-  { id: 'links', label: 'Links' },
+  { id: 'elevation', label: 'Elevation' },
+  { id: 'shapes', label: 'Shapes' },
+  {
+    id: 'components',
+    label: 'Components',
+    children: [
+      { id: 'buttons', label: 'Buttons' },
+      { id: 'icon-control', label: 'Icon control' },
+      { id: 'dropdown', label: 'Dropdown' },
+      { id: 'segmented-toggle', label: 'Segmented toggle' },
+      { id: 'tag', label: 'Tag' },
+      { id: 'links', label: 'Links' },
+      { id: 'media-overlay', label: 'Media overlay' },
+      { id: 'section-nav', label: 'Section nav' },
+      { id: 'comments', label: 'Comments' },
+    ],
+  },
+  { id: 'motion', label: 'Motion' },
 ];
 
 const dropdownOptions = ['Category', 'Accessibility', 'Content', 'Visual design', 'Bug'];
 
-const colors = [
-  { use: 'Page background', token: '--color-canvas', outline: true },
-  { use: 'Primary text', token: '--color-ink' },
-  { use: 'Secondary text', token: '--color-muted' },
-  { use: 'Tertiary text', token: '--color-subtle' },
-  { use: 'Dividers', token: '--color-line', outline: true },
-  { use: 'Panels', token: '--color-surface' },
-  { use: 'Outlines', token: '--color-border' },
-  { use: 'Control fill', token: '--color-fill' },
-  { use: 'Hover', token: '--color-hover' },
-  { use: 'Subtle hover', token: '--color-hover-subtle', outline: true },
-  { use: 'Floating surface', token: '--color-glass', outline: true },
-  { use: 'Accent', token: '--color-accent' },
-  { use: 'Selected · focus fill', token: '--color-accent-soft', outline: true },
-  { use: 'Errors', token: '--color-danger' },
-  { use: 'Error background', token: '--color-danger-soft', outline: true },
+// Mirrors the colour tokens in DESIGN.md; swatches read the live CSS variables, so they follow the
+// colour mode.
+const colorGroups = [
+  {
+    name: 'Text',
+    swatches: [
+      { use: 'Primary text', token: '--color-ink' },
+      { use: 'Secondary text', token: '--color-muted' },
+      { use: 'Labels · disabled', token: '--color-subtle' },
+    ],
+  },
+  {
+    name: 'Surfaces',
+    swatches: [
+      { use: 'Page background', token: '--color-page', outline: true },
+      { use: 'Cards · menus', token: '--color-canvas', outline: true },
+      { use: 'Panels', token: '--color-surface', outline: true },
+      { use: 'Floating bars', token: '--color-glass', outline: true },
+    ],
+  },
+  {
+    name: 'Controls',
+    swatches: [
+      { use: 'Control fill', token: '--color-fill' },
+      { use: 'Hover · pressed', token: '--color-hover' },
+      { use: 'Hover in menus', token: '--color-hover-subtle', outline: true },
+    ],
+  },
+  {
+    name: 'Lines',
+    swatches: [
+      { use: 'Dividers', token: '--color-line', outline: true },
+      { use: 'Outlines', token: '--color-border' },
+      { use: 'Strong outlines', token: '--color-border-strong' },
+      { use: 'Hairline (0.5px)', token: '--color-hairline' },
+    ],
+  },
+  {
+    name: 'Accent and errors',
+    swatches: [
+      { use: 'Focus · selection · primary button', token: '--color-accent' },
+      { use: 'Text on accent', token: '--color-on-accent', outline: true },
+      { use: 'Selected fill', token: '--color-accent-soft', outline: true },
+      { use: 'Errors', token: '--color-danger' },
+      { use: 'Error background', token: '--color-danger-soft', outline: true },
+    ],
+  },
+  {
+    name: 'Media',
+    swatches: [
+      { use: 'Overlay backdrop (page colour, 88%)', token: '--color-overlay', outline: true },
+      { use: 'Behind embedded video', token: '--color-media-backdrop' },
+    ],
+  },
 ];
 
+// One entry per --type-* token; samples render with the token itself
 const typeStyles = [
-  {
-    className: 'hero-copy',
-    label: 'Display',
-    sample: site.hero.headline,
-  },
-  {
-    className: 'heading',
-    label: 'Heading',
-    sample: 'A design community shouldn’t graduate without a shared experience.',
-  },
-  {
-    className: 'subheading',
-    label: 'Subheading',
-    sample: 'Intuit Design System',
-  },
-  {
-    className: 'text-body',
-    label: 'Body',
-    sample:
-      'I love when design can bridge the intersection between solving technical and people problems.',
-  },
+  { token: 'display', label: 'Display', spec: 'Bold · 2.5–3.625rem · the largest headline', sample: site.hero.headline },
+  { token: 'intro', label: 'Intro', spec: 'Bold · 1.75–2.5rem · intro line, Brand project titles', sample: 'I care about people and want to design around them.' },
+  { token: 'heading', label: 'Heading', spec: 'Bold · 1.625–2.375rem · page titles and statements', sample: 'A design community shouldn’t graduate without a shared experience.' },
+  { token: 'subheading', label: 'Subheading', spec: 'Bold · 1–1.25rem · section and project titles', sample: 'Intuit Design System' },
+  { token: 'quote', label: 'Quote', spec: 'Regular · 1–1.25rem / 1.35 · pull quotes', sample: '“It finally felt like one system.”' },
+  { token: 'body', label: 'Body', spec: 'Regular · 14px / 1.65 · body, metadata, nav', sample: 'I love when design can bridge the intersection between solving technical and people problems.' },
+  { token: 'label', label: 'Label', spec: 'Medium · 14px / 1.65 · labels above values, the current nav link', sample: 'Page widths' },
+  { token: 'compact', label: 'Compact', spec: 'Regular · 14px / 1.35 · controls, captions, dense lists', sample: 'Leave feedback' },
+  { token: 'tag', label: 'Tag', spec: 'Regular · 14px / 1 · tags', sample: 'Accessibility' },
+  { token: 'count', label: 'Count', spec: 'Medium · 12px / 1 · numbers beside a label', sample: '12' },
 ];
+
+// Spacing scale on a 4px grid; matches Tailwind's spacing (space-3 = mt-3 = 0.75rem)
+const spacing = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24].map((step) => ({
+  token: `--space-${step}`,
+  px: step * 4,
+}));
 
 const borders = [
-  {
-    name: 'Line',
-    token: '--color-line',
-    detail: '1px · portfolio dividers',
-  },
-  {
-    name: 'Border',
-    token: '--color-border',
-    detail: '1px · inputs · cards',
-  },
-  {
-    name: 'Border strong',
-    token: '--color-border-strong',
-    detail: '1px · higher contrast',
-  },
+  { name: 'Hairline', token: '--color-hairline', width: 'var(--border-width)', detail: '0.5px · nav bar, comment cards' },
+  { name: 'Line', token: '--color-line', width: '1px', detail: '1px · dividers' },
+  { name: 'Border', token: '--color-border', width: '1px', detail: '1px · inputs, cards' },
+  { name: 'Border strong', token: '--color-border-strong', width: '1px', detail: '1px · higher contrast' },
+];
+
+const shadows = [
+  { name: 'Raised', token: '--shadow-raised', detail: 'Cards that lift slightly' },
+  { name: 'Floating', token: '--shadow-floating', detail: 'Menus and popovers' },
 ];
 
 const radii = [
   { name: 'None', token: '--radius-none', detail: '0 · full-bleed frames' },
-  { name: 'Corner', token: '--radius-base', detail: '0.5rem · controls and cards' },
+  { name: 'Corner', token: '--radius-base', detail: '0.5rem · everything' },
+  { name: 'Menu', token: '--radius-menu', detail: '12.5px · menus' },
+  { name: 'Panel', token: '--radius-panel', detail: '16.5px · nav bar, footer' },
+  { name: 'Pill', token: '--radius-pill', detail: 'Segmented toggles only' },
+];
+
+const motion = [
+  { name: 'Press', demo: 'press', detail: 'Controls shrink slightly when pressed.' },
+  { name: 'Hover', demo: 'hover', detail: 'Colours change over 0.15s.' },
+  { name: 'Menus', demo: 'menu', detail: 'Fade in, with a highlight that slides between options.' },
+  { name: 'Reveal', demo: 'reveal', detail: 'Sections rise and fade in as they scroll into view.' },
+  { name: 'Nav bar', demo: 'nav', detail: 'Links fold away as you scroll down, narrowing the bar, and return as you scroll up.' },
+  { name: 'Media overlay', demo: 'overlay', detail: 'The image grows from its spot on the page to the centre.' },
+  { name: 'Reduced motion', demo: 'reduced', detail: 'Animations become instant changes.' },
 ];
 
 const widths = [
@@ -102,6 +158,16 @@ const breakpoints = [
   { name: 'Desktop', px: 1024 },
 ];
 
+// A Play image for the media overlay example
+const overlaySample = `${import.meta.env.BASE_URL}${galleryItems[1]?.thumb ?? galleryItems[1]?.images[0] ?? 'images/about/about-me.jpg'}`;
+
+// Every colour, spacing, radius, shadow, and type token in global.css, for Inspect mode. Tailwind's
+// radius aliases (sm … full) all equal the corner, and the inspector's own colours aren't part of
+// any component, so both are left out to keep matches readable.
+const tokenNames = [
+  ...new Set(globalCss.match(/--(?:color|space|radius|shadow|type)-[a-z0-9-]+(?=\s*:)/g) ?? []),
+].filter((name) => !/^--radius-(sm|md|lg|xl|full)$|^--color-(measure|on-measure|pin)$/.test(name));
+
 const sectionClass = 'scroll-mt-28 md:scroll-mt-32';
 const sectionTitleClass = 'subheading text-ink';
 ---
@@ -111,7 +177,11 @@ const sectionTitleClass = 'subheading text-ink';
   <main class="page-frame pb-24 pt-6 md:pt-8">
     <div class="grid gap-8 lg:grid-cols-[200px_1fr] lg:gap-20">
       <SidebarNav
-        nav={sections.map((item) => ({ label: item.label, href: `#${item.id}` }))}
+        nav={sections.map((item) => ({
+          label: item.label,
+          href: `#${item.id}`,
+          children: item.children?.map((child) => ({ label: child.label, href: `#${child.id}` })),
+        }))}
         ariaLabel="Design system sections"
       />
 
@@ -119,36 +189,64 @@ const sectionTitleClass = 'subheading text-ink';
         <div>
           <h1 class="hero-copy text-ink">Design system</h1>
           <p class="mt-3 max-w-[58ch] text-body text-muted">
-            Built with Astro, Tailwind, and React and adapted to light and dark mode.
+            Built with Astro, Tailwind, and React, documented in Google's DESIGN.md format, and adapted
+            to light and dark mode.
           </p>
+          <!-- The footer's colour mode menu, up front: switching it repaints every token below -->
+          <div class="ds-mode-cta mt-6">
+            <span class="text-body text-ink">Switch the colour mode to see every token change</span>
+            <ThemeMenu id="ds-theme-menu" placement="down" />
+          </div>
         </div>
 
     <section id="colors" class={sectionClass} aria-labelledby="colors-title">
       <h2 id="colors-title" class={sectionTitleClass}>Colors</h2>
-      <ul class="mt-8 grid list-none grid-cols-1 gap-x-8 gap-y-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+      <p class="mt-3 max-w-[58ch] text-body text-muted">
+        Named by role, each with a dark-mode value. Blue marks focus, selection, and the one primary button.
+      </p>
+      <div class="mt-8 grid gap-10">
         {
-          colors.map((swatch) => (
-            <li class="flex min-w-0 items-center gap-3">
-              <div
-                class:list={['size-10 shrink-0', swatch.outline && 'border border-border-strong']}
-                style={`background: var(${swatch.token}); border-radius: var(--radius-base)`}
-                aria-hidden="true"
-              />
-              <p class="text-body text-muted">{swatch.use}</p>
-            </li>
+          colorGroups.map((group) => (
+            <div>
+              <p class="text-body font-medium text-muted">{group.name}</p>
+              <ul class="mt-4 grid list-none grid-cols-1 gap-x-8 gap-y-4 p-0 sm:grid-cols-2 lg:grid-cols-3">
+                {group.swatches.map((swatch) => (
+                  <li class="flex min-w-0 items-center gap-3">
+                    <div
+                      class:list={['size-10 shrink-0', swatch.outline && 'border border-border-strong']}
+                      style={`background: var(${swatch.token}); border-radius: var(--radius-base)`}
+                      aria-hidden="true"
+                    />
+                    <div class="min-w-0">
+                      <p class="text-body text-ink">{swatch.use}</p>
+                      <p class="text-body text-muted">{swatch.token}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))
         }
-      </ul>
+      </div>
     </section>
 
     <section id="typography" class={sectionClass} aria-labelledby="typography-title">
       <h2 id="typography-title" class={sectionTitleClass}>Typography</h2>
+      <p class="mt-3 max-w-[58ch] text-body text-muted">
+        One typeface, TeX Gyre Heros, in ten type tokens. Components set type with these, never with loose sizes.
+      </p>
       <div class="mt-8 grid gap-12">
         {
           typeStyles.map((item) => (
             <div>
               <p class="text-body font-medium text-muted">{item.label}</p>
-              <div class:list={[item.className, 'mt-4 text-ink']}>{item.sample}</div>
+              <p class="text-body text-muted">--type-{item.token} · {item.spec}</p>
+              <div
+                class="mt-4 text-ink"
+                style={`font: var(--type-${item.token}); letter-spacing: var(--tracking-${['display', 'intro', 'heading', 'subheading', 'quote'].includes(item.token) ? 'tight' : 'body'})`}
+              >
+                {item.sample}
+              </div>
             </div>
           ))
         }
@@ -158,6 +256,28 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="layout" class={sectionClass} aria-labelledby="layout-title">
       <h2 id="layout-title" class={sectionTitleClass}>Layout</h2>
       <div class="mt-8 grid gap-16">
+        <div>
+          <p class="text-body font-medium text-muted">Spacing</p>
+          <p class="mt-1 max-w-[58ch] text-body text-muted">
+            Padding, margins, and gaps use this 4px scale, matching Tailwind's spacing classes.
+          </p>
+          <ul class="mt-4 grid list-none gap-2 p-0" aria-label="Spacing scale">
+            {
+              spacing.map((item) => (
+                <li class="grid grid-cols-[6.5rem_3rem_1fr] items-center gap-3 text-body">
+                  <span class="text-ink">{item.token}</span>
+                  <span class="text-muted">{item.px}px</span>
+                  <span
+                    class="block h-3"
+                    style={`width: var(${item.token}); background: var(--color-hover); border-radius: 2px`}
+                    aria-hidden="true"
+                  />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
         <div>
           <p class="text-body font-medium text-muted">Page widths</p>
           <div class="mt-4 grid gap-3 border border-border bg-surface p-3 sm:p-4" aria-hidden="true">
@@ -231,53 +351,71 @@ const sectionTitleClass = 'subheading text-ink';
       </div>
     </section>
 
-    <section id="borders" class={sectionClass} aria-labelledby="borders-title">
-      <h2 id="borders-title" class={sectionTitleClass}>Borders</h2>
+    <section id="elevation" class={sectionClass} aria-labelledby="elevation-title">
+      <h2 id="elevation-title" class={sectionTitleClass}>Elevation</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        The nav bar, comment cards, and page frame use a 0.5px border. Dividers and inputs stay
-        1px.
+        Mostly flat: depth comes from tone, hairline borders, and two shadow levels.
       </p>
-      <div
-        class="mt-6 h-16 w-40 bg-canvas"
-        style="border: var(--border-width) solid var(--color-hairline); border-radius: var(--radius-base)"
-        aria-hidden="true"
-      ></div>
-      <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3">
-        {
-          borders.map((item) => (
-            <li class="grid justify-items-start gap-4">
-              <div>
-                <p class="text-body font-medium text-muted">{item.name}</p>
-                <p class="mt-1 text-body text-muted">{item.detail}</p>
-              </div>
-              <div
-                class="size-20 bg-canvas"
-                style={`border: 2px solid var(${item.token}); border-radius: var(--radius-base)`}
-                aria-hidden="true"
-              />
-            </li>
-          ))
-        }
-      </ul>
+      <div class="mt-8 grid gap-16">
+        <div>
+          <p class="text-body font-medium text-muted">Borders</p>
+          <ul class="mt-4 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-4">
+            {
+              borders.map((item) => (
+                <li class="grid justify-items-start gap-4">
+                  <div>
+                    <p class="text-body text-ink">{item.name}</p>
+                    <p class="mt-1 text-body text-muted">{item.detail}</p>
+                  </div>
+                  <div
+                    class="size-20 bg-canvas"
+                    style={`border: ${item.width} solid var(${item.token}); border-radius: var(--radius-base)`}
+                    aria-hidden="true"
+                  />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div>
+          <p class="text-body font-medium text-muted">Shadows</p>
+          <ul class="mt-4 grid list-none grid-cols-1 gap-x-6 gap-y-10 p-0 sm:grid-cols-2">
+            {
+              shadows.map((item) => (
+                <li class="grid justify-items-start gap-4">
+                  <div>
+                    <p class="text-body text-ink">{item.name}</p>
+                    <p class="mt-1 text-body text-muted">{item.detail}</p>
+                  </div>
+                  <div
+                    class="h-20 w-40 bg-canvas"
+                    style={`box-shadow: var(${item.token}); border-radius: var(--radius-base)`}
+                    aria-hidden="true"
+                  />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
     </section>
 
-    <section id="radius" class={sectionClass} aria-labelledby="radius-title">
-      <h2 id="radius-title" class={sectionTitleClass}>Radius</h2>
+    <section id="shapes" class={sectionClass} aria-labelledby="shapes-title">
+      <h2 id="shapes-title" class={sectionTitleClass}>Shapes</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Controls, cards, and media use one corner. A shell around a nested control adds its padding
-        to that radius, so the two curves share a center. In comment mode the page frame corner is
-        the nav radius plus the space between the frame edge and the nav.
+        One corner radius for everything; a shell adds its padding to it. The pill is only for segmented toggles.
       </p>
-      <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3 lg:grid-cols-6">
+      <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3 lg:grid-cols-5">
         {
           radii.map((item) => (
             <li class="grid justify-items-start gap-4">
               <div>
-                <p class="text-body font-medium text-muted">{item.name}</p>
+                <p class="text-body text-ink">{item.name}</p>
                 <p class="mt-1 text-body text-muted">{item.detail}</p>
               </div>
               <div
-                class="size-20 bg-surface"
+                class:list={['bg-surface', item.token === '--radius-pill' ? 'h-10 w-20' : 'size-20']}
                 style={`border-radius: var(${item.token})`}
                 aria-hidden="true"
               />
@@ -287,335 +425,573 @@ const sectionTitleClass = 'subheading text-ink';
       </ul>
     </section>
 
-    <section id="buttons" class={sectionClass} aria-labelledby="buttons-title">
-      <h2 id="buttons-title" class={sectionTitleClass}>Buttons</h2>
+    <section id="components" class={sectionClass} aria-labelledby="components-title">
+      <h2 id="components-title" class="heading text-ink">Components</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        Leave feedback is the site's one call to action. Use it to invite visitors to comment on the
-        page.
+        Switch to Inspect and hover a component to see the tokens it's built from.
       </p>
-      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
-        <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
-          <div>
-            <p class="mb-3 text-body text-subtle">Default</p>
-            <LeaveFeedbackButton client:load />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Hover</p>
-            <LeaveFeedbackButton client:load previewState="hover" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Active</p>
-            <LeaveFeedbackButton client:load previewState="active" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Focus</p>
-            <LeaveFeedbackButton client:load previewState="focus" />
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Disabled</p>
-            <LeaveFeedbackButton client:load previewState="disabled" />
-          </div>
+      <div class="mt-6">
+        <div class="segmented" role="group" aria-label="How to show the components" data-inspect-toggle>
+          <span class="segmented-thumb" aria-hidden="true"></span>
+          <button type="button" class="segmented-option" data-inspect-choice="preview" aria-pressed="true">Preview</button>
+          <button type="button" class="segmented-option" data-inspect-choice="inspect" aria-pressed="false">Inspect</button>
         </div>
       </div>
-      <p class="mt-8 max-w-[58ch] text-body text-muted">
-        Text buttons are for lower-emphasis actions, like Back. Use tertiary when the button sits in
-        the page flow, and secondary when it floats over content.
-      </p>
-      <div class="mt-6 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
-        <div>
-          <p class="mb-5 text-body font-medium text-ink">Tertiary</p>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
-            <div>
-              <p class="mb-3 text-body text-subtle">Default</p>
-              <button type="button" class="button is-tertiary">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Hover</p>
-              <button type="button" class="button is-tertiary is-hover" tabindex="-1">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Active</p>
-              <button type="button" class="button is-tertiary is-hover is-pressed" tabindex="-1">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Focus</p>
-              <button type="button" class="button is-tertiary is-focus" tabindex="-1">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
+      <div class="section-stack mt-12 md:mt-16">
+        <section id="buttons" class={sectionClass} aria-labelledby="buttons-title">
+          <h3 id="buttons-title" class={sectionTitleClass}>Buttons</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            Leave feedback is the site's one call to action: the accent fill with on-accent text.
+          </p>
+          <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+              <div>
+                <p class="mb-3 text-body text-subtle">Default</p>
+                <LeaveFeedbackButton client:load />
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Hover</p>
+                <LeaveFeedbackButton client:load previewState="hover" />
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Active</p>
+                <LeaveFeedbackButton client:load previewState="active" />
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Focus</p>
+                <LeaveFeedbackButton client:load previewState="focus" />
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Disabled</p>
+                <LeaveFeedbackButton client:load previewState="disabled" />
+              </div>
             </div>
           </div>
-        </div>
-        <div>
-          <p class="mb-5 text-body font-medium text-ink">Secondary</p>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+          <p class="mt-10 max-w-[58ch] text-body text-muted">
+            For lower-emphasis actions like Back: secondary over content, tertiary in the page flow.
+          </p>
+          <div class="mt-6 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
             <div>
-              <p class="mb-3 text-body text-subtle">Default</p>
-              <button type="button" class="button is-secondary">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Hover</p>
-              <button type="button" class="button is-secondary is-hover" tabindex="-1">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Active</p>
-              <button type="button" class="button is-secondary is-hover is-pressed" tabindex="-1">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Focus</p>
-              <button type="button" class="button is-secondary is-focus" tabindex="-1">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="icon-control" class={sectionClass} aria-labelledby="icon-control-title">
-      <h2 id="icon-control-title" class={sectionTitleClass}>Icon control</h2>
-      <p class="mt-3 max-w-[58ch] text-body text-muted">
-        For compact actions where the icon speaks for itself, like opening the menu. Use dismiss to
-        close something, primary for the one main action in a surface, and destructive for actions
-        that delete something.
-      </p>
-      <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
-        <div>
-          <p class="mb-5 text-body font-medium text-ink">Standard</p>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
-            <div>
-              <p class="mb-3 text-body text-subtle">Default</p>
-              <IconControl label="Open menu" icon="menu" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Hover</p>
-              <IconControl label="Open menu" icon="menu" class="is-hover" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Active</p>
-              <IconControl label="Open menu" icon="menu" class="is-hover is-pressed" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Focus</p>
-              <IconControl label="Open menu" icon="menu" class="is-focus" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Selected</p>
-              <IconControl label="Close menu" icon="x" aria-pressed="true" />
-            </div>
-          </div>
-        </div>
-        <div>
-          <p class="mb-5 text-body font-medium text-ink">Dismiss</p>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
-            <div>
-              <p class="mb-3 text-body text-subtle">Default</p>
-              <IconControl label="Close" icon="x" class="is-dismiss" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Hover</p>
-              <IconControl label="Close" icon="x" class="is-dismiss is-hover" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Active</p>
-              <IconControl label="Close" icon="x" class="is-dismiss is-hover is-pressed" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Focus</p>
-              <IconControl label="Close" icon="x" class="is-dismiss is-focus" />
-            </div>
-          </div>
-        </div>
-        <div>
-          <p class="mb-5 text-body font-medium text-ink">Primary</p>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
-            <div>
-              <p class="mb-3 text-body text-subtle">Default</p>
-              <IconControl label="Post comment" icon="arrow-right" class="is-primary" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Hover</p>
-              <IconControl label="Post comment" icon="arrow-right" class="is-primary is-hover" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Active</p>
-              <IconControl label="Post comment" icon="arrow-right" class="is-primary is-hover is-pressed" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Focus</p>
-              <IconControl label="Post comment" icon="arrow-right" class="is-primary is-focus" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Disabled</p>
-              <IconControl label="Post comment" icon="arrow-right" class="is-primary" disabled />
-            </div>
-          </div>
-        </div>
-        <div>
-          <p class="mb-5 text-body font-medium text-ink">Destructive</p>
-          <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
-            <div>
-              <p class="mb-3 text-body text-subtle">Default</p>
-              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Hover</p>
-              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-hover" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Active</p>
-              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-hover is-pressed" />
-            </div>
-            <div>
-              <p class="mb-3 text-body text-subtle">Focus</p>
-              <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-focus" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="dropdown" class={sectionClass} aria-labelledby="dropdown-title">
-      <h2 id="dropdown-title" class={sectionTitleClass}>Dropdown</h2>
-      <p class="mt-3 max-w-[58ch] text-body text-muted">
-        For picking one option from a short list, like a comment's category or the color mode.
-      </p>
-      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
-        <div class="flex flex-wrap items-start gap-x-14 gap-y-10">
-          <div>
-            <p class="mb-3 text-body text-subtle">Default</p>
-            <select class="dropdown-trigger" data-dropdown aria-label="Category">
-              {dropdownOptions.map((option, index) => (
-                <option value={index === 0 ? '' : option}>{option}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Hover</p>
-            <button type="button" class="dropdown-trigger is-hover" tabindex="-1">Category</button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Active</p>
-            <button type="button" class="dropdown-trigger is-pressed" tabindex="-1">Category</button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Focus</p>
-            <button type="button" class="dropdown-trigger is-focus" tabindex="-1">Category</button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Disabled</p>
-            <button type="button" class="dropdown-trigger" disabled>Category</button>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Open</p>
-            <button type="button" class="dropdown-trigger" aria-expanded="true" tabindex="-1">
-              Visual design
-            </button>
-            <div class="dropdown-menu relative mt-1.5" role="presentation" data-dropdown-preview>
-              {dropdownOptions.map((option) => (
-                <div
-                  class:list={['dropdown-option', { 'is-active': option === 'Content' }]}
-                  aria-selected={option === 'Visual design' ? 'true' : 'false'}
-                >
-                  <span class="dropdown-check" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M20 6 9 17l-5-5" />
-                    </svg>
-                  </span>
-                  <span>{option}</span>
+              <p class="mb-5 text-body font-medium text-ink">Secondary</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <button type="button" class="button is-secondary">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
                 </div>
-              ))}
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <button type="button" class="button is-secondary is-hover" tabindex="-1">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <button type="button" class="button is-secondary is-hover is-pressed" tabindex="-1">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <button type="button" class="button is-secondary is-focus" tabindex="-1">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Tertiary</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <button type="button" class="button is-tertiary">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <button type="button" class="button is-tertiary is-hover" tabindex="-1">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <button type="button" class="button is-tertiary is-hover is-pressed" tabindex="-1">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <button type="button" class="button is-tertiary is-focus" tabindex="-1">
+                    <ArrowIcon direction="left" size="0.9em" />
+                    Back
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
+
+        <section id="icon-control" class={sectionClass} aria-labelledby="icon-control-title">
+          <h3 id="icon-control-title" class={sectionTitleClass}>Icon control</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            For compact actions where the icon speaks for itself. Dismiss closes, primary is the main action, destructive deletes.
+          </p>
+          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Standard</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <IconControl label="Open menu" icon="menu" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <IconControl label="Open menu" icon="menu" class="is-hover" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <IconControl label="Open menu" icon="menu" class="is-hover is-pressed" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <IconControl label="Open menu" icon="menu" class="is-focus" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Selected</p>
+                  <IconControl label="Close menu" icon="x" aria-pressed="true" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Dismiss</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <IconControl label="Close" icon="x" class="is-dismiss" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <IconControl label="Close" icon="x" class="is-dismiss is-hover" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <IconControl label="Close" icon="x" class="is-dismiss is-hover is-pressed" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <IconControl label="Close" icon="x" class="is-dismiss is-focus" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Primary</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <IconControl label="Post comment" icon="arrow-right" class="is-primary" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <IconControl label="Post comment" icon="arrow-right" class="is-primary is-hover" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <IconControl label="Post comment" icon="arrow-right" class="is-primary is-hover is-pressed" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <IconControl label="Post comment" icon="arrow-right" class="is-primary is-focus" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Disabled</p>
+                  <IconControl label="Post comment" icon="arrow-right" class="is-primary" disabled />
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Destructive</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-hover" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-hover is-pressed" />
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive is-focus" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="dropdown" class={sectionClass} aria-labelledby="dropdown-title">
+          <h3 id="dropdown-title" class={sectionTitleClass}>Dropdown</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            For picking one option from a short list, like a comment's category or the color mode.
+          </p>
+          <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+            <div class="flex flex-wrap items-start gap-x-14 gap-y-10">
+              <div>
+                <p class="mb-3 text-body text-subtle">Default</p>
+                <select class="dropdown-trigger" data-dropdown aria-label="Category">
+                  {dropdownOptions.map((option, index) => (
+                    <option value={index === 0 ? '' : option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Hover</p>
+                <button type="button" class="dropdown-trigger is-hover" tabindex="-1">Category</button>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Active</p>
+                <button type="button" class="dropdown-trigger is-pressed" tabindex="-1">Category</button>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Focus</p>
+                <button type="button" class="dropdown-trigger is-focus" tabindex="-1">Category</button>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Disabled</p>
+                <button type="button" class="dropdown-trigger" disabled>Category</button>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Open</p>
+                <button type="button" class="dropdown-trigger" aria-expanded="true" tabindex="-1">
+                  Visual design
+                </button>
+                <div class="dropdown-menu relative mt-1.5" role="presentation" data-dropdown-preview>
+                  {dropdownOptions.map((option) => (
+                    <div
+                      class:list={['dropdown-option', { 'is-active': option === 'Content' }]}
+                      aria-selected={option === 'Visual design' ? 'true' : 'false'}
+                    >
+                      <span class="dropdown-check" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M20 6 9 17l-5-5" />
+                        </svg>
+                      </span>
+                      <span>{option}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="segmented-toggle" class={sectionClass} aria-labelledby="segmented-toggle-title">
+          <h3 id="segmented-toggle-title" class={sectionTitleClass}>Segmented toggle</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            Switches between two views of the same thing, like light and dark. Use glass over media.
+          </p>
+          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Default</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">First selected</p>
+                  <div class="segmented" role="group" aria-label="Example">
+                    <span class="segmented-thumb" aria-hidden="true"></span>
+                    <button type="button" class="segmented-option" aria-pressed="true" tabindex="-1">Web</button>
+                    <button type="button" class="segmented-option" aria-pressed="false" tabindex="-1">Problems</button>
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <div class="segmented" role="group" aria-label="Example">
+                    <span class="segmented-thumb" aria-hidden="true"></span>
+                    <button type="button" class="segmented-option" aria-pressed="true" tabindex="-1">Web</button>
+                    <button type="button" class="segmented-option is-hover" aria-pressed="false" tabindex="-1">Problems</button>
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Second selected</p>
+                  <div class="segmented" role="group" aria-label="Example">
+                    <span class="segmented-thumb" aria-hidden="true"></span>
+                    <button type="button" class="segmented-option" aria-pressed="false" tabindex="-1">Web</button>
+                    <button type="button" class="segmented-option" aria-pressed="true" tabindex="-1">Problems</button>
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <div class="segmented" role="group" aria-label="Example">
+                    <span class="segmented-thumb" aria-hidden="true"></span>
+                    <button type="button" class="segmented-option is-focus" aria-pressed="true" tabindex="-1">Web</button>
+                    <button type="button" class="segmented-option" aria-pressed="false" tabindex="-1">Problems</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Glass, over media</p>
+              <div class="media-demo p-4" style={`background-image: url('${overlaySample}')`}>
+                <div class="segmented is-glass" role="group" aria-label="Example">
+                  <span class="segmented-thumb" aria-hidden="true"></span>
+                  <button type="button" class="segmented-option" aria-pressed="true" tabindex="-1">Light</button>
+                  <button type="button" class="segmented-option" aria-pressed="false" tabindex="-1">Dark</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tag" class={sectionClass} aria-labelledby="tag-title">
+          <h3 id="tag-title" class={sectionTitleClass}>Tag</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            A value that can't be changed, like a comment's category. Count shows a number beside a label.
+          </p>
+          <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+            <div class="flex flex-wrap items-start gap-x-14 gap-y-10">
+              <div>
+                <p class="mb-3 text-body text-subtle">Tag</p>
+                <span class="tag">Accessibility</span>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Count</p>
+                <span class="tag is-count text-ink">6</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="links" class={sectionClass} aria-labelledby="links-title">
+          <h3 id="links-title" class={sectionTitleClass}>Links</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            For moving between pages. Selected marks the current page.
+          </p>
+          <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+              <div>
+                <p class="mb-3 text-body text-subtle">Default</p>
+                <a href="/about" class="text-link text-body text-ink">About</a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Hover</p>
+                <a href="/about" class="text-link is-hover text-body text-ink">About</a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Active</p>
+                <a href="/about" class="text-link is-pressed text-body text-ink">About</a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Focus</p>
+                <a href="/about" class="text-link is-focus text-body text-ink">About</a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Selected</p>
+                <a
+                  href="/about"
+                  class="text-link is-active text-body text-ink"
+                  aria-current="page"
+                >
+                  About
+                </a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Copied</p>
+                <span
+                  class="text-link text-body font-medium text-accent"
+                  style="text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent)"
+                >
+                  Copied!
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="media-overlay" class={sectionClass} aria-labelledby="media-overlay-title">
+          <h3 id="media-overlay-title" class={sectionTitleClass}>Media overlay and carousel</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            Opens an image larger, growing from its spot on the page over a see-through backdrop. Arrows and slide dots sit below the image.
+          </p>
+          <div class="mt-8 showcase-card overlay-demo flex justify-center border border-border bg-surface p-6 sm:p-10">
+            <div class="gallery-modal-content">
+              <div class="gallery-carousel-container">
+                <div class="gallery-carousel">
+                  <div class="gallery-carousel-slide">
+                    <img src={overlaySample} alt="Example slide" />
+                  </div>
+                </div>
+              </div>
+              <div class="carousel-nav">
+                <IconControl label="Previous slide" tabindex="-1"><ArrowIcon direction="left" size="16px" /></IconControl>
+                <div class="carousel-controls">
+                  <span class="carousel-dot active" aria-hidden="true"></span>
+                  <span class="carousel-dot" aria-hidden="true"></span>
+                  <span class="carousel-dot" aria-hidden="true"></span>
+                </div>
+                <IconControl label="Next slide" tabindex="-1"><ArrowIcon direction="right" size="16px" /></IconControl>
+              </div>
+              <p class="gallery-modal-description">A caption describing the work, in secondary text.</p>
+              <div class="segmented gallery-mode-toggle" role="group" aria-label="Example">
+                <span class="segmented-thumb" aria-hidden="true"></span>
+                <button type="button" class="segmented-option" aria-pressed="true" tabindex="-1">Light</button>
+                <button type="button" class="segmented-option" aria-pressed="false" tabindex="-1">Dark</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="section-nav" class={sectionClass} aria-labelledby="section-nav-title">
+          <h3 id="section-nav-title" class={sectionTitleClass}>Section nav</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            The sidebar list of links to a page's sections. A dot marks the section you're reading.
+          </p>
+          <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
+            <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+              <div>
+                <p class="mb-3 text-body text-subtle">Default</p>
+                <a href="#colors" class="section-nav-link text-body text-muted">Colors</a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Hover</p>
+                <a href="#colors" class="section-nav-link is-hover text-body text-muted" tabindex="-1">Colors</a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Focus</p>
+                <a href="#colors" class="section-nav-link is-focus text-body text-muted" tabindex="-1">Colors</a>
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">Current</p>
+                <span class="section-nav-link is-current text-body text-muted">Colors</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="comments" class={sectionClass} aria-labelledby="comments-title">
+          <h3 id="comments-title" class={sectionTitleClass}>Comments</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            A comment's category, the element it's about, and the text. Your own comments can be
+            recategorised, edited, and deleted; everyone else's are read-only.
+          </p>
+          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Your comment</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] items-start gap-x-10 gap-y-10">
+                {
+                  [
+                    { state: 'Default', card: '', body: '' },
+                    { state: 'Hover', card: 'is-hover', body: '' },
+                    { state: 'Text hover', card: 'is-hover', body: 'is-hover' },
+                    { state: 'Active', card: 'is-active', body: '' },
+                    { state: 'Editing', card: 'is-active is-editing-comment', body: '', editing: true },
+                    { state: 'Error', card: 'is-active is-editing-comment', body: '', editing: true, error: true },
+                  ].map((cell) => (
+                    <div>
+                      <p class="mb-3 text-body text-subtle">{cell.state}</p>
+                      <article class:list={['comment-sidebar-card', cell.card]}>
+                        <div class="comment-sidebar-card-header">
+                          <button type="button" class="comment-sidebar-card-category-select" tabindex="-1">Visual design</button>
+                          <IconControl label="Delete comment" icon="x" class="is-dismiss is-destructive comment-sidebar-card-delete" tabindex="-1" />
+                        </div>
+                        <p class="comment-sidebar-card-title">Hero image</p>
+                        {cell.editing ? (
+                          <textarea class="comment-sidebar-card-body-input" rows="3" tabindex="-1" readonly>{'The contrast on this caption is a little low.'}</textarea>
+                        ) : (
+                          <p class:list={['comment-sidebar-card-body', cell.body]}>The contrast on this caption is a little low.</p>
+                        )}
+                        {cell.error && <p class="comment-sidebar-card-error">Could not update comment.</p>}
+                      </article>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Read-only</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] items-start gap-x-10 gap-y-10">
+                {
+                  [
+                    { state: 'Default', card: '' },
+                    { state: 'Hover', card: 'is-hover' },
+                    { state: 'Active', card: 'is-active' },
+                    { state: 'Admin review', card: '', meta: true },
+                  ].map((cell) => (
+                    <div>
+                      <p class="mb-3 text-body text-subtle">{cell.state}</p>
+                      <article class:list={['comment-sidebar-card comment-sidebar-card--readonly', cell.card]}>
+                        <div class="comment-sidebar-card-header">
+                          <span class="tag comment-sidebar-card-category-label">Visual design</span>
+                        </div>
+                        <p class="comment-sidebar-card-title">Hero image</p>
+                        <p class="comment-sidebar-card-body">The contrast on this caption is a little low.</p>
+                        {cell.meta && <p class="comment-sidebar-card-meta">Oct 12, 2026, 9:30 a.m. · Desktop · macOS · 1440px</p>}
+                      </article>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
 
-    <section id="tag" class={sectionClass} aria-labelledby="tag-title">
-      <h2 id="tag-title" class={sectionTitleClass}>Tag</h2>
+
+    <section id="motion" class={sectionClass} aria-labelledby="motion-title">
+      <h2 id="motion-title" class={sectionTitleClass}>Motion</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        For showing a value that can't be changed, like a comment's category. Use count for a number
-        next to a label, like the total on a tab.
+        Quick and physical: things press in and slide.
       </p>
-      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
-        <div class="flex flex-wrap items-start gap-x-14 gap-y-10">
-          <div>
-            <p class="mb-3 text-body text-subtle">Tag</p>
-            <span class="tag">Accessibility</span>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Count</p>
-            <span class="tag is-count text-ink">6</span>
-          </div>
-        </div>
-      </div>
+      <dl class="mt-8 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        {
+          motion.map((item) => (
+            <div>
+              <div class:list={['motion-stage showcase-card border border-border bg-surface p-6 sm:p-10', `is-${item.demo}`]} aria-hidden="true">
+                {item.demo === 'menu' ? (
+                  <div class="motion-menu">
+                    <span class="motion-menu-highlight" />
+                    <span class="motion-menu-row" />
+                    <span class="motion-menu-row" />
+                    <span class="motion-menu-row" />
+                  </div>
+                ) : item.demo === 'nav' ? (
+                  <div class="motion-nav">
+                    <span class="motion-nav-logo" />
+                    <span class="motion-nav-links">
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                    <span class="motion-nav-button" />
+                  </div>
+                ) : item.demo === 'overlay' ? (
+                  <>
+                    <span class="motion-backdrop" />
+                    <span class="motion-square" />
+                  </>
+                ) : (
+                  <span class="motion-square" />
+                )}
+              </div>
+              <dt class="mt-3 text-body font-medium text-ink">{item.name}</dt>
+              <dd class="mt-1 text-body text-muted">{item.detail}</dd>
+            </div>
+          ))
+        }
+      </dl>
     </section>
 
-    <section id="links" class={sectionClass} aria-labelledby="links-title">
-      <h2 id="links-title" class={sectionTitleClass}>Links</h2>
-      <p class="mt-3 max-w-[58ch] text-body text-muted">
-        For moving between pages in the header, footer, and body copy. Selected marks the page you're
-        on, and copied confirms something was copied to the clipboard.
-      </p>
-      <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
-        <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
-          <div>
-            <p class="mb-3 text-body text-subtle">Default</p>
-            <a href="/about" class="text-link text-body text-ink">About</a>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Hover</p>
-            <a href="/about" class="text-link is-hover text-body text-ink">About</a>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Active</p>
-            <a href="/about" class="text-link is-pressed text-body text-ink">About</a>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Focus</p>
-            <a href="/about" class="text-link is-focus text-body text-ink">About</a>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Selected</p>
-            <a
-              href="/about"
-              class="text-link is-active text-body text-ink"
-              aria-current="page"
-            >
-              About
-            </a>
-          </div>
-          <div>
-            <p class="mb-3 text-body text-subtle">Copied</p>
-            <span
-              class="text-link text-body font-medium text-accent"
-              style="text-decoration-color: color-mix(in srgb, var(--color-accent) 40%, transparent)"
-            >
-              Copied!
-            </span>
-          </div>
-        </div>
-      </div>
-    </section>
       </div>
     </div>
   </main>
@@ -623,6 +999,394 @@ const sectionTitleClass = 'subheading text-ink';
 </Layout>
 
 <style>
+  /* Component specimens: not usable; a layer on top catches the pointer for Inspect mode */
+  :global(.ds-specimen) {
+    position: relative;
+  }
+
+  :global(.ds-specimen *) {
+    pointer-events: none;
+  }
+
+  :global(.inspect-layer) {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: auto;
+  }
+
+  /* Inspect mode: dashed outlines show what can be inspected */
+  #components[data-inspect='on'] :global(.inspect-layer) {
+    cursor: crosshair;
+  }
+
+  #components[data-inspect='on'] :global(.ds-specimen :is(.button, .icon-control, .dropdown-trigger, .dropdown-menu, .tag, .text-link, .section-nav-link, .segmented, .comment-sidebar-card, .carousel-nav, .specular-button):not(.is-focus)) {
+    outline: 1px dashed color-mix(in srgb, var(--color-accent) 50%, transparent);
+    outline-offset: 2px;
+  }
+
+  /* Inspect overlay, in the style of Figma's dev mode. Above everything in the specimens,
+     including the open dropdown menu (z-index 10100). */
+  :global(.inspect-overlay) {
+    position: fixed;
+    inset: 0;
+    z-index: 10200;
+    pointer-events: none;
+  }
+
+  :global(.inspect-overlay[hidden]),
+  :global(.inspect-overlay [hidden]),
+  :global(.inspect-panel[hidden]) {
+    display: none;
+  }
+
+  /* The selected element */
+  :global(.inspect-box) {
+    position: fixed;
+    outline: 1px solid var(--color-accent);
+  }
+
+  /* Padding: a red line across each padded side, with its size in a badge */
+  :global(.inspect-measure) {
+    position: fixed;
+    border-color: var(--color-measure);
+    border-style: solid;
+    border-width: 0;
+  }
+
+  :global(.inspect-measure[data-side='top']),
+  :global(.inspect-measure[data-side='bottom']) {
+    border-left-width: 1px;
+  }
+
+  :global(.inspect-measure[data-side='left']),
+  :global(.inspect-measure[data-side='right']) {
+    border-top-width: 1px;
+  }
+
+  :global(.inspect-badge) {
+    position: fixed;
+    padding: 2px var(--space-1);
+    border-radius: var(--radius-base);
+    background: var(--color-measure);
+    color: var(--color-on-measure);
+    font: var(--type-count);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* The callout's dotted leader and its pin on the element */
+  :global(.inspect-leader) {
+    position: fixed;
+    border-top: 1px dashed var(--color-pin);
+  }
+
+  :global(.inspect-pin) {
+    position: fixed;
+    border-radius: var(--radius-pill);
+    background: var(--color-pin);
+    box-shadow: 0 0 0 2px var(--color-canvas);
+  }
+
+  /* The callout card */
+  :global(.inspect-panel) {
+    position: fixed;
+    z-index: 10201;
+    min-width: 14rem;
+    max-width: 24rem;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-menu);
+    background: var(--color-canvas);
+    box-shadow: var(--shadow-floating);
+    pointer-events: none;
+  }
+
+  :global(.inspect-swatch) {
+    display: inline-block;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    border: var(--border-width) solid var(--color-hairline);
+    border-radius: var(--radius-base);
+  }
+
+  .ds-mode-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Bold (the font has no 500), so the part name stands above the rows */
+  :global(.inspect-panel-title) {
+    margin: 0 0 var(--space-2);
+    color: var(--color-ink);
+    font: var(--type-label);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-body);
+  }
+
+  :global(.inspect-panel dl) {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: var(--space-2) var(--space-6);
+    margin: 0;
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+  }
+
+  :global(.inspect-panel dt) {
+    color: var(--color-muted);
+  }
+
+  :global(.inspect-panel dd) {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+
+  :global(.inspect-panel-note) {
+    margin: var(--space-2) 0 0;
+    color: var(--color-muted);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+  }
+
+  :global(.inspect-panel dd.is-untokened) {
+    color: var(--color-danger);
+  }
+
+  /* Motion previews: a square in a small stage, looping each animation with the site's real
+     durations and easings. Still for visitors who prefer reduced motion. */
+  /* Uses the standard preview card (showcase-card); this only sizes the stage */
+  .motion-stage {
+    --stage-pad: var(--space-6);
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 11rem;
+    overflow: hidden;
+  }
+
+  @media (min-width: 640px) {
+    .motion-stage {
+      --stage-pad: var(--space-10);
+    }
+  }
+
+  .motion-square {
+    display: block;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-base);
+    background: var(--color-ink);
+  }
+
+  /* Press: down in 0.15s, held, back up */
+  .is-press .motion-square {
+    animation: motion-press 2s ease infinite;
+  }
+
+  @keyframes motion-press {
+    0%, 25% { transform: scale(1); }
+    32.5%, 55% { transform: scale(0.92); }
+    62.5%, 100% { transform: scale(1); }
+  }
+
+  /* Hover: fill to hover colour in 0.15s, and back */
+  .is-hover .motion-square {
+    background: var(--color-fill);
+    animation: motion-hover 3s ease infinite;
+  }
+
+  @keyframes motion-hover {
+    0%, 45% { background: var(--color-fill); }
+    50%, 95% { background: var(--color-ink); }
+    100% { background: var(--color-fill); }
+  }
+
+  /* Menus: the panel fades in (0.12s), then the highlight slides between options (0.2s) */
+  .motion-menu {
+    position: relative;
+    display: grid;
+    gap: var(--space-1);
+    width: 6rem;
+    padding: var(--space-1);
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-menu);
+    background: var(--color-canvas);
+    box-shadow: var(--shadow-floating);
+    animation: motion-menu 3s ease infinite;
+  }
+
+  .motion-menu-row {
+    position: relative;
+    height: 0.875rem;
+    margin: var(--space-1) var(--space-2);
+    border-radius: var(--radius-base);
+    background: var(--color-fill);
+  }
+
+  .motion-menu-highlight {
+    position: absolute;
+    top: var(--space-1);
+    left: var(--space-1);
+    right: var(--space-1);
+    height: calc(0.875rem + var(--space-2));
+    border-radius: var(--radius-base);
+    background: var(--color-hover-subtle);
+    animation: motion-menu-highlight 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  @keyframes motion-menu {
+    0% { opacity: 0; transform: translateY(-2px); }
+    4%, 90% { opacity: 1; transform: none; }
+    100% { opacity: 0; transform: translateY(-2px); }
+  }
+
+  @keyframes motion-menu-highlight {
+    0%, 30% { transform: translateY(0); }
+    37%, 60% { transform: translateY(calc(100% + var(--space-1))); }
+    67%, 100% { transform: translateY(calc(200% + var(--space-2))); }
+  }
+
+  /* Nav bar: the links' column folds away and returns (0.7s, ease in and out) */
+  .motion-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: fit-content;
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-width) solid var(--color-hairline);
+    border-radius: var(--radius-panel);
+    background: var(--color-glass);
+  }
+
+  .motion-nav-logo {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-ink);
+  }
+
+  .motion-nav-links {
+    display: flex;
+    gap: var(--space-2);
+    width: 5.5rem;
+    overflow: hidden;
+    animation: motion-nav 4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+  }
+
+  .motion-nav-links span {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 0.375rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-subtle);
+  }
+
+  .motion-nav-button {
+    width: 2.5rem;
+    height: 1rem;
+    border-radius: var(--radius-base);
+    background: var(--color-accent);
+  }
+
+  @keyframes motion-nav {
+    0%, 20% { width: 5.5rem; opacity: 1; }
+    37.5%, 70% { width: 0; opacity: 0; }
+    87.5%, 100% { width: 5.5rem; opacity: 1; }
+  }
+
+  /* Reveal: rises 1.5rem and fades in (about 0.9s), then resets */
+  .is-reveal .motion-square {
+    animation: motion-reveal 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  @keyframes motion-reveal {
+    0% { opacity: 0; transform: translateY(1.5rem); }
+    30%, 85% { opacity: 1; transform: none; }
+    95%, 100% { opacity: 0; transform: translateY(1.5rem); }
+  }
+
+  /* Media overlay: a small tile grows to the centre as the backdrop fades in (0.46s), then back */
+  .is-overlay {
+    place-items: start;
+  }
+
+  .is-overlay::before {
+    content: '';
+    position: absolute;
+    top: var(--stage-pad);
+    left: var(--stage-pad);
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--radius-base);
+    background: var(--color-fill);
+  }
+
+  .motion-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--color-overlay);
+    animation: motion-backdrop 3s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+  }
+
+  .is-overlay .motion-square {
+    position: absolute;
+    top: var(--stage-pad);
+    left: var(--stage-pad);
+    width: 1.5rem;
+    height: 1.5rem;
+    animation: motion-overlay 3s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+  }
+
+  @keyframes motion-backdrop {
+    0%, 15% { opacity: 0; }
+    30%, 65% { opacity: 1; }
+    80%, 100% { opacity: 0; }
+  }
+
+  @keyframes motion-overlay {
+    0%, 15% { top: var(--stage-pad); left: var(--stage-pad); width: 1.5rem; height: 1.5rem; }
+    30%, 65% { top: calc(50% - 2.25rem); left: calc(50% - 2.25rem); width: 4.5rem; height: 4.5rem; }
+    80%, 100% { top: var(--stage-pad); left: var(--stage-pad); width: 1.5rem; height: 1.5rem; }
+  }
+
+  /* Reduced motion: the same change as Reveal, but instant */
+  .is-reduced .motion-square {
+    animation: motion-reduced 3s step-end infinite;
+  }
+
+  @keyframes motion-reduced {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    85% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-stage *,
+    .motion-stage::before {
+      animation: none !important;
+    }
+  }
+
+  /* Stand-ins for the media overlay and for media under a floating control */
+  .media-demo {
+    border-radius: var(--radius-base);
+    background: center / cover no-repeat;
+  }
+
+
+  .overlay-demo .gallery-carousel-slide img {
+    max-width: 100%;
+    max-height: 18rem;
+  }
+
+
   main :global(.border) {
     border-radius: var(--radius-base);
   }
@@ -639,10 +1403,60 @@ const sectionTitleClass = 'subheading text-ink';
   }
 </style>
 
+<script type="application/json" id="design-tokens" set:html={JSON.stringify(tokenNames)} />
+
 <script>
   import { attachDropdownHighlight } from '../lib/dropdown';
+  import { startTokenInspector } from '../lib/token-inspector';
 
   document
     .querySelectorAll<HTMLElement>('[data-dropdown-preview]')
     .forEach((menu) => attachDropdownHighlight(menu));
+
+  // Component previews are specimens: not usable, and inspectable in Inspect mode
+  const components = document.getElementById('components');
+  const specimens = [...(components?.querySelectorAll<HTMLElement>('.showcase-card, .overlay-demo, .media-demo') ?? [])];
+  const inspector = startTokenInspector({
+    specimens,
+    tokens: JSON.parse(document.getElementById('design-tokens')?.textContent ?? '[]'),
+    parts: [
+      { selector: '.segmented-option', name: 'Segmented option' },
+      { selector: '.segmented-thumb', name: 'Segmented thumb' },
+      { selector: '.segmented', name: 'Segmented toggle' },
+      { selector: '.specular-button', name: 'Primary button', exempt: 'Its WebGL shine reads the accent token at runtime; the shadow is the inset highlight that is part of the effect.' },
+      { selector: '.button.is-secondary', name: 'Secondary button' },
+      { selector: '.button.is-tertiary', name: 'Tertiary button' },
+      { selector: '.button', name: 'Button' },
+      { selector: '.icon-control', name: 'Icon control' },
+      { selector: '.dropdown-trigger:not(.dropdown-native)', name: 'Dropdown trigger' },
+      { selector: '.dropdown-option', name: 'Dropdown option' },
+      { selector: '.dropdown-menu', name: 'Dropdown menu' },
+      { selector: '.tag', name: 'Tag' },
+      { selector: '.text-link', name: 'Link' },
+      { selector: '.section-nav-link', name: 'Section nav link' },
+      { selector: '.comment-sidebar-card-category-select', name: 'Comment category' },
+      { selector: '.comment-sidebar-card-body-input', name: 'Comment edit field', exempt: 'The shadow is a 2px accent-soft ring, the same selection ring as an active card.' },
+      { selector: '.comment-sidebar-card-error', name: 'Comment error', exempt: 'The border is the danger colour at 35%, mixed from its token.' },
+      { selector: '.comment-sidebar-card-meta', name: 'Comment details' },
+      { selector: '.comment-sidebar-card-title', name: 'Comment title' },
+      { selector: '.comment-sidebar-card-body', name: 'Comment text' },
+      { selector: '.comment-sidebar-card', name: 'Comment card', exempt: 'Hovered, the shadow is shadow-raised; active, it is a 2px accent-soft selection ring.' },
+      { selector: '.carousel-dot', name: 'Slide dot' },
+      { selector: '.carousel-controls', name: 'Slide dots' },
+      { selector: '.carousel-nav', name: 'Carousel nav' },
+      { selector: '.gallery-modal-description', name: 'Caption' },
+      { selector: '.gallery-carousel-slide img', name: 'Image' },
+    ],
+  });
+
+  const toggle = document.querySelector<HTMLElement>('[data-inspect-toggle]');
+  const choices = [...(toggle?.querySelectorAll<HTMLButtonElement>('[data-inspect-choice]') ?? [])];
+  choices.forEach((choice) =>
+    choice.addEventListener('click', () => {
+      const on = choice.dataset.inspectChoice === 'inspect';
+      choices.forEach((each) => each.setAttribute('aria-pressed', String(each === choice)));
+      if (components) components.dataset.inspect = on ? 'on' : 'off';
+      inspector.setInspecting(on);
+    }),
+  );
 </script>

@@ -108,13 +108,13 @@ const contact = [
   .footer {
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
-    padding-top: 1.5rem;
-    padding-bottom: 1.25rem;
+    gap: var(--space-4);
+    padding-top: var(--space-6);
+    padding-bottom: var(--space-5);
   }
 
   .footer-card {
-    padding: 1.5rem 1.35rem;
+    padding: var(--space-6) var(--space-5);
     border: 1px solid var(--color-hairline);
     border-radius: var(--radius-panel);
     background: var(--color-canvas);
@@ -122,7 +122,7 @@ const contact = [
 
   @media (min-width: 768px) {
     .footer-card {
-      padding: 1.75rem;
+      padding: var(--space-8);
     }
   }
 
@@ -130,14 +130,14 @@ const contact = [
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 2rem 3rem;
+    gap: var(--space-8) var(--space-12);
   }
 
   .footer-cta {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: var(--space-4);
     max-width: 22rem;
   }
 
@@ -145,7 +145,7 @@ const contact = [
     display: grid;
     grid-template-columns: repeat(2, max-content);
     justify-content: end;
-    gap: 1.5rem 3.5rem;
+    gap: var(--space-6) var(--space-16);
   }
 
   @media (max-width: 640px) {
@@ -163,7 +163,7 @@ const contact = [
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.7rem;
+    gap: var(--space-3);
   }
 
   .footer-column a,
@@ -190,8 +190,8 @@ const contact = [
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem 1rem;
-    padding: 0.15rem 0.35rem 0.35rem;
+    gap: var(--space-3) var(--space-4);
+    padding: var(--space-1) var(--space-1) var(--space-1);
     color: var(--color-muted);
   }
 

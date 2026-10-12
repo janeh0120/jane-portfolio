@@ -11,10 +11,9 @@
   justify-content: center;
   border: none;
   margin: 0;
-  font-family: inherit;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  line-height: 1.2;
+  /* Same type as the other buttons (Compact) */
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
   color: var(--sb-text-color);
   background: color-mix(in srgb, var(--sb-tint) calc(var(--sb-tint-opacity) * 100%), transparent);
   border-radius: var(--sb-radius);
@@ -34,8 +33,8 @@
 
 .specular-button:focus-visible,
 .specular-button.is-focus {
-  outline: 2px solid color-mix(in srgb, var(--sb-text-color) 60%, transparent);
-  outline-offset: 3px;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .specular-button:disabled {
@@ -48,19 +47,19 @@
 }
 
 .specular-button--sm {
-  font-size: 0.875rem;
-  padding: 8px 12px 4px;
+  /* Even padding, like the other buttons (the font's metrics now centre the label) */
+  padding: var(--space-2) var(--space-3);
   min-height: 32px;
 }
 
 .specular-button--md {
   font-size: 1rem;
-  padding: 14px 30px;
+  padding: var(--space-4) var(--space-8);
 }
 
 .specular-button--lg {
   font-size: 1.15rem;
-  padding: 18px 40px;
+  padding: var(--space-5) var(--space-10);
 }
 
 /* Canvas extends past the button so the rim glow can bleed outside the edge */

@@ -1,6 +1,7 @@
 ---
 /**
- * Progressive blur at the top or bottom edge of the page.
+ * Progressive blur at the top or bottom edge of the page, or (`sides`) down its left and right
+ * edges, for the homepage, whose case studies scroll sideways.
  * Six stacked backdrop-blur layers at doubling strengths, each masked to its own overlapping band,
  * so content softens smoothly as it scrolls under an edge. The page's existing grain (body::after)
  * shows through, giving the grainy look — no extra grain layer, which read as a darker bar.
@@ -8,19 +9,33 @@
  * Rendered as the first (top) and last (bottom) child of the page's scroll container and made
  * sticky there, so it matches that container exactly: its width, its rounded corners in comment
  * mode, and it never covers the comments sidebar beside it.
+ * `sides` is one sticky, zero-height strip at the top of the scroll container holding a full-height
+ * band at each side, so the bands stay put and span the whole visible area.
  * Purely decorative: pointer-events none, and browsers without backdrop-filter simply show nothing.
  */
 interface Props {
-  edge: 'top' | 'bottom';
+  edge: 'top' | 'bottom' | 'sides';
 }
 
 const { edge } = Astro.props;
 const layers = [1, 2, 4, 8, 16, 32];
 ---
 
-<div class:list={['edge-blur', `edge-blur--${edge}`]} aria-hidden="true">
-  {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
-</div>
+{
+  edge === 'sides' ? (
+    <div class="edge-blur-sides" aria-hidden="true">
+      {(['left', 'right'] as const).map((side) => (
+        <div class:list={['edge-blur', `edge-blur--${side}`]}>
+          {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
+        </div>
+      ))}
+    </div>
+  ) : (
+    <div class:list={['edge-blur', `edge-blur--${edge}`]} aria-hidden="true">
+      {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
+    </div>
+  )
+}
 
 <style>
   .edge-blur {
@@ -46,6 +61,35 @@ const layers = [1, 2, 4, 8, 16, 32];
     --edge-direction: 180deg;
     bottom: 0;
     margin-top: calc(-1 * var(--edge-height));
+  }
+
+  /* Sides: a zero-height strip stuck to the top of the scroll area; each band hangs from it at the
+     full visible height (the scroll area clips anything past its bottom) */
+  .edge-blur-sides {
+    position: sticky;
+    top: 0;
+    z-index: 8;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .edge-blur--left,
+  .edge-blur--right {
+    --edge-width: clamp(4rem, 10vw, 8rem); /* design-tokens-ignore: blur band, not spacing */
+    position: absolute;
+    top: 0;
+    width: var(--edge-width);
+    height: 100dvh; /* design-tokens-ignore: the visible height, not spacing */
+  }
+
+  .edge-blur--left {
+    --edge-direction: 270deg; /* strongest at the far left */
+    left: 0;
+  }
+
+  .edge-blur--right {
+    --edge-direction: 90deg;
+    right: 0;
   }
 
   .edge-blur-layer {

@@ -26,7 +26,7 @@ const nav = [
 >
   <MigrationReel slot="hero" client:visible />
   <section id="context" data-comment-id="migration-context">
-    <h2>Context</h2>
+    <h2 class="section-label">Context</h2>
     <p class="heading text-ink">
       An internal platform shipped in beta to help developers and technical program managers (TPMs)
       manage and run mass code migrations.
@@ -34,7 +34,7 @@ const nav = [
   </section>
 
   <section id="role" data-comment-id="migration-role">
-    <h2>Role</h2>
+    <h2 class="section-label">Role</h2>
     <p class="heading text-ink">
       I joined as the sole designer, defining design direction and what success looked like.
     </p>
@@ -67,7 +67,7 @@ const nav = [
   </section>
 
   <section id="outcome" data-comment-id="migration-outcome">
-    <h2>Outcome</h2>
+    <h2 class="section-label">Outcome</h2>
     <div class="case-study-stats">
       <div class="case-study-stat">
         <strong>10</strong>
@@ -86,7 +86,7 @@ const nav = [
 
 
   <section id="feedback" data-comment-id="migration-feedback">
-    <h2>Feedback</h2>
+    <h2 class="section-label">Feedback</h2>
     <div class="migration-quotes">
       <figure class="migration-quote">
         <blockquote>
@@ -122,39 +122,25 @@ const nav = [
 </CaseStudyLayout>
 
 <style>
-  /* Match the other case studies' statements (the page title's .heading style);
-     overrides the shared case-study paragraph size */
-  #context .heading,
-  #role .heading {
-    font-family: var(--font-serif);
-    font-size: clamp(1.625rem, calc(3.2vw - 2px), 2.375rem);
-    line-height: 1.2;
-    letter-spacing: -0.04em;
-    font-weight: 700;
-  }
-
   #role ol {
-    margin-top: 1.75rem;
+    margin-top: var(--space-8);
   }
 
   /* Outcome numbers use the page title's .heading style */
   #outcome :global(.case-study-stat strong) {
-    font-family: var(--font-serif);
-    font-size: clamp(1.625rem, calc(3.2vw - 2px), 2.375rem);
-    line-height: 1.2;
-    letter-spacing: -0.04em;
-    font-weight: 700;
+    font: var(--type-heading);
+    letter-spacing: var(--tracking-tight);
   }
 
   #outcome .migration-outcome-note {
-    margin-top: 1.5rem;
+    margin-top: var(--space-6);
   }
 
   /* Short pull quotes in cards: three columns, stacked on phones */
   .migration-quotes {
     display: grid;
-    gap: 1rem;
-    margin-top: 0.875rem;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
   }
 
   @media (min-width: 640px) {
@@ -167,7 +153,7 @@ const nav = [
     margin: 0;
     display: flex;
     flex-direction: column;
-    padding: 1.15rem 1.25rem;
+    padding: var(--space-5) var(--space-5);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-base);
@@ -182,15 +168,12 @@ const nav = [
   .migration-quote blockquote p {
     margin: 0;
     color: var(--color-ink);
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
-    line-height: 1.35;
-    font-weight: 400;
-    letter-spacing: -0.03em;
+    font: var(--type-quote);
+    letter-spacing: var(--tracking-tight);
   }
 
   .migration-quote blockquote p + p {
-    margin-top: 0.875rem;
+    margin-top: var(--space-4);
   }
 
   .migration-quote blockquote p:first-child::before {
@@ -204,27 +187,22 @@ const nav = [
   /* Captions line up along the bottom of the row */
   .migration-quote figcaption {
     margin-top: auto;
-    padding-top: 0.75rem;
+    padding-top: var(--space-3);
     color: var(--color-muted);
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
   }
 
   .migration-disclaimer {
-    padding: 1rem 0;
+    padding: var(--space-4) 0;
     background: transparent;
   }
 
   .migration-disclaimer p {
     margin: 0;
     color: var(--color-muted);
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
   }
 
   .migration-disclaimer a {

@@ -4,23 +4,22 @@ import Header from '../components/Header.astro';
 import LogoScrollIntro from '../components/LogoScrollIntro.astro';
 import Hero from '../components/Hero.astro';
 import Experience from '../components/Experience.astro';
-import ProjectColumn from '../components/ProjectColumn.astro';
+import ProjectRow from '../components/ProjectRow.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 ---
 
-<Layout>
+<Layout edgeBlur="sides">
   {/* <LogoScrollIntro /> */}
   <Header />
   <div class="home-intro-content" id="home-intro-content">
-    <main>
-      <section id="projects" class="home-layout page-frame" data-comment-id="project-grid">
-        <div class="home-copy-pin">
-          <div class="home-copy">
-            <Hero />
-            <Experience />
-          </div>
-        </div>
-        <ProjectColumn />
+    <main class="home-layout">
+      <!-- Intro and experience, centred above the case studies -->
+      <div class="home-intro page-frame">
+        <Hero type="compact" />
+        <Experience />
+      </div>
+      <section id="projects" data-comment-id="project-grid" aria-label="Case studies">
+        <ProjectRow />
       </section>
     </main>
     <SiteFooter />
@@ -28,46 +27,76 @@ import SiteFooter from '../components/SiteFooter.astro';
 </Layout>
 
 <style>
+  /* One column the width of the page (not of the row's content, which scrolls inside it) */
   .home-layout {
-    --home-header-offset: 6.55rem;
     display: grid;
-    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-    gap: 2.5rem;
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-12);
+    padding-block: var(--space-12);
   }
 
-  /* Intro and experience stay put, centred vertically, while the projects scroll past */
-  .home-copy-pin {
-    position: sticky;
-    top: var(--home-header-offset);
-    height: calc(100svh - var(--home-header-offset));
-    display: flex;
-    align-items: center;
+  /* The same width as the expanded nav bar (published by the header as --nav-bar-width), centred,
+     with its text left-aligned so the intro lines up with the experience list. Narrower screens
+     keep the page gutters. Above the side edge blur (z 8, below the footer's 10): the blur is for
+     the cards passing the edges, never the intro. */
+  .home-intro {
+    position: relative;
+    z-index: 9;
+    max-width: var(--nav-bar-width, 30rem); /* design-tokens-ignore: matches the nav bar */
+    display: grid;
+    gap: var(--space-6);
   }
 
-  .home-copy {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-    padding-block: 3rem;
+  .home-intro :global(.home-hero) {
+    max-width: none;
   }
 
   @media (max-width: 767px) {
     .home-layout {
-      --home-header-offset: 5.55rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
-
-    .home-copy-pin {
-      position: static;
-      height: auto;
-    }
-
-    .home-copy {
-      gap: 1.5rem;
-      padding-block: 0.35rem 0;
+      gap: var(--space-10);
+      padding-block: var(--space-8);
     }
   }
 </style>
+
+<script>
+  // Scrolling down (mouse wheel or trackpad) moves the case studies sideways first; once the last card
+  // is in view, the page scrolls on to the footer. Scrolling up does the reverse: the row returns to
+  // its first card before the page moves up. Touch and sideways trackpad swipes scroll the row
+  // natively, and the page is an ordinary scroller without this script.
+  const row = document.querySelector<HTMLElement>('[data-project-row]');
+  const scroller = document.getElementById('site-canvas');
+
+  if (row && scroller) {
+    row.classList.add('is-driven');
+
+    scroller.addEventListener(
+      'wheel',
+      (event) => {
+        if (event.ctrlKey || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        const max = row.scrollWidth - row.clientWidth;
+        if (max <= 0) return;
+
+        let delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+        const view = scroller.getBoundingClientRect();
+        const box = row.getBoundingClientRect();
+
+        if (delta > 0) {
+          if (row.scrollLeft >= max - 1 || box.top < view.top) return; // done, or already passed
+          event.preventDefault();
+          // Bring the row's bottom edge into view first, then spend the rest on the row
+          const below = Math.max(0, box.bottom - view.bottom);
+          const pageStep = Math.min(delta, below);
+          scroller.scrollTop += pageStep;
+          delta -= pageStep;
+          row.scrollLeft = Math.min(max, row.scrollLeft + delta);
+        } else {
+          if (row.scrollLeft <= 0 || box.top < view.top || box.bottom > view.bottom) return;
+          event.preventDefault();
+          row.scrollLeft = Math.max(0, row.scrollLeft + delta);
+        }
+      },
+      { passive: false },
+    );
+  }
+</script>

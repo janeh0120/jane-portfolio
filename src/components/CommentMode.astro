@@ -881,11 +881,11 @@ import IconControl from './IconControl.astro';
 
       const upvoteBtn = document.createElement('button');
       upvoteBtn.type = 'button';
-      upvoteBtn.className = 'comment-sidebar-card-upvote';
-      upvoteBtn.disabled = upvoted.has(item.id);
-      upvoteBtn.textContent = upvoted.has(item.id)
-        ? `+1 · ${item.upvoteCount}`
-        : `+1 · ${item.upvoteCount}`;
+      const isUpvoted = upvoted.has(item.id);
+      upvoteBtn.className = `button is-tertiary comment-sidebar-card-upvote${isUpvoted ? ' is-selected' : ''}`;
+      upvoteBtn.disabled = isUpvoted;
+      upvoteBtn.setAttribute('aria-pressed', String(isUpvoted));
+      upvoteBtn.textContent = `+1 · ${item.upvoteCount}`;
       upvoteBtn.addEventListener('click', (event) => {
         event.stopPropagation();
         void upvoteComment(item.id);

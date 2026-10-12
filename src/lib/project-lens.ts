@@ -1,9 +1,10 @@
 /**
- * Lens warp for the homepage project column.
+ * Lens warp for a scrolling set of project images (the homepage row, the Play gallery).
  *
  * Project images are drawn into an offscreen WebGL target at their live positions, then one fixed,
- * screen-space lens pass runs over it: in zones at the top and bottom of the viewport the image is
- * magnified outward (fisheye) inside an hourglass-shaped lens and split into RGB fringes. The middle of
+ * screen-space lens pass runs over it: in zones at two opposite edges of the viewport (top and bottom
+ * for a vertical layout, left and right for a horizontal one) the image is magnified outward (fisheye)
+ * inside an hourglass-shaped lens and split into RGB fringes. The middle of
  * the screen is untouched — cards there stay the real HTML (crisp, clickable, live demo) — and a card
  * only hands over to WebGL inside a lens zone, where the lens is still neutral at the boundary.
  *
@@ -13,8 +14,8 @@
  */
 import { Renderer, Program, Mesh, Geometry, Texture, Transform, RenderTarget, Triangle } from 'ogl';
 
-/** Fraction of the viewport height covered by each lens zone. */
-const ZONE = 0.24;
+/** Fraction of the viewport (along the scroll direction) covered by each lens zone. */
+const ZONE = { y: 0.24, x: 0.2 };
 /** Cap on offscreen buffer size (device pixels) so huge displays don't use excessive GPU memory. */
 const MAX_BUFFER_PIXELS = 3_600_000;
 
@@ -68,9 +69,10 @@ const lensFragment = /* glsl */ `
   precision highp float;
   uniform sampler2D uScene;
   uniform vec2 uViewport;   // CSS px
-  uniform float uCenterX;   // lens axis, CSS px (the column's centre)
-  uniform float uHalfWidth; // half the column width, CSS px
-  uniform float uZone;      // zone height as a fraction of the viewport
+  uniform float uCenterX;   // lens axis, CSS px across the scroll direction (the column's centre)
+  uniform float uHalfWidth; // half the lens's thickness across the scroll direction, CSS px
+  uniform float uZone;      // zone size as a fraction of the viewport, along the scroll direction
+  uniform float uSideways;  // 1: zones at the left and right edges (a row); 0: top and bottom
   uniform vec3 uPage;       // page background colour (0..1), for compositing split channels
   uniform float uStrength;  // scales magnification, colour split and flare (1 = full)
   varying vec2 vUv;
@@ -80,20 +82,24 @@ const lensFragment = /* glsl */ `
     return texture2D(uScene, vec2(uv.x, 1.0 - uv.y));
   }
 
+  // Work in a frame where y runs along the scroll direction and x across it (swap for a row)
+  vec2 frame(vec2 v) { return uSideways > 0.5 ? v.yx : v; }
+
   void main() {
-    vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uViewport;     // CSS px, y down
-    float edgeDist = min(px.y, uViewport.y - px.y) / uViewport.y;
+    vec2 px = frame(vec2(vUv.x, 1.0 - vUv.y) * uViewport); // CSS px, y down, then into the frame
+    vec2 view = frame(uViewport);
+    float edgeDist = min(px.y, view.y - px.y) / view.y;
     float e = 1.0 - smoothstep(0.0, uZone, edgeDist);   // 0 in the middle, 1 at the screen edge
     float e2 = e * e * uStrength;
 
-    // Fisheye: magnify horizontally around the column axis, more toward the edge.
+    // Fisheye: magnify across the scroll direction around the lens axis, more toward the edge.
     float dx = px.x - uCenterX;
     float k = 1.0 + 0.9 * e2;
     // Chromatic dispersion: each channel is magnified by a slightly different amount.
     float spread = 0.16 * e2;
-    vec4 r = scene(vec2(uCenterX + dx / (k * (1.0 + spread)), px.y));
-    vec4 g = scene(vec2(uCenterX + dx / k, px.y));
-    vec4 b = scene(vec2(uCenterX + dx / (k * (1.0 - spread)), px.y));
+    vec4 r = scene(frame(vec2(uCenterX + dx / (k * (1.0 + spread)), px.y)));
+    vec4 g = scene(frame(vec2(uCenterX + dx / k, px.y)));
+    vec4 b = scene(frame(vec2(uCenterX + dx / (k * (1.0 - spread)), px.y)));
 
     // Hourglass lens: content is contained inside a shape that flares outward toward the screen edge.
     float lensHalf = uHalfWidth * (1.0 + 0.55 * e2);
@@ -110,6 +116,8 @@ const lensFragment = /* glsl */ `
 export type LensOptions = {
   /** How strong the warp is, from 0 (none) to 1 (the homepage's full effect). */
   strength?: number;
+  /** The scroll direction: `y` puts the lens at the top and bottom, `x` at the left and right. */
+  axis?: 'x' | 'y';
 };
 
 type Card = {
@@ -131,7 +139,8 @@ function assertLinked(gl: WebGLRenderingContext, program: Program, name: string)
  * Starts the lens over the given column. Throws if WebGL or the shaders are unavailable, in which
  * case nothing on the page has been changed. Returns a function that removes the lens.
  */
-export function startProjectLens(column: HTMLElement, { strength = 1 }: LensOptions = {}): () => void {
+export function startProjectLens(column: HTMLElement, { strength = 1, axis = 'y' }: LensOptions = {}): () => void {
+  const sideways = axis === 'x';
   const cards: Card[] = [];
   let canvas: HTMLCanvasElement | undefined;
   let gl: WebGLRenderingContext | undefined;
@@ -194,7 +203,8 @@ export function startProjectLens(column: HTMLElement, { strength = 1 }: LensOpti
         uViewport: { value: [1, 1] },
         uCenterX: { value: 0 },
         uHalfWidth: { value: 1 },
-        uZone: { value: ZONE },
+        uZone: { value: ZONE[axis] },
+        uSideways: { value: sideways ? 1 : 0 },
         uStrength: { value: strength },
         uPage: { value: [0.94, 0.94, 0.945] },
       },
@@ -283,13 +293,20 @@ export function startProjectLens(column: HTMLElement, { strength = 1 }: LensOpti
           lensProgram.uniforms.uScene.value = target.texture;
         }
 
-        const zonePx = h * ZONE;
+        // Along the scroll direction: the viewport's length, and where a box starts and ends
+        const length = sideways ? w : h;
+        const zonePx = length * ZONE[axis];
+        const along = (box: DOMRect) =>
+          sideways ? [box.left - ox, box.right - ox] : [box.top - oy, box.bottom - oy];
         const handover: Card[] = [];
+        let lensBox: DOMRect | null = null;
         for (const card of cards) {
           const r = card.media.getBoundingClientRect();
-          const rect = { left: r.left - ox, top: r.top - oy, bottom: r.bottom - oy, width: r.width, height: r.height };
-          const inZone = rect.top < zonePx || rect.bottom > h - zonePx;
-          const onScreen = rect.bottom > 0 && rect.top < h;
+          lensBox ??= r;
+          const rect = { left: r.left - ox, top: r.top - oy, width: r.width, height: r.height };
+          const [from, to] = along(r);
+          const inZone = from < zonePx || to > length - zonePx;
+          const onScreen = to > 0 && from < length;
           const drawGl = visible && card.ready && inZone && onScreen;
           card.mesh.visible = drawGl;
           if (drawGl) {
@@ -301,16 +318,23 @@ export function startProjectLens(column: HTMLElement, { strength = 1 }: LensOpti
           }
           // Captions fade out as they reach a lens zone (images are what pass through the lens)
           if (card.caption) {
-            const c = card.caption.getBoundingClientRect();
-            const edge = Math.min(c.top - oy, h - (c.bottom - oy));
+            const [from, to] = along(card.caption.getBoundingClientRect());
+            const edge = Math.min(from, length - to);
             card.caption.style.opacity = visible ? String(Math.max(0, Math.min(1, edge / zonePx))) : '';
           }
         }
 
+        // The lens runs along the column's middle; for a row, along the middle of its images
         const col = column.getBoundingClientRect();
         lensProgram.uniforms.uViewport.value = [w, h];
-        lensProgram.uniforms.uCenterX.value = col.left - ox + col.width / 2;
-        lensProgram.uniforms.uHalfWidth.value = col.width / 2;
+        if (sideways) {
+          const box = lensBox ?? col;
+          lensProgram.uniforms.uCenterX.value = box.top - oy + box.height / 2;
+          lensProgram.uniforms.uHalfWidth.value = box.height / 2;
+        } else {
+          lensProgram.uniforms.uCenterX.value = col.left - ox + col.width / 2;
+          lensProgram.uniforms.uHalfWidth.value = col.width / 2;
+        }
         lensProgram.uniforms.uPage.value = pageColor();
 
         renderer.render({ scene: cardsScene, target, clear: true });
@@ -335,6 +359,8 @@ export function startProjectLens(column: HTMLElement, { strength = 1 }: LensOpti
     const scroller = document.getElementById('site-canvas') ?? window;
     on(scroller, 'scroll', requestRender, { passive: true });
     on(window, 'scroll', requestRender, { passive: true });
+    // A row scrolls itself sideways
+    on(column, 'scroll', requestRender, { passive: true });
     on(window, 'resize', requestRender);
     // Comment mode resizes the page area without resizing the window
     if (host && 'ResizeObserver' in window) {

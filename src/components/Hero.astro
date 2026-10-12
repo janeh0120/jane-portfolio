@@ -3,28 +3,22 @@ import { site } from '../data/site';
 
 interface Props {
   subhead?: string;
+  /** Which type-ramp style the intro uses: Intro (Brand) or Compact (homepage, matching the experience list). */
+  type?: 'intro' | 'compact';
 }
 
-const { subhead = site.hero.subhead } = Astro.props;
+const { subhead = site.hero.subhead, type = 'intro' } = Astro.props;
 const intro = [site.hero.headline, subhead].filter(Boolean).join(' ');
 ---
 
 <div class="home-hero">
-  <h1 class="text-ink" data-comment-id="hero-intro">{intro}</h1>
+  <h1 class:list={['text-ink', type === 'compact' ? 'text-compact' : 'text-intro']} data-comment-id="hero-intro">
+    {intro}
+  </h1>
 </div>
 
 <style>
   .home-hero {
     max-width: 28rem;
-  }
-
-  /* ~2.75× body (14px), matching the heading-to-roles ratio in the reference */
-  .home-hero h1 {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: clamp(1.75rem, calc(3.4vw - 2px), 2.5rem);
-    line-height: 1.15;
-    letter-spacing: -0.04em;
-    font-weight: 700;
   }
 </style>

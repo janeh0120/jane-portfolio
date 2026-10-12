@@ -109,9 +109,7 @@ function formatDate(iso: string) {
                       <div class="flex flex-wrap items-center gap-3">
                         <h2 class="subheading text-ink">{version.label}</h2>
                         {version.isActive && (
-                          <span class="text-body font-medium uppercase tracking-wide text-muted">
-                            Live
-                          </span>
+                          <span class="tag">Live</span>
                         )}
                       </div>
                       <p class="text-body text-muted">{formatDate(version.createdAt.toISOString())}</p>
