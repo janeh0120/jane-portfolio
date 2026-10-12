@@ -16,6 +16,9 @@
   background-color: #14181b;
   isolation: isolate;
   font-family: var(--font-sans);
+  /* The reel is an illustration laid out for these; pin them so page type changes don't shift it */
+  line-height: 1.5;
+  letter-spacing: normal;
   -webkit-font-smoothing: antialiased;
 }
 

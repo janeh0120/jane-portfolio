@@ -32,6 +32,17 @@
     "thumb": "images/play-thumbs/ids-illustrations.webp"
   },
   {
+    "slug": "dex",
+    "title": "Dex",
+    "description": "A Hack the North 2026 semi-finalist, built in 36 hours with Keyaan Vegdani. Dex turns the sensors in a MacBook (the hinge, trackpad, motion, and microphone) into daily occupational therapy exercises that help kids practise dexterity at home.",
+    "year": "",
+    "images": [
+      "images/case-study-heroes/dex.png",
+      "https://www.youtube.com/watch?v=faLR2IYWOWU"
+    ],
+    "thumb": "images/play-thumbs/dex.webp"
+  },
+  {
     "slug": "shoebox-craft",
     "title": "Shoebox craft cafe",
     "description": "I ran a craft cafe at my apartment and designed a brand and experience for it!",

@@ -1,6 +1,16 @@
 ---
 import { Icon } from 'astro-icon/components';
 
+interface Props {
+  /** Unique per page when the menu appears more than once. */
+  id?: string;
+  /** Which way the menu opens: up (footer) or down (near the top of a page). */
+  placement?: 'up' | 'down';
+}
+
+const { id = 'theme-menu', placement = 'up' } = Astro.props;
+const listId = `${id}-list`;
+
 const options = [
   { id: 'dark', label: 'Dark', icon: 'lucide:moon' },
   { id: 'light', label: 'Light', icon: 'lucide:sun' },
@@ -8,13 +18,13 @@ const options = [
 ] as const;
 ---
 
-<div class="theme-menu" data-theme-menu data-theme="system">
+<div class:list={['theme-menu', `theme-menu--${placement}`]} data-theme-menu data-theme="system">
   <button
     type="button"
-    class="theme-menu-button"
+    class="dropdown-trigger theme-menu-button"
     aria-haspopup="menu"
     aria-expanded="false"
-    aria-controls="theme-menu-list"
+    aria-controls={listId}
   >
     <span class="theme-menu-icons" aria-hidden="true">
       {
@@ -27,7 +37,7 @@ const options = [
     </span>
     <span data-theme-label>System</span>
   </button>
-  <div class="dropdown-menu theme-menu-popover" id="theme-menu-list" role="menu" hidden>
+  <div class="dropdown-menu theme-menu-popover" id={listId} role="menu" hidden>
     {
       options.map((option) => (
         <button
@@ -53,33 +63,7 @@ const options = [
     position: relative;
   }
 
-  .theme-menu-button,
-  .theme-menu-option {
-    font: inherit;
-    color: var(--color-ink);
-    cursor: pointer;
-  }
-
-  .theme-menu-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    border: none;
-    border-radius: var(--radius-base);
-    background: var(--color-fill);
-    padding: 0.45rem 0.9rem 0.45rem 0.75rem;
-  }
-
-  .theme-menu-button:hover,
-  .theme-menu-button[aria-expanded='true'] {
-    background: var(--color-hover);
-  }
-
-  .theme-menu-button:focus-visible,
-  .theme-menu-option:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
+  /* The button is the shared .dropdown-trigger (global.css) with the current mode's icon */
 
   .theme-menu-icons :global(svg),
   .theme-menu-option :global(svg) {
@@ -104,6 +88,13 @@ const options = [
     bottom: calc(100% + 0.55rem);
     z-index: 30;
     min-width: 11.5rem;
+  }
+
+  .theme-menu--down .theme-menu-popover {
+    right: auto;
+    left: 0;
+    top: calc(100% + 0.55rem);
+    bottom: auto;
   }
 
   .theme-menu-popover[hidden] {
@@ -176,6 +167,11 @@ const options = [
 
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     media.addEventListener('change', paint);
+    // Another menu on the page (or anything else) may change the mode; stay in step with it
+    new MutationObserver(paint).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme'],
+    });
     paint();
   });
 </script>

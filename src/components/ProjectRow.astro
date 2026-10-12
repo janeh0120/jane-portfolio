@@ -1,0 +1,144 @@
+---
+/**
+ * Homepage projects as one horizontal row that scrolls sideways. On the homepage, scrolling the page
+ * down moves it first (see src/pages/index.astro); without JavaScript it is a plain sideways scroller.
+ * A WebGL lens (src/lib/project-lens.ts) warps the images as they pass the left and right edges of
+ * the screen. It is progressive enhancement: the row is complete, readable HTML on its own.
+ */
+import { site } from '../data/site';
+import { formatProjectTags } from '../utils/tags';
+
+const base = import.meta.env.BASE_URL;
+const projects = site.projects;
+
+function commentId(project: (typeof projects)[number]) {
+  return project.slug
+    ? `project-${project.slug}`
+    : `project-${project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+}
+---
+
+<div class="project-row" data-project-row role="region" aria-label="Case studies">
+  {
+    projects.map((project) => {
+      const href = project.href ?? (project.slug ? `${base}${project.slug}` : undefined);
+      const external = Boolean(href?.startsWith('http'));
+      const imageSrc = `${base}${project.image}`;
+      const media = (
+        <div class="project-card-media" data-lens-src={imageSrc}>
+          <img src={imageSrc} alt={href ? '' : project.title} class="project-row-image" draggable="false" />
+        </div>
+      );
+      const caption = (
+        <div class="project-row-caption" data-lens-caption>
+          <p class="text-body text-muted">{formatProjectTags(project.tags)}</p>
+          <h3 class="subheading text-ink">{project.title}</h3>
+        </div>
+      );
+      return (
+        <article class="project-row-card" data-comment-id={commentId(project)}>
+          {project.comingSoon || !href ? (
+            <div class="project-row-link">
+              {media}
+              {caption}
+            </div>
+          ) : (
+            <a
+              href={href}
+              class="project-row-link"
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noopener noreferrer' : undefined}
+            >
+              {media}
+              {caption}
+            </a>
+          )}
+        </article>
+      );
+    })
+  }
+</div>
+
+<style>
+  /* Full width, padded by half the space beside one card, so the first card sits centred on load
+     and the last is centred when the row reaches its end (padding % is of the row's width) */
+  .project-row {
+    --card-width: clamp(16rem, 36vw, 36rem); /* design-tokens-ignore: card width, not spacing */
+    --row-gutter: calc((100% - var(--card-width)) / 2);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--card-width);
+    gap: var(--space-8);
+    padding-inline: var(--row-gutter);
+    padding-block: var(--space-2) var(--space-4);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: var(--row-gutter);
+    scrollbar-width: none;
+  }
+
+  .project-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* When the page scroll drives the row, snapping would fight it */
+  .project-row.is-driven {
+    scroll-snap-type: none;
+  }
+
+  .project-row-card {
+    scroll-snap-align: center;
+    min-width: 0;
+  }
+
+  .project-row-link {
+    display: grid;
+    gap: var(--space-1);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .project-row-link .project-card-media {
+    margin-bottom: var(--space-2);
+  }
+
+  .project-row-link p {
+    font: var(--type-compact);
+  }
+
+  .project-row-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+  }
+
+  .project-row-caption {
+    display: grid;
+    gap: var(--space-1);
+    transition: opacity 0.25s ease;
+  }
+
+  .project-row-link:hover .project-row-image {
+    opacity: 0.92;
+  }
+
+  .project-row-link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+  }
+
+  @media (max-width: 767px) {
+    .project-row {
+      --card-width: 80vw; /* design-tokens-ignore: card width, not spacing */
+      gap: var(--space-4);
+    }
+  }
+</style>
+
+<script>
+  import { enhanceWithLens } from '../lib/lens-enhance';
+
+  enhanceWithLens(document.querySelector<HTMLElement>('[data-project-row]'), { axis: 'x' });
+</script>

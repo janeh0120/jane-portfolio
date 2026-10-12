@@ -13,13 +13,11 @@ const rank = (label: string) => {
   return i === -1 ? order.length : i;
 };
 const sortedPrevious = [...previous].sort((a, b) => rank(a.label) - rank(b.label));
+// Each year (or Currently / Previously, for roles without one) shows once, on the first row it covers.
 const rows = [
   { ...current, when: current.years ?? 'Currently' },
-  ...sortedPrevious.map((place, index) => ({
-    ...place,
-    when: place.years ?? (index === 0 ? 'Previously' : ''),
-  })),
-];
+  ...sortedPrevious.map((place) => ({ ...place, when: place.years ?? 'Previously' })),
+].map((row, index, all) => ({ ...row, when: index > 0 && all[index - 1].when === row.when ? '' : row.when }));
 ---
 
 <section class="experience-list" data-comment-id="experience" aria-label="Experience">
@@ -31,7 +29,7 @@ const rows = [
           <a href={row.href} target="_blank" rel="noopener noreferrer" class="experience-place text-link text-ink">
             {row.label}
           </a>
-          {row.role ? <span class="experience-role">{row.role.toLowerCase()}</span> : null}
+          {row.role ? <span class="experience-role">{row.role}</span> : null}
         </li>
       ))
     }
@@ -50,8 +48,8 @@ const rows = [
     list-style: none;
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
-    column-gap: 2rem;
-    row-gap: 0.85rem;
+    column-gap: var(--space-8);
+    row-gap: var(--space-3);
   }
 
   .experience-row {
@@ -59,8 +57,8 @@ const rows = [
     display: grid;
     grid-template-columns: subgrid;
     grid-template-rows: auto auto;
-    row-gap: 0.1rem;
-    line-height: 1.4;
+    row-gap: var(--space-1);
+    font: var(--type-compact);
   }
 
   .experience-when {
@@ -79,11 +77,12 @@ const rows = [
     color: var(--color-muted);
   }
 
-  /* Wide: label, company, and role on one line */
-  @container (min-width: 28rem) {
+  /* Wide: label, company, and role on one line (the longest row needs about 26rem, so this holds
+     at the homepage's nav-bar width) */
+  @container (min-width: 26rem) {
     .experience-rows {
       grid-template-columns: max-content max-content minmax(0, 1fr);
-      row-gap: 0.4rem;
+      row-gap: var(--space-2);
     }
 
     .experience-row {

@@ -43,10 +43,11 @@ const linkClass = (href: string) =>
 
     <div class="header-actions flex shrink-0 items-center gap-5 md:gap-8">
       <nav
-        class="main-nav hidden items-center gap-5 md:flex md:gap-7"
+        class="main-nav hidden md:grid"
         aria-label="Main"
         data-comment-id="main-nav"
       >
+        <div class="main-nav-links flex items-center gap-5 md:gap-7">
         {
           site.nav.map((item) => (
             <a
@@ -61,6 +62,7 @@ const linkClass = (href: string) =>
             </a>
           ))
         }
+        </div>
       </nav>
       <div id="comment-toggle-anchor" class="comment-toggle-anchor" data-comment-ui>
         <LeaveFeedbackButton client:load id="comment-mode-toggle" hideInCommentMode />
@@ -131,13 +133,13 @@ const linkClass = (href: string) =>
   }
 
   .site-header-bar {
-    --bar-inset: 0.6rem;
+    --bar-inset: var(--space-2);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 0.6rem;
-    padding-left: 1.1rem;
+    gap: var(--space-4);
+    padding: var(--bar-inset);
+    padding-left: var(--space-4);
     border: var(--border-width, 0.5px) solid var(--color-hairline);
     border-radius: var(--radius-panel);
     background: var(--color-glass);
@@ -155,7 +157,7 @@ const linkClass = (href: string) =>
 
     .mobile-nav-panel.is-open {
       grid-template-rows: 1fr;
-      margin-top: 0.5rem;
+      margin-top: var(--space-2);
       border: var(--border-width) solid var(--color-hairline);
       border-radius: var(--radius-base);
       background: var(--color-glass-hover);
@@ -186,6 +188,56 @@ const linkClass = (href: string) =>
 
     .mobile-nav-panel {
       display: none;
+    }
+
+    /* The bar hugs its contents, centred, instead of spanning the page (phones keep full width
+       so the menu panel lines up under it). It narrows with the links as they collapse. */
+    .site-header-bar {
+      width: fit-content;
+      margin-inline: auto;
+      gap: var(--space-8);
+    }
+
+    /* Scrolling down collapses the links, leaving the logo and Leave feedback; scrolling up brings
+       them back. Slow and even on purpose (0.7s, ease in and out) so the bar eases rather than snaps;
+       on the way back the links fade in once there's room for them. */
+    /* The links' column animates between their real width (1fr) and nothing (0fr) */
+    .main-nav {
+      --nav-ease: cubic-bezier(0.45, 0, 0.25, 1);
+      grid-template-columns: 1fr;
+      transition:
+        grid-template-columns 0.7s var(--nav-ease),
+        margin-right 0.7s var(--nav-ease),
+        opacity 0.5s ease 0.15s,
+        visibility 0s;
+    }
+
+    /* Clipped while collapsing; the padding (cancelled by the margin) leaves room for focus rings */
+    .main-nav-links {
+      min-width: 0;
+      margin: calc(var(--space-2) * -1);
+      padding: var(--space-2);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .site-header.is-collapsed .main-nav {
+      grid-template-columns: 0fr;
+      margin-right: calc(var(--space-8) * -1);
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        grid-template-columns 0.7s var(--nav-ease),
+        margin-right 0.7s var(--nav-ease),
+        opacity 0.4s ease,
+        visibility 0s 0.7s;
+    }
+  }
+
+  @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
+    .main-nav,
+    .site-header.is-collapsed .main-nav {
+      transition: none;
     }
   }
 
@@ -244,5 +296,58 @@ const linkClass = (href: string) =>
 
   window.matchMedia('(min-width: 768px)').addEventListener('change', (event) => {
     if (event.matches) setOpen(false);
+  });
+
+  // Desktop: collapse the nav links while scrolling down, bring them back on any scroll up (or
+  // near the top, or when the header gets keyboard focus). Small jitters are ignored.
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const scroller = document.getElementById('site-canvas');
+  const desktop = window.matchMedia('(min-width: 768px)');
+  const TOP = 80;
+  const JITTER = 6;
+  let lastY = 0;
+  let frame = 0;
+
+  const scrollY = () => (scroller ? scroller.scrollTop : window.scrollY);
+  const setCollapsed = (collapsed: boolean) => header?.classList.toggle('is-collapsed', collapsed);
+
+  function onScroll() {
+    frame = 0;
+    const y = scrollY();
+    if (!desktop.matches || y < TOP) {
+      setCollapsed(false);
+    } else if (y > lastY + JITTER) {
+      setCollapsed(true);
+    } else if (y < lastY - JITTER) {
+      setCollapsed(false);
+    } else {
+      return; // within the jitter band: keep the current state and the reference point
+    }
+    lastY = y;
+  }
+
+  (scroller ?? window).addEventListener(
+    'scroll',
+    () => {
+      if (!frame) frame = requestAnimationFrame(onScroll);
+    },
+    { passive: true },
+  );
+  header?.addEventListener('focusin', () => setCollapsed(false));
+  desktop.addEventListener('change', () => setCollapsed(false));
+
+  // Publish the bar's expanded width (it hugs its contents) as --nav-bar-width, so the homepage
+  // intro can match it. Measured only while expanded: on load, once fonts are in, on resize, and
+  // when the links finish easing back in.
+  const bar = header?.querySelector<HTMLElement>('.site-header-bar');
+  function publishBarWidth() {
+    if (!bar || header?.classList.contains('is-collapsed')) return;
+    document.documentElement.style.setProperty('--nav-bar-width', `${bar.getBoundingClientRect().width}px`);
+  }
+  publishBarWidth();
+  void document.fonts?.ready.then(publishBarWidth);
+  window.addEventListener('resize', publishBarWidth);
+  header?.querySelector('.main-nav')?.addEventListener('transitionend', (event) => {
+    if ((event as TransitionEvent).propertyName === 'grid-template-columns') publishBarWidth();
   });
 </script>

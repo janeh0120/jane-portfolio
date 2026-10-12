@@ -31,12 +31,12 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
         >
           <div class="brand-gallery">
             {project.colorModes && (
-              <div class="brand-mode-toggle" role="group" aria-label="Illustration colour mode">
-                <span class="brand-mode-thumb" aria-hidden="true" />
-                <button type="button" class="brand-mode-option" data-mode-choice="light" aria-pressed="true">
+              <div class="segmented is-glass brand-mode-toggle" role="group" aria-label="Illustration colour mode">
+                <span class="segmented-thumb" aria-hidden="true" />
+                <button type="button" class="segmented-option" data-mode-choice="light" aria-pressed="true">
                   Light
                 </button>
-                <button type="button" class="brand-mode-option" data-mode-choice="dark" aria-pressed="false">
+                <button type="button" class="segmented-option" data-mode-choice="dark" aria-pressed="false">
                   Dark
                 </button>
               </div>
@@ -92,7 +92,7 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
 
           <div class="brand-strip page-frame">
             <div class="brand-meta">
-              <h2 class="text-ink brand-title">{project.title}</h2>
+              <h2 class="text-ink text-intro brand-title">{project.title}</h2>
               <dl class="brand-details">
                 {project.details.map((detail) => (
                   <div>
@@ -128,15 +128,15 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
     --gutter: max(1.5rem, calc((100% - 1400px) / 2));
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 7rem;
-    padding-block: 2.5rem 7rem;
+    gap: var(--space-section);
+    padding-block: var(--space-10) var(--space-section);
   }
 
   /* Two halves, like a spread: left for who/what, right for the story */
   .brand-strip {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 3rem;
+    gap: var(--space-12);
   }
 
   /* Experience list hugs its text instead of filling the column. Its layout switch is a
@@ -156,14 +156,14 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
   .brand-project {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: 1.25rem;
+    gap: var(--space-5);
     scroll-margin-top: 7rem;
   }
 
   /* Images keep their natural proportions at one height; extras scroll sideways */
   .brand-row {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
     height: var(--brand-row-height);
     overflow-x: auto;
     overscroll-behavior-x: contain;
@@ -228,77 +228,21 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
 
   .brand-embed {
     border: 0;
-    background: #000;
+    background: var(--color-media-backdrop);
   }
 
+  /* Shared .segmented toggle (global.css), held in place over the row */
   .brand-mode-toggle {
-    --toggle-pad: 0.25rem;
     position: absolute;
-    top: 0.75rem;
-    left: calc(var(--gutter) + 0.75rem);
+    top: var(--space-3);
+    left: calc(var(--gutter) + var(--space-3));
     z-index: 2;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: var(--toggle-pad);
-    border-radius: 999px;
-    background: var(--color-glass-hover);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 1px 3px rgb(0 0 0 / 12%);
-  }
-
-  /* Pill that slides between the two options */
-  .brand-mode-thumb {
-    position: absolute;
-    top: var(--toggle-pad);
-    bottom: var(--toggle-pad);
-    left: var(--toggle-pad);
-    width: calc(50% - var(--toggle-pad));
-    border-radius: 999px;
-    background: var(--color-ink);
-    transition: transform 320ms cubic-bezier(0.3, 0.7, 0.2, 1);
-  }
-
-  [data-mode='dark'] .brand-mode-thumb {
-    transform: translateX(100%);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .brand-mode-thumb {
-      transition: none;
-    }
-  }
-
-  .brand-mode-option {
-    position: relative;
-    padding: 0.3rem 0.9rem;
-    border: 0;
-    border-radius: 999px;
-    background: transparent;
-    color: var(--color-muted);
-    font: inherit;
-    cursor: pointer;
-    transition: color 200ms ease;
-  }
-
-  .brand-mode-option:hover {
-    color: var(--color-ink);
-  }
-
-  /* Selected label sits on the ink pill, so it takes the canvas colour */
-  .brand-mode-option[aria-pressed='true'] {
-    color: var(--color-canvas);
-  }
-
-  .brand-mode-option:focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
   }
 
   .brand-meta {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2rem;
+    gap: var(--space-8);
     align-content: start;
   }
 
@@ -307,20 +251,14 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
     margin: 0;
   }
 
-  /* Same type as the homepage intro (Hero.astro) */
   .brand-title {
     align-self: start;
-    font-family: var(--font-sans);
-    font-size: clamp(1.75rem, calc(3.4vw - 2px), 2.5rem);
-    line-height: 1.15;
-    letter-spacing: -0.04em;
-    font-weight: 700;
   }
 
 
   .brand-body {
     display: grid;
-    gap: 0.875rem;
+    gap: var(--space-4);
     align-content: start;
     max-width: 38rem;
   }
@@ -332,7 +270,7 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
   /* Label above value, stacked down the column */
   .brand-details {
     display: grid;
-    gap: 0.75rem;
+    gap: var(--space-3);
     align-content: start;
     margin: 0;
   }
@@ -349,18 +287,18 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
     .brand {
       --brand-row-height: 16rem;
       --gutter: 1rem;
-      gap: 4.5rem;
-      padding-top: 1rem;
+      gap: var(--space-20);
+      padding-top: var(--space-4);
     }
 
     .brand-strip {
       grid-template-columns: minmax(0, 1fr);
-      gap: 1.5rem;
+      gap: var(--space-6);
     }
 
     .brand-meta {
       grid-template-columns: minmax(0, 1fr);
-      gap: 0.75rem;
+      gap: var(--space-3);
     }
   }
 </style>

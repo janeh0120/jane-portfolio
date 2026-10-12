@@ -1,32 +1,15 @@
 import { useEffect, useState, type MouseEventHandler } from 'react';
 import SpecularButton from './SpecularButton';
 
-type Theme = 'light' | 'dark';
+// The primary button is the accent colour with on-accent text. The fill and text use the CSS
+// tokens directly; the WebGL shine needs a real colour value, so it reads --color-accent once the
+// page has loaded (and again if the colour mode changes). Until then, this mirrors it.
+const ACCENT_FALLBACK = '#246cff';
 
-function readTheme(): Theme {
-  if (typeof document === 'undefined') return 'light';
-  if (document.documentElement.classList.contains('theme-dark')) return 'dark';
-  if (document.documentElement.dataset.theme === 'dark') return 'dark';
-  if (document.documentElement.dataset.theme === 'light') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+function readAccent() {
+  if (typeof document === 'undefined') return ACCENT_FALLBACK;
+  return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || ACCENT_FALLBACK;
 }
-
-const themeProps = {
-  light: {
-    tint: '#f5f5f5',
-    tintOpacity: 1,
-    textColor: '#555555',
-    lineColor: '#111111',
-    baseColor: '#e8e8e8',
-  },
-  dark: {
-    tint: '#262626',
-    tintOpacity: 1,
-    textColor: '#a8a8a8',
-    lineColor: '#f3f3f3',
-    baseColor: '#3a3a3a',
-  },
-} as const;
 
 export type LeaveFeedbackButtonProps = {
   id?: string;
@@ -46,11 +29,11 @@ export default function LeaveFeedbackButton({
   hideInCommentMode = false,
   previewState,
 }: LeaveFeedbackButtonProps) {
-  const [theme, setTheme] = useState<Theme>('light');
+  const [accent, setAccent] = useState(ACCENT_FALLBACK);
   const [inCommentMode, setInCommentMode] = useState(false);
 
   useEffect(() => {
-    const syncTheme = () => setTheme(readTheme());
+    const syncTheme = () => setAccent(readAccent());
     const syncMode = () => {
       setInCommentMode(document.body.classList.contains('comment-view-comment'));
     };
@@ -96,7 +79,6 @@ export default function LeaveFeedbackButton({
     document.dispatchEvent(new CustomEvent('portfolio:leave-feedback'));
   };
 
-  const colors = themeProps[theme];
   const hidden = hideInCommentMode && inCommentMode;
   const disabled = previewState === 'disabled' || (!hideInCommentMode && inCommentMode);
   const stateClass =
@@ -109,13 +91,13 @@ export default function LeaveFeedbackButton({
       id={id}
       className={[className, stateClass].filter(Boolean).join(' ')}
       size="sm"
-      radius={8}
-      tint={colors.tint}
-      tintOpacity={colors.tintOpacity}
+      radius="var(--radius-base)"
+      tint="var(--color-accent)"
+      tintOpacity={1}
       blur={0}
-      textColor={colors.textColor}
-      lineColor={colors.lineColor}
-      baseColor={colors.baseColor}
+      textColor="var(--color-on-accent)"
+      lineColor={accent}
+      baseColor={accent}
       intensity={1}
       shineSize={10}
       shineFade={40}
@@ -123,7 +105,9 @@ export default function LeaveFeedbackButton({
       speed={0.35}
       followMouse
       proximity={250}
-      autoAnimate={previewState === 'hover' || previewState === 'active'}
+      // Always on: an accent glow circles the edge and turns toward a nearby pointer
+      autoAnimate={!disabled}
+      glow={!disabled}
       disabled={disabled}
       aria-pressed={inCommentMode}
       onClick={onClick}

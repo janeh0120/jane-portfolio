@@ -16,7 +16,7 @@ precision highp float;
 
 uniform vec2 uCenter;
 uniform vec2 uHalfSize;
-uniform float uRadius;
+uniform vec4 uRadii; // corner radii: top right, bottom right, top left, bottom left
 uniform float uAngle;
 uniform float uPx;
 uniform vec3 uLineColor;
@@ -26,15 +26,19 @@ uniform float uShineSize;
 uniform float uShineFade;
 uniform float uThickness;
 uniform float uBaseWidth;
+uniform float uGlow;
 
 out vec4 fragColor;
 
-float sdRoundedRect(vec2 p, vec2 b, float r) {
-  vec2 q = abs(p) - b + r;
-  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+// A rounded rectangle with its own radius per corner (y up, as in gl_FragCoord)
+float sdRoundedRect(vec2 p, vec2 b, vec4 r) {
+  r.xy = p.x > 0.0 ? r.xy : r.zw;
+  float rc = p.y > 0.0 ? r.x : r.y;
+  vec2 q = abs(p) - b + rc;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - rc;
 }
 
-float shapeSDF(vec2 p) { return sdRoundedRect(p, uHalfSize, uRadius); }
+float shapeSDF(vec2 p) { return sdRoundedRect(p, uHalfSize, uRadii); }
 
 float gaussianLine(float d, float sigma) {
   float x = d / (sigma + 1e-6);
@@ -42,22 +46,36 @@ float gaussianLine(float d, float sigma) {
   return exp(-k * x * x);
 }
 
+// How much of the shine falls on this point of the edge, for a shine pointing along angle
+float rimAt(vec2 nEll, float angle) {
+  vec2 L = vec2(cos(angle), sin(angle));
+  float phi = acos(clamp(abs(dot(nEll, L)), 0.0, 1.0));
+  return 1.0 - smoothstep(uShineSize - uShineFade, uShineSize + uShineFade + 1e-4, phi);
+}
+
 void main() {
   vec2 p = gl_FragCoord.xy - uCenter;
   float d = shapeSDF(p);
-  vec2 L = vec2(cos(uAngle), sin(uAngle));
 
   float base = (1.0 - smoothstep(0.0, uBaseWidth, abs(d))) * 0.45;
 
   vec2 nEll = normalize(p / (uHalfSize * uHalfSize) + 1e-6);
-  float phi = acos(clamp(abs(dot(nEll, L)), 0.0, 1.0));
-  float rim = 1.0 - smoothstep(uShineSize - uShineFade, uShineSize + uShineFade + 1e-4, phi);
   float line = gaussianLine(d, uThickness);
   float edgeClamp = 1.0 - smoothstep(0.5 * uPx, 3.0 * uPx, abs(d));
+  float rim = rimAt(nEll, uAngle);
   float hi = line * rim * edgeClamp * uIntensity;
 
-  vec3 col = uBaseColor * base + uLineColor * hi;
-  float a = clamp(base + hi, 0.0, 1.0);
+  // Glow: a soft halo in the line colour that follows the shine, only outside the edge (it fades
+  // out within a pixel or so inside), so it never tints the button's fill
+  float halo = gaussianLine(max(d, 0.0), uThickness * 5.0)
+    * (1.0 - smoothstep(0.0, 12.0 * uPx, d))
+    * smoothstep(-1.5 * uPx, 0.0, d);
+  float glow = halo * rim * 0.55 * uGlow * uIntensity;
+
+  float shineA = clamp(hi + glow, 0.0, 1.0);
+  vec3 shine = uLineColor * shineA;
+  vec3 col = uBaseColor * base + shine;
+  float a = clamp(base + shineA, 0.0, 1.0);
   fragColor = vec4(col, a);
 }
 `;
@@ -65,7 +83,8 @@ void main() {
 export type SpecularButtonProps = {
   children?: ReactNode;
   size?: 'sm' | 'md' | 'lg';
-  radius?: number;
+  /** Corner radius: px, or any CSS border-radius (tokens, or four values for per-corner radii). */
+  radius?: number | string;
   tint?: string;
   tintOpacity?: number;
   blur?: number;
@@ -80,6 +99,8 @@ export type SpecularButtonProps = {
   followMouse?: boolean;
   proximity?: number;
   autoAnimate?: boolean;
+  /** Add a soft halo in the line colour around the shine. */
+  glow?: boolean;
   disabled?: boolean;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
@@ -89,7 +110,6 @@ export type SpecularButtonProps = {
 };
 
 type LiveProps = {
-  radius: number;
   lineColor: string;
   baseColor: string;
   intensity: number;
@@ -100,6 +120,7 @@ type LiveProps = {
   followMouse: boolean;
   proximity: number;
   autoAnimate: boolean;
+  glow: boolean;
 };
 
 export default function SpecularButton({
@@ -120,6 +141,7 @@ export default function SpecularButton({
   followMouse = true,
   proximity = 250,
   autoAnimate = false,
+  glow = false,
   disabled = false,
   onClick,
   className = '',
@@ -130,7 +152,6 @@ export default function SpecularButton({
   const btnRef = useRef<HTMLButtonElement>(null);
   const fxRef = useRef<HTMLSpanElement>(null);
   const propsRef = useRef<LiveProps>({
-    radius,
     lineColor,
     baseColor,
     intensity,
@@ -141,10 +162,10 @@ export default function SpecularButton({
     followMouse,
     proximity,
     autoAnimate,
+    glow,
   });
 
   propsRef.current = {
-    radius,
     lineColor,
     baseColor,
     intensity,
@@ -155,6 +176,7 @@ export default function SpecularButton({
     followMouse,
     proximity,
     autoAnimate,
+    glow,
   };
 
   useEffect(() => {
@@ -178,7 +200,7 @@ export default function SpecularButton({
       uniforms: {
         uCenter: { value: [0, 0] },
         uHalfSize: { value: [1, 1] },
-        uRadius: { value: 0 },
+        uRadii: { value: [0, 0, 0, 0] },
         uAngle: { value: 2.4 },
         uPx: { value: dpr },
         uLineColor: { value: [1, 1, 1] },
@@ -188,22 +210,29 @@ export default function SpecularButton({
         uShineFade: { value: 0.7 },
         uThickness: { value: 1 },
         uBaseWidth: { value: dpr },
+        uGlow: { value: 0 },
       },
     });
 
     const mesh = new Mesh(gl, { geometry, program });
     fx.appendChild(gl.canvas);
 
-    const sizeRef = { w: 1, h: 1 };
     const resize = () => {
       const rect = btn.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
-      sizeRef.w = w;
-      sizeRef.h = h;
       renderer.setSize(w + PAD * 2, h + PAD * 2);
       program.uniforms.uCenter.value = [(PAD + w / 2) * dpr, (PAD + h / 2) * dpr];
       program.uniforms.uHalfSize.value = [(w / 2) * dpr, (h / 2) * dpr];
+      // The shine follows the button's own corners, so the CSS (and its tokens) sets the shape
+      const css = getComputedStyle(btn);
+      const corner = (value: string) => Math.min(parseFloat(value) || 0, Math.min(w, h) / 2) * dpr;
+      program.uniforms.uRadii.value = [
+        corner(css.borderTopRightRadius),
+        corner(css.borderBottomRightRadius),
+        corner(css.borderTopLeftRadius),
+        corner(css.borderBottomLeftRadius),
+      ];
     };
     const ro = new ResizeObserver(resize);
     ro.observe(btn);
@@ -236,16 +265,35 @@ export default function SpecularButton({
     let last = performance.now();
     let raf = 0;
 
+    // Hold still for reduced motion; stop drawing while off screen
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let onScreen = true;
+    const io = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      if (onScreen && !raf) {
+        last = performance.now();
+        raf = requestAnimationFrame(update);
+      }
+    });
+    io.observe(btn);
+
     const lineC = new Color();
     const baseC = new Color();
 
-    const update = (now: number) => {
+    function update(now: number) {
+      if (!onScreen) {
+        raf = 0;
+        return;
+      }
       raf = requestAnimationFrame(update);
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       const p = propsRef.current;
+      const still = reduceMotion.matches;
 
-      idleAngle += p.speed * dt;
+      if (!still) {
+        idleAngle += p.speed * dt;
+      }
       const steer = p.followMouse && pointerAngle != null && (!p.autoAnimate || proximityT > 0);
       const target = steer ? pointerAngle : idleAngle;
       const diff = ((target - angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
@@ -257,19 +305,20 @@ export default function SpecularButton({
       lineC.set(p.lineColor);
       baseC.set(p.baseColor);
       program.uniforms.uAngle.value = angle;
-      program.uniforms.uRadius.value = Math.min(p.radius, Math.min(sizeRef.w, sizeRef.h) / 2) * dpr;
       program.uniforms.uLineColor.value = [lineC.r, lineC.g, lineC.b];
       program.uniforms.uBaseColor.value = [baseC.r, baseC.g, baseC.b];
       program.uniforms.uIntensity.value = p.intensity * bright;
       program.uniforms.uShineSize.value = (p.shineSize * Math.PI) / 180;
       program.uniforms.uShineFade.value = (p.shineFade * Math.PI) / 180;
       program.uniforms.uThickness.value = p.thickness * dpr;
+      program.uniforms.uGlow.value = p.glow ? 1 : 0;
       renderer.render({ scene: mesh });
-    };
+    }
     raf = requestAnimationFrame(update);
 
     return () => {
       cancelAnimationFrame(raf);
+      io.disconnect();
       ro.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
       if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);
@@ -288,7 +337,7 @@ export default function SpecularButton({
       className={`specular-button specular-button--${size}${className ? ` ${className}` : ''}`}
       style={
         {
-          '--sb-radius': `${radius}px`,
+          '--sb-radius': typeof radius === 'number' ? `${radius}px` : radius,
           '--sb-tint': tint,
           '--sb-tint-opacity': tintOpacity,
           '--sb-blur': `${blur}px`,

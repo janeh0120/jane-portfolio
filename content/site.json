@@ -35,29 +35,33 @@
   ],
   "hero": {
     "headline": "Hi I'm Jane Hou!",
-    "subhead": "I care about people and want to design around them."
+    "subhead": "I care about people and use systems thinking and initiative to define what matters and design for it."
   },
   "experience": {
     "current": {
       "label": "IBM",
       "href": "https://www.ibm.com/consulting",
-      "role": "Product Design Consulting"
+      "role": "Product design consulting",
+      "years": "2026"
     },
     "previous": [
       {
         "label": "Intuit",
         "href": "https://www.intuit.com/ca/",
-        "role": "AI Product Design & Design Systems"
+        "role": "AI product design & design systems",
+        "years": "2026"
       },
       {
         "label": "GWSK",
         "href": "https://gwsk.studio/",
-        "role": "Brand & Web Design"
+        "role": "Brand & web design",
+        "years": "2025"
       },
       {
         "label": "Simple Ventures",
         "href": "https://www.simpleventures.ca/",
-        "role": "Brand & Web Design"
+        "role": "Brand & web design",
+        "years": "2025"
       }
     ],
     "note": "Interested in Summer 2027 internships and part-time/contract work!"
@@ -77,15 +81,6 @@
       "tags": ["Intuit", "product", "partially shipped"],
       "title": "Leading design of 0 → 1 internal tooling",
       "image": "images/case-study-heroes/migration-reel.webp",
-      "comingSoon": false
-    },
-    {
-      "slug": "dex",
-      "name": "Dex",
-      "tags": ["product", "brand", "hackathon", "Hack the North Semi-finalist"],
-      "title": "Hacking laptop sensors into daily OT practice",
-      "image": "images/case-study-heroes/dex.png",
-      "href": "https://devpost.com/software/htn-2026",
       "comingSoon": false
     },
     {

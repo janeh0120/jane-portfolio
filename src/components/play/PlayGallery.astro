@@ -1,6 +1,7 @@
 ---
 import { galleryItems } from '../../lib/play-gallery';
 import ArrowIcon from '../ArrowIcon.astro';
+import IconControl from '../IconControl.astro';
 
 const base = import.meta.env.BASE_URL;
 
@@ -54,28 +55,27 @@ function isVideo(path: string) {
 
 <div class="gallery-modal" id="gallery-modal" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="gallery-modal-content">
-    <button type="button" class="gallery-modal-close" id="gallery-modal-close" aria-label="Close">
-      ×
-    </button>
+    <IconControl label="Close" icon="x" id="gallery-modal-close" class="is-dismiss gallery-modal-close" />
 
     <div class="gallery-carousel-container">
       <div class="gallery-carousel" id="carousel-slides" />
-      <div class="carousel-controls-wrap" id="carousel-controls" hidden>
-        <button type="button" class="carousel-arrow prev" id="carousel-prev" aria-label="Previous slide">
-          <ArrowIcon direction="left" size="18px" />
-        </button>
-        <div class="carousel-controls" id="carousel-dots" />
-        <button type="button" class="carousel-arrow next" id="carousel-next" aria-label="Next slide">
-          <ArrowIcon direction="right" size="18px" />
-        </button>
-      </div>
+    </div>
+
+    <div class="carousel-nav" id="carousel-controls" hidden>
+      <IconControl label="Previous slide" id="carousel-prev">
+        <ArrowIcon direction="left" size="16px" />
+      </IconControl>
+      <div class="carousel-controls" id="carousel-dots" />
+      <IconControl label="Next slide" id="carousel-next">
+        <ArrowIcon direction="right" size="16px" />
+      </IconControl>
     </div>
 
     <p class="gallery-modal-description" id="modal-description" />
-    <div class="gallery-mode-toggle" id="modal-mode-toggle" role="group" aria-label="Illustration colour mode" hidden>
-      <span class="gallery-mode-thumb" aria-hidden="true"></span>
-      <button type="button" class="gallery-mode-option" data-mode-choice="light" aria-pressed="true">Light</button>
-      <button type="button" class="gallery-mode-option" data-mode-choice="dark" aria-pressed="false">Dark</button>
+    <div class="segmented gallery-mode-toggle" id="modal-mode-toggle" role="group" aria-label="Illustration colour mode" hidden>
+      <span class="segmented-thumb" aria-hidden="true"></span>
+      <button type="button" class="segmented-option" data-mode-choice="light" aria-pressed="true">Light</button>
+      <button type="button" class="segmented-option" data-mode-choice="dark" aria-pressed="false">Dark</button>
     </div>
   </div>
 </div>
@@ -87,7 +87,13 @@ function isVideo(path: string) {
   enhanceWithLens(document.getElementById('gallery-grid'), { strength: 0.4 });
 </script>
 
-<script define:vars={{ galleryItems, base }}>
+<script type="application/json" id="play-gallery-data" set:html={JSON.stringify({ galleryItems, base })} />
+
+<script>
+  import { createMediaMorph } from '../../lib/media-morph';
+
+  const { galleryItems, base } = JSON.parse(document.getElementById('play-gallery-data')?.textContent ?? '{}');
+
   function resolveSrc(path) {
     if (path.startsWith('data:') || path.startsWith('http')) return path;
     return `${base}${path}`;
@@ -95,6 +101,11 @@ function isVideo(path: string) {
 
   function isVideo(path) {
     return /\.(mp4|webm|mov|m4v)$/i.test(path);
+  }
+
+  // A YouTube link becomes an embedded player (privacy-enhanced domain)
+  function youTubeId(path) {
+    return path.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/)?.[1] ?? null;
   }
 
   let currentItemId = null;
@@ -110,6 +121,16 @@ function isVideo(path: string) {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let modeTouched = false;
   let modeHintTimer = 0;
+  // The clicked image grows into the overlay and shrinks back on close (src/lib/media-morph.ts)
+  const morph = modal ? createMediaMorph(modal) : null;
+
+  function gridImage(itemId) {
+    return document.querySelector(`[data-gallery-id="${itemId}"] img`);
+  }
+
+  function slideMedia(index) {
+    return carouselSlides?.querySelectorAll('.gallery-carousel-slide')[index]?.querySelector('.gallery-themed, img, video') ?? null;
+  }
 
   // Light/dark toggle for items with dark versions: follows the site's colour mode, flips once
   // on its own as a hint, and the viewer can switch it any time (like the /brand page).
@@ -136,6 +157,8 @@ function isVideo(path: string) {
     carouselSlides?.querySelectorAll('video').forEach((video) => {
       video.pause();
     });
+    // Unloading a YouTube player is the reliable way to stop it
+    carouselSlides?.querySelectorAll('iframe[src]').forEach((frame) => frame.removeAttribute('src'));
   }
 
   function playActiveVideo() {
@@ -146,6 +169,9 @@ function isVideo(path: string) {
       video.currentTime = 0;
       void video.play().catch(() => {});
     }
+    // YouTube loads only once its slide is shown, and doesn't autoplay
+    const frame = active?.querySelector('iframe');
+    if (frame && !frame.getAttribute('src')) frame.src = frame.dataset.src;
   }
 
   function updateCarousel() {
@@ -194,7 +220,18 @@ function isVideo(path: string) {
       const slide = document.createElement('div');
       slide.className = 'gallery-carousel-slide';
       const darkMedia = themed ? item.darkImages[index] : null;
-      if (isVideo(media)) {
+      const youTube = youTubeId(media);
+      if (youTube) {
+        const frame = document.createElement('iframe');
+        frame.dataset.src = `https://www.youtube-nocookie.com/embed/${youTube}?rel=0`;
+        frame.title = `${item.title} video`;
+        frame.allow = 'encrypted-media; picture-in-picture; fullscreen';
+        frame.allowFullscreen = true;
+        const wrap = document.createElement('div');
+        wrap.className = 'gallery-embed';
+        wrap.appendChild(frame);
+        slide.appendChild(wrap);
+      } else if (isVideo(media)) {
         slide.innerHTML = `<video src="${resolveSrc(media)}" muted playsinline loop controls preload="metadata"></video>`;
       } else if (darkMedia) {
         slide.innerHTML = `<div class="gallery-themed"><img class="gallery-mode-light" src="${resolveSrc(media)}" alt="Slide ${index + 1}"><img class="gallery-mode-dark" src="${resolveSrc(darkMedia)}" alt=""></div>`;
@@ -211,9 +248,7 @@ function isVideo(path: string) {
       carouselDots?.appendChild(dot);
     });
 
-    if (carouselControls) {
-      carouselControls.hidden = item.images.length <= 1;
-    }
+    if (carouselControls) carouselControls.hidden = item.images.length <= 1;
 
     if (modalDescription) modalDescription.textContent = item.description;
 
@@ -234,11 +269,15 @@ function isVideo(path: string) {
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
     updateCarousel();
+    void morph?.open(gridImage(itemId), slideMedia(0));
   }
 
-  function closeGallery() {
+  async function closeGallery() {
+    if (!modal?.classList.contains('active') || morph?.busy) return;
     clearTimeout(modeHintTimer);
     pauseAllVideos();
+    // Only the first slide is the image in the grid; from other slides the overlay just closes.
+    if (currentSlideIndex === 0) await morph?.close(gridImage(currentItemId), slideMedia(0));
     modal?.classList.remove('active');
     modal?.setAttribute('aria-hidden', 'true');
     currentItemId = null;
@@ -261,8 +300,8 @@ function isVideo(path: string) {
   });
 
   document.addEventListener('keydown', (event) => {
-    if (!modal?.classList.contains('active')) return;
-    if (event.key === 'Escape') closeGallery();
+    if (!modal?.classList.contains('active') || morph?.busy) return;
+    if (event.key === 'Escape') void closeGallery();
     if (event.key === 'ArrowRight') nextSlide();
     if (event.key === 'ArrowLeft') previousSlide();
   });

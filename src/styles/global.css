@@ -6,6 +6,12 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+  /* The font reserves 0.73em above the baseline (its cap height) but 0.22em below, so text sat
+     about 0.11em high in every line box. Matching the space above the caps to the space below
+     the baseline centres capitals vertically wherever a line height is set. */
+  ascent-override: 95%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 @font-face {
@@ -14,6 +20,12 @@
   font-weight: 400;
   font-style: italic;
   font-display: swap;
+  /* The font reserves 0.73em above the baseline (its cap height) but 0.22em below, so text sat
+     about 0.11em high in every line box. Matching the space above the caps to the space below
+     the baseline centres capitals vertically wherever a line height is set. */
+  ascent-override: 95%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 @font-face {
@@ -22,6 +34,12 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
+  /* The font reserves 0.73em above the baseline (its cap height) but 0.22em below, so text sat
+     about 0.11em high in every line box. Matching the space above the caps to the space below
+     the baseline centres capitals vertically wherever a line height is set. */
+  ascent-override: 95%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 @font-face {
@@ -30,6 +48,12 @@
   font-weight: 700;
   font-style: italic;
   font-display: swap;
+  /* The font reserves 0.73em above the baseline (its cap height) but 0.22em below, so text sat
+     about 0.11em high in every line box. Matching the space above the caps to the space below
+     the baseline centres capitals vertically wherever a line height is set. */
+  ascent-override: 95%;
+  descent-override: 22%;
+  line-gap-override: 0%;
 }
 
 @theme {
@@ -41,11 +65,17 @@
   --color-canvas: #ffffff;
   --color-ink: #111111;
   --color-muted: #555555;
-  --color-subtle: #919191;
+  /* Labels and disabled text; 4.5:1 or better on page, canvas and surface */
+  --color-subtle: #6b6b6b;
   --color-line: #f0f0f0;
   --color-link: #111111;
 
+  /* The primary (ink-filled) control on hover: ink eased toward the canvas */
+  --color-ink-hover: color-mix(in srgb, var(--color-ink) 82%, var(--color-canvas));
+
   --color-accent: #246cff;
+  /* Text and icons on an accent fill (the primary button); white in both colour modes */
+  --color-on-accent: #ffffff;
   --color-accent-soft: rgb(36 108 255 / 12%);
 
   --color-surface: #f5f5f5;
@@ -62,6 +92,21 @@
   --color-glass-hover: rgb(255 255 255 / 82%);
   --color-hairline: rgb(17 17 17 / 8%);
 
+  /* The media overlay (Play, About): the page colour, slightly see-through so the page shows
+     behind, and following the colour mode */
+  --color-overlay: color-mix(in srgb, var(--color-page) 88%, transparent);
+  /* Solid black behind embedded video (letterboxing), in both modes */
+  --color-media-backdrop: #000000;
+
+  /* Inspect mode on /design-system only, in Figma's dev-mode colours: measurements and pins */
+  --color-measure: #f24822;
+  --color-on-measure: #ffffff;
+  --color-pin: #14ae5c;
+
+  /* Two elevation levels: raised (cards that lift slightly) and floating (menus, popovers) */
+  --shadow-raised: 0 2px 8px rgb(0 0 0 / 6%);
+  --shadow-floating: 0 12px 32px rgb(0 0 0 / 14%);
+
   /* One corner radius for every border */
   --radius-none: 0;
   --radius-sm: 0.5rem;
@@ -70,6 +115,8 @@
   --radius-xl: 0.5rem;
   --radius-base: 0.5rem;
   --radius-full: 0.5rem;
+  /* Segmented toggles only (Light / Dark, Web / Problems) */
+  --radius-pill: 999px;
 
   --max-w-site: 1400px;
   --max-w-prose: 48rem;
@@ -80,11 +127,51 @@
   html {
     /* Nav, comment cards, and the page frame */
     --border-width: 0.5px;
-    --bar-inset: 0.6rem;
+    --bar-inset: var(--space-2);
     /* Floating panels (nav, footer card): the corner plus the inset to the controls inside */
     --radius-panel: calc(var(--radius-base) + var(--bar-inset) + var(--border-width));
+    /* Menus: the corner plus the menu's inset to its options */
+    --radius-menu: calc(var(--radius-base) + var(--space-inset) + var(--border-width));
+    /* Spacing scale on a 4px grid, matching Tailwind's (space-3 = mt-3 = 0.75rem) */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    /* Between page sections (.section-stack): mobile, then 768px and up */
+    --space-section-sm: 5.5rem;
+    --space-section: 7rem;
     /* Small inset: menu padding, tag padding */
-    --space-inset: 4px;
+    --space-inset: var(--space-1);
+
+    /* Type styles: weight, size / line height, and family in one token. Use as
+       `font: var(--type-body); letter-spacing: var(--tracking-body);` */
+    --type-display: 700 clamp(2.5rem, calc(4.8vw - 2px), 3.625rem) / 1.2 var(--font-sans);
+    --type-intro: 700 clamp(1.75rem, calc(3.4vw - 2px), 2.5rem) / 1.15 var(--font-sans);
+    --type-heading: 700 clamp(1.625rem, calc(3.2vw - 2px), 2.375rem) / 1.2 var(--font-sans);
+    --type-subheading: 700 clamp(1rem, calc(1.8vw - 2px), 1.25rem) / 1.3 var(--font-sans);
+    /* Pull quotes: subheading size, regular weight */
+    --type-quote: 400 clamp(1rem, calc(1.8vw - 2px), 1.25rem) / 1.35 var(--font-sans);
+    --type-body: 400 0.875rem / 1.65 var(--font-sans);
+    --type-label: 500 0.875rem / 1.65 var(--font-sans);
+    /* Body size, tighter: controls, captions, and dense lists */
+    --type-compact: 400 0.875rem / 1.35 var(--font-sans);
+    --type-tag: 400 0.875rem / 1 var(--font-sans);
+    --type-count: 500 0.75rem / 1 var(--font-sans);
+    /* Letter spacing: tight for the bold display styles, body for everything else */
+    --tracking-tight: -0.04em;
+    --tracking-body: -0.01em;
+    /* Weights, for the few places that change only the weight */
+    --weight-regular: 400;
+    --weight-medium: 500;
+    --weight-bold: 700;
     font-family: var(--font-sans);
     background: var(--color-page);
     color: var(--color-ink);
@@ -92,7 +179,8 @@
 
   body {
     margin: 0;
-    font-size: 0.875rem;
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
   }
 
   body::after {
@@ -124,47 +212,48 @@
   }
 
   /*
-   * Type ramp (4 steps):
-   * - hero-copy  → homepage display
+   * Type ramp (see DESIGN.md); each class applies one --type-* token:
+   * - hero-copy  → display (largest headline)
+   * - text-intro → intro line, Brand project titles
    * - heading    → page titles
    * - subheading → section / project titles
-   * - text-body  → body, labels, meta, nav
+   * - text-body  → body, meta, nav
+   * - text-compact → compact (body size, tighter lines): dense text such as the homepage intro
+   * - label      → text-body + font-medium (500), for small labels above values
+   * Quote, tag, and count are used inside components through their tokens.
+   * No margin reset here: Tailwind's base already zeroes margins, and a reset in this layer would
+   * cancel margin utilities on the same element (mt-3 text-body).
    */
 
   .hero-copy {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(2.5rem, calc(4.8vw - 2px), 3.625rem);
-    line-height: 1.2;
-    letter-spacing: -0.04em;
-    font-weight: 700;
+    font: var(--type-display);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  /* Intro: Brand's intro line and project titles */
+  .text-intro {
+    font: var(--type-intro);
+    letter-spacing: var(--tracking-tight);
   }
 
   .heading {
-    margin: 0;
-    font-family: var(--font-serif);
-    font-size: clamp(1.625rem, calc(3.2vw - 2px), 2.375rem);
-    line-height: 1.2;
-    letter-spacing: -0.04em;
-    font-weight: 700;
+    font: var(--type-heading);
+    letter-spacing: var(--tracking-tight);
   }
 
   .subheading {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
-    line-height: 1.3;
-    letter-spacing: -0.04em;
-    font-weight: 700;
+    font: var(--type-subheading);
+    letter-spacing: var(--tracking-tight);
   }
 
   .text-body {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .text-compact {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
   }
 
   .text-link {
@@ -197,7 +286,7 @@
 
   .text-link[aria-current='page'],
   .text-link.is-active {
-    font-weight: 500;
+    font-weight: var(--weight-medium);
     text-decoration-color: var(--color-ink);
   }
 
@@ -215,12 +304,12 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 5.5rem;
+    gap: var(--space-section-sm);
   }
 
   @media (min-width: 768px) {
     .section-stack {
-      gap: 7rem;
+      gap: var(--space-section);
     }
   }
 
@@ -232,10 +321,8 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    min-height: 32px;
-    padding: 0;
+    /* One size for every variant: the 16px icon plus space-2 on each side (32px) */
+    padding: var(--space-2);
     border: none;
     border-radius: var(--radius-base);
     background: transparent;
@@ -248,17 +335,6 @@
       color 0.15s ease,
       background 0.15s ease,
       transform 0.15s ease;
-  }
-
-  .icon-control.is-dismiss {
-    width: 24px;
-    height: 24px;
-    min-height: 24px;
-  }
-
-  .icon-control.is-dismiss svg {
-    width: 14px;
-    height: 14px;
   }
 
   .icon-control svg {
@@ -298,7 +374,7 @@
 
   .icon-control.is-primary:hover,
   .icon-control.is-primary.is-hover {
-    background: color-mix(in srgb, var(--color-ink) 82%, var(--color-canvas));
+    background: var(--color-ink-hover);
     color: var(--color-canvas);
   }
 
@@ -326,10 +402,10 @@
   }
 
   @media (max-width: 767px) {
-    .icon-control {
-      width: 36px;
-      height: 36px;
-      min-height: 36px;
+    /* Phones: a 20px icon with the same padding, for a 36px touch target */
+    .icon-control svg {
+      width: 20px;
+      height: 20px;
     }
   }
 }
@@ -374,12 +450,12 @@
   background: var(--color-canvas);
   border: 1px solid var(--color-hairline);
   border-radius: var(--radius-base);
-  padding: 1.75rem 1.35rem;
+  padding: var(--space-8) var(--space-5);
 }
 
 @media (min-width: 768px) {
   .surface-card {
-    padding: 2.5rem 2.25rem;
+    padding: var(--space-10) var(--space-10);
   }
 }
 
@@ -394,11 +470,10 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.45rem 2rem 0.45rem 0.75rem;
-  font: inherit;
-  font-size: 0.875rem;
-  line-height: 1.35;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
   color: var(--color-ink);
   text-align: left;
   white-space: nowrap;
@@ -419,7 +494,7 @@
   right: 0.7rem;
   width: 12px;
   height: 12px;
-  margin-top: -6px;
+  transform: translateY(-50%);
   background: var(--color-muted);
   -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
@@ -454,20 +529,19 @@
   display: inline-block;
   min-width: 0;
   padding: var(--space-inset) calc(var(--space-inset) * 2);
-  font-size: 0.875rem;
-  line-height: 1;
+  font: var(--type-tag);
+  letter-spacing: var(--tracking-body);
   color: var(--color-ink);
   white-space: nowrap;
   background: var(--color-fill);
   border-radius: var(--radius-base);
-  /* The font's descender space sits the text high; trim to cap height so padding is even */
+  /* Trim to the cap height so the tag stays compact with even padding */
   text-box: trim-both cap alphabetic;
 }
 
 .tag.is-count {
-  padding: var(--space-inset) calc(var(--space-inset) * 1.5);
-  font-size: 0.75rem;
-  font-weight: 500;
+  padding: var(--space-1) var(--space-2);
+  font: var(--type-count);
   font-variant-numeric: tabular-nums;
   text-align: center;
   color: inherit;
@@ -477,12 +551,10 @@
 .button {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  padding: 0.45rem 0.75rem;
-  font: inherit;
-  font-size: 0.875rem;
-  line-height: 1.35;
-  letter-spacing: -0.01em;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
   color: var(--color-ink);
   white-space: nowrap;
   text-decoration: none;
@@ -524,6 +596,140 @@
   background: var(--color-hover);
 }
 
+/* Only for the upvote in the public comments view, which is turned off; deliberately left out of
+   the documented system (DESIGN.md, /design-system) */
+.button.is-selected,
+.button.is-selected:hover {
+  color: var(--color-ink);
+  background: var(--color-accent-soft);
+}
+
+/* Section label: the pretitle that opens each case study section (an h2). Body type, muted. */
+.section-label {
+  margin: 0 0 var(--space-3);
+  font: var(--type-body);
+  letter-spacing: var(--tracking-body);
+  color: var(--color-muted);
+}
+
+/* Section nav (sidebar on case studies and /design-system): muted links, ink on hover */
+.section-nav-link {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: var(--radius-base);
+}
+
+/* The current section's dot: grows in before the label and slides the text over */
+.section-nav-link::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0;
+  height: 3px;
+  margin-right: 0;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  transition:
+    width 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    margin-right 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.section-nav-link.is-current::before {
+  width: 3px;
+  margin-right: var(--space-2);
+}
+
+.section-nav-link.is-hover,
+.section-nav-link.is-current {
+  color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-nav-link::before {
+    transition: none;
+  }
+}
+
+.section-nav-link:focus-visible,
+.section-nav-link.is-focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Segmented toggle: two options on a pill track, with a thumb that slides to the pressed one.
+   Variants: default (fill track, on the page) and is-glass (floating over media). */
+.segmented {
+  --segmented-pad: var(--space-1);
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: max-content;
+  padding: var(--segmented-pad);
+  border-radius: var(--radius-pill);
+  background: var(--color-fill);
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
+}
+
+.segmented[hidden] {
+  display: none;
+}
+
+.segmented-thumb {
+  position: absolute;
+  top: var(--segmented-pad);
+  bottom: var(--segmented-pad);
+  left: var(--segmented-pad);
+  width: calc(50% - var(--segmented-pad));
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  transition: transform 320ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.segmented:has(.segmented-option:last-of-type[aria-pressed='true']) .segmented-thumb {
+  transform: translateX(100%);
+}
+
+.segmented-option {
+  position: relative;
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-muted);
+  font: inherit;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.segmented-option:hover,
+.segmented-option.is-hover {
+  color: var(--color-ink);
+}
+
+.segmented-option[aria-pressed='true'] {
+  color: var(--color-canvas);
+}
+
+.segmented-option:focus-visible,
+.segmented-option.is-focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.segmented.is-glass {
+  background: var(--color-glass-hover);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-raised);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .segmented-thumb {
+    transition: none;
+  }
+}
+
 .button:focus-visible,
 .button.is-focus {
   outline: 2px solid var(--color-accent);
@@ -537,13 +743,13 @@
   overflow-y: auto;
   padding: var(--space-inset);
   box-sizing: border-box;
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
   color: var(--color-ink);
   background: var(--color-canvas);
   border: var(--border-width) solid var(--color-border);
-  border-radius: calc(var(--radius-base) + var(--space-inset) + var(--border-width));
-  box-shadow: 0 12px 32px rgb(0 0 0 / 14%);
+  border-radius: var(--radius-menu);
+  box-shadow: var(--shadow-floating);
 }
 
 .dropdown-menu.is-floating {
@@ -554,12 +760,11 @@
 .dropdown-option {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
   width: 100%;
-  padding: 0.4rem 0.75rem 0.4rem 0.5rem;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
   box-sizing: border-box;
   font: inherit;
-  line-height: 1.35;
   color: var(--color-ink);
   text-align: left;
   white-space: nowrap;
@@ -573,6 +778,11 @@
 .dropdown-option:hover,
 .dropdown-option.is-active {
   background: var(--color-hover-subtle);
+}
+
+.dropdown-option:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
 }
 
 .dropdown-option[aria-disabled="true"] {

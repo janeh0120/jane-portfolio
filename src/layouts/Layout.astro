@@ -10,6 +10,8 @@ interface Props {
   description?: string;
   showCommentMode?: boolean;
   adminReview?: boolean;
+  /** Where the progressive edge blur goes: top and bottom, or the left and right sides (homepage). */
+  edgeBlur?: 'top-bottom' | 'sides';
 }
 
 const {
@@ -17,6 +19,7 @@ const {
   description = site.description,
   showCommentMode = true,
   adminReview = false,
+  edgeBlur = 'top-bottom',
 } = Astro.props;
 
 if (adminReview) {
@@ -132,9 +135,9 @@ const iconVersion = '3';
       ) : showCommentMode ? (
         <div id="site-shell" class="site-shell">
           <div id="site-canvas" class="site-canvas">
-            <EdgeBlur edge="top" />
+            <EdgeBlur edge={edgeBlur === 'sides' ? 'sides' : 'top'} />
             <slot />
-            <EdgeBlur edge="bottom" />
+            {edgeBlur === 'top-bottom' && <EdgeBlur edge="bottom" />}
           </div>
         </div>
       ) : (

@@ -10,6 +10,7 @@
     "prebuild": "node scripts/check-media-size.mjs",
     "build": "astro build",
     "check:media": "node scripts/check-media-size.mjs",
+    "check:design": "node scripts/check-design-tokens.mjs && npx @google/design.md lint DESIGN.md",
     "preview": "astro preview",
     "astro": "astro",
     "thumbs:play": "node scripts/generate-play-thumbs.mjs"

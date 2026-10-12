@@ -26,7 +26,7 @@ const nav = [
   <FeedbackDemoReel slot="hero" client:visible />
 
   <section id="problem" data-comment-id="feedback-need">
-    <h2><span class="tag">Problem</span></h2>
+    <h2 class="section-label">Problem</h2>
     <p class="heading text-ink">
       Portfolio reviewers and I want to keep track of portfolio feedback inline, so I can remember
       where each comment was left and collect async feedback more easily.
@@ -34,7 +34,7 @@ const nav = [
   </section>
 
   <section id="solution" data-comment-id="feedback-feature">
-    <h2><span class="tag">Solution</span></h2>
+    <h2 class="section-label">Solution</h2>
     <h3 class="heading text-ink">Users can make and edit comments.</h3>
     <figure class="case-study-figure case-study-figure--wide feedback-video">
       <video
@@ -64,7 +64,7 @@ const nav = [
   </section>
 
   <section id="decisions" data-comment-id="feedback-decisions">
-    <h2><span class="tag">Design decisions</span></h2>
+    <h2 class="section-label">Design decisions</h2>
     <ol>
       <li class="decision-row">
         <div class="decision-text">
@@ -147,49 +147,37 @@ const nav = [
 </CaseStudyLayout>
 
 <style>
-  h2 .tag {
-    margin-left: calc(var(--space-inset) * -2);
-  }
-
-  /* Match the page title's .heading style; overrides the shared section-heading size */
-  #problem .heading,
-  #solution .heading {
-    font-family: var(--font-serif);
-    font-size: clamp(1.625rem, calc(3.2vw - 2px), 2.375rem);
-    line-height: 1.2;
-    letter-spacing: -0.04em;
-    font-weight: 700;
-  }
-
   .feedback-video {
     padding: clamp(1rem, 5%, 2.5rem);
     border-radius: var(--radius-base);
+    /* design-tokens-ignore: case study artwork, the blue matches the background image */
     background: #1e4fd6 url('/images/case-studies/feedback/blue-bg.jpg') center / cover;
   }
 
   .case-study-figure.feedback-video {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
   }
 
   section .feedback-view-desc {
-    margin-top: 0.35rem;
+    margin-top: var(--space-1);
   }
 
   .feedback-video + h3 {
-    margin-top: 2.75rem;
+    margin-top: var(--space-12);
   }
 
   .feedback-video .feedback-video__media {
     aspect-ratio: 2766 / 1638;
     border-radius: calc(var(--radius-base) * 0.75);
     background: var(--color-surface);
+    /* design-tokens-ignore: case study artwork, a blue-tinted shadow on the blue background */
     box-shadow: 0 12px 40px rgb(0 20 80 / 35%);
   }
 
   .decision-row {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.25rem;
+    gap: var(--space-5);
   }
 
   @media (min-width: 640px) {
@@ -200,7 +188,7 @@ const nav = [
   }
 
   .decision-figure {
-    margin-top: 1rem;
+    margin-top: var(--space-4);
   }
 
   @media (min-width: 640px) {

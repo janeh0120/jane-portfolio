@@ -124,43 +124,29 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     border-radius: var(--radius-base);
   }
 
-  .case-study-content :global(h3) {
+  .case-study-content :global(h3:not(.hero-copy, .text-intro, .heading)) {
     margin: 0;
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.3;
+    font: var(--type-subheading);
+    letter-spacing: var(--tracking-tight);
   }
 
-  .case-study-content :global(h2) {
-    margin: 0 0 0.75rem;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-weight: 400;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
-    color: var(--color-muted);
-  }
 
   /* Keep heading + body as one unit; separate each unit clearly */
   .case-study-content :global(h2:not(:first-child)) {
-    margin-top: 2.75rem;
+    margin-top: var(--space-12);
   }
 
-  .case-study-content :global(p),
+  /* Body type for paragraphs, except ones that set a type-ramp class (statements in .heading) */
+  .case-study-content :global(p:not(.hero-copy, .text-intro, .heading, .subheading)),
   .case-study-content :global(.lead) {
     margin: 0;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    font-weight: 400;
-    letter-spacing: -0.01em;
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
     color: var(--color-ink);
   }
 
   .case-study-content :global(p + p) {
-    margin-top: 0.875rem;
+    margin-top: var(--space-4);
   }
 
   .case-study-content :global(section) {
@@ -182,41 +168,35 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   .case-study-content :global(ol) {
     list-style: none;
     padding: 0;
-    margin: 0.875rem 0 0;
+    margin: var(--space-4) 0 0;
     display: grid;
-    gap: 1.75rem;
+    gap: var(--space-8);
   }
 
   .case-study-content :global(ol li h3) {
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.3;
-    margin: 0 0 0.35rem;
+    font: var(--type-subheading);
+    letter-spacing: var(--tracking-tight);
+    margin: 0 0 var(--space-1);
     color: var(--color-ink);
   }
 
   .case-study-content :global(ol li p),
   .case-study-content :global(ol li .lead) {
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    font-weight: 400;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
     color: var(--color-muted);
   }
 
   .case-study-content :global(.case-study-figure) {
-    margin: 1.5rem 0 0;
+    margin: var(--space-6) 0 0;
   }
 
   .case-study-content :global(.case-study-figure--wide) {
-    margin-top: 2rem;
+    margin-top: var(--space-8);
   }
 
   .case-study-content :global(.case-study-figure--wide + .case-study-figure--wide) {
-    margin-top: 2.5rem;
+    margin-top: var(--space-10);
   }
 
   .case-study-content :global(.case-study-figure img) {
@@ -242,18 +222,16 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   }
 
   .case-study-content :global(.case-study-figure figcaption) {
-    margin-top: 0.5rem;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
+    margin-top: var(--space-2);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
     color: var(--color-muted);
   }
 
   .case-study-content :global(.case-study-figure-row) {
     display: grid;
-    gap: 1rem;
-    margin-top: 1.5rem;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
   }
 
   @media (min-width: 640px) {
@@ -264,8 +242,8 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
   .case-study-content :global(.case-study-stats) {
     display: grid;
-    gap: 1.25rem;
-    margin-top: 1.5rem;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
   }
 
   @media (min-width: 640px) {
@@ -281,30 +259,24 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
   .case-study-content :global(.case-study-stat strong) {
     display: block;
-    font-family: var(--font-sans);
-    font-size: clamp(1rem, calc(1.8vw - 2px), 1.25rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
+    font: var(--type-subheading);
+    letter-spacing: var(--tracking-tight);
     color: var(--color-ink);
   }
 
   .case-study-content :global(.case-study-stat span) {
     display: block;
-    margin-top: 0.25rem;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
+    margin-top: var(--space-1);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
     color: var(--color-muted);
   }
 
   .case-study-content :global(ul.case-study-list) {
-    margin: 0.75rem 0 0;
-    padding-left: 1.25rem;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
     color: var(--color-ink);
   }
 
@@ -312,16 +284,14 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     list-style: decimal;
     display: block;
     gap: unset;
-    margin: 0.75rem 0 0;
-    padding-left: 1.25rem;
-    font-family: var(--font-sans);
-    font-size: 0.875rem;
-    line-height: 1.65;
-    letter-spacing: -0.01em;
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
     color: var(--color-ink);
   }
 
   .case-study-content :global(ol.case-study-list li + li) {
-    margin-top: 0.35rem;
+    margin-top: var(--space-1);
   }
 </style>
