@@ -252,3 +252,13 @@ between them: your own comment (default, hover, text hover, active, editing, err
 from the real classes, with `is-hover` demo states added to the shared CSS. Showing them surfaced a
 missing style: the admin details line was styled only in the admin stylesheet, so it moved into the
 shared comment-mode CSS.
+
+### Follow-up: the colour mode switch eases in instead of snapping
+
+Switching between light and dark repainted every token in a single frame, a hard flash at odds with
+the site's otherwise soft motion. The switch now runs as a view transition: the new mode rises from
+the bottom of the screen behind a soft gradient edge, and three backdrop-blur bands ride that edge,
+reusing the edge blur's idea of stacked, masked blur strengths, so the page warps where the two
+modes meet. It's a new Motion rule (DESIGN.md and the Motion section of `/design-system`), built
+only from the colour tokens it is switching between. Reduced motion and browsers without view
+transitions keep the instant switch. The token checker stays at 0.

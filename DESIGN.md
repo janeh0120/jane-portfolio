@@ -559,6 +559,13 @@ it appears.
 - **Media overlay:** the clicked image grows from its place on the page to the centre of the
   overlay while the backdrop fades in (0.46s), and shrinks back on close; skipped for reduced
   motion, off-screen sources, and video previews.
+- **Colour mode switch:** picking a mode that changes light or dark rises the new mode in from the
+  bottom of the screen to the top over 1.1s (`cubic-bezier(0.45, 0, 0.25, 1)`), behind a soft
+  gradient edge. Three backdrop-blur bands (4, 12, 28px) ride that edge, strongest at its centre,
+  so the page warps as the modes meet, like the edge blur. It runs as a view transition
+  (`theme-wipe` in `global.css`, started by `__setTheme` in `Layout.astro`). Switches that keep the
+  same look (System matching the current mode), the OS changing mode on its own, reduced motion,
+  and browsers without view transitions change instantly.
 - **Larger transitions** (the media overlay, view switches) ease with
   `cubic-bezier(0.3, 0.7, 0.2, 1)` over roughly 0.3 to 0.5s.
 - **Reduced motion:** honour `prefers-reduced-motion` everywhere: drop reveals, slides, and

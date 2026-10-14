@@ -941,3 +941,68 @@ html.theme-dark body::after {
 html.theme-dark ::selection {
   background: rgb(255 255 255 / 16%);
 }
+
+/* Colour mode switch: the new mode rises from the bottom of the screen to the top, behind a soft
+   front that blurs the page as it passes, like the edge blur. Layout.astro runs it as a view
+   transition: --theme-wipe is how far up the new mode has reached (past 100% so the soft front
+   clears the top). Instant without view transitions or with reduced motion. */
+@property --theme-wipe {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+html.theme-switching {
+  --theme-wipe-duration: 1.1s;
+  --theme-wipe-ease: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+html.theme-switching::view-transition-old(root),
+html.theme-switching::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* The new mode, revealed under a gradient whose soft edge climbs the screen */
+html.theme-switching::view-transition-new(root) {
+  mask-image: linear-gradient(to top, #000 calc(var(--theme-wipe) - 35%), transparent var(--theme-wipe));
+  animation: theme-wipe var(--theme-wipe-duration) var(--theme-wipe-ease) both;
+}
+
+/* Blur bands riding the soft edge: the wider the band, the lighter its blur, so the page warps
+   most where the two modes meet and eases off either side (the edge blur's stacking, sideways) */
+html.theme-switching::view-transition-group(theme-wipe-1),
+html.theme-switching::view-transition-group(theme-wipe-2),
+html.theme-switching::view-transition-group(theme-wipe-3) {
+  animation: theme-wipe var(--theme-wipe-duration) var(--theme-wipe-ease) both;
+}
+
+html.theme-switching::view-transition-group(theme-wipe-1) {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  mask-image: linear-gradient(to top, transparent calc(var(--theme-wipe) - 50%), #000 calc(var(--theme-wipe) - 18%), transparent calc(var(--theme-wipe) + 14%));
+}
+
+html.theme-switching::view-transition-group(theme-wipe-2) {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  mask-image: linear-gradient(to top, transparent calc(var(--theme-wipe) - 38%), #000 calc(var(--theme-wipe) - 18%), transparent calc(var(--theme-wipe) + 2%));
+}
+
+html.theme-switching::view-transition-group(theme-wipe-3) {
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  mask-image: linear-gradient(to top, transparent calc(var(--theme-wipe) - 28%), #000 calc(var(--theme-wipe) - 18%), transparent calc(var(--theme-wipe) - 8%));
+}
+
+@keyframes theme-wipe {
+  from { --theme-wipe: -15%; }
+  to { --theme-wipe: 150%; }
+}
+
+/* Stand-ins that give the blur bands their own layers; only on the page during a switch */
+.theme-wipe-band {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}

@@ -48,7 +48,40 @@ const iconVersion = '3';
             localStorage.setItem('theme', theme);
           } catch (e) {}
         }
-        window.__setTheme = apply;
+        // A choice that changes light or dark rises in from the bottom of the screen (theme-wipe in
+        // global.css): each blur band gets its own layer, so it can blur the page as it passes.
+        function switchTo(theme) {
+          var root = document.documentElement;
+          var dark = theme === 'dark' || (theme === 'system' && media.matches);
+          var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (
+            dark === root.classList.contains('theme-dark') ||
+            still ||
+            !document.startViewTransition ||
+            root.classList.contains('theme-switching')
+          ) {
+            apply(theme);
+            return;
+          }
+          var bands = [1, 2, 3].map(function (n) {
+            var band = document.createElement('div');
+            band.className = 'theme-wipe-band';
+            band.setAttribute('aria-hidden', 'true');
+            band.style.viewTransitionName = 'theme-wipe-' + n;
+            document.body.appendChild(band);
+            return band;
+          });
+          root.classList.add('theme-switching');
+          document.startViewTransition(function () {
+            apply(theme);
+          }).finished.finally(function () {
+            root.classList.remove('theme-switching');
+            bands.forEach(function (band) {
+              band.remove();
+            });
+          });
+        }
+        window.__setTheme = switchTo;
         var stored = 'system';
         try {
           stored = localStorage.getItem('theme') || 'system';
