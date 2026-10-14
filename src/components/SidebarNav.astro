@@ -143,8 +143,10 @@ const hasNav = nav.length > 0;
     margin-left: calc(-0.75rem - var(--border-width));
   }
 
+  /* Above the page's edge blur (z 8) so the back button and nav stay sharp, below the footer (z 10) */
   .case-study-aside {
     scroll-margin-top: 5rem;
+    z-index: 9;
   }
 
   .case-study-nav-group,
