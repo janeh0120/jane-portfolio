@@ -262,3 +262,11 @@ reusing the edge blur's idea of stacked, masked blur strengths, so the page warp
 modes meet. It's a new Motion rule (DESIGN.md and the Motion section of `/design-system`), built
 only from the colour tokens it is switching between. Reduced motion and browsers without view
 transitions keep the instant switch. The token checker stays at 0.
+
+### Follow-up: Brand image rows reuse the carousel's arrows and dots
+
+The Brand page's image rows only scrolled sideways with a trackpad. A first fix put two small
+arrows at the row's right edge, which were hard to find and needed a new disabled state for the
+ends. They were replaced by the existing carousel row from the Play overlay, unchanged: standard
+icon-control arrows either side of slide dots, centred under the images, looping at the ends. One
+pattern now serves both places, and no new state or token was needed. The token checker stays at 0.

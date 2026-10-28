@@ -4,9 +4,12 @@ import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
 import Experience from '../components/Experience.astro';
 import ExternalLinkIcon from '../components/ExternalLinkIcon.astro';
+import IconControl from '../components/IconControl.astro';
+import ArrowIcon from '../components/ArrowIcon.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { site } from '../data/site';
 import { brandWork } from '../data/brand-work';
+import '../styles/play.css';
 
 const base = import.meta.env.BASE_URL;
 const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
@@ -87,6 +90,26 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
                   />
                 );
               })}
+            </div>
+            {/* The Play overlay's arrows and dots (play.css), shown by the script only when the row
+                overflows, for mice without sideways scroll */}
+            <div class="carousel-nav brand-row-nav" data-brand-row-nav hidden>
+              <IconControl label={`Previous ${project.title} image`} data-brand-step="-1">
+                <ArrowIcon direction="left" size="16px" />
+              </IconControl>
+              <div class="carousel-controls">
+                {project.media.map((item, index) => (
+                  <button
+                    type="button"
+                    class:list={['carousel-dot', { active: index === 0 }]}
+                    aria-label={`Go to image ${index + 1}`}
+                    data-brand-dot={index}
+                  />
+                ))}
+              </div>
+              <IconControl label={`Next ${project.title} image`} data-brand-step="1">
+                <ArrowIcon direction="right" size="16px" />
+              </IconControl>
             </div>
           </div>
 
@@ -353,6 +376,70 @@ const isVideo = (src: string) => /\.(mp4|webm|mov)$/i.test(src);
       const row = section.querySelector('.brand-row');
       if (row) hint.observe(row);
     }
+  });
+
+  // Arrows, dots, and the arrow keys while a row has focus step the row one image at a time, for
+  // mice without sideways scrolling. Like the Play overlay's carousel, the arrows loop at the ends.
+  // Each step lands an image's left edge on the gutter, where scroll snapping puts it.
+  document.querySelectorAll<HTMLElement>('.brand-gallery').forEach((gallery) => {
+    const row = gallery.querySelector<HTMLElement>('.brand-row');
+    const nav = gallery.querySelector<HTMLElement>('[data-brand-row-nav]');
+    if (!row || !nav) return;
+    const items = [...row.children] as HTMLElement[];
+    const dots = [...nav.querySelectorAll<HTMLButtonElement>('[data-brand-dot]')];
+    const max = () => row.scrollWidth - row.clientWidth;
+    // Where the row scrolls to for each image (the last few share the end of the row)
+    const stops = () => {
+      const gutter = parseFloat(getComputedStyle(row).paddingLeft);
+      return items.map((item) => Math.min(max(), item.offsetLeft - row.offsetLeft - gutter));
+    };
+    let current = 0;
+    let target: number | null = null;
+
+    const show = (index: number) => {
+      current = index;
+      dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    };
+
+    const go = (index: number) => {
+      const next = (index + items.length) % items.length;
+      target = next;
+      show(next);
+      row.scrollTo({ left: stops()[next], behavior: reduceMotion ? 'auto' : 'smooth' });
+    };
+
+    // Swipes and scrolls move the dot too; a step in progress keeps the image it chose
+    const sync = () => {
+      nav.hidden = max() <= 1;
+      const all = stops();
+      if (target !== null) {
+        if (Math.abs(row.scrollLeft - all[target]) > 2) return;
+        target = null;
+        return;
+      }
+      if (Math.abs(row.scrollLeft - all[current]) <= 2) return;
+      let index = 0;
+      all.forEach((stop, i) => {
+        if (stop <= row.scrollLeft + 2) index = i;
+      });
+      show(index);
+    };
+
+    nav.querySelectorAll<HTMLButtonElement>('[data-brand-step]').forEach((button) =>
+      button.addEventListener('click', () => go(current + Number(button.dataset.brandStep))),
+    );
+    dots.forEach((dot, index) => dot.addEventListener('click', () => go(index)));
+    row.addEventListener('keydown', (event) => {
+      if (event.target !== row || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+      event.preventDefault();
+      go(current + (event.key === 'ArrowRight' ? 1 : -1));
+    });
+    row.addEventListener('scroll', sync, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(sync).observe(row);
+    row.querySelectorAll('img, video').forEach((media) =>
+      media.addEventListener(media.tagName === 'IMG' ? 'load' : 'loadedmetadata', sync, { once: true }),
+    );
+    sync();
   });
 
   const videos = [...document.querySelectorAll<HTMLVideoElement>('video[data-brand-video]')];

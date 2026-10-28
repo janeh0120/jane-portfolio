@@ -500,7 +500,8 @@ are used only there.
   out of its spot on the page into the centre as the backdrop fades in, and shrinks back on close
   (`src/lib/media-morph.ts`). A YouTube link as a slide becomes a 16:9 player (privacy-enhanced
   embed, corner radius, Media backdrop) that loads only when shown and unloads when you leave it.
-  Styles live in `src/styles/play.css`.
+  Styles live in `src/styles/play.css`. The same arrows-and-dots row sits centred under each
+  image row on Brand, stepping the row one image at a time and looping at the ends.
 - **Section nav (`.section-nav-link`):** the sidebar list on case studies and `/design-system`,
   muted links that turn ink on hover, with the accent focus ring. The section you're reading is
   marked `.is-current` (`aria-current="location"`): its label turns ink and a 3px ink dot grows in
