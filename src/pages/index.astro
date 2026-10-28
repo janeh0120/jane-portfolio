@@ -14,9 +14,11 @@ import SiteFooter from '../components/SiteFooter.astro';
   <div class="home-intro-content" id="home-intro-content">
     <main class="home-layout">
       <!-- Intro and experience, centred above the case studies -->
-      <div class="home-intro page-frame">
-        <Hero type="compact" />
-        <Experience />
+      <div class="home-intro-pin">
+        <div class="home-intro page-frame">
+          <Hero type="compact" />
+          <Experience />
+        </div>
       </div>
       <section id="projects" data-comment-id="project-grid" aria-label="Case studies">
         <ProjectRow />
@@ -47,6 +49,29 @@ import SiteFooter from '../components/SiteFooter.astro';
     gap: var(--space-6);
   }
 
+  /* Scroll-driven: the layout is made taller by the row's sideways distance, and the intro and the
+     row stick in place (tops set by the script below) while the page scrolls through that extra
+     height, so the scrollbar covers the whole journey, down and then across. Each sticks on its
+     own rather than as one wrapper, so the intro stays above the side edge blur and the cards
+     below it. The intro's wrapper gives it the same room to stick as the row (the script sets its
+     height and pulls the row back up by the same amount), so the two let go together. */
+  .home-layout.is-driven {
+    align-content: start;
+  }
+
+  .home-layout.is-driven .home-intro,
+  .home-layout.is-driven #projects {
+    position: sticky;
+  }
+
+  .home-layout.is-driven .home-intro {
+    top: var(--pin-intro-top, 0);
+  }
+
+  .home-layout.is-driven #projects {
+    top: var(--pin-row-top, 0);
+  }
+
   .home-intro :global(.home-hero) {
     max-width: none;
   }
@@ -60,43 +85,87 @@ import SiteFooter from '../components/SiteFooter.astro';
 </style>
 
 <script>
-  // Scrolling down (mouse wheel or trackpad) moves the case studies sideways first; once the last card
-  // is in view, the page scrolls on to the footer. Scrolling up does the reverse: the row returns to
-  // its first card before the page moves up. Touch and sideways trackpad swipes scroll the row
-  // natively, and the page is an ordinary scroller without this script.
+  // The page's own scroll drives the case studies sideways. The layout grows by the row's sideways
+  // distance and the intro and row stick in place (frozen where the row's bottom meets the bottom
+  // of the screen) while the page scrolls through it, so the scrollbar reflects the full length,
+  // down to the row, across it, then on to the footer. How far the row has been held in place is
+  // how far it has moved across. Without this script the row is an ordinary sideways scroller.
+  const layout = document.querySelector<HTMLElement>('.home-layout');
+  const introPin = layout?.querySelector<HTMLElement>('.home-intro-pin');
+  const intro = introPin?.querySelector<HTMLElement>('.home-intro');
+  const section = document.getElementById('projects');
   const row = document.querySelector<HTMLElement>('[data-project-row]');
   const scroller = document.getElementById('site-canvas');
 
-  if (row && scroller) {
+  if (layout && introPin && intro && section && row && scroller) {
+    layout.classList.add('is-driven');
     row.classList.add('is-driven');
 
-    scroller.addEventListener(
+    let distance = 0;
+    let rowOffset = 0; // the row section's natural top within the layout
+
+    // How far the row is being held in place: its top within the layout, past where it would sit
+    const held = () =>
+      Math.min(
+        distance,
+        Math.max(0, section.getBoundingClientRect().top - layout.getBoundingClientRect().top - rowOffset),
+      );
+
+    const sync = () => {
+      row.scrollLeft = held();
+    };
+
+    const measure = () => {
+      const style = getComputedStyle(layout);
+      const padTop = parseFloat(style.paddingTop);
+      const padBottom = parseFloat(style.paddingBottom);
+      const gap = parseFloat(style.rowGap) || 0;
+      distance = Math.max(0, row.scrollWidth - row.clientWidth);
+      rowOffset = padTop + intro.offsetHeight + gap;
+      const content = rowOffset + section.offsetHeight;
+
+      // Freeze the layout where the row's bottom meets the bottom of the screen, or where it
+      // already is if it all fits
+      const layoutTop =
+        layout.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
+      const top = Math.floor(Math.min(layoutTop, scroller.clientHeight - content));
+      layout.style.setProperty('--pin-intro-top', `${top + padTop}px`);
+      layout.style.setProperty('--pin-row-top', `${top + rowOffset}px`);
+      introPin.style.height = `${intro.offsetHeight + distance}px`;
+      introPin.style.marginBottom = `${-distance}px`;
+      layout.style.height = `${content + distance + padBottom}px`;
+      sync();
+    };
+
+    measure();
+    scroller.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', measure);
+    if ('ResizeObserver' in window) {
+      const observer = new ResizeObserver(measure);
+      [scroller, intro, row].forEach((element) => observer.observe(element));
+    }
+    // Images load in after the first measure and change the row's width
+    row.querySelectorAll('img').forEach((img) => img.addEventListener('load', measure, { once: true }));
+
+    // Sideways swipes on the row move the page through the same journey
+    row.addEventListener(
       'wheel',
       (event) => {
-        if (event.ctrlKey || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-        const max = row.scrollWidth - row.clientWidth;
-        if (max <= 0) return;
-
-        let delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
-        const view = scroller.getBoundingClientRect();
-        const box = row.getBoundingClientRect();
-
-        if (delta > 0) {
-          if (row.scrollLeft >= max - 1 || box.top < view.top) return; // done, or already passed
-          event.preventDefault();
-          // Bring the row's bottom edge into view first, then spend the rest on the row
-          const below = Math.max(0, box.bottom - view.bottom);
-          const pageStep = Math.min(delta, below);
-          scroller.scrollTop += pageStep;
-          delta -= pageStep;
-          row.scrollLeft = Math.min(max, row.scrollLeft + delta);
-        } else {
-          if (row.scrollLeft <= 0 || box.top < view.top || box.bottom > view.bottom) return;
-          event.preventDefault();
-          row.scrollLeft = Math.max(0, row.scrollLeft + delta);
-        }
+        if (event.ctrlKey || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+        event.preventDefault();
+        scroller.scrollTop += event.deltaMode === 1 ? event.deltaX * 16 : event.deltaX;
       },
       { passive: false },
+    );
+
+    // Anything else that moves the row (tabbing to a card) moves the page to match
+    row.addEventListener(
+      'scroll',
+      () => {
+        const drift = row.scrollLeft - held();
+        if (Math.abs(drift) > 1) scroller.scrollTop += drift;
+      },
+      { passive: true },
     );
   }
 </script>

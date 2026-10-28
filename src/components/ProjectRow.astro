@@ -1,7 +1,8 @@
 ---
 /**
- * Homepage projects as one horizontal row that scrolls sideways. On the homepage, scrolling the page
- * down moves it first (see src/pages/index.astro); without JavaScript it is a plain sideways scroller.
+ * Homepage projects as one horizontal row that scrolls sideways. On the homepage, the page's own
+ * scroll moves it across while it is held in place (see src/pages/index.astro); without JavaScript
+ * it is a plain sideways scroller.
  * A WebGL lens (src/lib/project-lens.ts) warps the images as they pass the left and right edges of
  * the screen. It is progressive enhancement: the row is complete, readable HTML on its own.
  */
@@ -82,8 +83,10 @@ function commentId(project: (typeof projects)[number]) {
     display: none;
   }
 
-  /* When the page scroll drives the row, snapping would fight it */
+  /* When the page scroll drives the row, snapping would fight it, and the row only moves with the
+     page (sideways swipes are passed on to the page, src/pages/index.astro) */
   .project-row.is-driven {
+    overflow-x: hidden;
     scroll-snap-type: none;
   }
 
