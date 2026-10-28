@@ -5,8 +5,8 @@ body.comment-feedback-root {
   --comment-accent: var(--color-accent, #246cff);
   --comment-accent-soft: var(--color-accent-soft, rgb(36 108 255 / 12%));
   --comment-shell-padding: 0px;
-  --comment-motion: 0.7s;
-  --comment-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --comment-motion: var(--duration-700);
+  --comment-ease: var(--ease-glide);
   --header-offset: 1rem;
   background: var(--comment-frame-bg);
   margin: 0;
@@ -140,7 +140,7 @@ body.comment-sidebar-interacting.comment-mode-active .site-canvas * {
   transition:
     width var(--comment-motion) var(--comment-ease),
     min-width var(--comment-motion) var(--comment-ease),
-    opacity 0.5s ease;
+    opacity var(--duration-500) var(--ease-standard);
 }
 
 body.comment-view-comment .comment-sidebar {
@@ -167,14 +167,14 @@ body.comment-feedback-root.comment-view-comment:not(.admin-review-root) .comment
   opacity: 0;
   transform: translateX(8px);
   transition:
-    opacity 0.5s ease,
+    opacity var(--duration-500) var(--ease-standard),
     transform var(--comment-motion) var(--comment-ease);
 }
 
 body.comment-view-comment .comment-sidebar-panel {
   opacity: 1;
   transform: translateX(0);
-  transition-delay: 0.06s;
+  transition-delay: var(--duration-80);
 }
 
 body.comment-feedback-root.comment-view-comment:not(.admin-review-root) .comment-sidebar-panel {
@@ -233,7 +233,7 @@ body.comment-view-only .comment-sidebar-panel {
   letter-spacing: var(--tracking-body);
   color: var(--color-muted);
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: color var(--duration-150) var(--ease-standard);
 }
 
 .comment-sidebar-tab:hover {
@@ -318,8 +318,8 @@ body.comment-view-only .comment-sidebar-panel {
   overflow-wrap: anywhere;
   word-break: break-word;
   transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    border-color var(--duration-150) var(--ease-standard),
+    box-shadow var(--duration-150) var(--ease-standard);
 }
 
 .comment-sidebar-card:hover,
@@ -388,9 +388,9 @@ body.comment-view-only .comment-sidebar-panel {
 .comment-sidebar-card-delete {
   opacity: 0;
   transition:
-    opacity 0.15s ease,
-    background 0.15s ease,
-    color 0.15s ease;
+    opacity var(--duration-150) var(--ease-standard),
+    background var(--duration-150) var(--ease-standard),
+    color var(--duration-150) var(--ease-standard);
 }
 
 .comment-sidebar-card:hover .comment-sidebar-card-delete,
@@ -433,8 +433,8 @@ body.comment-view-only .comment-sidebar-panel {
   overflow-wrap: anywhere;
   word-break: break-word;
   transition:
-    background 0.12s ease,
-    border-color 0.12s ease;
+    background var(--duration-150) var(--ease-standard),
+    border-color var(--duration-150) var(--ease-standard);
 }
 
 .comment-sidebar-card:not(.comment-sidebar-card--readonly) .comment-sidebar-card-body:hover,
@@ -501,10 +501,10 @@ body.comment-mode-active [data-comment-ui] * {
   border-radius: var(--radius-base);
   box-sizing: border-box;
   transition:
-    top 0.08s ease,
-    left 0.08s ease,
-    width 0.08s ease,
-    height 0.08s ease;
+    top var(--duration-80) var(--ease-standard),
+    left var(--duration-80) var(--ease-standard),
+    width var(--duration-80) var(--ease-standard),
+    height var(--duration-80) var(--ease-standard);
 }
 
 .comment-mode-highlight.is-pinned {
@@ -551,7 +551,7 @@ body.comment-mode-active [data-comment-ui] * {
 
 .comment-popover-body {
   --comment-send-size: 32px;
-  --comment-expand: 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  --comment-expand: var(--duration-200) var(--ease-settle);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -594,7 +594,7 @@ body.comment-mode-active [data-comment-ui] * {
   line-height: var(--comment-compose-line);
   cursor: pointer;
   box-sizing: border-box;
-  transition: background-color 0.15s ease;
+  transition: background-color var(--duration-150) var(--ease-standard);
 }
 
 .comment-popover-chip-label {
@@ -616,7 +616,7 @@ body.comment-mode-active [data-comment-ui] * {
   position: absolute;
   inset: 0;
   display: flex;
-  transition: opacity 0.12s ease;
+  transition: opacity var(--duration-150) var(--ease-standard);
 }
 
 .comment-popover-chip-icon svg {
@@ -696,8 +696,8 @@ body.comment-mode-active [data-comment-ui] * {
   visibility: hidden;
   transition:
     grid-template-rows var(--comment-expand),
-    opacity 0.15s ease,
-    visibility 0s linear 0.24s;
+    opacity var(--duration-150) var(--ease-standard),
+    visibility 0s linear var(--duration-200);
 }
 
 .comment-popover-card.is-expanded .comment-popover-footer {
@@ -706,7 +706,7 @@ body.comment-mode-active [data-comment-ui] * {
   visibility: visible;
   transition:
     grid-template-rows var(--comment-expand),
-    opacity 0.2s ease 0.06s,
+    opacity var(--duration-200) var(--ease-standard) var(--duration-80),
     visibility 0s;
 }
 
@@ -748,7 +748,7 @@ body.comment-mode-active [data-comment-ui] * {
   box-sizing: border-box;
   text-align: left;
   white-space: nowrap;
-  transition: background-color 0.12s ease, color 0.12s ease;
+  transition: background-color var(--duration-150) var(--ease-standard), color var(--duration-150) var(--ease-standard);
 }
 
 .comment-popover-category-select:hover,
@@ -771,8 +771,8 @@ body.comment-mode-active [data-comment-ui] * {
   min-height: var(--comment-send-size);
   opacity: 0.4;
   transition:
-    background 0.15s ease,
-    opacity 0.15s ease;
+    background var(--duration-150) var(--ease-standard),
+    opacity var(--duration-150) var(--ease-standard);
 }
 
 .comment-popover-card.is-expanded .comment-popover-send:not(:disabled) {

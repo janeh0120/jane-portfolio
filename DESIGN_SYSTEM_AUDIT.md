@@ -270,3 +270,19 @@ arrows at the row's right edge, which were hard to find and needed a new disable
 ends. They were replaced by the existing carousel row from the Play overlay, unchanged: standard
 icon-control arrows either side of slide dots, centred under the images, looping at the ends. One
 pattern now serves both places, and no new state or token was needed. The token checker stays at 0.
+
+### Follow-up: motion gets tokens
+
+Motion was the one part of the system still described only in prose. DESIGN.md gave a few
+numbers ("0.12 to 0.15s", "roughly 0.3 to 0.5s"), but the code used 22 different literal durations
+and easings across 143 transitions and animations: 0.12s next to 0.15s for the same hover, 0.3s,
+320ms, and 0.35s for similar fades, and a near copy of the nav's in-and-out curve redefined in
+comment mode. Each was tuned on its own, so there was no rule to follow for the next one.
+
+Motion now has seven durations (80, 150, 200, 320, 500, 700, 1000ms, named by length like the
+spacing scale), four easings named by job (standard, settle, glide, morph), and two press scales.
+Every value moved to the nearest step, never by more than about 20%; the biggest visible changes are
+the colour mode wipe (1.1s to 1s) and reveal on scroll (0.9s to 1s). The media morph reads its
+timing from the same tokens in JavaScript, and Tailwind's bare `transition` class uses them too. The
+token checker gained a motion rule: it went from 143 uses (22 distinct values) to 0. The
+`/design-system` Motion section now shows the durations as bars and the easings as curves.

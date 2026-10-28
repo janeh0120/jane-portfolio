@@ -546,29 +546,53 @@ it appears.
 
 ## Motion
 
-- **Press:** buttons and dropdown triggers scale to 0.97 when pressed; icon controls to 0.92.
-- **Hover:** colour and background transitions run 0.12 to 0.15s.
-- **Menus** fade in over 0.12s, and the option highlight slides with
-  `cubic-bezier(0.22, 1, 0.36, 1)` over 0.2s.
-- **Reveal on scroll:** project cards and case study sections rise 1.5rem and fade in.
+Every transition and animation is timed with the motion tokens in `global.css`; never type a
+duration or a `cubic-bezier()` directly (`scripts/check-design-tokens.mjs` flags it). They aren't in
+the front matter because the format has no motion section. Tailwind's bare `transition` class uses
+`--duration-150` and `--ease-standard` too. Looping animations (the `/design-system` previews, a
+blinking caret) keep their own cycle length but still use the easing tokens.
+
+| Duration | Value | For |
+| --- | --- | --- |
+| `--duration-80` | 80ms | following the pointer (comment mode's hover outline) |
+| `--duration-150` | 150ms | hovers, presses, menus fading in |
+| `--duration-200` | 200ms | small changes in size (menu highlight, comment cards expanding) |
+| `--duration-320` | 320ms | fades and overlays sliding |
+| `--duration-500` | 500ms | the media morph and slow fades |
+| `--duration-700` | 700ms | the nav bar folding, comment mode opening |
+| `--duration-1000` | 1000ms | long arrivals: reveal on scroll, the colour mode wipe |
+
+| Easing | Value | For |
+| --- | --- | --- |
+| `--ease-standard` | `ease` | colour and opacity |
+| `--ease-settle` | `cubic-bezier(0.22, 1, 0.36, 1)` | things arriving or growing: fast, then a long settle |
+| `--ease-glide` | `cubic-bezier(0.45, 0, 0.25, 1)` | things that leave and return, eased at both ends |
+| `--ease-morph` | `cubic-bezier(0.3, 0.7, 0.2, 1)` | the media overlay |
+
+- **Press:** buttons and dropdown triggers scale to `--press-scale` (0.97) when pressed; icon
+  controls to `--press-scale-icon` (0.92). Both over `--duration-150`.
+- **Hover:** colour and background transitions run `--duration-150` on `--ease-standard`.
+- **Menus** fade in over `--duration-150`, and the option highlight slides over `--duration-200`
+  on `--ease-settle`.
+- **Reveal on scroll:** project cards and case study sections rise 1.5rem and fade in, the rise
+  over `--duration-1000` on `--ease-settle`, the fade over `--duration-700`.
 - **Nav bar (desktop):** the bar hugs its contents, centred at the top. Scrolling down collapses
   the nav links so only the logo and Leave feedback remain, and the bar narrows with them; any scroll up, the top of the page, or keyboard focus brings them back. The
-  links' column eases between its width and nothing over 0.7s (ease in and out) while they fade,
-  slower than other transitions so the bar never snaps.
+  links' column eases between its width and nothing over `--duration-700` on `--ease-glide` while
+  they fade, slower than other transitions so the bar never snaps.
 - **Primary button shine:** the Leave feedback glow circles continuously and slowly; never fast
   enough to read as flashing.
 - **Media overlay:** the clicked image grows from its place on the page to the centre of the
-  overlay while the backdrop fades in (0.46s), and shrinks back on close; skipped for reduced
-  motion, off-screen sources, and video previews.
+  overlay while the backdrop fades in (`--duration-500` on `--ease-morph`, read from the tokens by
+  `src/lib/media-morph.ts`), and shrinks back on close; skipped for reduced motion, off-screen
+  sources, and video previews.
 - **Colour mode switch:** picking a mode that changes light or dark rises the new mode in from the
-  bottom of the screen to the top over 1.1s (`cubic-bezier(0.45, 0, 0.25, 1)`), behind a soft
+  bottom of the screen to the top over `--duration-1000` on `--ease-glide`, behind a soft
   gradient edge. Three backdrop-blur bands (4, 12, 28px) ride that edge, strongest at its centre,
   so the page warps as the modes meet, like the edge blur. It runs as a view transition
   (`theme-wipe` in `global.css`, started by `__setTheme` in `Layout.astro`). Switches that keep the
   same look (System matching the current mode), the OS changing mode on its own, reduced motion,
   and browsers without view transitions change instantly.
-- **Larger transitions** (the media overlay, view switches) ease with
-  `cubic-bezier(0.3, 0.7, 0.2, 1)` over roughly 0.3 to 0.5s.
 - **Reduced motion:** honour `prefers-reduced-motion` everywhere: drop reveals, slides, and
   morphs, and fall back to instant changes. Content must never depend on JavaScript to become
   visible.
@@ -584,7 +608,8 @@ it appears.
 - Do use Muted for readable secondary text; reserve Subtle for labels and disabled states.
 - Don't use the Accent blue for links, decoration, or any button but Leave feedback; it means
   focus, selection, or the primary call to action.
-- Don't add shadows outside the two elevation levels.
+- Don't add shadows outside the two elevation levels, or durations and easings outside the motion
+  tokens.
 - Don't introduce a second typeface or new font weights (400, 500, and 700 only).
 - Don't use the pill radius for anything but segmented toggles.
 - Don't add another primary call to action; Leave feedback is the one.

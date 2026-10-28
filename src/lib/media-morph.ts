@@ -7,8 +7,8 @@
  * previews, or overlay media that isn't ready in time.
  */
 
-const MORPH_MS = 460;
-const MORPH_EASE = 'cubic-bezier(0.3, 0.7, 0.2, 1)';
+// The Web Animations API can't take var(), so the motion tokens are read from global.css.
+const motionToken = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 type Rect = Pick<DOMRect, 'left' | 'top' | 'width' | 'height' | 'bottom'>;
 
@@ -25,6 +25,9 @@ export function createMediaMorph(modal: HTMLElement): MediaMorph {
   const content = modal.querySelector<HTMLElement>('.gallery-modal-content');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let busy = false;
+  const MORPH_MS = parseFloat(motionToken('--duration-500')) || 500;
+  const MORPH_EASE = motionToken('--ease-morph') || 'ease';
+  const FADE_EASE = motionToken('--ease-settle') || 'ease-out';
 
   // Resolves true once the overlay media has a size to fly to, false if it isn't ready in time.
   function mediaReady(media: HTMLElement): Promise<boolean> {
@@ -101,7 +104,7 @@ export function createMediaMorph(modal: HTMLElement): MediaMorph {
     const reveal = content.animate([{ opacity: 0 }, { opacity: 1 }], {
       duration: MORPH_MS * 0.6,
       delay: MORPH_MS * 0.4,
-      easing: 'ease-out',
+      easing: FADE_EASE,
       fill: 'both',
     });
     const flyer = await fly(source, source.getBoundingClientRect(), target.getBoundingClientRect(), [
@@ -131,7 +134,7 @@ export function createMediaMorph(modal: HTMLElement): MediaMorph {
     const backdrop = fadeBackdrop(1, 0);
     const hide = content.animate([{ opacity: 1 }, { opacity: 0 }], {
       duration: MORPH_MS * 0.4,
-      easing: 'ease-out',
+      easing: FADE_EASE,
       fill: 'both',
     });
     const flyer = await fly(source, from, home, [getComputedStyle(target).borderRadius, cornerOf(source)]);

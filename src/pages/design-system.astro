@@ -136,7 +136,7 @@ const radii = [
 ];
 
 const motion = [
-  { name: 'Press', demo: 'press', detail: 'Controls shrink slightly when pressed.' },
+  { name: 'Press', demo: 'press', detail: 'Controls shrink to 97% when pressed, icon controls to 92%.' },
   { name: 'Hover', demo: 'hover', detail: 'Colours change over 0.15s.' },
   { name: 'Menus', demo: 'menu', detail: 'Fade in, with a highlight that slides between options.' },
   { name: 'Reveal', demo: 'reveal', detail: 'Sections rise and fade in as they scroll into view.' },
@@ -144,6 +144,24 @@ const motion = [
   { name: 'Media overlay', demo: 'overlay', detail: 'The image grows from its spot on the page to the centre.' },
   { name: 'Colour mode', demo: 'mode', detail: 'The new mode rises from the bottom, blurring the page as it passes.' },
   { name: 'Reduced motion', demo: 'reduced', detail: 'Animations become instant changes.' },
+];
+
+const durations = [
+  { token: '--duration-80', ms: 80, detail: 'Follows the pointer' },
+  { token: '--duration-150', ms: 150, detail: 'Hover, press, menus' },
+  { token: '--duration-200', ms: 200, detail: 'Small changes in size' },
+  { token: '--duration-320', ms: 320, detail: 'Fades and overlays' },
+  { token: '--duration-500', ms: 500, detail: 'Media morph, slow fades' },
+  { token: '--duration-700', ms: 700, detail: 'Nav bar, comment mode' },
+  { token: '--duration-1000', ms: 1000, detail: 'Reveal, colour mode' },
+];
+
+// Control points of each easing's cubic-bezier, to draw its curve
+const easings = [
+  { name: 'Standard', token: '--ease-standard', curve: [0.25, 0.1, 0.25, 1], detail: 'Colour and opacity' },
+  { name: 'Settle', token: '--ease-settle', curve: [0.22, 1, 0.36, 1], detail: 'Things arriving or growing' },
+  { name: 'Glide', token: '--ease-glide', curve: [0.45, 0, 0.25, 1], detail: 'Things that leave and return' },
+  { name: 'Morph', token: '--ease-morph', curve: [0.3, 0.7, 0.2, 1], detail: 'The media overlay' },
 ];
 
 const widths = [
@@ -998,6 +1016,43 @@ const sectionTitleClass = 'subheading text-ink';
           ))
         }
       </dl>
+      <div class="mt-16 grid gap-x-6 gap-y-12 lg:grid-cols-2">
+        <div>
+          <p class="text-body font-medium text-muted">Durations</p>
+          <ul class="mt-4 grid list-none gap-3 p-0">
+            {
+              durations.map((item) => (
+                <li class="grid grid-cols-[10rem_1fr] items-center gap-4">
+                  <div>
+                    <p class="text-body text-ink">{item.ms}ms</p>
+                    <p class="text-body text-muted">{item.detail}</p>
+                  </div>
+                  <span class="motion-duration-bar" style={`width: ${item.ms / 10}%`} aria-hidden="true" />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div>
+          <p class="text-body font-medium text-muted">Easings</p>
+          <ul class="mt-4 grid list-none grid-cols-2 gap-x-6 gap-y-8 p-0">
+            {
+              easings.map((item) => (
+                <li class="grid justify-items-start gap-3">
+                  <svg class="motion-curve" viewBox="-4 -4 108 108" aria-hidden="true">
+                    <path d="M0 100 L100 0" class="motion-curve-guide" />
+                    <path d={`M0 100 C${item.curve[0] * 100} ${100 - item.curve[1] * 100} ${item.curve[2] * 100} ${100 - item.curve[3] * 100} 100 0`} />
+                  </svg>
+                  <div>
+                    <p class="text-body text-ink">{item.name}</p>
+                    <p class="text-body text-muted">{item.detail}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
     </section>
 
       </div>
@@ -1193,21 +1248,44 @@ const sectionTitleClass = 'subheading text-ink';
     background: var(--color-ink);
   }
 
+  /* Duration and easing specimens */
+  .motion-duration-bar {
+    display: block;
+    height: var(--space-2);
+    border-radius: var(--radius-base);
+    background: var(--color-ink);
+  }
+
+  .motion-curve {
+    width: 6rem;
+    height: 6rem;
+    border-radius: var(--radius-base);
+    background: var(--color-surface);
+    fill: none;
+    stroke: var(--color-ink);
+    stroke-width: 2;
+  }
+
+  .motion-curve-guide {
+    stroke: var(--color-border-strong);
+    stroke-width: 1;
+  }
+
   /* Press: down in 0.15s, held, back up */
   .is-press .motion-square {
-    animation: motion-press 2s ease infinite;
+    animation: motion-press 2s var(--ease-standard) infinite;
   }
 
   @keyframes motion-press {
     0%, 25% { transform: scale(1); }
-    32.5%, 55% { transform: scale(0.92); }
+    32.5%, 55% { transform: scale(var(--press-scale-icon)); }
     62.5%, 100% { transform: scale(1); }
   }
 
   /* Hover: fill to hover colour in 0.15s, and back */
   .is-hover .motion-square {
     background: var(--color-fill);
-    animation: motion-hover 3s ease infinite;
+    animation: motion-hover 3s var(--ease-standard) infinite;
   }
 
   @keyframes motion-hover {
@@ -1227,7 +1305,7 @@ const sectionTitleClass = 'subheading text-ink';
     border-radius: var(--radius-menu);
     background: var(--color-canvas);
     box-shadow: var(--shadow-floating);
-    animation: motion-menu 3s ease infinite;
+    animation: motion-menu 3s var(--ease-standard) infinite;
   }
 
   .motion-menu-row {
@@ -1246,7 +1324,7 @@ const sectionTitleClass = 'subheading text-ink';
     height: calc(0.875rem + var(--space-2));
     border-radius: var(--radius-base);
     background: var(--color-hover-subtle);
-    animation: motion-menu-highlight 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    animation: motion-menu-highlight 3s var(--ease-settle) infinite;
   }
 
   @keyframes motion-menu {
@@ -1285,7 +1363,7 @@ const sectionTitleClass = 'subheading text-ink';
     gap: var(--space-2);
     width: 5.5rem;
     overflow: hidden;
-    animation: motion-nav 4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+    animation: motion-nav 4s var(--ease-glide) infinite;
   }
 
   .motion-nav-links span {
@@ -1311,7 +1389,7 @@ const sectionTitleClass = 'subheading text-ink';
 
   /* Reveal: rises 1.5rem and fades in (about 0.9s), then resets */
   .is-reveal .motion-square {
-    animation: motion-reveal 3s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    animation: motion-reveal 3s var(--ease-settle) infinite;
   }
 
   @keyframes motion-reveal {
@@ -1340,7 +1418,7 @@ const sectionTitleClass = 'subheading text-ink';
     position: absolute;
     inset: 0;
     background: var(--color-overlay);
-    animation: motion-backdrop 3s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+    animation: motion-backdrop 3s var(--ease-morph) infinite;
   }
 
   .is-overlay .motion-square {
@@ -1349,7 +1427,7 @@ const sectionTitleClass = 'subheading text-ink';
     left: var(--stage-pad);
     width: 1.5rem;
     height: 1.5rem;
-    animation: motion-overlay 3s cubic-bezier(0.3, 0.7, 0.2, 1) infinite;
+    animation: motion-overlay 3s var(--ease-morph) infinite;
   }
 
   @keyframes motion-backdrop {
@@ -1365,12 +1443,12 @@ const sectionTitleClass = 'subheading text-ink';
   }
 
   /* Colour mode: the new mode's colour rises behind a soft edge with a blur riding it (the
-     site's theme-wipe, 1.1s ease in and out), holds, then fades back */
+     site's theme-wipe, 1s on the glide easing), holds, then fades back */
   .motion-mode,
   .motion-mode-blur {
     position: absolute;
     inset: 0;
-    animation: motion-mode 4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+    animation: motion-mode 4s var(--ease-glide) infinite;
   }
 
   .motion-mode {
