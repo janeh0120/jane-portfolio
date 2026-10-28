@@ -286,3 +286,15 @@ the colour mode wipe (1.1s to 1s) and reveal on scroll (0.9s to 1s). The media m
 timing from the same tokens in JavaScript, and Tailwind's bare `transition` class uses them too. The
 token checker gained a motion rule: it went from 143 uses (22 distinct values) to 0. The
 `/design-system` Motion section now shows the durations as bars and the easings as curves.
+
+### Follow-up: focus and headings, from the gap audit
+
+A full audit against a fully specified system (`DESIGN_SYSTEM_GAPS.md`) found three places where
+the site broke its own accessibility rules. Tabbing through every page showed three controls (the
+nav logo, Play's gallery tiles, the carousel dots) falling back to the browser's focus ring,
+because each component had to opt in to the accent ring. A base `:focus-visible` rule now gives
+every focusable element the ring by default. Comment mode's category dropdowns looked the same
+focused as hovered, and the popover's compose field had no focus state at all; the dropdowns now
+show the accent ring, and the popover card takes the editing state's Accent border while you type.
+About and Play, the two image-led pages, had no heading at all and now have a visually hidden
+`<h1>`. The token checker stays at 0.

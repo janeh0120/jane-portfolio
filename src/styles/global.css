@@ -224,6 +224,13 @@
     text-decoration: none;
   }
 
+  /* Every focusable element shows the accent ring, including ones without their own focus style.
+     Components set their own (links use a 3px offset); this catches the rest. */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
   ::selection {
     background: rgb(0 0 0 / 8%);
   }

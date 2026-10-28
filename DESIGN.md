@@ -513,7 +513,10 @@ are used only there.
     deletes it (shown on hover, always on touch), and clicking the text edits it. States: hover
     (Border strong and `shadow-raised`; the text shows Hover subtle behind it), active / pinned
     (Accent border with a 2px Accent soft ring), editing (the text becomes a field with the same
-    ring), and an error under the field in Danger on Danger soft.
+    border and ring), and an error under the field in Danger on Danger soft. The category
+    dropdown shows the Accent focus ring on keyboard focus. In the comment popover, the compose
+    field has no box of its own, so the popover card takes the Accent border and soft ring while
+    you type.
   - *Read-only* (All comments, and the admin review): the category is a tag and nothing is
     editable. States: hover, active; the admin review adds a Subtle line with when and on what
     device it was left (`.comment-sidebar-card-meta`).
@@ -526,7 +529,13 @@ are used only there.
   pretitles.
 - **Status labels:** use a tag (for example "Live" on `/history`), not uppercase or letter-spaced
   text.
-- **Focus:** every focusable element shows a 2px Accent outline with a 2px offset (3px for links).
+- **Focus:** every focusable element shows a 2px Accent outline with a 2px offset (3px for links)
+  on keyboard focus. Components set their own, and a base `:focus-visible` rule in `global.css`
+  gives the same ring to anything that doesn't (the nav logo, gallery tiles, carousel dots), so a
+  new control can't fall back to the browser's ring. Don't remove an outline without replacing it
+  with this ring or an Accent border; the soft 12% ring alone is too faint to show focus.
+- **Headings:** every page has exactly one `<h1>`. Pages led by images (About, Play) use a visually
+  hidden one (`sr-only`) so screen readers still get a page title.
 
 ### Patterns
 

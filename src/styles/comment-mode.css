@@ -382,7 +382,12 @@ body.comment-view-only .comment-sidebar-panel {
 .comment-sidebar-card-category-select:focus {
   background-color: var(--color-hover);
   color: var(--color-ink);
-  box-shadow: 0 0 0 2px var(--comment-accent-soft);
+}
+
+.comment-sidebar-card-category-select:focus-visible,
+.comment-popover-category-select:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .comment-sidebar-card-delete {
@@ -676,6 +681,13 @@ body.comment-mode-active [data-comment-ui] * {
   outline: none;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+/* The compose field has no box of its own, so the card shows that it has focus, with the same
+   accent border and soft ring as a comment being edited */
+.comment-popover-card:has(.comment-popover-compose textarea:focus-visible) {
+  border-color: var(--comment-accent);
+  box-shadow: var(--shadow-floating), 0 0 0 2px var(--comment-accent-soft);
 }
 
 .comment-popover-compose textarea::placeholder {
