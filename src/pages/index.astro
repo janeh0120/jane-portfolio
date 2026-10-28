@@ -72,11 +72,23 @@ import SiteFooter from '../components/SiteFooter.astro';
     top: var(--pin-row-top, 0);
   }
 
+  /* The first card starts in line with the intro's left edge (the intro's width, as above,
+     centred); the row's far end keeps its own gutter so the last card ends centred */
+  #projects :global(.project-row) {
+    --intro-width: min(var(--nav-bar-width, 30rem), 1400px, 100% - 3rem); /* design-tokens-ignore: the intro and .page-frame widths */
+    padding-inline-start: calc((100% - var(--intro-width)) / 2);
+    scroll-padding-inline-start: calc((100% - var(--intro-width)) / 2);
+  }
+
   .home-intro :global(.home-hero) {
     max-width: none;
   }
 
   @media (max-width: 767px) {
+    #projects :global(.project-row) {
+      --intro-width: min(var(--nav-bar-width, 30rem), 100% - 2rem); /* design-tokens-ignore: the intro and .page-frame widths */
+    }
+
     .home-layout {
       gap: var(--space-10);
       padding-block: var(--space-8);
