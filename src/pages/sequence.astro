@@ -1,0 +1,56 @@
+---
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+
+// Stop-gap while the full case study is written (the draft is on the sequence-case-study branch):
+// the demo and walkthrough video, with a note that the write-up is coming.
+---
+
+<CaseStudyLayout
+  title="Sequence"
+  heading="Making product motion reel as easy as storyboarding"
+  role="Product Designer"
+  team="Rayna Lai"
+  timeline="5 days, October 2026"
+  projectType="Product Design, Concept"
+  commentId="case-study-sequence"
+>
+  <div slot="hero" class="sequence-video">
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/Ts35Q32hbhs?rel=0"
+      title="Sequence demo and design walkthrough"
+      loading="lazy"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen></iframe>
+  </div>
+
+  <section id="overview" data-comment-id="sequence-overview">
+    <p class="heading text-ink">
+      Sequence helps product designers without motion experience turn their designs into launch
+      videos: they storyboard shots on a canvas, group them into chapters, and shape the motion by
+      prompting, annotating, or editing properties.
+    </p>
+    <p>
+      <span class="text-muted">Case study in progress.</span>
+      <a href="https://svsd-nine.vercel.app" target="_blank" rel="noopener noreferrer" class="text-link">Try the prototype</a>
+      (desktop only).
+    </p>
+  </section>
+</CaseStudyLayout>
+
+<style>
+  /* 16:9 player, like the media overlay's YouTube slides */
+  .sequence-video {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: var(--radius-base);
+    background: var(--color-media-backdrop);
+  }
+
+  .sequence-video iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>

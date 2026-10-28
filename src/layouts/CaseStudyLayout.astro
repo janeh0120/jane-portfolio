@@ -145,7 +145,8 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     color: var(--color-ink);
   }
 
-  .case-study-content :global(p + p) {
+  /* As specific as the margin reset above, so it wins */
+  .case-study-content :global(p + p:not(.hero-copy, .text-intro, .subheading)) {
     margin-top: var(--space-4);
   }
 
