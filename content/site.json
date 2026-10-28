@@ -68,6 +68,14 @@
   },
   "projects": [
     {
+      "slug": "sequence",
+      "name": "Sequence",
+      "tags": ["Product Design", "concept"],
+      "title": "Making product motion reel as easy as storyboarding",
+      "image": "images/case-study-heroes/sequence.jpg",
+      "comingSoon": false
+    },
+    {
       "slug": "feedback",
       "name": "Inline feedback",
       "tags": ["product", "shipped"],

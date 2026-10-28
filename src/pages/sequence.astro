@@ -1,0 +1,166 @@
+---
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+
+const nav = [
+  { label: 'Problem', href: '#problem' },
+  { label: 'Solution', href: '#solution' },
+  { label: 'Design decisions', href: '#decisions' },
+  { label: 'Next steps', href: '#next-steps' },
+];
+
+// Placeholders mark where the Figma deck's visuals go; the slide number is in each comment.
+---
+
+<CaseStudyLayout
+  title="Sequence"
+  heading="Making product motion reel as easy as storyboarding"
+  role="Product Designer"
+  team="Rayna Lai"
+  timeline="5 days, October 2026"
+  projectType="Product Design, Concept"
+  nav={nav}
+  commentId="case-study-sequence"
+>
+  <CaseStudyFigure
+    slot="hero"
+    src="videos/sequence/title-card.mp4"
+    poster="images/case-study-heroes/sequence.jpg"
+    alt="Sequence title film: a designer's storyboard of shots turning into a launch video"
+    loop
+    wide
+  />
+
+  <section id="problem" data-comment-id="sequence-problem">
+    <h2 class="section-label">Problem</h2>
+    <p class="heading text-ink">
+      Product designers without motion experience struggle to turn their designs into launch videos.
+      Pro tools take time to learn, simpler ones don’t think in stories, and AI drafts are hard to
+      refine.
+    </p>
+  </section>
+
+  <section id="solution" data-comment-id="sequence-solution">
+    <h2 class="section-label">Solution</h2>
+    <h3 class="heading text-ink">Designers storyboard shots on a canvas and group them into chapters.</h3>
+    {/* Slides 11 and 15: storyboard canvas and chapters recordings */}
+    <CaseStudyFigure alt="Placeholder: shots laid out as storyboards, grouped into chapters (slides 11, 15)" placeholder wide />
+
+    <h3 class="heading text-ink">They shape the motion by prompting, annotating, or editing properties.</h3>
+    {/* Slides 18–20: ask the agent, annotate, edit properties recordings */}
+    <CaseStudyFigure alt="Placeholder: asking the agent, annotating a shot, then editing properties (slides 18–20)" placeholder wide />
+
+    <p>
+      Rayna and I built it in five days, prototyping the key interactions rather than a full editor:
+      storyboard editing works, and the AI agent is simulated.
+      <a href="https://svsd-nine.vercel.app" target="_blank" rel="noopener noreferrer" class="text-link">Try the prototype</a>
+      (desktop only).
+    </p>
+  </section>
+
+  <section id="decisions" data-comment-id="sequence-decisions">
+    <h2 class="section-label">Design decisions</h2>
+    <ol>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h3>Storyboards, not a timeline</h3>
+          <p>
+            Designers already think in frames and artboards. Laying shots out on a canvas keeps the
+            story visible, where timeline tools make you think in elements appearing over time.
+          </p>
+        </div>
+        {/* Slide 5: Jitter / Figma Motion timeline */}
+        <CaseStudyFigure alt="Placeholder: a timeline-based motion tool (slide 5)" placeholder />
+      </li>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h3>Two levels of control</h3>
+          <p>
+            Like Figma’s prototyping connections, editable connectors set how one shot transitions
+            into the next. Within a shot, designers select elements and adjust their properties.
+          </p>
+        </div>
+        {/* Slide 13: connectors and properties */}
+        <CaseStudyFigure alt="Placeholder: editing a connector between shots (slide 13)" placeholder />
+      </li>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h3>Chapters for the bigger picture</h3>
+          <p>
+            Inspired by motion breakdown videos, chapters group shots into sections like an intro,
+            walkthrough, or call to action, so designers keep the whole flow in mind.
+          </p>
+        </div>
+        {/* Slide 14: motion breakdown inspiration */}
+        <CaseStudyFigure alt="Placeholder: motion breakdown video inspiration (slide 14)" placeholder />
+      </li>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h3>Progressive control, not fewer controls</h3>
+          <p>
+            Too few controls feel limiting; too many feel overwhelming. Designers start with a prompt
+            and get more precise only when they need to, without prompting every change or learning a
+            pro animation tool.
+          </p>
+        </div>
+        {/* Slide 17: too few vs too many controls */}
+        <CaseStudyFigure alt="Placeholder: a sparse tool next to a dense pro animation tool (slide 17)" placeholder />
+      </li>
+    </ol>
+  </section>
+
+  <section id="next-steps" data-comment-id="sequence-next-steps">
+    <h2 class="section-label">Next steps</h2>
+    <ol>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h3>Bring existing work in</h3>
+          <p>Import designs and sketches, and keep them editable once they’re in the workspace.</p>
+        </div>
+        {/* Slide 26: inputs panel */}
+        <CaseStudyFigure alt="Placeholder: importing files, websites, and apps into Sequence (slide 26)" placeholder />
+      </li>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h3>Easier ways to iterate</h3>
+          <p>Branch to compare creative directions side by side without losing work.</p>
+        </div>
+        {/* Slide 27: branching */}
+        <CaseStudyFigure alt="Placeholder: comparing creative directions side by side (slide 27)" placeholder />
+      </li>
+      <li class="decision-row">
+        <div class="decision-text">
+          <h3>Easier ways to edit</h3>
+          <p>Refine motion in plain language, without animation jargon or metrics.</p>
+        </div>
+        {/* Slide 28: animation log */}
+        <CaseStudyFigure alt="Placeholder: refining motion in plain language (slide 28)" placeholder />
+      </li>
+    </ol>
+  </section>
+</CaseStudyLayout>
+
+<style>
+  .decision-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 640px) {
+    .decision-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+
+  .decision-row :global(.case-study-figure) {
+    margin-top: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .decision-row :global(.case-study-figure) {
+      margin-top: 0;
+    }
+  }
+</style>
