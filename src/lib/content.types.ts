@@ -62,6 +62,8 @@ export type GalleryItemMeta = {
   slug: string;
   title: string;
   description: string;
+  /** Opens in a new tab, after the description in the modal. */
+  link?: { label: string; href: string };
   year: string;
   images: string[];
   /** Dark-mode versions of `images`, in the same order. Adds a light/dark toggle to the modal. */

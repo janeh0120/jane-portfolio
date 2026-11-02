@@ -250,7 +250,18 @@ function isVideo(path: string) {
 
     if (carouselControls) carouselControls.hidden = item.images.length <= 1;
 
-    if (modalDescription) modalDescription.textContent = item.description;
+    if (modalDescription) {
+      modalDescription.textContent = item.description;
+      if (item.link) {
+        const link = document.createElement('a');
+        link.className = 'text-link';
+        link.href = item.link.href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = item.link.label;
+        modalDescription.append(' ', link);
+      }
+    }
 
     clearTimeout(modeHintTimer);
     if (modeToggle) modeToggle.hidden = !themed;
