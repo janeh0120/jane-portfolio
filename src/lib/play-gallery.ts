@@ -8,6 +8,7 @@ export function buildGalleryItems(): GalleryItem[] {
     slug: item.slug,
     title: item.title,
     description: item.description,
+    link: item.link,
     year: item.year,
     images: item.images ?? [],
     darkImages: item.darkImages,
