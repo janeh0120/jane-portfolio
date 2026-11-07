@@ -298,3 +298,102 @@ focused as hovered, and the popover's compose field had no focus state at all; t
 show the accent ring, and the popover card takes the editing state's Accent border while you type.
 About and Play, the two image-led pages, had no heading at all and now have a visually hidden
 `<h1>`. The token checker stays at 0.
+
+### Follow-up: stat cards became cards
+
+Case study stats were bare text in a row of three, so each label ran into the next figure and the
+row read as one block. They now reuse the quote card panel (Surface fill, 1px border, the corner
+radius, `space-5` padding) with a `space-4` gap, the same gap as Migration's quote row. No new token:
+it's documented as a Stat card pattern in DESIGN.md. The token checker stays at 0.
+
+### Follow-up: decision rows became shared
+
+The text-beside-figure row on the Feedback case study was styled on that page alone. When the Design
+Systems case study needed the same layout, it moved into the case study layout as a documented
+Decision row pattern instead of being copied. No new token, and the token checker stays at 0.
+
+### Follow-up: drift now fails the build
+
+The token checker only printed its total, and `npm run check:design` was something agents were told
+to run, so nothing actually stopped drift from shipping. The checker now exits with an error when
+the total isn't 0, and `prebuild` runs `check:design`, so a stray value or a DESIGN.md lint error
+fails the build. The linter is pinned as a dev dependency so a new release can't break a deploy. The
+token checker stays at 0.
+
+### Follow-up: spacing tokens built from Tailwind's unit
+
+`--space-3` and `mt-3` both meant 12px, but only because they'd been given the same values by hand;
+changing one wouldn't have changed the other, a small version of the drift this system exists to
+prevent. Each `--space-N` is now `calc(var(--spacing) * N)`, with `--spacing` set once in the theme,
+so markup and CSS share one source. Every step resolves to the same pixels as before, and the token
+checker stays at 0.
+
+### Follow-up: DESIGN.md's values are checked against the CSS
+
+DESIGN.md repeats the system's values because the format and its linter need them, which made it a
+small second source of truth: the rule was that the CSS wins, but nothing noticed if the two
+disagreed. `scripts/check-design-md-sync.mjs` now compares colours, type, radii, spacing, and the
+dark mode table with `global.css`, working out `var()`, `calc()`, and `color-mix()` first, and
+flags tokens missing from either side. It runs in `check:design`, so a mismatch fails the build. On
+its first run, 108 values were compared with 0 mismatches. Rules and rationale in the prose are
+still kept up by hand.
+
+### Follow-up: fewer type styles, line colours with one job each, one unit for radii
+
+Near-duplicates had crept in. Intro and Heading were 2px apart at their largest, Quote was Subheading
+at a lighter weight with almost the same line height, and Tag was Compact with its line height
+hidden by the text box trim. Those three went, taking the ramp from ten styles to seven. Label stays
+as a role, and Count stays as the only 12px size.
+
+Line colours had overlapping jobs. Line (#f0f0f0) nearly matched the page colour, so it was invisible
+except on panels and was used only on `/design-system` and the private admin pages; it folded into
+Border. Border is now the default outline, Border strong the outline with more presence, and Hairline
+the translucent 0.5px edge for anything over content. The footer card and `.surface-card` used
+Hairline at 1px, which also put the footer's panel radius formula out by half a pixel; both are now
+0.5px. The sidebar's group line moved to Border.
+
+Radii mixed `rem` and `px` with no functional reason, so they're all `px` now; the nested radii still
+add the `rem` inset, so curves stay concentric. A Units rule in DESIGN.md explains which unit goes
+where, and why the reading widths stay in `rem` while the site width stays in `px`. The token checker
+stays at 0.
+
+The `/design-system` page's labels were hand-written and had drifted from that rule (the Shapes
+section still said 0.5rem), and each row in Shapes described something different. Every label now
+gives the value in the unit its token uses, then what it's for.
+
+### Follow-up: the page's labels are checked too
+
+Those labels drifted because nothing compared them with the CSS: the DESIGN.md sync check never read
+the page. It now also checks the value labels on `/design-system`, including their units: radii,
+type, spacing, page widths, border widths, durations, easing curves, and the numbers in the press
+and hover descriptions. It also flags any colour or shadow the page names that no longer exists. A
+label like 0.5rem now fails even though it works out to the right size. That took the check from 94
+values to 152, with 0 mismatches, and 15 deliberately wrong labels all failed it. The breakpoints
+aren't covered because they have no token to compare against.
+
+The move to `px` radii also caused a visible bug no check caught. The WebGL lens on the homepage and
+Play read `--radius-base` as text and multiplied it by 16 to convert `rem`, so 8px became 128px and
+the cards turned into ovals. It now asks the browser for the token's resolved size, so its unit no
+longer matters. The token checks only read styles, not values used by scripts.
+
+### Follow-up: every scale now comes from Tailwind
+
+Colours, type sizes, weights, line heights, letter spacing, the base radius, and reading widths now
+point at Tailwind's default scales, as spacing already did. Only the accent had to clear a bar: blue-600
+(#155dfc) is about as close to the old #246cff as blue-500, and white text on it passes AA at about
+5.3:1 where blue-500 would fail.
+
+Mapping each grey to its numerically nearest step would have broken the system: fill, hover, and both
+borders all landed on neutral-200, page and panels matched, and text greys either merged or failed AA.
+So steps were assigned to keep each role distinct: page neutral-100, panels neutral-50, fills 200, hover
+300, Muted 700, Subtle 600. The trade-off is visible: secondary text is darker, and the dark page moved
+to neutral-950.
+
+Scripts were the risk again. The lens parsed the page colour's numbers as text, and the Leave feedback
+shine's colour library can't read oklch(), so both now go through one helper that paints the colour and
+reads back real RGB. Still custom, because Tailwind has no equivalent: the font family, the 1400px site
+width, the pill radius, and durations.
+
+Shadows and easings followed. Raised is now `shadow-sm` and Floating `shadow-xl`. Tailwind only has
+two easings that fit, so the four became two: Glide merged into Standard (`ease-in-out`) and Morph into
+Settle (`ease-out`). Motion loses a little of its long, soft settle as a result.

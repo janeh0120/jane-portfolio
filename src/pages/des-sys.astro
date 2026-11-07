@@ -6,65 +6,64 @@ const img = (file: string) => `images/case-studies/des-sys/${file}`;
 
 const nav = [
   { label: 'Overview', href: '#overview' },
-  { label: 'Impact & Process', href: '#impact' },
-  { label: 'AI Workflow', href: '#workflow' },
-  { label: 'Reflection', href: '#reflection' },
+  { label: 'Problem: Tokens', href: '#tokens' },
+  { label: 'Solution: AI Audit', href: '#audit' },
+  { label: 'Challenge: Visual', href: '#visual' },
+  { label: 'How Might We', href: '#hmw' },
+  { label: 'Finding', href: '#finding' },
+  { label: 'Solution: Visibility', href: '#specs' },
+  { label: 'Takeaway', href: '#takeaway' },
 ];
 ---
 
 <CaseStudyLayout
   title="Design Systems"
-  heading="Bridging design and code with AI"
+  heading="Enterprise and 0 to 1 design systems"
   role="Product Designer"
-  team="Sole designer, 1 developer, with guidance from 2 designers"
-  timeline="Jan 2026 – Mar 2026"
+  team="Intuit: sole designer, 1 developer, guidance from 2 designers. Portfolio: solo"
+  timeline="Jan – Mar 2026, Oct 2026"
   projectType="Product, Design Systems"
   nav={nav}
   commentId="case-study-des-sys"
-  heroImage={{
-    src: 'images/case-study-heroes/dessys.png',
-    alt: 'Intuit Design Systems cover',
-    wide: true,
-  }}
 >
+  <CaseStudyFigure
+    slot="hero"
+    src="videos/des-sys/colour-mode-switch.mp4"
+    alt="The portfolio switching between light and dark mode: the new mode rises from the bottom of the screen behind a soft blurred edge"
+    loop
+    wide
+  />
   <section id="overview" data-comment-id="des-sys-overview">
-    <h2 class="section-label">Context</h2>
-    <p class="lead">
-      The Intuit Design System (IDS) is a shared library of components and tokens used across
-      products. As it evolves, keeping design and code aligned gets harder. I identified gaps,
-      documented them, and carried fixes through so teams relying on the system could stay in sync.
-    </p>
-
-    <h2 class="section-label">Why this matters</h2>
-    <ol>
-      <li>
-        <h3>Design handoff is less reliable</h3>
-        <p>
-          Handoff breaks down when components aren’t 1-to-1 between prototypes and implementation.
-        </p>
-      </li>
-      <li>
-        <h3>Hardcoded values bypass tokens</h3>
-        <p>
-          Hardcoded values in components skip tokens, so global theme updates never reach the UI.
-        </p>
-      </li>
-    </ol>
-
-    <h2 class="section-label">Opportunity</h2>
-    <p class="lead">
-      I explored how AI can help designers own more of the implementation path, finding token
-      mismatches, proposing fixes, and shipping lower-risk updates without losing quality.
+    <h2 class="section-label">Overview</h2>
+    <p class="heading text-ink">
+     Being on the Intuit Design System team, I learned that design system consistency is challenging to maintain between design and code. I took my learnings from working on a mature design system to building one from scratch for my portfolio.
     </p>
   </section>
 
-  <section id="impact" data-comment-id="des-sys-impact">
-    <h2 class="section-label">How small changes scale</h2>
-    <p class="lead">
-      I updated 3 core components across the design system. Just one component can have a large
-      systematic impact.
-    </p>
-    <p class="lead">For the checkbox component:</p>
+  <section id="tokens" data-comment-id="des-sys-intuit">
+    <h2 class="section-label">Problem</h2>
+    <p class="heading text-ink">Design and code don’t always use the right tokens. Hardcoded values and incorrect tokens kept theme updates from
+          reaching parts of the UI.</p>
+    <div class="decision-row des-sys-row">
+      
+      <CaseStudyFigure
+        src={img('token-alignment.webp')}
+        alt="Before and after: the checkbox label uses one font weight token in code and a semibold token in design, then both use the same token"
+      />
+    </div>
+  </section>
+
+  <section id="audit" data-comment-id="des-sys-workflow">
+    <h2 class="section-label">Solution</h2>
+    <p class="heading text-ink">AI skills ran the audit to check for hardcoded values and token misalignment, then I previewed changes in code and in design.</p>
+    <CaseStudyFigure
+      src={img('audit-workflow-after.png')}
+      alt="Designer-owned audit workflow with AI-assisted review, Storybook preview, and PR"
+      wide
+    />
+
+    <h3 class="des-sys-subhead">Impact</h3>
+    <p>I updated 3 core components. For the checkbox alone:</p>
     <div class="case-study-stats">
       <div class="case-study-stat">
         <strong>355k+</strong>
@@ -80,56 +79,123 @@ const nav = [
       </div>
     </div>
 
-    <h2 class="section-label">What do token adjustments look like?</h2>
-    <p class="lead">
-      Some token adjustments bring design and code into alignment, like syncing label font weight to
-      the correct component token.
-    </p>
-    <CaseStudyFigure
-      src={img('token-alignment-font-weight.png')}
-      alt="Before and after aligning checkbox label font weight between design and code"
-    />
-    <p class="lead">
-      Others update tokens to match documentation for correct usage, even when design and code were
-      already in line with each other, like swapping `--input-label` for `--text-primary` on checkbox
-      labels.
-    </p>
-    <CaseStudyFigure
-      src={img('token-alignment-input-label.png')}
-      alt="Before and after aligning input label colour token from --input-label to --text-primary"
-    />
+    <!-- <h3 class="des-sys-subhead">How the workflow changed</h3>
+    <p>By the end of my term, Figma MCP let AI make the design changes too.</p> -->
   </section>
 
-  <section id="workflow" data-comment-id="des-sys-workflow">
-    <h2 class="section-label">Audit process</h2>
-    <p class="lead">
-      Previously, identifying an issue and implementing a fix required separate design and
-      engineering workflows. Below is the workflow that designers can own in the process.
+  <section id="visual" data-comment-id="des-sys-visual">
+    <h2 class="section-label">Challenge</h2>
+    <p class="heading text-ink">But 1 to 1 token alignment can still look misaligned. Text and layout render differently between design and code, so matching them takes deliberate adjustments that intentionally break 1 to 1 token alignment.</p>
+    <div class="decision-row des-sys-row">
+     
+      <CaseStudyFigure
+        src={img('visual-alignment.webp')}
+        alt="Illustration: a checkbox label uses the same token in code and design but sits higher in code, then a hardcoded padding value lines it up"
+      />
+    </div>
+  </section>
+
+  <section id="hmw" data-comment-id="des-sys-tradeoff">
+    <h2 class="section-label">How might we</h2>
+    <p class="heading text-ink">Would one source of truth bring everything into alignment?</p>
+    <p>Large teams can’t leave Figma quickly, so I tested it on my portfolio, built code first.</p>
+  </section>
+
+  <section id="finding" data-comment-id="des-sys-portfolio">
+    <h2 class="section-label">Finding</h2>
+    <p class="heading text-ink">It fixed alignment, but not consistency.</p>
+    <p>
+      With no Figma to match, design and code can’t disagree. But AI still left near-duplicate text
+      styles and mixed units.
     </p>
-    <CaseStudyFigure
-      src={img('audit-workflow-after.png')}
-      alt="Designer-owned audit workflow with AI-assisted review, Storybook preview, and PR"
-      wide
-    />
-    <p class="lead">AI didn’t replace review or decision-making.</p>
-    <p class="lead">
-      Instead, it enabled me to participate more directly in implementation, reducing dependency on
-      engineering bandwidth for lower-risk updates while maintaining quality.
+    <p>To be transparent, I vibe coded the first layouts, then wrote the system down with AI.</p>
+  </section>
+
+  <section id="specs" data-comment-id="des-sys-system">
+    <h2 class="section-label">Solution</h2>
+    <p class="heading text-ink">So I made the system visible, to proofread what AI generates.</p>
+    <ol>
+      <li>
+        <h3>DESIGN.md</h3>
+        <p>
+          The rules agents read before any UI work. The tokens themselves live in the CSS.
+        </p>
+      </li>
+      <li>
+        <h3>Automated checks</h3>
+        <p>
+          Flag any value that isn’t a token, and fail the build on drift.
+        </p>
+        <CaseStudyFigure
+          src={img('docs-and-checks.webp')}
+          alt="A DESIGN.md excerpt defining the spacing scale and its rule, next to the design check output reporting 0 off-token values"
+        />
+      </li>
+      <li>
+        <h3>Design system page</h3>
+        <p>
+          Every token and component state in one place, to review naming.
+        </p>
+        <CaseStudyFigure
+          src={img('colour-roles.webp')}
+          alt="Colour tokens on the design system page, named by role, shown half in light mode and half in dark mode"
+          caption="Colours named by role, each with a light and a dark value."
+        />
+      </li>
+      <li>
+        <h3>Inspect mode</h3>
+        <p>
+          Hover a component to see its tokens and flag anything that isn’t one.
+        </p>
+        <CaseStudyFigure
+          src={img('inspect-mode.webp')}
+          alt="Inspect mode on the design system page, listing the tokens behind a secondary button: fill, text, type, border, padding, gap, and radius"
+        />
+      </li>
+    </ol>
+    <div class="case-study-stats">
+      <div class="case-study-stat">
+        <strong>10 → 7</strong>
+        <span>text styles, after consolidating near-duplicates</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>4 → 3</strong>
+        <span>line colours, each with one job</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>323 → 0</strong>
+        <span>off-token values after writing the system down</span>
+      </div>
+    </div>
+    <p class="des-sys-after-figure">
+      The checks missed the near-duplicates. I found them reading the
+      <a class="text-link" href="/design-system">design system page</a>.
     </p>
   </section>
 
-  <section id="reflection" data-comment-id="des-sys-reflection">
-    <h2 class="section-label">Reflection</h2>
-    <p class="lead">
-      Nothing is too small. Maintaining the integrity of a design system starts at the token level.
-      By leveraging AI throughout the workflow, I could move beyond spotting gaps and contribute
-      directly to documentation, implementation, validation, and shipping.
-    </p>
-
-    <h2 class="section-label">Next steps</h2>
-    <p class="lead">
-      Since I worked on this project, AI has advanced. I would use Figma MCP to automate the design
-      file updates for me, removing another layer of manual work and streamlining this process further.
-    </p>
+  <section id="takeaway" data-comment-id="des-sys-takeaways">
+    <h2 class="section-label">Takeaway</h2>
+    <p class="heading text-ink">On both sides, AI speeds up the work, and people still have to check it.</p>
+    <p>What carries over is making the system visible enough to proofread.</p>
   </section>
 </CaseStudyLayout>
+
+<style>
+  /* Sub-sections within a section; specific enough to beat the layout's h3 reset */
+  :global(.case-study-content) section > h3.des-sys-subhead {
+    margin: var(--space-10) 0 var(--space-3);
+  }
+
+  /* A statement's text and figure, sitting below the statement */
+  :global(.case-study-content) section > .des-sys-row {
+    margin-top: var(--space-4);
+  }
+
+  :global(.case-study-content) section > p.des-sys-after-figure {
+    margin-top: var(--space-8);
+  }
+
+  :global(.case-study-content) #specs .case-study-stats {
+    margin-top: var(--space-10);
+  }
+</style>

@@ -138,3 +138,5 @@ for (const [key, check] of [...Object.entries(checks), ['motion', motion]]) {
   if (list) for (const f of found) console.log(`  ${f.file}:${f.line}  ${f.value}`);
 }
 console.log(`\nTotal: ${total}`);
+// Fail the build on any drift
+if (total > 0) process.exitCode = 1;

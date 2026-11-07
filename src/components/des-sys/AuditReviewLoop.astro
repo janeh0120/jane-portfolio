@@ -1,0 +1,134 @@
+---
+// Case study diagram (/des-sys-audit): what happens after the skill's report. Every recommendation
+// goes through a person: verify it, fix Figma, test the code in Cursor, compare the two, and shim
+// where rendering differences leave them visibly off. The last two steps repeat until they match.
+
+const steps = [
+  { title: 'Verify', body: 'Check each recommendation and why it was flagged' },
+  { title: 'Fix Figma', body: 'Make the design changes that are clearly needed' },
+  { title: 'Test in code', body: 'Apply the code changes in Cursor and preview them' },
+  { title: 'Compare', body: 'Put design and code side by side to catch visual drift' },
+  { title: 'Shim', body: 'Where text sits differently, add a small offset in design or code' },
+];
+---
+
+<figure class="audit-loop">
+  <ol class="audit-loop-steps">
+    {
+      steps.map((step, i) => (
+        <li class:list={['audit-step', i >= 3 && 'is-looped']}>
+          <span class="audit-step-number">{i + 1}</span>
+          <strong>{step.title}</strong>
+          <span class="audit-step-body">{step.body}</span>
+        </li>
+      ))
+    }
+  </ol>
+  <div class="audit-loop-repeat">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4"></path>
+    </svg>
+    <span>Steps 4 and 5 repeat until design and code match</span>
+  </div>
+  <figcaption>Every step after the report is a judgment call, which is where most of the time went.</figcaption>
+</figure>
+
+<style>
+  .audit-loop {
+    margin: var(--space-8) 0 0;
+  }
+
+  /* Specific enough to beat the case study layout's ol styles */
+  .audit-loop ol.audit-loop-steps {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .audit-loop ol.audit-loop-steps {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  /* The stat card panel, reused as a step */
+  .audit-step {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  /* The repeating steps: dashed, to tie them to the loop note below */
+  .audit-step.is-looped {
+    border-style: dashed;
+    border-color: var(--color-border-strong);
+  }
+
+  .audit-step-number {
+    display: inline-grid;
+    place-items: center;
+    width: var(--space-6);
+    height: var(--space-6);
+    margin-bottom: var(--space-2);
+    border-radius: var(--radius-base);
+    background: var(--color-ink);
+    color: var(--color-canvas);
+    font: var(--type-count);
+  }
+
+  .audit-step strong {
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .audit-step .audit-step-body {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  .audit-loop-repeat {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-base);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  /* On wide screens the note sits under steps 4 and 5 only */
+  @media (min-width: 640px) {
+    .audit-loop-repeat {
+      margin-left: calc(60% + var(--space-3) * 0.6);
+    }
+  }
+
+  .audit-loop-repeat svg {
+    flex: none;
+    width: var(--space-4);
+    height: var(--space-4);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .audit-loop figcaption {
+    margin-top: var(--space-2);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+</style>

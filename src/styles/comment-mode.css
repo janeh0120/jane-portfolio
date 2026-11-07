@@ -2,11 +2,11 @@
 body.comment-feedback-root {
   --comment-frame-bg: var(--color-canvas, #ffffff);
   --comment-sidebar-width: 300px;
-  --comment-accent: var(--color-accent, #246cff);
-  --comment-accent-soft: var(--color-accent-soft, rgb(36 108 255 / 12%));
+  --comment-accent: var(--color-accent, #155dfc);
+  --comment-accent-soft: var(--color-accent-soft, rgb(21 93 252 / 12%));
   --comment-shell-padding: 0px;
   --comment-motion: var(--duration-700);
-  --comment-ease: var(--ease-glide);
+  --comment-ease: var(--ease-standard);
   --header-offset: 1rem;
   background: var(--comment-frame-bg);
   margin: 0;
@@ -22,7 +22,7 @@ body.comment-feedback-root {
   box-sizing: border-box;
   min-height: 100dvh;
   padding: var(--comment-shell-padding, 0px);
-  background: var(--color-page, #f0f0f1);
+  background: var(--color-page, #f5f5f5);
 }
 
 body.comment-feedback-root .site-shell {
@@ -54,7 +54,7 @@ body.comment-feedback-root:not(.admin-review-root) .site-shell {
 }
 
 .site-canvas {
-  background: var(--color-page, #f0f0f1);
+  background: var(--color-page, #f5f5f5);
   border: none;
   border-radius: 0;
   min-height: calc(100dvh - (var(--comment-shell-padding, 0px) * 2));

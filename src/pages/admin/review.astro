@@ -63,17 +63,17 @@ const clientComments = comments.map((item) => ({
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
         <h1 class="heading text-ink">Admin access required</h1>
         <p class="mt-4 text-body text-muted">
-          Add <code class="rounded bg-line px-1.5 py-0.5">?key=YOUR_ADMIN_SECRET</code> to the URL.
+          Add <code class="rounded bg-fill px-1.5 py-0.5">?key=YOUR_ADMIN_SECRET</code> to the URL.
         </p>
         {!ADMIN_SECRET && (
           <p class="mt-4 text-body text-danger">
-            <code class="rounded bg-line px-1 py-0.5">ADMIN_SECRET</code> is not set on this server.
+            <code class="rounded bg-fill px-1 py-0.5">ADMIN_SECRET</code> is not set on this server.
             Add it in Vercel Environment Variables and redeploy.
           </p>
         )}
         <p class="mt-4 text-body text-muted">
           Example:{' '}
-          <code class="break-all rounded bg-line px-1.5 py-0.5">
+          <code class="break-all rounded bg-fill px-1.5 py-0.5">
             {Astro.url.origin}
             {base}admin/review?key=…
           </code>
@@ -85,10 +85,10 @@ const clientComments = comments.map((item) => ({
         <p class="mt-6 text-body text-danger">{error}</p>
         <p class="mt-4 text-body text-muted">
           On Vercel, open <strong>Settings → Environment Variables</strong> and add{' '}
-          <code class="rounded bg-line px-1 py-0.5">SUPABASE_URL</code>,{' '}
-          <code class="rounded bg-line px-1 py-0.5">SUPABASE_SERVICE_ROLE_KEY</code>, and{' '}
-          <code class="rounded bg-line px-1 py-0.5">ADMIN_SECRET</code> (same values as your local{' '}
-          <code class="rounded bg-line px-1 py-0.5">.env</code>), then redeploy.
+          <code class="rounded bg-fill px-1 py-0.5">SUPABASE_URL</code>,{' '}
+          <code class="rounded bg-fill px-1 py-0.5">SUPABASE_SERVICE_ROLE_KEY</code>, and{' '}
+          <code class="rounded bg-fill px-1 py-0.5">ADMIN_SECRET</code> (same values as your local{' '}
+          <code class="rounded bg-fill px-1 py-0.5">.env</code>), then redeploy.
         </p>
       </main>
     ) : selectedVersion ? (

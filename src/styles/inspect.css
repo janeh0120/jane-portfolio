@@ -1,0 +1,132 @@
+/* Inspect mode, styled like Figma's dev mode: the selection box, padding measurements, and the
+   callout card (with its leader and pin) that lists a component's tokens. Built by
+   src/lib/token-inspector.ts on /design-system, and shown as static callouts in case study
+   illustrations (src/components/des-sys/InspectExample.astro). */
+
+/* Inspect overlay, in the style of Figma's dev mode. Above everything in the specimens,
+   including the open dropdown menu (z-index 10100). */
+.inspect-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10200;
+  pointer-events: none;
+}
+
+.inspect-overlay[hidden],
+.inspect-overlay [hidden],
+.inspect-panel[hidden] {
+  display: none;
+}
+
+/* The selected element */
+.inspect-box {
+  position: fixed;
+  outline: 1px solid var(--color-accent);
+}
+
+/* Padding: a red line across each padded side, with its size in a badge */
+.inspect-measure {
+  position: fixed;
+  border-color: var(--color-measure);
+  border-style: solid;
+  border-width: 0;
+}
+
+.inspect-measure[data-side='top'],
+.inspect-measure[data-side='bottom'] {
+  border-left-width: 1px;
+}
+
+.inspect-measure[data-side='left'],
+.inspect-measure[data-side='right'] {
+  border-top-width: 1px;
+}
+
+.inspect-badge {
+  position: fixed;
+  padding: 2px var(--space-1);
+  border-radius: var(--radius-base);
+  background: var(--color-measure);
+  color: var(--color-on-measure);
+  font: var(--type-count);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The callout's dotted leader and its pin on the element */
+.inspect-leader {
+  position: fixed;
+  border-top: 1px dashed var(--color-pin);
+}
+
+.inspect-pin {
+  position: fixed;
+  border-radius: var(--radius-pill);
+  background: var(--color-pin);
+  box-shadow: 0 0 0 2px var(--color-canvas);
+}
+
+/* The callout card */
+.inspect-panel {
+  position: fixed;
+  z-index: 10201;
+  min-width: 14rem;
+  max-width: 24rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-menu);
+  background: var(--color-canvas);
+  box-shadow: var(--shadow-floating);
+  pointer-events: none;
+}
+
+.inspect-swatch {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+  border: var(--border-width) solid var(--color-hairline);
+  border-radius: var(--radius-base);
+}
+
+
+/* Bold (the font has no 500), so the part name stands above the rows */
+.inspect-panel-title {
+  margin: 0 0 var(--space-2);
+  color: var(--color-ink);
+  font: var(--type-label);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-body);
+}
+
+.inspect-panel dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
+}
+
+.inspect-panel dt {
+  color: var(--color-muted);
+}
+
+.inspect-panel dd {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.inspect-panel-note {
+  margin: var(--space-2) 0 0;
+  color: var(--color-muted);
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
+}
+
+.inspect-panel dd.is-untokened {
+  color: var(--color-danger);
+}

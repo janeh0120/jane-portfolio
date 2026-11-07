@@ -1,0 +1,291 @@
+---
+// Case study illustration (/des-sys-audit): the portfolio's secondary button in Inspect mode, before
+// and after an audit. The callouts use Inspect mode's own styles (src/styles/inspect.css) as static,
+// always-open panels. "After" is the shipped button; its rows are what /design-system's Inspect mode
+// reports. "Before" is the same button recreated with the kinds of values the audit flags.
+import ArrowIcon from '../ArrowIcon.astro';
+import '../../styles/inspect.css';
+
+type Row = { label: string; value: string; swatch?: string; flagged?: boolean };
+
+const variants: {
+  id: string;
+  label: string;
+  note?: string;
+  padding: { y: string; x: string };
+  rows: Row[];
+}[] = [
+  {
+    id: 'before',
+    label: 'Before',
+    note: 'type-body is a real token, so it passes alignment. Guidance says controls use type-compact.',
+    padding: { y: '10', x: '12' },
+    rows: [
+      { label: 'Fill', value: 'color-glass', swatch: 'var(--color-glass)' },
+      // design-tokens-ignore: callout text quoting the hardcoded colour, not a style
+      { label: 'Text', value: 'rgb(31, 31, 31) · not a token', flagged: true },
+      { label: 'Type', value: 'type-body' },
+      { label: 'Border', value: 'color-hairline', swatch: 'var(--color-hairline)' },
+      { label: 'Padding', value: '10 12 10 12 px · not a token', flagged: true },
+      { label: 'Gap', value: 'space-1' },
+      { label: 'Radius', value: 'radius-base' },
+      { label: 'Size', value: '73 × 44' },
+    ],
+  },
+  {
+    id: 'after',
+    label: 'After',
+    padding: { y: '8', x: '12' },
+    rows: [
+      { label: 'Fill', value: 'color-glass', swatch: 'var(--color-glass)' },
+      { label: 'Text', value: 'color-ink' },
+      { label: 'Type', value: 'type-compact' },
+      { label: 'Border', value: 'color-hairline', swatch: 'var(--color-hairline)' },
+      { label: 'Padding', value: 'space-2 · space-3' },
+      { label: 'Gap', value: 'space-1' },
+      { label: 'Radius', value: 'radius-base' },
+      { label: 'Size', value: '73 × 36' },
+    ],
+  },
+];
+---
+
+<figure class="inspect-example">
+  {
+    variants.map((variant) => (
+      <div class="inspect-example-row">
+        <p class="inspect-example-label">{variant.label}</p>
+        <div class="inspect-example-stage">
+          <div class:list={['inspect-example-target', `is-${variant.id}`]} aria-hidden="true">
+            <span class:list={['button', 'is-secondary', `is-${variant.id}`]}>
+              <ArrowIcon direction="left" size="0.9em" />
+              Back
+            </span>
+            <span class="inspect-box" />
+            <span class="inspect-measure" data-side="top" />
+            <span class="inspect-measure" data-side="bottom" />
+            <span class="inspect-measure" data-side="left" />
+            <span class="inspect-measure" data-side="right" />
+            <span class="inspect-badge" data-side="top">{variant.padding.y}</span>
+            <span class="inspect-badge" data-side="bottom">{variant.padding.y}</span>
+            <span class="inspect-badge" data-side="left">{variant.padding.x}</span>
+            <span class="inspect-badge" data-side="right">{variant.padding.x}</span>
+            <span class="inspect-pin" />
+          </div>
+          <span class="inspect-leader" aria-hidden="true" />
+          <div class="inspect-panel">
+            <p class="inspect-panel-title">Secondary button</p>
+            <dl>
+              {variant.rows.map((row) => (
+                <>
+                  <dt>{row.label}</dt>
+                  <dd class:list={[row.flagged && 'is-untokened']}>
+                    {row.swatch && <span class="inspect-swatch" style={`background: ${row.swatch}`} />}
+                    <span>{row.value}</span>
+                  </dd>
+                </>
+              ))}
+            </dl>
+            {variant.note && <p class="inspect-panel-note">{variant.note}</p>}
+          </div>
+        </div>
+      </div>
+    ))
+  }
+  <figcaption>
+    My portfolio’s secondary button in Inspect mode. Before is recreated with the kinds of values the
+    audit flags; after is the shipped button.
+  </figcaption>
+</figure>
+
+<style>
+  .inspect-example {
+    display: grid;
+    gap: var(--space-4);
+    margin: var(--space-8) 0 0;
+  }
+
+  .inspect-example-row {
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  .inspect-example .inspect-example-label {
+    margin: 0 0 var(--space-6);
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
+  }
+
+  /* Button, leader, then the callout, like the live overlay; stacked on phones */
+  .inspect-example-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-10);
+    padding-left: var(--space-6);
+  }
+
+  @media (min-width: 640px) {
+    .inspect-example-stage {
+      flex-direction: row;
+      align-items: center;
+      gap: 0;
+    }
+  }
+
+  /* The live overlay is fixed to the viewport; here every piece is placed around the button */
+  .inspect-example-target {
+    --pad-y: var(--space-2);
+    --pad-x: var(--space-3);
+    position: relative;
+    flex: none;
+    display: inline-block;
+  }
+
+  .inspect-example-target.is-before {
+    /* design-tokens-ignore: deliberately off-grid, to show what the audit flags */
+    --pad-y: 10px;
+  }
+
+  .inspect-example-target .button {
+    display: inline-flex;
+    vertical-align: top;
+  }
+
+  /* The recreated "before": a near-ink hex, off-grid padding, and the body type style */
+  .inspect-example-target .button.is-before {
+    /* design-tokens-ignore: deliberately hardcoded, to show what the audit flags */
+    color: #1f1f1f;
+    /* design-tokens-ignore: deliberately off-grid, to show what the audit flags */
+    padding: 10px 12px;
+    font: var(--type-body);
+  }
+
+  .inspect-example .inspect-box,
+  .inspect-example .inspect-measure,
+  .inspect-example .inspect-badge,
+  .inspect-example .inspect-pin {
+    position: absolute;
+  }
+
+  .inspect-example .inspect-box {
+    inset: 0;
+    border-radius: var(--radius-none);
+  }
+
+  .inspect-example .inspect-measure[data-side='top'],
+  .inspect-example .inspect-measure[data-side='bottom'] {
+    left: 50%;
+    height: var(--pad-y);
+  }
+
+  .inspect-example .inspect-measure[data-side='top'] {
+    top: 0;
+  }
+
+  .inspect-example .inspect-measure[data-side='bottom'] {
+    bottom: 0;
+  }
+
+  .inspect-example .inspect-measure[data-side='left'],
+  .inspect-example .inspect-measure[data-side='right'] {
+    top: 50%;
+    width: var(--pad-x);
+  }
+
+  .inspect-example .inspect-measure[data-side='left'] {
+    left: 0;
+  }
+
+  .inspect-example .inspect-measure[data-side='right'] {
+    right: 0;
+  }
+
+  .inspect-example .inspect-badge[data-side='top'] {
+    left: 50%;
+    bottom: calc(100% + var(--space-1));
+    transform: translateX(-50%);
+  }
+
+  .inspect-example .inspect-badge[data-side='bottom'] {
+    left: 50%;
+    top: calc(100% + var(--space-1));
+    transform: translateX(-50%);
+  }
+
+  .inspect-example .inspect-badge[data-side='left'] {
+    right: calc(100% + var(--space-1));
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  /* On the side the leader leaves from, the badge drops below the line */
+  .inspect-example .inspect-badge[data-side='right'] {
+    left: calc(100% + var(--space-1));
+    top: calc(50% + var(--space-1));
+  }
+
+  .inspect-example .inspect-pin {
+    right: 0;
+    top: 50%;
+    width: calc(var(--space-1) * 1.5);
+    height: calc(var(--space-1) * 1.5);
+    transform: translate(50%, -50%);
+  }
+
+  .inspect-example .inspect-leader {
+    display: none;
+    position: static;
+  }
+
+  @media (min-width: 640px) {
+    .inspect-example .inspect-leader {
+      display: block;
+      flex: none;
+      width: var(--space-10);
+    }
+  }
+
+  .inspect-example .inspect-panel {
+    position: relative;
+    z-index: auto;
+  }
+
+  @media (max-width: 639px) {
+    .inspect-example .inspect-panel {
+      min-width: 0;
+      max-width: 100%;
+    }
+  }
+
+  /* As specific as the case study layout's paragraph rules, so the panel keeps its own type */
+  .inspect-example .inspect-panel p.inspect-panel-title {
+    margin: 0 0 var(--space-2);
+    font: var(--type-label);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .inspect-example .inspect-panel p.inspect-panel-note {
+    margin: var(--space-2) 0 0;
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  .inspect-example figcaption {
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  @media (max-width: 639px) {
+    .inspect-example .inspect-pin {
+      display: none;
+    }
+  }
+</style>

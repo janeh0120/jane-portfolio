@@ -1,14 +1,16 @@
 import { useEffect, useState, type MouseEventHandler } from 'react';
 import SpecularButton from './SpecularButton';
+import { colorToHex } from '../../lib/resolve-color';
 
 // The primary button is the accent colour with on-accent text. The fill and text use the CSS
 // tokens directly; the WebGL shine needs a real colour value, so it reads --color-accent once the
 // page has loaded (and again if the colour mode changes). Until then, this mirrors it.
-const ACCENT_FALLBACK = '#246cff';
+const ACCENT_FALLBACK = '#155dfc';
 
 function readAccent() {
   if (typeof document === 'undefined') return ACCENT_FALLBACK;
-  return getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim() || ACCENT_FALLBACK;
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim();
+  return colorToHex(accent) ?? ACCENT_FALLBACK;
 }
 
 export type LeaveFeedbackButtonProps = {

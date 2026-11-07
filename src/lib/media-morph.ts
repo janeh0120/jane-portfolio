@@ -26,7 +26,7 @@ export function createMediaMorph(modal: HTMLElement): MediaMorph {
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let busy = false;
   const MORPH_MS = parseFloat(motionToken('--duration-500')) || 500;
-  const MORPH_EASE = motionToken('--ease-morph') || 'ease';
+  const MORPH_EASE = motionToken('--ease-settle') || 'ease';
   const FADE_EASE = motionToken('--ease-settle') || 'ease-out';
 
   // Resolves true once the overlay media has a size to fly to, false if it isn't ready in time.

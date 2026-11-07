@@ -11,6 +11,7 @@ import SpecularButton from '../components/react/SpecularButton';
 import { site } from '../data/site';
 import { galleryItems } from '../lib/play-gallery';
 import '../styles/play.css';
+import '../styles/inspect.css';
 import globalCss from '../styles/global.css?raw';
 
 const sections = [
@@ -70,10 +71,9 @@ const colorGroups = [
   {
     name: 'Lines',
     swatches: [
-      { use: 'Dividers', token: '--color-line', outline: true },
-      { use: 'Outlines', token: '--color-border' },
-      { use: 'Strong outlines', token: '--color-border-strong' },
-      { use: 'Hairline (0.5px)', token: '--color-hairline' },
+      { use: 'Outlines · dividers', token: '--color-border' },
+      { use: 'Hover outlines · fields', token: '--color-border-strong' },
+      { use: 'Over content (0.5px)', token: '--color-hairline' },
     ],
   },
   {
@@ -97,29 +97,25 @@ const colorGroups = [
 
 // One entry per --type-* token; samples render with the token itself
 const typeStyles = [
-  { token: 'display', label: 'Display', spec: 'Bold · 2.5–3.625rem · the largest headline', sample: site.hero.headline },
-  { token: 'intro', label: 'Intro', spec: 'Bold · 1.75–2.5rem · intro line, Brand project titles', sample: 'I care about people and want to design around them.' },
-  { token: 'heading', label: 'Heading', spec: 'Bold · 1.625–2.375rem · page titles and statements', sample: 'A design community shouldn’t graduate without a shared experience.' },
+  { token: 'display', label: 'Display', spec: 'Bold · 2.25–3.75rem · the largest headline', sample: site.hero.headline },
+  { token: 'heading', label: 'Heading', spec: 'Bold · 1.5–2.25rem · page titles, statements, Brand project titles', sample: 'A design community shouldn’t graduate without a shared experience.' },
   { token: 'subheading', label: 'Subheading', spec: 'Bold · 1–1.25rem · section and project titles', sample: 'Intuit Design System' },
-  { token: 'quote', label: 'Quote', spec: 'Regular · 1–1.25rem / 1.35 · pull quotes', sample: '“It finally felt like one system.”' },
-  { token: 'body', label: 'Body', spec: 'Regular · 14px / 1.65 · body, metadata, nav', sample: 'I love when design can bridge the intersection between solving technical and people problems.' },
-  { token: 'label', label: 'Label', spec: 'Medium · 14px / 1.65 · labels above values, the current nav link', sample: 'Page widths' },
-  { token: 'compact', label: 'Compact', spec: 'Regular · 14px / 1.35 · controls, captions, dense lists', sample: 'Leave feedback' },
-  { token: 'tag', label: 'Tag', spec: 'Regular · 14px / 1 · tags', sample: 'Accessibility' },
-  { token: 'count', label: 'Count', spec: 'Medium · 12px / 1 · numbers beside a label', sample: '12' },
+  { token: 'body', label: 'Body', spec: 'Regular · 0.875rem / 1.625 · body, metadata, nav', sample: 'I love when design can bridge the intersection between solving technical and people problems.' },
+  { token: 'label', label: 'Label', spec: 'Medium · 0.875rem / 1.625 · labels above values, the current nav link', sample: 'Page widths' },
+  { token: 'compact', label: 'Compact', spec: 'Regular · 0.875rem / 1.375 · controls, tags, captions, dense lists', sample: 'Leave feedback' },
+  { token: 'count', label: 'Count', spec: 'Medium · 0.75rem / 1 · numbers beside a label', sample: '12' },
 ];
 
-// Spacing scale on a 4px grid; matches Tailwind's spacing (space-3 = mt-3 = 0.75rem)
+// Spacing scale on a 4px grid, built from Tailwind's spacing unit (space-3 = mt-3 = 0.75rem)
 const spacing = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24].map((step) => ({
   token: `--space-${step}`,
-  px: step * 4,
+  value: `${step * 0.25}rem`,
 }));
 
 const borders = [
-  { name: 'Hairline', token: '--color-hairline', width: 'var(--border-width)', detail: '0.5px · nav bar, comment cards' },
-  { name: 'Line', token: '--color-line', width: '1px', detail: '1px · dividers' },
-  { name: 'Border', token: '--color-border', width: '1px', detail: '1px · inputs, cards' },
-  { name: 'Border strong', token: '--color-border-strong', width: '1px', detail: '1px · higher contrast' },
+  { name: 'Hairline', token: '--color-hairline', width: 'var(--border-width)', detail: '0.5px · translucent, for anything over content' },
+  { name: 'Border', token: '--color-border', width: '1px', detail: '1px · cards, panels, dividers' },
+  { name: 'Border strong', token: '--color-border-strong', width: '1px', detail: '1px · hover outlines, form fields' },
 ];
 
 const shadows = [
@@ -128,16 +124,16 @@ const shadows = [
 ];
 
 const radii = [
-  { name: 'None', token: '--radius-none', detail: '0 · full-bleed frames' },
-  { name: 'Corner', token: '--radius-base', detail: '0.5rem · everything' },
+  { name: 'None', token: '--radius-none', detail: '0px · full-bleed frames' },
+  { name: 'Base', token: '--radius-base', detail: '8px · controls, cards, images, tags' },
   { name: 'Menu', token: '--radius-menu', detail: '12.5px · menus' },
   { name: 'Panel', token: '--radius-panel', detail: '16.5px · nav bar, footer' },
-  { name: 'Pill', token: '--radius-pill', detail: 'Segmented toggles only' },
+  { name: 'Pill', token: '--radius-pill', detail: '999px · segmented toggles' },
 ];
 
 const motion = [
   { name: 'Press', demo: 'press', detail: 'Controls shrink to 97% when pressed, icon controls to 92%.' },
-  { name: 'Hover', demo: 'hover', detail: 'Colours change over 0.15s.' },
+  { name: 'Hover', demo: 'hover', detail: 'Colours change over 150ms.' },
   { name: 'Menus', demo: 'menu', detail: 'Fade in, with a highlight that slides between options.' },
   { name: 'Reveal', demo: 'reveal', detail: 'Sections rise and fade in as they scroll into view.' },
   { name: 'Nav bar', demo: 'nav', detail: 'Links fold away as you scroll down, narrowing the bar, and return as you scroll up.' },
@@ -158,16 +154,14 @@ const durations = [
 
 // Control points of each easing's cubic-bezier, to draw its curve
 const easings = [
-  { name: 'Standard', token: '--ease-standard', curve: [0.25, 0.1, 0.25, 1], detail: 'Colour and opacity' },
-  { name: 'Settle', token: '--ease-settle', curve: [0.22, 1, 0.36, 1], detail: 'Things arriving or growing' },
-  { name: 'Glide', token: '--ease-glide', curve: [0.45, 0, 0.25, 1], detail: 'Things that leave and return' },
-  { name: 'Morph', token: '--ease-morph', curve: [0.3, 0.7, 0.2, 1], detail: 'The media overlay' },
+  { name: 'Standard', token: '--ease-standard', curve: [0.4, 0, 0.2, 1], detail: 'Colour, opacity, things that leave and return' },
+  { name: 'Settle', token: '--ease-settle', curve: [0, 0, 0.2, 1], detail: 'Things arriving or growing' },
 ];
 
 const widths = [
-  { name: 'Site', px: 1400 },
-  { name: 'Case study', px: 768 },
-  { name: 'About', px: 672 },
+  { name: 'Site', px: 1400, label: '1400px' },
+  { name: 'Case study', px: 768, label: '48rem' },
+  { name: 'About', px: 672, label: '42rem' },
 ];
 
 const breakpoints = [
@@ -253,7 +247,7 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="typography" class={sectionClass} aria-labelledby="typography-title">
       <h2 id="typography-title" class={sectionTitleClass}>Typography</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        One typeface, TeX Gyre Heros, in ten type tokens. Components set type with these, never with loose sizes.
+        One typeface, TeX Gyre Heros, in seven type tokens. Components set type with these, never with loose sizes.
       </p>
       <div class="mt-8 grid gap-12">
         {
@@ -263,7 +257,7 @@ const sectionTitleClass = 'subheading text-ink';
               <p class="text-body text-muted">--type-{item.token} · {item.spec}</p>
               <div
                 class="mt-4 text-ink"
-                style={`font: var(--type-${item.token}); letter-spacing: var(--tracking-${['display', 'intro', 'heading', 'subheading', 'quote'].includes(item.token) ? 'tight' : 'body'})`}
+                style={`font: var(--type-${item.token}); letter-spacing: var(--tracking-${['display', 'heading', 'subheading'].includes(item.token) ? 'display' : 'body'})`}
               >
                 {item.sample}
               </div>
@@ -279,14 +273,14 @@ const sectionTitleClass = 'subheading text-ink';
         <div>
           <p class="text-body font-medium text-muted">Spacing</p>
           <p class="mt-1 max-w-[58ch] text-body text-muted">
-            Padding, margins, and gaps use this 4px scale, matching Tailwind's spacing classes.
+            Padding, margins, and gaps use this scale, in steps of 0.25rem (4px), matching Tailwind's spacing classes.
           </p>
           <ul class="mt-4 grid list-none gap-2 p-0" aria-label="Spacing scale">
             {
               spacing.map((item) => (
-                <li class="grid grid-cols-[6.5rem_3rem_1fr] items-center gap-3 text-body">
+                <li class="grid grid-cols-[6.5rem_4rem_1fr] items-center gap-3 text-body">
                   <span class="text-ink">{item.token}</span>
-                  <span class="text-muted">{item.px}px</span>
+                  <span class="text-muted">{item.value}</span>
                   <span
                     class="block h-3"
                     style={`width: var(${item.token}); background: var(--color-hover); border-radius: 2px`}
@@ -308,7 +302,7 @@ const sectionTitleClass = 'subheading text-ink';
                   style={`width: ${(item.px / 1400) * 100}%`}
                 >
                   <span class="text-muted">{item.name}</span>
-                  <span class="text-subtle">{item.px}px</span>
+                  <span class="text-subtle">{item.label}</span>
                 </div>
               ))
             }
@@ -424,7 +418,7 @@ const sectionTitleClass = 'subheading text-ink';
     <section id="shapes" class={sectionClass} aria-labelledby="shapes-title">
       <h2 id="shapes-title" class={sectionTitleClass}>Shapes</h2>
       <p class="mt-3 max-w-[58ch] text-body text-muted">
-        One corner radius for everything; a shell adds its padding to it. The pill is only for segmented toggles.
+        One base radius for almost everything; a shell adds its padding to it. The pill is only for segmented toggles.
       </p>
       <ul class="mt-8 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 sm:grid-cols-3 lg:grid-cols-5">
         {
@@ -490,7 +484,7 @@ const sectionTitleClass = 'subheading text-ink';
           <p class="mt-10 max-w-[58ch] text-body text-muted">
             For lower-emphasis actions like Back: secondary over content, tertiary in the page flow.
           </p>
-          <div class="mt-6 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+          <div class="mt-6 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-border [&>div+div]:pt-10">
             <div>
               <p class="mb-5 text-body font-medium text-ink">Secondary</p>
               <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
@@ -565,7 +559,7 @@ const sectionTitleClass = 'subheading text-ink';
           <p class="mt-3 max-w-[58ch] text-body text-muted">
             For compact actions where the icon speaks for itself. Dismiss closes, primary is the main action, destructive deletes.
           </p>
-          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-border [&>div+div]:pt-10">
             <div>
               <p class="mb-5 text-body font-medium text-ink">Standard</p>
               <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
@@ -722,7 +716,7 @@ const sectionTitleClass = 'subheading text-ink';
           <p class="mt-3 max-w-[58ch] text-body text-muted">
             Switches between two views of the same thing, like light and dark. Use glass over media.
           </p>
-          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-border [&>div+div]:pt-10">
             <div>
               <p class="mb-5 text-body font-medium text-ink">Default</p>
               <div class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] items-start gap-x-10 gap-y-10">
@@ -904,7 +898,7 @@ const sectionTitleClass = 'subheading text-ink';
             A comment's category, the element it's about, and the text. Your own comments can be
             recategorised, edited, and deleted; everyone else's are read-only.
           </p>
-          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-line [&>div+div]:pt-10">
+          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-border [&>div+div]:pt-10">
             <div>
               <p class="mb-5 text-body font-medium text-ink">Your comment</p>
               <div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] items-start gap-x-10 gap-y-10">
@@ -1088,138 +1082,11 @@ const sectionTitleClass = 'subheading text-ink';
     outline-offset: 2px;
   }
 
-  /* Inspect overlay, in the style of Figma's dev mode. Above everything in the specimens,
-     including the open dropdown menu (z-index 10100). */
-  :global(.inspect-overlay) {
-    position: fixed;
-    inset: 0;
-    z-index: 10200;
-    pointer-events: none;
-  }
-
-  :global(.inspect-overlay[hidden]),
-  :global(.inspect-overlay [hidden]),
-  :global(.inspect-panel[hidden]) {
-    display: none;
-  }
-
-  /* The selected element */
-  :global(.inspect-box) {
-    position: fixed;
-    outline: 1px solid var(--color-accent);
-  }
-
-  /* Padding: a red line across each padded side, with its size in a badge */
-  :global(.inspect-measure) {
-    position: fixed;
-    border-color: var(--color-measure);
-    border-style: solid;
-    border-width: 0;
-  }
-
-  :global(.inspect-measure[data-side='top']),
-  :global(.inspect-measure[data-side='bottom']) {
-    border-left-width: 1px;
-  }
-
-  :global(.inspect-measure[data-side='left']),
-  :global(.inspect-measure[data-side='right']) {
-    border-top-width: 1px;
-  }
-
-  :global(.inspect-badge) {
-    position: fixed;
-    padding: 2px var(--space-1);
-    border-radius: var(--radius-base);
-    background: var(--color-measure);
-    color: var(--color-on-measure);
-    font: var(--type-count);
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
-  }
-
-  /* The callout's dotted leader and its pin on the element */
-  :global(.inspect-leader) {
-    position: fixed;
-    border-top: 1px dashed var(--color-pin);
-  }
-
-  :global(.inspect-pin) {
-    position: fixed;
-    border-radius: var(--radius-pill);
-    background: var(--color-pin);
-    box-shadow: 0 0 0 2px var(--color-canvas);
-  }
-
-  /* The callout card */
-  :global(.inspect-panel) {
-    position: fixed;
-    z-index: 10201;
-    min-width: 14rem;
-    max-width: 24rem;
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-menu);
-    background: var(--color-canvas);
-    box-shadow: var(--shadow-floating);
-    pointer-events: none;
-  }
-
-  :global(.inspect-swatch) {
-    display: inline-block;
-    flex-shrink: 0;
-    width: 1rem;
-    height: 1rem;
-    border: var(--border-width) solid var(--color-hairline);
-    border-radius: var(--radius-base);
-  }
-
   .ds-mode-cta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3);
-  }
-
-  /* Bold (the font has no 500), so the part name stands above the rows */
-  :global(.inspect-panel-title) {
-    margin: 0 0 var(--space-2);
-    color: var(--color-ink);
-    font: var(--type-label);
-    font-weight: var(--weight-bold);
-    letter-spacing: var(--tracking-body);
-  }
-
-  :global(.inspect-panel dl) {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    gap: var(--space-2) var(--space-6);
-    margin: 0;
-    font: var(--type-compact);
-    letter-spacing: var(--tracking-body);
-  }
-
-  :global(.inspect-panel dt) {
-    color: var(--color-muted);
-  }
-
-  :global(.inspect-panel dd) {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin: 0;
-    color: var(--color-ink);
-    overflow-wrap: anywhere;
-  }
-
-  :global(.inspect-panel-note) {
-    margin: var(--space-2) 0 0;
-    color: var(--color-muted);
-    font: var(--type-compact);
-    letter-spacing: var(--tracking-body);
-  }
-
-  :global(.inspect-panel dd.is-untokened) {
-    color: var(--color-danger);
   }
 
   /* Motion previews: a square in a small stage, looping each animation with the site's real
@@ -1363,7 +1230,7 @@ const sectionTitleClass = 'subheading text-ink';
     gap: var(--space-2);
     width: 5.5rem;
     overflow: hidden;
-    animation: motion-nav 4s var(--ease-glide) infinite;
+    animation: motion-nav 4s var(--ease-standard) infinite;
   }
 
   .motion-nav-links span {
@@ -1418,7 +1285,7 @@ const sectionTitleClass = 'subheading text-ink';
     position: absolute;
     inset: 0;
     background: var(--color-overlay);
-    animation: motion-backdrop 3s var(--ease-morph) infinite;
+    animation: motion-backdrop 3s var(--ease-settle) infinite;
   }
 
   .is-overlay .motion-square {
@@ -1427,7 +1294,7 @@ const sectionTitleClass = 'subheading text-ink';
     left: var(--stage-pad);
     width: 1.5rem;
     height: 1.5rem;
-    animation: motion-overlay 3s var(--ease-morph) infinite;
+    animation: motion-overlay 3s var(--ease-settle) infinite;
   }
 
   @keyframes motion-backdrop {
@@ -1443,12 +1310,12 @@ const sectionTitleClass = 'subheading text-ink';
   }
 
   /* Colour mode: the new mode's colour rises behind a soft edge with a blur riding it (the
-     site's theme-wipe, 1s on the glide easing), holds, then fades back */
+     site's theme-wipe, 1s on the standard easing), holds, then fades back */
   .motion-mode,
   .motion-mode-blur {
     position: absolute;
     inset: 0;
-    animation: motion-mode 4s var(--ease-glide) infinite;
+    animation: motion-mode 4s var(--ease-standard) infinite;
   }
 
   .motion-mode {

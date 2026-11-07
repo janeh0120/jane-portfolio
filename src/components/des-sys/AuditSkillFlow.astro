@@ -1,0 +1,287 @@
+---
+// Case study diagram (/des-sys-audit): how the audit skill works. Two inputs (the component in a
+// local copy of production code, and the Figma component's YAML) go into the skill, which also pulls
+// usage guidance from the Intuit Design System MCP, and comes back as a prioritised table.
+// Rendered in HTML with role tokens so it follows the colour mode. Example rows are illustrative.
+
+// The same findings as the "before" button in InspectExample, so the report and the Inspect mode
+// callouts describe one example.
+const rows = [
+  {
+    property: 'Text colour',
+    figma: 'color-ink',
+    code: 'Hardcoded hex',
+    issue: 'Hardcoded',
+    priority: 'High',
+    guidance: 'Use the ink role so dark mode follows',
+  },
+  {
+    property: 'Type',
+    figma: 'type-compact',
+    code: 'type-body',
+    issue: 'Wrong role',
+    priority: 'Medium',
+    guidance: 'Controls use type-compact; body is for paragraphs',
+  },
+  {
+    property: 'Padding',
+    figma: 'space-2 · space-3',
+    code: '10px · 12px',
+    issue: 'Hardcoded',
+    priority: 'Low',
+    guidance: 'Snap to the 4px spacing grid',
+  },
+];
+---
+
+<figure class="audit-flow">
+  <div class="audit-flow-row">
+    <div class="audit-flow-col">
+      <div class="audit-card">
+        <span class="audit-card-kicker">Input</span>
+        <strong>Component in code</strong>
+        <span>Named in the prompt, read from a local copy of production code</span>
+      </div>
+      <div class="audit-card">
+        <span class="audit-card-kicker">Input</span>
+        <strong>Figma component data</strong>
+        <span>YAML pasted from the Figma component</span>
+      </div>
+    </div>
+
+    <svg class="audit-arrow" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6"></path>
+    </svg>
+
+    <div class="audit-flow-col">
+      <div class="audit-card is-skill">
+        <span class="audit-card-kicker">Skill</span>
+        <strong>Audit</strong>
+        <span>Compares every design and code property, then ranks what’s off</span>
+      </div>
+      <div class="audit-card is-source">
+        <span class="audit-card-kicker">Reads from</span>
+        <strong>Intuit Design System MCP</strong>
+        <span>Guidance on which token each part should use</span>
+      </div>
+    </div>
+  </div>
+
+  <svg class="audit-arrow is-down" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 5v14M6 13l6 6 6-6"></path>
+  </svg>
+
+  <div class="audit-report">
+    <div class="audit-report-title">
+      <strong>Output: misalignment report</strong>
+      <span>Secondary button</span>
+    </div>
+    <div class="audit-table-scroll" tabindex="0" role="region" aria-label="Example audit report">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Property</th>
+            <th scope="col">Design</th>
+            <th scope="col">Code</th>
+            <th scope="col">Issue</th>
+            <th scope="col">Priority</th>
+            <th scope="col">Guidance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((row) => (
+              <tr>
+                <th scope="row">{row.property}</th>
+                <td><code>{row.figma}</code></td>
+                <td><code>{row.code}</code></td>
+                <td><span class="tag">{row.issue}</span></td>
+                <td>{row.priority}</td>
+                <td class="audit-muted">{row.guidance}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <figcaption>
+    Intuit’s components are confidential, so this example audits a button from my own design system.
+  </figcaption>
+</figure>
+
+<style>
+  .audit-flow {
+    margin: var(--space-8) 0 0;
+  }
+
+  .audit-flow-row {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: center;
+  }
+
+  @media (min-width: 640px) {
+    .audit-flow-row {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+    }
+  }
+
+  .audit-flow-col {
+    display: grid;
+    gap: var(--space-3);
+    width: 100%;
+  }
+
+  /* The stat card panel, reused as a diagram node */
+  .audit-card {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  .audit-card strong {
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .audit-card span {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  .audit-card .audit-card-kicker {
+    color: var(--color-subtle);
+  }
+
+  /* The skill is the one inverted node, like the primary icon control */
+  .audit-card.is-skill {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+  }
+
+  .audit-card.is-skill strong,
+  .audit-card.is-skill span {
+    color: var(--color-canvas);
+  }
+
+  /* A source the skill reads from, not a step */
+  .audit-card.is-source {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--color-border-strong);
+  }
+
+  .audit-arrow {
+    width: var(--space-6);
+    height: var(--space-6);
+    fill: none;
+    stroke: var(--color-subtle);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transform: rotate(90deg);
+  }
+
+  .audit-arrow.is-down {
+    display: block;
+    margin: var(--space-3) auto;
+    transform: none;
+  }
+
+  @media (min-width: 640px) {
+    .audit-arrow {
+      transform: none;
+    }
+  }
+
+  .audit-report {
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+    overflow: hidden;
+  }
+
+  .audit-report-title {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .audit-report-title strong {
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .audit-report-title span {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
+  }
+
+  .audit-table-scroll {
+    overflow-x: auto;
+  }
+
+  .audit-table-scroll:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .audit-report table {
+    width: 100%;
+    min-width: var(--container-2xl);
+    border-collapse: collapse;
+    text-align: left;
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .audit-report th,
+  .audit-report td {
+    padding: var(--space-3) var(--space-4);
+    vertical-align: top;
+    color: var(--color-ink);
+  }
+
+  .audit-report thead th {
+    font-weight: var(--weight-medium);
+    color: var(--color-subtle);
+    background: var(--color-surface);
+  }
+
+  .audit-report tbody tr + tr th,
+  .audit-report tbody tr + tr td {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .audit-report tbody th {
+    font-weight: var(--weight-medium);
+  }
+
+  .audit-report code {
+    font: inherit;
+    color: var(--color-muted);
+  }
+
+  .audit-report .audit-muted {
+    color: var(--color-muted);
+  }
+
+  .audit-flow figcaption {
+    margin-top: var(--space-2);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+</style>

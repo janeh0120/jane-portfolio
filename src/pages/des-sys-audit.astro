@@ -1,0 +1,198 @@
+---
+// Exploration: an alternative telling of the Intuit half of the Design Systems case study, focused
+// on how the audit grew from token alignment to semantic compliance, and on what's still unproven
+// (time savings). Not linked from the homepage; see /des-sys for the live version.
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+import AuditSkillFlow from '../components/des-sys/AuditSkillFlow.astro';
+import AuditReviewLoop from '../components/des-sys/AuditReviewLoop.astro';
+import InspectExample from '../components/des-sys/InspectExample.astro';
+
+const img = (file: string) => `images/case-studies/des-sys/${file}`;
+
+const nav = [
+  { label: 'Overview', href: '#overview' },
+  { label: 'Problem: Scale', href: '#problem' },
+  { label: 'Approach: AI Audit', href: '#approach' },
+  { label: 'The Scope Grew', href: '#scope' },
+  { label: 'Review', href: '#review' },
+  { label: 'Challenge: Visual', href: '#visual' },
+  { label: 'Impact', href: '#impact' },
+  { label: 'Open Question', href: '#open-question' },
+  { label: 'Takeaway', href: '#takeaway' },
+];
+---
+
+<CaseStudyLayout
+  title="Design System Audit"
+  heading="Auditing an enterprise design system with AI"
+  role="Product Designer"
+  company="Intuit Design System"
+  team="Sole designer, 1 developer, guidance from 2 designers"
+  timeline="Jan – Mar 2026"
+  projectType="Design Systems"
+  nav={nav}
+  commentId="case-study-des-sys-audit"
+>
+  <section id="overview" data-comment-id="des-sys-audit-overview">
+    <h2 class="section-label">Overview</h2>
+    <p class="heading text-ink">
+      I set out to get design and code using the same tokens. It turned into a check on whether they
+      were the right tokens.
+    </p>
+  </section>
+
+  <section id="problem" data-comment-id="des-sys-audit-problem">
+    <h2 class="section-label">Problem</h2>
+    <p class="heading text-ink">A hardcoded value can look identical to a token, but it doesn’t scale.</p>
+    <p>
+      When the system changes a token, everything using it updates. A hardcoded value stays behind,
+      so mass changes quietly miss parts of the UI.
+    </p>
+    <div class="decision-row audit-row">
+      <CaseStudyFigure
+        src={img('token-alignment.webp')}
+        alt="Before and after: the checkbox label uses one font weight token in code and a semibold token in design, then both use the same token"
+      />
+    </div>
+  </section>
+
+  <section id="approach" data-comment-id="des-sys-audit-approach">
+    <h2 class="section-label">Approach</h2>
+    <p class="heading text-ink">AI skills audited each component, and I previewed the fixes in code.</p>
+    <p>
+      I gave the skill the component in code and its Figma data. It checked both against the Intuit
+      Design System MCP’s guidance and returned a prioritised report.
+    </p>
+    <AuditSkillFlow />
+  </section>
+
+  <section id="scope" data-comment-id="des-sys-audit-scope">
+    <h2 class="section-label">The scope grew</h2>
+    <p class="heading text-ink">Matching tokens wasn’t enough. A real token can still be the wrong one.</p>
+    <ol>
+      <li>
+        <h3>Alignment</h3>
+        <p>Is every value a token, and do design and code use the same one?</p>
+      </li>
+      <li>
+        <h3>Semantics</h3>
+        <p>Does the token fit the text’s place in the hierarchy? A label styled with a body token passes alignment but breaks meaning.</p>
+      </li>
+      <li>
+        <h3>Compliance</h3>
+        <p>Does the component follow the system’s written guidance? I extended the audit skill to check this too.</p>
+      </li>
+    </ol>
+    <p class="audit-after-figure">
+      Here’s the report’s button in Inspect mode. Switch to dark mode and the hardcoded text stops
+      following the theme.
+    </p>
+    <InspectExample />
+  </section>
+
+  <section id="review" data-comment-id="des-sys-audit-review">
+    <h2 class="section-label">Review</h2>
+    <p class="heading text-ink">The report was a starting point. Every recommendation went through me.</p>
+    <p>
+      I fixed Figma where the change was clear and tested code changes in Cursor. Instead of handing
+      developers a list of issues, I opened my own PRs.
+    </p>
+    <AuditReviewLoop />
+  </section>
+
+  <section id="visual" data-comment-id="des-sys-audit-visual">
+    <h2 class="section-label">Challenge</h2>
+    <p class="heading text-ink">But 1 to 1 token alignment can still look misaligned.</p>
+    <p>
+      Figma sets line height as a percentage while code uses a multiplier, and text aligns
+      differently in each. The same token can leave text sitting slightly off.
+    </p>
+    <p>
+      Matching them meant adding small shims in design or code. These intentionally break 1 to 1
+      alignment to get visual alignment.
+    </p>
+    <div class="decision-row audit-row">
+      <CaseStudyFigure
+        src={img('visual-alignment.webp')}
+        alt="Illustration: a checkbox label uses the same token in code and design but sits higher in code, then a hardcoded padding value lines it up"
+      />
+    </div>
+  </section>
+
+  <section id="impact" data-comment-id="des-sys-audit-impact">
+    <h2 class="section-label">Impact</h2>
+    <p class="heading text-ink">I audited and updated 3 core components before the work was deprioritized.</p>
+    <p>Small in count, wide in reach. For the checkbox alone:</p>
+    <div class="case-study-stats">
+      <div class="case-study-stat">
+        <strong>355k+</strong>
+        <span>instances of checkbox in Figma</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>143</strong>
+        <span>business units use checkbox in code</span>
+      </div>
+      <div class="case-study-stat">
+        <strong>164</strong>
+        <span>design teams use checkbox</span>
+      </div>
+    </div>
+    <p class="audit-after-figure">
+      Priorities shift in a system this size. The audit skill stayed, so anyone can run it on the next
+      component.
+    </p>
+    <!-- TODO(Jane): issues found per component (hardcoded / wrong token / semantic), PRs merged. -->
+  </section>
+
+  <section id="open-question" data-comment-id="des-sys-audit-open-question">
+    <h2 class="section-label">Open question</h2>
+    <p class="heading text-ink">Did it save time? Honestly, I don’t know.</p>
+    <p>
+      Each component still took a while. AI made finding issues cheap, but deciding what to do about
+      them didn’t get faster.
+    </p>
+    <h3 class="audit-subhead">Where the time went</h3>
+    <ol>
+      <li>
+        <h3>Choosing the right semantic token</h3>
+        <p>The skill could flag a mismatch, but picking the fix meant reading the guidance.</p>
+      </li>
+      <li>
+        <h3>Breaking alignment on purpose</h3>
+        <p>Visual fixes needed judgment the audit couldn’t make.</p>
+      </li>
+      <li>
+        <h3>Reviewing what AI flagged</h3>
+        <p>Every finding still needed a person to confirm it.</p>
+      </li>
+    </ol>
+    <h3 class="audit-subhead">How I’d measure it next time</h3>
+    <p>
+      Time a manual audit and an AI-assisted one on the same component. Track issues found by type,
+      false positives, and handoff rounds, not just hours.
+    </p>
+  </section>
+
+  <section id="takeaway" data-comment-id="des-sys-audit-takeaway">
+    <h2 class="section-label">Takeaway</h2>
+    <p class="heading text-ink">AI made the audit more thorough, not necessarily faster.</p>
+    <p>The judgment is still the work, so the system has to make that judgment easy to check.</p>
+  </section>
+</CaseStudyLayout>
+
+<style>
+  /* Sub-sections within a section; specific enough to beat the layout's h3 reset */
+  :global(.case-study-content) section > h3.audit-subhead {
+    margin: var(--space-10) 0 var(--space-3);
+  }
+
+  /* A statement's figure, sitting below the statement */
+  :global(.case-study-content) section > .audit-row {
+    margin-top: var(--space-4);
+  }
+
+  :global(.case-study-content) section > p.audit-after-figure {
+    margin-top: var(--space-8);
+  }
+</style>
