@@ -1,12 +1,12 @@
 ---
 // Exploration: an alternative telling of the Intuit half of the Design Systems case study, focused
 // on how the audit grew from token alignment to semantic compliance, and on what's still unproven
-// (time savings). Not linked from the homepage; see /des-sys for the live version.
+// (time savings). This is the version the homepage card links to; /des-sys is the older combined one.
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
 import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 import AuditSkillFlow from '../components/des-sys/AuditSkillFlow.astro';
 import AuditReviewLoop from '../components/des-sys/AuditReviewLoop.astro';
-import InspectExample from '../components/des-sys/InspectExample.astro';
+import TokenCompare from '../components/des-sys/TokenCompare.astro';
 
 const img = (file: string) => `images/case-studies/des-sys/${file}`;
 
@@ -33,6 +33,11 @@ const nav = [
   projectType="Design Systems"
   nav={nav}
   commentId="case-study-des-sys-audit"
+  heroImage={{
+    src: 'images/case-study-heroes/dessys.png',
+    alt: 'A checkbox component with its label annotated with the --text-primary colour and --font-weight-component tokens',
+    wide: true,
+  }}
 >
   <section id="overview" data-comment-id="des-sys-audit-overview">
     <h2 class="section-label">Overview</h2>
@@ -49,12 +54,7 @@ const nav = [
       When the system changes a token, everything using it updates. A hardcoded value stays behind,
       so mass changes quietly miss parts of the UI.
     </p>
-    <div class="decision-row audit-row">
-      <CaseStudyFigure
-        src={img('token-alignment.webp')}
-        alt="Before and after: the checkbox label uses one font weight token in code and a semibold token in design, then both use the same token"
-      />
-    </div>
+    <TokenCompare example="checkbox" />
   </section>
 
   <section id="approach" data-comment-id="des-sys-audit-approach">
@@ -85,10 +85,10 @@ const nav = [
       </li>
     </ol>
     <p class="audit-after-figure">
-      Here’s the report’s button in Inspect mode. Switch to dark mode and the hardcoded text stops
-      following the theme.
+      Here’s the report’s button. Its type is a real token, just the wrong role. Switch to dark mode
+      and the hardcoded text stops following the theme.
     </p>
-    <InspectExample />
+    <TokenCompare example="button" />
   </section>
 
   <section id="review" data-comment-id="des-sys-audit-review">

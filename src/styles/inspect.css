@@ -1,7 +1,6 @@
 /* Inspect mode, styled like Figma's dev mode: the selection box, padding measurements, and the
    callout card (with its leader and pin) that lists a component's tokens. Built by
-   src/lib/token-inspector.ts on /design-system, and shown as static callouts in case study
-   illustrations (src/components/des-sys/InspectExample.astro). */
+   src/lib/token-inspector.ts on /design-system. */
 
 /* Inspect overlay, in the style of Figma's dev mode. Above everything in the specimens,
    including the open dropdown menu (z-index 10100). */

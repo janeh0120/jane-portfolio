@@ -1,0 +1,294 @@
+---
+// Case study illustration (/des-sys-audit): one component rendered as design specifies it and as
+// code builds it, side by side, with a Before/After toggle for the audit's fix. Each example lists
+// only the properties its section is about, so the mismatch the story turns on is the only thing
+// highlighted. Rendered in HTML with role tokens so it follows the colour mode.
+//
+// Without JavaScript the toggle stays hidden and the "before" state shows, since that's the problem
+// each section describes; the caption states the fix.
+import ArrowIcon from '../ArrowIcon.astro';
+
+type Side = { before: string; after: string };
+type Row = { property: string; design: Side; code: Side; issue: string };
+
+interface Props {
+  example: 'checkbox' | 'button';
+}
+
+const { example } = Astro.props;
+
+const examples: Record<Props['example'], { title: string; caption: string; rows: Row[] }> = {
+  // Intuit's checkbox label, from the original token alignment illustration
+  checkbox: {
+    title: 'Checkbox label',
+    caption:
+      'Design and code each used a real token, just different ones. After the audit, both use --font-weight-component.',
+    rows: [
+      {
+        property: 'Weight',
+        design: { before: '--font-weight-component-semibold', after: '--font-weight-component' },
+        code: { before: '--font-weight-component', after: '--font-weight-component' },
+        issue: 'Mismatch',
+      },
+    ],
+  },
+  // The "before" button in the audit report (AuditSkillFlow), from my own design system
+  button: {
+    title: 'Secondary button',
+    caption:
+      'My portfolio’s secondary button. Before recreates the kinds of values the audit flags; after is the shipped button.',
+    rows: [
+      {
+        property: 'Type',
+        design: { before: 'type-compact', after: 'type-compact' },
+        code: { before: 'type-body', after: 'type-compact' },
+        issue: 'Wrong role',
+      },
+      {
+        property: 'Text',
+        design: { before: 'color-ink', after: 'color-ink' },
+        // design-tokens-ignore: label quoting the hardcoded colour, not a style
+        code: { before: '#1f1f1f', after: 'color-ink' },
+        issue: 'Hardcoded',
+      },
+    ],
+  },
+};
+
+const { title, caption, rows } = examples[example];
+
+const sides = [
+  { id: 'design', label: 'Design' },
+  { id: 'code', label: 'Code' },
+] as const;
+---
+
+<figure class="token-compare" data-example={example} data-state="before" data-token-compare>
+  <div class="token-compare-head">
+    <p class="token-compare-title">{title}</p>
+    <div class="segmented" role="group" aria-label={`Show ${title.toLowerCase()} before or after the audit`} hidden>
+      <span class="segmented-thumb" aria-hidden="true"></span>
+      <button type="button" class="segmented-option" data-state-choice="before" aria-pressed="true">Before</button>
+      <button type="button" class="segmented-option" data-state-choice="after" aria-pressed="false">After</button>
+    </div>
+  </div>
+
+  <div class="token-compare-cols">
+    {
+      sides.map((side) => (
+        <div class="token-compare-col" data-side={side.id}>
+          <p class="token-compare-side">{side.label}</p>
+
+          <div class="token-compare-stage" aria-hidden="true">
+            {example === 'checkbox' ? (
+              <span class="token-compare-checkbox">
+                <span class="token-compare-box" />
+                <span class="token-compare-target">Mango</span>
+              </span>
+            ) : (
+              <span class="button is-secondary token-compare-target">
+                <ArrowIcon direction="left" size="0.9em" />
+                Back
+              </span>
+            )}
+          </div>
+
+          <dl class="token-compare-specs">
+            {rows.map((row) => {
+              const value = row[side.id];
+              // The side the audit changed is the one that was off
+              const flagged = value.before !== value.after;
+              return (
+                <div class="token-compare-spec">
+                  <dt>{row.property}</dt>
+                  <dd>
+                    <code data-when="before" class:list={[flagged && 'is-flagged']}>
+                      {value.before}
+                    </code>
+                    <code data-when="after">{value.after}</code>
+                    {flagged && (
+                      <span class="tag" data-when="before">
+                        {row.issue}
+                      </span>
+                    )}
+                  </dd>
+                </div>
+              );
+            })}
+          </dl>
+        </div>
+      ))
+    }
+  </div>
+
+  <figcaption>{caption}</figcaption>
+</figure>
+
+<script>
+  // Turn on each figure's Before/After toggle. Without this, the figure shows "before".
+  document.querySelectorAll<HTMLElement>('[data-token-compare]').forEach((figure) => {
+    const toggle = figure.querySelector<HTMLElement>('.segmented');
+    if (!toggle) return;
+    const options = toggle.querySelectorAll<HTMLButtonElement>('[data-state-choice]');
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        figure.dataset.state = option.dataset.stateChoice;
+        options.forEach((o) => o.setAttribute('aria-pressed', String(o === option)));
+      });
+    });
+    toggle.hidden = false;
+  });
+</script>
+
+<style>
+  .token-compare {
+    margin: var(--space-8) 0 0;
+  }
+
+  .token-compare-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .token-compare p.token-compare-title {
+    margin: 0;
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  /* Design and code side by side, the comparison is the point; stacked on phones */
+  .token-compare-cols {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 640px) {
+    .token-compare-cols {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .token-compare-col {
+    display: grid;
+    align-content: start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5) var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  .token-compare p.token-compare-side {
+    margin: 0;
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  .token-compare-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--space-24) + var(--space-4));
+    background: var(--color-canvas);
+    border-radius: var(--radius-base);
+  }
+
+  /* The part the rows describe, selected as in Inspect mode */
+  .token-compare-target {
+    outline: 1px solid var(--color-accent);
+    outline-offset: var(--space-1);
+  }
+
+  /* Checkbox: Intuit's, recreated. Weight is the only thing that changes */
+  .token-compare-checkbox {
+    --label-weight: var(--weight-regular);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font: var(--type-subheading);
+    font-weight: var(--label-weight);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .token-compare-box {
+    width: 1em;
+    height: 1em;
+    border: calc(var(--border-width) * 3) solid var(--color-muted);
+    /* Half the base radius, so a 1em box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  .token-compare[data-state='before'] [data-side='design'] .token-compare-checkbox {
+    --label-weight: var(--weight-bold);
+  }
+
+  /* Button: code's "before" uses the body type style and a hardcoded near-ink */
+  .token-compare-stage .button {
+    cursor: default;
+    transition: none;
+  }
+
+  .token-compare[data-state='before'] [data-side='code'] .button {
+    font: var(--type-body);
+    /* design-tokens-ignore: deliberately hardcoded, to show what the audit flags */
+    color: #1f1f1f;
+  }
+
+  /* Only the properties the section is about */
+  .token-compare-specs {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .token-compare-spec {
+    display: grid;
+    grid-template-columns: var(--space-12) minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: baseline;
+  }
+
+  .token-compare-spec dt {
+    color: var(--color-muted);
+  }
+
+  .token-compare-spec dd {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    margin: 0;
+    min-width: 0;
+  }
+
+  .token-compare-spec code {
+    font: inherit;
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
+  }
+
+  .token-compare-spec code.is-flagged {
+    color: var(--color-danger);
+  }
+
+  .token-compare[data-state='before'] [data-when='after'],
+  .token-compare[data-state='after'] [data-when='before'] {
+    display: none;
+  }
+
+  .token-compare figcaption {
+    margin-top: var(--space-2);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+</style>

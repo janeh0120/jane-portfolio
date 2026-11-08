@@ -84,11 +84,11 @@
       "comingSoon": false
     },
     {
-      "slug": "des-sys",
-      "name": "Design Systems",
+      "slug": "des-sys-audit",
+      "name": "Design System Audit",
       "tags": ["design systems", "shipped"],
-      "title": "Learning design systems, then building one from the ground up",
-      "image": "images/case-study-heroes/dessys-colour-mode.webp",
+      "title": "Auditing an enterprise design system with AI",
+      "image": "images/case-study-heroes/dessys.png",
       "comingSoon": false
     },
     {
