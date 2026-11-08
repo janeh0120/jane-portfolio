@@ -1,32 +1,30 @@
 ---
-// Exploration: an alternative telling of the Intuit half of the Design Systems case study, focused
-// on how the audit grew from token alignment to semantic compliance, and on what's still unproven
-// (time savings). This is the version the homepage card links to; /des-sys is the older combined one.
+// The Intuit design system audit, in Jane's own words from her draft (grammar fixes only): context,
+// problems, the manual audit, the AI skill, the documentation opportunity, final solution, impact,
+// and reflection. Visuals sit where they illustrate each point. This is the version the homepage card links to; /des-sys is the older combined one.
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
-import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 import AuditSkillFlow from '../components/des-sys/AuditSkillFlow.astro';
 import AuditReviewLoop from '../components/des-sys/AuditReviewLoop.astro';
 import TokenCompare from '../components/des-sys/TokenCompare.astro';
-
-const img = (file: string) => `images/case-studies/des-sys/${file}`;
+import ProblemVisual from '../components/des-sys/ProblemVisual.astro';
 
 const nav = [
-  { label: 'Overview', href: '#overview' },
-  { label: 'Problem: Scale', href: '#problem' },
-  { label: 'Approach: AI Audit', href: '#approach' },
-  { label: 'The Scope Grew', href: '#scope' },
-  { label: 'Review', href: '#review' },
-  { label: 'Challenge: Visual', href: '#visual' },
+  { label: 'Context', href: '#context' },
+  { label: 'Problem', href: '#problem' },
+  { label: 'Solution', href: '#solution' },
+  { label: 'Opportunity: AI', href: '#opportunity' },
+  { label: 'New Solution', href: '#new-solution' },
+  { label: 'Opportunity: Docs', href: '#opportunity-docs' },
+  { label: 'Final Solution', href: '#final' },
   { label: 'Impact', href: '#impact' },
-  { label: 'Open Question', href: '#open-question' },
-  { label: 'Takeaway', href: '#takeaway' },
+  { label: 'Reflection', href: '#reflection' },
 ];
 ---
 
 <CaseStudyLayout
   title="Design System Audit"
   heading="Auditing an enterprise design system with AI"
-  role="Product Designer"
+  role="Product Design Intern"
   company="Intuit Design System"
   team="Sole designer, 1 developer, guidance from 2 designers"
   timeline="Jan – Mar 2026"
@@ -39,91 +37,63 @@ const nav = [
     wide: true,
   }}
 >
-  <section id="overview" data-comment-id="des-sys-audit-overview">
-    <h2 class="section-label">Overview</h2>
-    <p class="heading text-ink">
-      I set out to get design and code using the same tokens. It turned into a check on whether they
-      were the right tokens.
-    </p>
+  <section id="context" data-comment-id="des-sys-audit-context">
+    <h2 class="section-label">Context</h2>
+    <p class="heading text-ink">As an intern on the Intuit Design System team, I was tasked with auditing components to ensure token alignment between design and code.</p>
   </section>
 
   <section id="problem" data-comment-id="des-sys-audit-problem">
     <h2 class="section-label">Problem</h2>
-    <p class="heading text-ink">A hardcoded value can look identical to a token, but it doesn’t scale.</p>
-    <p>
-      When the system changes a token, everything using it updates. A hardcoded value stays behind,
-      so mass changes quietly miss parts of the UI.
-    </p>
-    <TokenCompare example="checkbox" />
+    <ol>
+      <li>
+        <h3>Design handoff is less reliable</h3>
+        <p>Handoff breaks down when components aren’t 1-to-1 between prototypes and implementation.</p>
+        <ProblemVisual kind="handoff" />
+      </li>
+      <li>
+        <h3>Hardcoded values bypass tokens</h3>
+        <p>Hardcoded values in components skip tokens, so global theme updates never reach the UI.</p>
+        <ProblemVisual kind="hardcoded" />
+      </li>
+    </ol>
   </section>
 
-  <section id="approach" data-comment-id="des-sys-audit-approach">
-    <h2 class="section-label">Approach</h2>
-    <p class="heading text-ink">AI skills audited each component, and I previewed the fixes in code.</p>
-    <p>
-      I gave the skill the component in code and its Figma data. It checked both against the Intuit
-      Design System MCP’s guidance and returned a prioritised report.
-    </p>
+  <section id="solution" data-comment-id="des-sys-audit-solution">
+    <h2 class="section-label">Solution</h2>
+    <p class="heading text-ink">Manually auditing components for token misalignment between design and code can be slow and tedious.</p>
+    <!-- TODO(Jane): replace with the manual audit image (16:9). -->
+    <div class="audit-placeholder" role="img" aria-label="Placeholder for the manual audit image">
+      <span>Image placeholder · 16:9</span>
+    </div>
+  </section>
+
+  <section id="opportunity" data-comment-id="des-sys-audit-opportunity">
+    <h2 class="section-label">Opportunity</h2>
+    <p class="heading text-ink">How might we use AI to make auditing faster and less prone to missing misalignments?</p>
+  </section>
+
+  <section id="new-solution" data-comment-id="des-sys-audit-new-solution">
+    <h2 class="section-label">New solution</h2>
+    <p class="heading text-ink">I built an AI skill that checks a component’s code and design to point out inconsistencies.</p>
     <AuditSkillFlow />
   </section>
 
-  <section id="scope" data-comment-id="des-sys-audit-scope">
-    <h2 class="section-label">The scope grew</h2>
-    <p class="heading text-ink">Matching tokens wasn’t enough. A real token can still be the wrong one.</p>
-    <ol>
-      <li>
-        <h3>Alignment</h3>
-        <p>Is every value a token, and do design and code use the same one?</p>
-      </li>
-      <li>
-        <h3>Semantics</h3>
-        <p>Does the token fit the text’s place in the hierarchy? A label styled with a body token passes alignment but breaks meaning.</p>
-      </li>
-      <li>
-        <h3>Compliance</h3>
-        <p>Does the component follow the system’s written guidance? I extended the audit skill to check this too.</p>
-      </li>
-    </ol>
-    <p class="audit-after-figure">
-      Here’s the report’s button. Its type is a real token, just the wrong role. Switch to dark mode
-      and the hardcoded text stops following the theme.
-    </p>
+  <section id="opportunity-docs" data-comment-id="des-sys-audit-opportunity-docs">
+    <h2 class="section-label">Opportunity</h2>
+    <p class="heading text-ink">Design system alignment isn’t just about alignment between design and code, but also compliance with documentation.</p>
+    <p>How might we refine skills to make recommendations on correct token usage based on design system documentation?</p>
     <TokenCompare example="button" />
   </section>
 
-  <section id="review" data-comment-id="des-sys-audit-review">
-    <h2 class="section-label">Review</h2>
-    <p class="heading text-ink">The report was a starting point. Every recommendation went through me.</p>
-    <p>
-      I fixed Figma where the change was clear and tested code changes in Cursor. Instead of handing
-      developers a list of issues, I opened my own PRs.
-    </p>
+  <section id="final" data-comment-id="des-sys-audit-final">
+    <h2 class="section-label">Final solution</h2>
+    <!-- TODO(Jane): final solution copy. -->
     <AuditReviewLoop />
-  </section>
-
-  <section id="visual" data-comment-id="des-sys-audit-visual">
-    <h2 class="section-label">Challenge</h2>
-    <p class="heading text-ink">But 1 to 1 token alignment can still look misaligned.</p>
-    <p>
-      Figma sets line height as a percentage while code uses a multiplier, and text aligns
-      differently in each. The same token can leave text sitting slightly off.
-    </p>
-    <p>
-      Matching them meant adding small shims in design or code. These intentionally break 1 to 1
-      alignment to get visual alignment.
-    </p>
-    <div class="decision-row audit-row">
-      <CaseStudyFigure
-        src={img('visual-alignment.webp')}
-        alt="Illustration: a checkbox label uses the same token in code and design but sits higher in code, then a hardcoded padding value lines it up"
-      />
-    </div>
   </section>
 
   <section id="impact" data-comment-id="des-sys-audit-impact">
     <h2 class="section-label">Impact</h2>
-    <p class="heading text-ink">I audited and updated 3 core components before the work was deprioritized.</p>
-    <p>Small in count, wide in reach. For the checkbox alone:</p>
+    <!-- TODO(Jane): impact copy. -->
     <div class="case-study-stats">
       <div class="case-study-stat">
         <strong>355k+</strong>
@@ -138,61 +108,27 @@ const nav = [
         <span>design teams use checkbox</span>
       </div>
     </div>
-    <p class="audit-after-figure">
-      Priorities shift in a system this size. The audit skill stayed, so anyone can run it on the next
-      component.
-    </p>
-    <!-- TODO(Jane): issues found per component (hardcoded / wrong token / semantic), PRs merged. -->
   </section>
 
-  <section id="open-question" data-comment-id="des-sys-audit-open-question">
-    <h2 class="section-label">Open question</h2>
-    <p class="heading text-ink">Did it save time? Honestly, I don’t know.</p>
-    <p>
-      Each component still took a while. AI made finding issues cheap, but deciding what to do about
-      them didn’t get faster.
-    </p>
-    <h3 class="audit-subhead">Where the time went</h3>
-    <ol>
-      <li>
-        <h3>Choosing the right semantic token</h3>
-        <p>The skill could flag a mismatch, but picking the fix meant reading the guidance.</p>
-      </li>
-      <li>
-        <h3>Breaking alignment on purpose</h3>
-        <p>Visual fixes needed judgment the audit couldn’t make.</p>
-      </li>
-      <li>
-        <h3>Reviewing what AI flagged</h3>
-        <p>Every finding still needed a person to confirm it.</p>
-      </li>
-    </ol>
-    <h3 class="audit-subhead">How I’d measure it next time</h3>
-    <p>
-      Time a manual audit and an AI-assisted one on the same component. Track issues found by type,
-      false positives, and handoff rounds, not just hours.
-    </p>
-  </section>
-
-  <section id="takeaway" data-comment-id="des-sys-audit-takeaway">
-    <h2 class="section-label">Takeaway</h2>
-    <p class="heading text-ink">AI made the audit more thorough, not necessarily faster.</p>
-    <p>The judgment is still the work, so the system has to make that judgment easy to check.</p>
+  <section id="reflection" data-comment-id="des-sys-audit-reflection">
+    <h2 class="section-label">Reflection</h2>
+    <!-- TODO(Jane): reflection and takeaways copy. -->
   </section>
 </CaseStudyLayout>
 
 <style>
-  /* Sub-sections within a section; specific enough to beat the layout's h3 reset */
-  :global(.case-study-content) section > h3.audit-subhead {
-    margin: var(--space-10) 0 var(--space-3);
-  }
-
-  /* A statement's figure, sitting below the statement */
-  :global(.case-study-content) section > .audit-row {
-    margin-top: var(--space-4);
-  }
-
-  :global(.case-study-content) section > p.audit-after-figure {
+  /* The manual audit image's slot, held at 16:9 until the real image replaces it */
+  .audit-placeholder {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 9;
     margin-top: var(--space-8);
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-base);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
   }
 </style>
+

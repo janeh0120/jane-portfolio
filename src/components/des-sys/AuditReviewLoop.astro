@@ -1,14 +1,30 @@
 ---
 // Case study diagram (/des-sys-audit): what happens after the skill's report. Every recommendation
 // goes through a person: verify it, fix Figma, test the code in Cursor, compare the two, and shim
-// where rendering differences leave them visibly off. The last two steps repeat until they match.
+// where rendering differences leave them visibly off. The last two steps repeat until they match,
+// so they sit together in a dashed loop panel. Every step has a small illustration of the same
+// (illustrative) checkbox: the findings checked, the Figma fix, the code diff, then the label in
+// design and code against one baseline, before and after a 2px shim. Rendered in HTML with role
+// tokens so it follows the colour mode.
+import { Icon } from 'astro-icon/components';
 
 const steps = [
-  { title: 'Verify', body: 'Check each recommendation and why it was flagged' },
-  { title: 'Fix Figma', body: 'Make the design changes that are clearly needed' },
-  { title: 'Test in code', body: 'Apply the code changes in Cursor and preview them' },
-  { title: 'Compare', body: 'Put design and code side by side to catch visual drift' },
-  { title: 'Shim', body: 'Where text sits differently, add a small offset in design or code' },
+  { title: 'Verify', body: 'Check each recommendation and why it was flagged', visual: 'verify' },
+  { title: 'Fix Figma', body: 'Make the design changes that are clearly needed', visual: 'figma' },
+  { title: 'Test in code', body: 'Apply the code changes in Cursor and preview them', visual: 'code' },
+] as const;
+
+const loopSteps = [
+  {
+    title: 'Compare',
+    body: 'Put design and code side by side. Same token, but the code text sits higher.',
+    shimmed: false,
+  },
+  {
+    title: 'Shim',
+    body: 'Add a small offset so the text lands on the same line, here 2px of top padding in code.',
+    shimmed: true,
+  },
 ];
 ---
 
@@ -16,21 +32,101 @@ const steps = [
   <ol class="audit-loop-steps">
     {
       steps.map((step, i) => (
-        <li class:list={['audit-step', i >= 3 && 'is-looped']}>
+        <li class="audit-step">
           <span class="audit-step-number">{i + 1}</span>
           <strong>{step.title}</strong>
           <span class="audit-step-body">{step.body}</span>
+
+          <div class="audit-visual" aria-hidden="true">
+            {step.visual === 'verify' && (
+              <ul class="audit-verify">
+                <li>
+                  <span>Weight mismatch</span>
+                  <Icon name="lucide:check" class="audit-verdict" />
+                </li>
+                <li class="is-dismissed">
+                  <span>Hardcoded padding</span>
+                  <Icon name="lucide:x" class="audit-verdict" />
+                  <small>A 2px shim, kept on purpose</small>
+                </li>
+              </ul>
+            )}
+            {step.visual === 'figma' && (
+              <div class="audit-figma">
+                <span class="audit-drift-label">
+                  <span class="audit-drift-box" />
+                  <span class="audit-drift-text">Mango</span>
+                </span>
+                <p class="audit-figma-prop">
+                  <span>Weight</span>
+                  <del>Semibold</del>
+                  <ins>Regular</ins>
+                </p>
+              </div>
+            )}
+            {step.visual === 'code' && (
+              <div class="audit-diff">
+                <code class="is-removed">
+                  <span>-</span>
+                  {/* design-tokens-ignore: diff text quoting a hardcoded colour, not a style */}
+                  color: #1f1f1f
+                </code>
+                <code class="is-added">
+                  <span>+</span>
+                  color: --text-primary
+                </code>
+              </div>
+            )}
+          </div>
         </li>
       ))
     }
   </ol>
-  <div class="audit-loop-repeat">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4"></path>
-    </svg>
-    <span>Steps 4 and 5 repeat until design and code match</span>
+
+  <div class="audit-loop-panel">
+    <div class="audit-loop-repeat">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4"></path>
+      </svg>
+      <span>Steps 4 and 5 repeat until design and code match</span>
+    </div>
+
+    <ol class="audit-loop-steps is-looped" start="4">
+      {
+        loopSteps.map((step, i) => (
+          <li class="audit-step">
+            <span class="audit-step-number">{i + 4}</span>
+            <strong>{step.title}</strong>
+            <span class="audit-step-body">{step.body}</span>
+
+            <div class:list={['audit-drift', step.shimmed && 'is-shimmed']} aria-hidden="true">
+              <span class="audit-drift-side">Design</span>
+              <span class="audit-drift-side">Code</span>
+              <div class="audit-drift-rows">
+                <span class="audit-drift-label">
+                  <span class="audit-drift-box" />
+                  <span class="audit-drift-text">Mango</span>
+                </span>
+                <span class="audit-drift-label is-code">
+                  <span class="audit-drift-box" />
+                  <span class="audit-drift-text">
+                    Mango
+                    {step.shimmed && <span class="audit-drift-shim">padding-top: 2px</span>}
+                  </span>
+                </span>
+                <span class="audit-drift-line" />
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
   </div>
-  <figcaption>Every step after the report is a judgment call, which is where most of the time went.</figcaption>
+
+  <figcaption>
+    Every step after the report is a judgment call, which is where most of the time went. The
+    checkbox is an illustrative example.
+  </figcaption>
 </figure>
 
 <style>
@@ -49,14 +145,19 @@ const steps = [
 
   @media (min-width: 640px) {
     .audit-loop ol.audit-loop-steps {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .audit-loop ol.audit-loop-steps.is-looped {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   /* The stat card panel, reused as a step */
+  /* A column, so each illustration grows to the card's bottom and the row's stages line up */
   .audit-step {
-    display: grid;
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     gap: var(--space-1);
     padding: var(--space-4);
     background: var(--color-surface);
@@ -64,13 +165,8 @@ const steps = [
     border-radius: var(--radius-base);
   }
 
-  /* The repeating steps: dashed, to tie them to the loop note below */
-  .audit-step.is-looped {
-    border-style: dashed;
-    border-color: var(--color-border-strong);
-  }
-
   .audit-step-number {
+    align-self: flex-start;
     display: inline-grid;
     place-items: center;
     width: var(--space-6);
@@ -94,24 +190,22 @@ const steps = [
     color: var(--color-muted);
   }
 
+  /* The repeating steps share one dashed panel, headed by the loop note */
+  .audit-loop-panel {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-base);
+  }
+
   .audit-loop-repeat {
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    margin-top: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border: 1px dashed var(--color-border-strong);
-    border-radius: var(--radius-base);
+    padding: var(--space-1) var(--space-1) var(--space-3);
     font: var(--type-compact);
     letter-spacing: var(--tracking-body);
     color: var(--color-muted);
-  }
-
-  /* On wide screens the note sits under steps 4 and 5 only */
-  @media (min-width: 640px) {
-    .audit-loop-repeat {
-      margin-left: calc(60% + var(--space-3) * 0.6);
-    }
   }
 
   .audit-loop-repeat svg {
@@ -123,6 +217,203 @@ const steps = [
     stroke-width: 1.5;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  /* The illustration: design and code labels against one shared baseline */
+  .audit-drift {
+    flex: 1 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: center;
+    gap: var(--space-2) var(--space-4);
+    margin-top: var(--space-3);
+    padding: var(--space-4) var(--space-5) var(--space-6);
+    background: var(--color-canvas);
+    border-radius: var(--radius-base);
+  }
+
+  /* Every step's illustration sits on the same canvas panel */
+  .audit-visual {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-canvas);
+    border-radius: var(--radius-base);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  /* 1. Verify: the findings, one confirmed and one dismissed */
+  .audit-loop ul.audit-verify {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .audit-verify li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0 var(--space-2);
+  }
+
+  .audit-verify .audit-verdict {
+    width: var(--space-4);
+    height: var(--space-4);
+  }
+
+  .audit-verify li.is-dismissed {
+    color: var(--color-subtle);
+  }
+
+  .audit-verify li.is-dismissed > span {
+    text-decoration: line-through;
+  }
+
+  .audit-verify small {
+    grid-column: 1 / -1;
+    font: var(--type-count);
+    color: var(--color-subtle);
+  }
+
+  /* 2. Fix Figma: the label, with its weight changed in the properties */
+  .audit-figma {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  .audit-loop .audit-figma p.audit-figma-prop {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-2);
+    margin: 0;
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .audit-figma-prop span {
+    color: var(--color-subtle);
+  }
+
+  .audit-figma-prop del {
+    color: var(--color-subtle);
+  }
+
+  .audit-figma-prop ins {
+    text-decoration: none;
+  }
+
+  /* 3. Test in code: the change as a two-line diff */
+  .audit-diff {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .audit-diff code {
+    display: flex;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-base);
+    font: inherit;
+    overflow-wrap: anywhere;
+  }
+
+  .audit-diff code span {
+    flex: none;
+    color: var(--color-subtle);
+  }
+
+  .audit-diff code.is-removed {
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+  }
+
+  .audit-diff code.is-added {
+    background: var(--color-fill);
+    color: var(--color-ink);
+  }
+
+  .audit-drift-side {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
+  }
+
+  .audit-drift-rows {
+    position: relative;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    align-items: end;
+    /* Room for the shim label above the code text */
+    padding-top: var(--space-8);
+  }
+
+  .audit-drift-label {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+    /* Large, so a 2px drift is visible */
+    font: var(--type-heading);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .audit-drift-box {
+    flex: none;
+    /* Cap height, so the box sits on the baseline and lines up with the capitals */
+    width: 0.7em;
+    height: 0.7em;
+    border: calc(var(--border-width) * 3) solid var(--color-muted);
+    /* Half the base radius, so a small box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  /* Trimmed to cap height and baseline, so the box's bottom edge is the text's baseline */
+  .audit-drift-text {
+    position: relative;
+    text-box: trim-both cap alphabetic;
+  }
+
+  /* Same token, but code renders the text higher: half a spacing step, 2px */
+  .audit-drift-label.is-code .audit-drift-text {
+    transform: translateY(calc(var(--space-1) / -2));
+  }
+
+  .audit-drift.is-shimmed .audit-drift-label.is-code .audit-drift-text {
+    transform: none;
+  }
+
+  /* The baseline both labels should sit on, in Inspect mode's measurement colour */
+  .audit-drift-line {
+    position: absolute;
+    left: calc(var(--space-2) * -1);
+    right: calc(var(--space-2) * -1);
+    bottom: 0;
+    border-top: 1px dashed var(--color-measure);
+  }
+
+  .audit-drift-shim {
+    position: absolute;
+    left: 0;
+    bottom: calc(100% + var(--space-2));
+    padding: var(--space-inset) var(--space-1);
+    border-radius: var(--radius-base);
+    background: var(--color-measure);
+    color: var(--color-on-measure);
+    font: var(--type-count);
+    white-space: nowrap;
+    text-box: normal;
   }
 
   .audit-loop figcaption {

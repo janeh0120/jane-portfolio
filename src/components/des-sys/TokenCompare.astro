@@ -1,6 +1,7 @@
 ---
 // Case study illustration (/des-sys-audit): one component rendered as design specifies it and as
-// code builds it, side by side, with a Before/After toggle for the audit's fix. Each example lists
+// code builds it, side by side, with a Before/After toggle for the audit's fix. "button" is the
+// documentation opportunity. Each example lists
 // only the properties its section is about, so the mismatch the story turns on is the only thing
 // highlighted. Rendered in HTML with role tokens so it follows the colour mode.
 //
@@ -12,50 +13,37 @@ type Side = { before: string; after: string };
 type Row = { property: string; design: Side; code: Side; issue: string };
 
 interface Props {
-  example: 'checkbox' | 'button';
+  example: 'button';
 }
 
 const { example } = Astro.props;
 
-const examples: Record<Props['example'], { title: string; caption: string; rows: Row[] }> = {
-  // Intuit's checkbox label, from the original token alignment illustration
-  checkbox: {
-    title: 'Checkbox label',
-    caption:
-      'Design and code each used a real token, just different ones. After the audit, both use --font-weight-component.',
-    rows: [
-      {
-        property: 'Weight',
-        design: { before: '--font-weight-component-semibold', after: '--font-weight-component' },
-        code: { before: '--font-weight-component', after: '--font-weight-component' },
-        issue: 'Mismatch',
-      },
-    ],
-  },
-  // The "before" button in the audit report (AuditSkillFlow), from my own design system
+type Doc = { source: string; rule: string };
+
+const examples: Record<Props['example'], { title: string; caption: string; doc?: Doc; rows: Row[] }> = {
+  // Compliance with documentation: a token that matches on both sides and is still the wrong one.
+  // From my own design system, since Intuit's is confidential.
   button: {
     title: 'Secondary button',
+    // Paraphrased from DESIGN.md's Compact type style
+    doc: {
+      source: 'DESIGN.md',
+      rule: 'Compact type is for controls (buttons, dropdowns, menus), tags, and dense text.',
+    },
     caption:
-      'My portfolio’s secondary button. Before recreates the kinds of values the audit flags; after is the shipped button.',
+      'Design and code both used type-body, so they matched. The documentation says controls use type-compact.',
     rows: [
       {
         property: 'Type',
-        design: { before: 'type-compact', after: 'type-compact' },
+        design: { before: 'type-body', after: 'type-compact' },
         code: { before: 'type-body', after: 'type-compact' },
         issue: 'Wrong role',
-      },
-      {
-        property: 'Text',
-        design: { before: 'color-ink', after: 'color-ink' },
-        // design-tokens-ignore: label quoting the hardcoded colour, not a style
-        code: { before: '#1f1f1f', after: 'color-ink' },
-        issue: 'Hardcoded',
       },
     ],
   },
 };
 
-const { title, caption, rows } = examples[example];
+const { title, caption, doc, rows } = examples[example];
 
 const sides = [
   { id: 'design', label: 'Design' },
@@ -73,6 +61,15 @@ const sides = [
     </div>
   </div>
 
+  {
+    doc && (
+      <div class="token-compare-doc">
+        <span class="token-compare-doc-source">Documentation · {doc.source}</span>
+        <span class="token-compare-doc-rule">{doc.rule}</span>
+      </div>
+    )
+  }
+
   <div class="token-compare-cols">
     {
       sides.map((side) => (
@@ -80,17 +77,10 @@ const sides = [
           <p class="token-compare-side">{side.label}</p>
 
           <div class="token-compare-stage" aria-hidden="true">
-            {example === 'checkbox' ? (
-              <span class="token-compare-checkbox">
-                <span class="token-compare-box" />
-                <span class="token-compare-target">Mango</span>
-              </span>
-            ) : (
-              <span class="button is-secondary token-compare-target">
-                <ArrowIcon direction="left" size="0.9em" />
-                Back
-              </span>
-            )}
+            <span class="button is-secondary token-compare-target">
+              <ArrowIcon direction="left" size="0.9em" />
+              Back
+            </span>
           </div>
 
           <dl class="token-compare-specs">
@@ -161,6 +151,26 @@ const sides = [
     color: var(--color-ink);
   }
 
+  /* The guidance both sides are checked against: dashed, as reference material */
+  .token-compare-doc {
+    display: grid;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+    padding: var(--space-3) var(--space-5);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-base);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .token-compare-doc-source {
+    color: var(--color-subtle);
+  }
+
+  .token-compare-doc-rule {
+    color: var(--color-ink);
+  }
+
   /* Design and code side by side, the comparison is the point; stacked on phones */
   .token-compare-cols {
     display: grid;
@@ -205,40 +215,14 @@ const sides = [
     outline-offset: var(--space-1);
   }
 
-  /* Checkbox: Intuit's, recreated. Weight is the only thing that changes */
-  .token-compare-checkbox {
-    --label-weight: var(--weight-regular);
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-3);
-    font: var(--type-subheading);
-    font-weight: var(--label-weight);
-    letter-spacing: var(--tracking-body);
-    color: var(--color-ink);
-  }
-
-  .token-compare-box {
-    width: 1em;
-    height: 1em;
-    border: calc(var(--border-width) * 3) solid var(--color-muted);
-    /* Half the base radius, so a 1em box reads as a rounded square, not a circle */
-    border-radius: calc(var(--radius-base) / 2);
-  }
-
-  .token-compare[data-state='before'] [data-side='design'] .token-compare-checkbox {
-    --label-weight: var(--weight-bold);
-  }
-
-  /* Button: code's "before" uses the body type style and a hardcoded near-ink */
+  /* Button: before, both sides use the body type style; after, the control style */
   .token-compare-stage .button {
     cursor: default;
     transition: none;
   }
 
-  .token-compare[data-state='before'] [data-side='code'] .button {
+  .token-compare[data-state='before'] .button {
     font: var(--type-body);
-    /* design-tokens-ignore: deliberately hardcoded, to show what the audit flags */
-    color: #1f1f1f;
   }
 
   /* Only the properties the section is about */

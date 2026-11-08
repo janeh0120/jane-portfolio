@@ -1,0 +1,194 @@
+---
+// Case study illustrations (/des-sys-audit), one per problem:
+// - "handoff": the same checkbox in the prototype and in the implementation, with a different label
+//   weight, so what's designed isn't what ships.
+// - "hardcoded": a global theme update from light to dark. The label built on a token follows it;
+//   the hardcoded one keeps its dark text and disappears.
+// The theme panels show fixed light and dark themes, so they use the palette's neutrals rather than
+// role tokens; everything else follows the colour mode.
+
+interface Props {
+  kind: 'handoff' | 'hardcoded';
+}
+
+const { kind } = Astro.props;
+---
+
+{
+  kind === 'handoff' ? (
+    <div class="problem-visual is-handoff" aria-hidden="true">
+      <div class="problem-panel">
+        <span class="problem-panel-label">Prototype</span>
+        <span class="problem-checkbox is-semibold">
+          <span class="problem-box" />
+          Mango
+        </span>
+        <span class="problem-note">Semibold label</span>
+      </div>
+      <span class="problem-between">≠</span>
+      <div class="problem-panel">
+        <span class="problem-panel-label">Implementation</span>
+        <span class="problem-checkbox">
+          <span class="problem-box" />
+          Mango
+        </span>
+        <span class="problem-note">Regular label</span>
+      </div>
+    </div>
+  ) : (
+    <div class="problem-visual is-hardcoded" aria-hidden="true">
+      {['light', 'dark'].map((theme, i) => (
+        <>
+          {i === 1 && (
+            <span class="problem-between is-arrow">
+              <svg viewBox="0 0 24 24">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+              <span>Theme update</span>
+            </span>
+          )}
+          <div class:list={['problem-panel', 'is-theme', `is-${theme}`]}>
+            <span class="problem-panel-label">{theme === 'light' ? 'Light theme' : 'Dark theme'}</span>
+            <span class="problem-row">
+              <span class="problem-checkbox">
+                <span class="problem-box" />
+                Mango
+              </span>
+              <span class="problem-note">Token</span>
+            </span>
+            <span class="problem-row is-hardcoded-row">
+              <span class="problem-checkbox is-hardcoded">
+                <span class="problem-box" />
+                Mango
+              </span>
+              <span class="problem-note">Hardcoded</span>
+            </span>
+          </div>
+        </>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .problem-visual {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .problem-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+    color: var(--color-ink);
+  }
+
+  .problem-panel-label,
+  .problem-note {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
+  }
+
+  .problem-between {
+    align-self: center;
+    font: var(--type-heading);
+    color: var(--color-subtle);
+  }
+
+  .problem-between.is-arrow {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-1);
+    font: var(--type-count);
+  }
+
+  .problem-between svg {
+    width: var(--space-6);
+    height: var(--space-6);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .problem-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font: var(--type-subheading);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .problem-checkbox.is-semibold {
+    font-weight: var(--weight-bold);
+  }
+
+  .problem-box {
+    flex: none;
+    width: 0.9em;
+    height: 0.9em;
+    border: calc(var(--border-width) * 3) solid currentColor;
+    /* Half the base radius, so a small box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+    opacity: 0.6;
+  }
+
+  .problem-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  /* Fixed light and dark themes: palette neutrals, not role tokens, so they don't flip with the
+     site's colour mode */
+  .problem-panel.is-light {
+    background: var(--color-white);
+    color: var(--color-neutral-900);
+  }
+
+  .problem-panel.is-dark {
+    background: var(--color-neutral-900);
+    border-color: var(--color-neutral-700);
+    color: var(--color-neutral-100);
+  }
+
+  .problem-panel.is-theme .problem-panel-label,
+  .problem-panel.is-theme .problem-note {
+    color: var(--color-neutral-500);
+  }
+
+  /* The hardcoded label keeps its light-theme text, whatever the theme */
+  .problem-checkbox.is-hardcoded {
+    /* design-tokens-ignore: deliberately hardcoded, to show what a theme update misses */
+    color: #1f1f1f;
+  }
+
+  .problem-panel.is-dark .is-hardcoded-row {
+    margin: calc(var(--space-1) * -1);
+    padding: var(--space-1);
+    border: 1px dashed var(--color-measure);
+    border-radius: var(--radius-base);
+  }
+
+  @media (max-width: 639px) {
+    .problem-visual {
+      gap: var(--space-2);
+    }
+
+    .problem-panel {
+      padding: var(--space-3);
+    }
+  }
+</style>
