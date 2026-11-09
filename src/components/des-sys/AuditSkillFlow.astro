@@ -1,11 +1,15 @@
 ---
 // Case study diagram (/des-sys-audit): the audit skill, read top to bottom. The
-// component in a local copy of production code and the Figma component's YAML flow into the skill,
+// component in a local copy of production code and the Figma component's YAML (each shown with a
+// screenshot of the real input) flow into the skill,
 // which compares them and returns a prioritised table. Rendered in HTML with role tokens so it follows
 // the colour mode. Example rows are illustrative.
 //
-// Comparing design with code finds hardcoded values and mismatches. The button's type (type-body on
-// both sides) passes here; TokenCompare's "button" example shows the documentation catching it.
+// Comparing design with code finds hardcoded values and mismatches. A token that matches on both
+// sides passes here; TokenCompare shows the documentation catching it.
+const base = import.meta.env.BASE_URL;
+const img = (file: string) => `${base}images/case-studies/des-sys/${file}`;
+
 const rows = [
   {
     property: 'Text colour',
@@ -28,15 +32,23 @@ const rows = [
 
 <figure class="audit-flow">
   <div class="audit-flow-inputs">
-    <div class="audit-card">
-      <span class="audit-card-kicker">Input</span>
-      <strong>Component in code</strong>
-      <span>Named in the prompt, read from a local copy of production code</span>
+    <div class="audit-card has-image">
+      <img
+        src={img('input-code.webp')}
+        alt="The checkbox's production stylesheet, with the label colour line, var(--color-text-primary), highlighted"
+        loading="lazy"
+        decoding="async"
+      />
+      <strong>Code</strong>
     </div>
-    <div class="audit-card">
-      <span class="audit-card-kicker">Input</span>
-      <strong>Figma component data</strong>
-      <span>YAML pasted from the Figma component</span>
+    <div class="audit-card has-image">
+      <img
+        src={img('input-figma-data.webp')}
+        alt="The checkbox component set in Figma, with the Specs plugin's Data tab set to export YAML with tokens across all variant combinations"
+        loading="lazy"
+        decoding="async"
+      />
+      <strong>Figma component (YAML data)</strong>
     </div>
   </div>
 
@@ -118,6 +130,19 @@ const rows = [
     padding: var(--space-4) var(--space-5);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  /* An input's screenshot, above its label */
+  .audit-card.has-image {
+    align-content: start;
+  }
+
+  .audit-card.has-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-bottom: var(--space-3);
     border-radius: var(--radius-base);
   }
 

@@ -1,117 +1,77 @@
 ---
-// Case study illustration (/des-sys-audit): one component rendered as design specifies it and as
-// code builds it, side by side, with a Before/After toggle for the audit's fix. "button" is the
-// documentation opportunity. Each example lists
-// only the properties its section is about, so the mismatch the story turns on is the only thing
-// highlighted. Rendered in HTML with role tokens so it follows the colour mode.
+// Case study illustration (/des-sys-audit): the documentation opportunity. The checkbox label used
+// text-secondary in both design and code, so they matched, but the design system docs call for
+// text-primary, so both changed. A Before/After toggle shows the fix; Inspect mode's callouts
+// (src/styles/inspect.css) name each side's token.
 //
-// Without JavaScript the toggle stays hidden and the "before" state shows, since that's the problem
-// each section describes; the caption states the fix.
-import ArrowIcon from '../ArrowIcon.astro';
+// Without JavaScript the toggle stays hidden and the "before" state shows; the caption states the fix.
+import '../../styles/inspect.css';
 
-type Side = { before: string; after: string };
-type Row = { property: string; design: Side; code: Side; issue: string };
+const texture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/pink-texture.webp`;
 
-interface Props {
-  example: 'button';
-}
+const before = '--color-text-secondary';
+const after = '--color-text-primary';
 
-const { example } = Astro.props;
-
-type Doc = { source: string; rule: string };
-
-const examples: Record<Props['example'], { title: string; caption: string; doc?: Doc; rows: Row[] }> = {
-  // Compliance with documentation: a token that matches on both sides and is still the wrong one.
-  // From my own design system, since Intuit's is confidential.
-  button: {
-    title: 'Secondary button',
-    // Paraphrased from DESIGN.md's Compact type style
-    doc: {
-      source: 'DESIGN.md',
-      rule: 'Compact type is for controls (buttons, dropdowns, menus), tags, and dense text.',
-    },
-    caption:
-      'Design and code both used type-body, so they matched. The documentation says controls use type-compact.',
-    rows: [
-      {
-        property: 'Type',
-        design: { before: 'type-body', after: 'type-compact' },
-        code: { before: 'type-body', after: 'type-compact' },
-        issue: 'Wrong role',
-      },
-    ],
-  },
-};
-
-const { title, caption, doc, rows } = examples[example];
-
-const sides = [
-  { id: 'design', label: 'Design' },
-  { id: 'code', label: 'Code' },
-] as const;
+const sides = ['Design', 'Code'];
 ---
 
-<figure class="token-compare" data-example={example} data-state="before" data-token-compare>
+<figure class="token-compare" data-state="before" data-token-compare>
   <div class="token-compare-head">
-    <p class="token-compare-title">{title}</p>
-    <div class="segmented" role="group" aria-label={`Show ${title.toLowerCase()} before or after the audit`} hidden>
+    <p class="token-compare-title">Checkbox label</p>
+    <div class="segmented" role="group" aria-label="Show the checkbox label before or after the fix" hidden>
       <span class="segmented-thumb" aria-hidden="true"></span>
       <button type="button" class="segmented-option" data-state-choice="before" aria-pressed="true">Before</button>
       <button type="button" class="segmented-option" data-state-choice="after" aria-pressed="false">After</button>
     </div>
   </div>
 
-  {
-    doc && (
-      <div class="token-compare-doc">
-        <span class="token-compare-doc-source">Documentation · {doc.source}</span>
-        <span class="token-compare-doc-rule">{doc.rule}</span>
-      </div>
-    )
-  }
+  <div class="token-compare-doc">
+    <span class="token-compare-doc-source">Documentation · Intuit Design System MCP</span>
+    <span class="token-compare-doc-rule">Checkbox label text should use text-primary.</span>
+  </div>
 
   <div class="token-compare-cols">
     {
       sides.map((side) => (
-        <div class="token-compare-col" data-side={side.id}>
-          <p class="token-compare-side">{side.label}</p>
-
-          <div class="token-compare-stage" aria-hidden="true">
-            <span class="button is-secondary token-compare-target">
-              <ArrowIcon direction="left" size="0.9em" />
-              Back
-            </span>
+        <div class="token-compare-col">
+          <div class="token-compare-col-head">
+            <p class="token-compare-side">{side}</p>
+            <span class="tag" data-when="before">Wrong token</span>
+            <span class="tag" data-when="after">Matches docs</span>
           </div>
 
-          <dl class="token-compare-specs">
-            {rows.map((row) => {
-              const value = row[side.id];
-              // The side the audit changed is the one that was off
-              const flagged = value.before !== value.after;
-              return (
-                <div class="token-compare-spec">
-                  <dt>{row.property}</dt>
+          <div class="token-compare-stage" aria-hidden="true">
+            <img src={texture} alt="" loading="lazy" decoding="async" />
+            <div class="token-compare-component">
+              <span class="token-compare-checkbox">
+                <span class="token-compare-box" />
+                <span class="token-compare-label">
+                  Mango
+                  <span class="token-compare-leader" />
+                </span>
+              </span>
+              <div class="inspect-panel">
+                <span class="inspect-panel-title">Checkbox label</span>
+                <dl>
+                  <dt>Text</dt>
                   <dd>
-                    <code data-when="before" class:list={[flagged && 'is-flagged']}>
-                      {value.before}
-                    </code>
-                    <code data-when="after">{value.after}</code>
-                    {flagged && (
-                      <span class="tag" data-when="before">
-                        {row.issue}
-                      </span>
-                    )}
+                    <span class="inspect-swatch" />
+                    <span class="is-flagged" data-when="before">{before}</span>
+                    <span data-when="after">{after}</span>
                   </dd>
-                </div>
-              );
-            })}
-          </dl>
+                </dl>
+              </div>
+            </div>
+          </div>
         </div>
       ))
     }
   </div>
 
-  <figcaption>{caption}</figcaption>
+  <figcaption>
+    Before, the text used text-secondary in both design and code. According to the design system docs
+    it should use text-primary, so I changed both design and code.
+  </figcaption>
 </figure>
 
 <script>
@@ -179,88 +139,126 @@ const sides = [
 
   @media (min-width: 640px) {
     .token-compare-cols {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
   .token-compare-col {
     display: grid;
     align-content: start;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-5) var(--space-5);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-base);
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .token-compare-col-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
   }
 
   .token-compare p.token-compare-side {
     margin: 0;
-    font: var(--type-compact);
+    font: var(--type-label);
     letter-spacing: var(--tracking-body);
-    color: var(--color-muted);
+    color: var(--color-ink);
   }
 
   .token-compare-stage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(var(--space-24) + var(--space-4));
-    background: var(--color-canvas);
+    container-type: inline-size;
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: calc(var(--space-24) * 3);
+    overflow: hidden;
     border-radius: var(--radius-base);
   }
 
-  /* The part the rows describe, selected as in Inspect mode */
-  .token-compare-target {
+  .token-compare-stage img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .token-compare-component {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: var(--space-8);
+    max-width: 90cqw;
+  }
+
+  .token-compare-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: var(--space-2);
+  }
+
+  .token-compare-box {
+    flex: none;
+    width: var(--space-5);
+    height: var(--space-5);
+    background: var(--color-white);
+    border: calc(var(--border-width) * 3) solid var(--color-neutral-500);
+    /* Half the base radius, so a small box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  /* The label's colour is the one thing that changes. Palette neutrals, since the checkbox depicts
+     fixed UI on the textured background */
+  .token-compare-label {
+    position: relative;
+    font: var(--type-subheading);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-neutral-900);
+    /* The label being compared, selected as in Inspect mode */
     outline: 1px solid var(--color-accent);
     outline-offset: var(--space-1);
   }
 
-  /* Button: before, both sides use the body type style; after, the control style */
-  .token-compare-stage .button {
-    cursor: default;
-    transition: none;
+  .token-compare[data-state='before'] .token-compare-label {
+    color: var(--color-neutral-500);
   }
 
-  .token-compare[data-state='before'] .button {
-    font: var(--type-body);
+  .token-compare-leader {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + var(--space-1));
+    height: calc(var(--space-8) - var(--space-1));
+    border-left: 1px dashed var(--color-pin);
   }
 
-  /* Only the properties the section is about */
-  .token-compare-specs {
-    display: grid;
-    gap: var(--space-2);
-    margin: 0;
-    font: var(--type-compact);
-    letter-spacing: var(--tracking-body);
-  }
-
-  .token-compare-spec {
-    display: grid;
-    grid-template-columns: var(--space-12) minmax(0, 1fr);
-    gap: var(--space-3);
-    align-items: baseline;
-  }
-
-  .token-compare-spec dt {
-    color: var(--color-muted);
-  }
-
-  .token-compare-spec dd {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--space-1) var(--space-2);
-    margin: 0;
+  .token-compare .inspect-panel {
+    position: relative;
+    z-index: auto;
+    width: max-content;
     min-width: 0;
+    max-width: 100%;
   }
 
-  .token-compare-spec code {
-    font: inherit;
-    color: var(--color-ink);
-    overflow-wrap: anywhere;
+  .token-compare .inspect-panel-title {
+    display: block;
   }
 
-  .token-compare-spec code.is-flagged {
+  .token-compare .inspect-panel dl {
+    gap: var(--space-1) var(--space-3);
+  }
+
+  /* The ink swatch sits on a dark callout in dark mode, so it needs a visible edge */
+  .token-compare .inspect-swatch {
+    background: var(--color-neutral-900);
+    border-color: var(--color-border-strong);
+  }
+
+  .token-compare[data-state='before'] .inspect-swatch {
+    background: var(--color-neutral-500);
+  }
+
+  .token-compare .is-flagged {
     color: var(--color-danger);
   }
 

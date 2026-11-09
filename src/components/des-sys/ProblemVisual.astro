@@ -1,69 +1,133 @@
 ---
 // Case study illustrations (/des-sys-audit), one per problem:
-// - "handoff": the same checkbox in the prototype and in the implementation, with a different label
-//   weight, so what's designed isn't what ships.
-// - "hardcoded": a global theme update from light to dark. The label built on a token follows it;
-//   the hardcoded one keeps its dark text and disappears.
-// The theme panels show fixed light and dark themes, so they use the palette's neutrals rather than
+// - "handoff": the same checkbox on a textured background, as prototyped and as implemented. Inspect
+//   callouts name each label's text colour token, so what's designed isn't what ships. The mismatch
+//   is the kind recorded on the manual audit.
+// - "hardcoded": a static grid of design and code, before and after a theme change. One token's
+//   resolved primitive moves from blue to green: design references the token, so it updates; code
+//   hardcodes the hex, so it doesn't. Inspect mode's callouts (src/styles/inspect.css) name the token
+//   or hex. Token names are illustrative.
+// The website screens and checkbox fills depict fixed UI, so they use palette colours rather than
 // role tokens; everything else follows the colour mode.
+import '../../styles/inspect.css';
 
 interface Props {
   kind: 'handoff' | 'hardcoded';
 }
 
 const { kind } = Astro.props;
+
+const texture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/pink-texture.webp`;
+
+const screens = [
+  { id: 'prototype', label: 'Prototype', token: '--color-text-primary' },
+  { id: 'implementation', label: 'Implementation', token: '--color-text-secondary' },
+];
+
+// design-tokens-ignore: labels quoting hex values, not styles
+const oldValue = 'blue-600 · #155DFC';
+// design-tokens-ignore: labels quoting hex values, not styles
+const newValue = 'emerald-600 · #009966';
+// design-tokens-ignore: label quoting the hardcoded hex, not a style
+const hardcodedHex = '#155DFC · not a token';
+
+const themeRows = [
+  {
+    side: 'Design',
+    cells: [
+      { fill: 'is-blue', token: '--color-action', value: oldValue },
+      { fill: 'is-green', token: '--color-action', value: newValue, result: 'Updated' },
+    ],
+  },
+  {
+    side: 'Code',
+    cells: [
+      { fill: 'is-hardcoded', value: hardcodedHex, untokened: true },
+      { fill: 'is-hardcoded', value: hardcodedHex, untokened: true, result: 'Not updated' },
+    ],
+  },
+];
 ---
 
 {
   kind === 'handoff' ? (
     <div class="problem-visual is-handoff" aria-hidden="true">
-      <div class="problem-panel">
-        <span class="problem-panel-label">Prototype</span>
-        <span class="problem-checkbox is-semibold">
-          <span class="problem-box" />
-          Mango
-        </span>
-        <span class="problem-note">Semibold label</span>
-      </div>
-      <span class="problem-between">≠</span>
-      <div class="problem-panel">
-        <span class="problem-panel-label">Implementation</span>
-        <span class="problem-checkbox">
-          <span class="problem-box" />
-          Mango
-        </span>
-        <span class="problem-note">Regular label</span>
-      </div>
+      {screens.map((screen, i) => (
+        <>
+          {i === 1 && <span class="problem-between">≠</span>}
+          <div class:list={['handoff-side', `is-${screen.id}`]}>
+            <span class="problem-panel-label">{screen.label}</span>
+            <div class="handoff-frame">
+              <img src={texture} alt="" loading="lazy" decoding="async" />
+
+              <div class="handoff-component">
+                <span class="handoff-checkbox">
+                  <span class="handoff-box" />
+                  <span class="handoff-label">
+                    Mango
+                    <span class="handoff-leader" />
+                  </span>
+                </span>
+                <div class="inspect-panel">
+                  <span class="inspect-panel-title">Checkbox label</span>
+                  <dl>
+                    <dt>Text</dt>
+                    <dd>
+                      <span class="inspect-swatch" />
+                      <span>{screen.token}</span>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ))}
     </div>
   ) : (
-    <div class="problem-visual is-hardcoded" aria-hidden="true">
-      {['light', 'dark'].map((theme, i) => (
+    <div
+      class="theme-compare"
+      role="img"
+      aria-label="Before a theme change, design and code checkboxes are both blue. After the token --color-action changes to green, design updates to green because it uses the token. Code stays blue because it hardcodes the hex."
+    >
+      <span class="theme-corner" />
+      <span class="theme-col-label">Before theme change</span>
+      <span class="theme-col-label">After theme change</span>
+
+      {themeRows.map((row) => (
         <>
-          {i === 1 && (
-            <span class="problem-between is-arrow">
-              <svg viewBox="0 0 24 24">
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
-              <span>Theme update</span>
-            </span>
-          )}
-          <div class:list={['problem-panel', 'is-theme', `is-${theme}`]}>
-            <span class="problem-panel-label">{theme === 'light' ? 'Light theme' : 'Dark theme'}</span>
-            <span class="problem-row">
-              <span class="problem-checkbox">
-                <span class="problem-box" />
-                Mango
+          <span class="theme-row-label">{row.side}</span>
+          {row.cells.map((cell) => (
+            <div class="problem-panel theme-cell">
+              <span class="theme-cell-head">
+                <span class="theme-target">
+                  <span class:list={['theme-box', cell.fill]}>
+                    <svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" /></svg>
+                  </span>
+                  Mango
+                  <span class="inspect-box" />
+                </span>
+                {cell.result && <span class="tag">{cell.result}</span>}
               </span>
-              <span class="problem-note">Token</span>
-            </span>
-            <span class="problem-row is-hardcoded-row">
-              <span class="problem-checkbox is-hardcoded">
-                <span class="problem-box" />
-                Mango
-              </span>
-              <span class="problem-note">Hardcoded</span>
-            </span>
-          </div>
+              <span class="theme-leader" />
+              <div class="inspect-panel">
+                <span class="inspect-panel-title">Checkbox fill</span>
+                <dl>
+                  {cell.token && (
+                    <>
+                      <dt>Token</dt>
+                      <dd>{cell.token}</dd>
+                    </>
+                  )}
+                  <dt>Value</dt>
+                  <dd class:list={[cell.untokened && 'is-untokened']}>
+                    <span class:list={['inspect-swatch', cell.fill]} />
+                    <span>{cell.value}</span>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          ))}
         </>
       ))}
     </div>
@@ -90,8 +154,7 @@ const { kind } = Astro.props;
     color: var(--color-ink);
   }
 
-  .problem-panel-label,
-  .problem-note {
+  .problem-panel-label {
     font: var(--type-compact);
     letter-spacing: var(--tracking-body);
     color: var(--color-subtle);
@@ -103,83 +166,265 @@ const { kind } = Astro.props;
     color: var(--color-subtle);
   }
 
-  .problem-between.is-arrow {
+  /* Handoff: the checkbox on its own, on the textured background */
+  .handoff-side {
     display: grid;
-    justify-items: center;
-    gap: var(--space-1);
-    font: var(--type-count);
+    align-content: start;
+    gap: var(--space-2);
+    min-width: 0;
   }
 
-  .problem-between svg {
-    width: var(--space-6);
-    height: var(--space-6);
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .handoff-frame {
+    container-type: inline-size;
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 8 / 9;
+    min-height: calc(var(--space-24) * 3.75);
+    overflow: hidden;
+    border-radius: var(--radius-base);
   }
 
-  .problem-checkbox {
+  .handoff-frame img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .handoff-component {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: var(--space-8);
+    max-width: 90cqw;
+  }
+
+  .handoff-checkbox {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-3);
+    margin-left: var(--space-2);
+  }
+
+  .handoff-box {
+    flex: none;
+    width: var(--space-5);
+    height: var(--space-5);
+    background: var(--color-white);
+    border: calc(var(--border-width) * 3) solid var(--color-neutral-500);
+    /* Half the base radius, so a small box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  .handoff-label {
+    position: relative;
     font: var(--type-subheading);
     font-weight: var(--weight-regular);
     letter-spacing: var(--tracking-body);
+    /* The label being compared, selected as in Inspect mode */
+    outline: 1px solid var(--color-accent);
+    outline-offset: var(--space-1);
   }
 
-  .problem-checkbox.is-semibold {
-    font-weight: var(--weight-bold);
+  /* The one difference between the two sides */
+  .is-prototype .handoff-label {
+    color: var(--color-neutral-900);
   }
 
-  .problem-box {
-    flex: none;
-    width: 0.9em;
-    height: 0.9em;
-    border: calc(var(--border-width) * 3) solid currentColor;
-    /* Half the base radius, so a small box reads as a rounded square, not a circle */
-    border-radius: calc(var(--radius-base) / 2);
-    opacity: 0.6;
+  .is-implementation .handoff-label {
+    color: var(--color-neutral-500);
   }
 
-  .problem-row {
+  .is-prototype .inspect-swatch {
+    background: var(--color-neutral-900);
+  }
+
+  .is-implementation .inspect-swatch {
+    background: var(--color-neutral-500);
+  }
+
+  .handoff-leader {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + var(--space-1));
+    height: calc(var(--space-8) - var(--space-1));
+    border-left: 1px dashed var(--color-pin);
+  }
+
+  .handoff-component .inspect-panel {
+    position: relative;
+    z-index: auto;
+    width: max-content;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .handoff-component .inspect-panel-title {
+    display: block;
+  }
+
+  .handoff-component .inspect-panel dl {
+    gap: var(--space-1) var(--space-3);
+  }
+
+  /* The ink swatch sits on a dark callout in dark mode, so it needs a visible edge */
+  .handoff-component .inspect-swatch {
+    border-color: var(--color-border-strong);
+  }
+
+  /* Stacked on phones, so each side keeps a readable size; the arrow then points down */
+  @media (max-width: 639px) {
+    .problem-visual {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .problem-between {
+      justify-self: center;
+    }
+  }
+
+  /* Hardcoded: design and code as rows, before and after the theme change as columns */
+  .theme-compare {
+    display: grid;
+    grid-template-columns: max-content repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .theme-col-label {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
+  }
+
+  .theme-row-label {
+    align-self: center;
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .theme-cell {
+    gap: 0;
+    min-width: 0;
+  }
+
+  .theme-cell-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .theme-target {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: var(--space-1);
+    font: var(--type-body);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .theme-box {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: var(--space-5);
+    height: var(--space-5);
+    /* Half the base radius, so a small box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  .theme-box svg {
+    width: var(--space-4);
+    height: var(--space-4);
+    fill: none;
+    stroke: var(--color-white);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .theme-box.is-blue,
+  .inspect-swatch.is-blue {
+    background: var(--color-blue-600);
+  }
+
+  .theme-box.is-green,
+  .inspect-swatch.is-green {
+    background: var(--color-emerald-600);
+  }
+
+  .theme-box.is-hardcoded,
+  .inspect-swatch.is-hardcoded {
+    /* design-tokens-ignore: deliberately hardcoded, to show what a theme update misses */
+    background: #155dfc;
+  }
+
+  /* Inspect mode's overlay is fixed to the viewport; here each piece sits with its checkbox */
+  .theme-target .inspect-box {
+    position: absolute;
+    inset: calc(var(--space-1) * -1);
+    border-radius: var(--radius-none);
+  }
+
+  .theme-leader {
+    align-self: flex-start;
+    height: var(--space-4);
+    margin: var(--space-1) 0 0 var(--space-3);
+    border-left: 1px dashed var(--color-pin);
+  }
+
+  .theme-cell .inspect-panel {
+    position: relative;
+    z-index: auto;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .theme-cell .inspect-panel-title {
+    display: block;
+  }
+
+  .theme-cell .inspect-panel dl {
     gap: var(--space-1) var(--space-3);
   }
 
-  /* Fixed light and dark themes: palette neutrals, not role tokens, so they don't flip with the
-     site's colour mode */
-  .problem-panel.is-light {
-    background: var(--color-white);
-    color: var(--color-neutral-900);
-  }
+  /* On phones each row label takes its own line, and values wrap between words */
+  @media (max-width: 639px) {
+    .theme-compare {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-2);
+    }
 
-  .problem-panel.is-dark {
-    background: var(--color-neutral-900);
-    border-color: var(--color-neutral-700);
-    color: var(--color-neutral-100);
-  }
+    .theme-corner {
+      display: none;
+    }
 
-  .problem-panel.is-theme .problem-panel-label,
-  .problem-panel.is-theme .problem-note {
-    color: var(--color-neutral-500);
-  }
+    .theme-row-label {
+      grid-column: 1 / -1;
+      margin-top: var(--space-2);
+    }
 
-  /* The hardcoded label keeps its light-theme text, whatever the theme */
-  .problem-checkbox.is-hardcoded {
-    /* design-tokens-ignore: deliberately hardcoded, to show what a theme update misses */
-    color: #1f1f1f;
-  }
+    .theme-cell .inspect-panel {
+      padding: var(--space-2) var(--space-3);
+    }
 
-  .problem-panel.is-dark .is-hardcoded-row {
-    margin: calc(var(--space-1) * -1);
-    padding: var(--space-1);
-    border: 1px dashed var(--color-measure);
-    border-radius: var(--radius-base);
+    .theme-cell .inspect-panel dl {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .theme-cell .inspect-panel dd {
+      align-items: flex-start;
+      overflow-wrap: normal;
+    }
   }
 
   @media (max-width: 639px) {

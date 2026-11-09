@@ -7,6 +7,7 @@ import AuditSkillFlow from '../components/des-sys/AuditSkillFlow.astro';
 import AuditReviewLoop from '../components/des-sys/AuditReviewLoop.astro';
 import TokenCompare from '../components/des-sys/TokenCompare.astro';
 import ProblemVisual from '../components/des-sys/ProblemVisual.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 
 const nav = [
   { label: 'Context', href: '#context' },
@@ -61,10 +62,11 @@ const nav = [
   <section id="solution" data-comment-id="des-sys-audit-solution">
     <h2 class="section-label">Solution</h2>
     <p class="heading text-ink">Manually auditing components for token misalignment between design and code can be slow and tedious.</p>
-    <!-- TODO(Jane): replace with the manual audit image (16:9). -->
-    <div class="audit-placeholder" role="img" aria-label="Placeholder for the manual audit image">
-      <span>Image placeholder · 16:9</span>
-    </div>
+    <CaseStudyFigure
+      src="images/case-studies/des-sys/manual-audit.webp"
+      alt="The manual audit board: for each checkbox property (description text colour, selection label font weight, label to description gap, description font size), Figma inspect panels sit beside the matching code, with each mismatch highlighted and marked Change Design or Change Code"
+      wide
+    />
   </section>
 
   <section id="opportunity" data-comment-id="des-sys-audit-opportunity">
@@ -82,7 +84,7 @@ const nav = [
     <h2 class="section-label">Opportunity</h2>
     <p class="heading text-ink">Design system alignment isn’t just about alignment between design and code, but also compliance with documentation.</p>
     <p>How might we refine skills to make recommendations on correct token usage based on design system documentation?</p>
-    <TokenCompare example="button" />
+    <TokenCompare />
   </section>
 
   <section id="final" data-comment-id="des-sys-audit-final">
@@ -116,19 +118,4 @@ const nav = [
   </section>
 </CaseStudyLayout>
 
-<style>
-  /* The manual audit image's slot, held at 16:9 until the real image replaces it */
-  .audit-placeholder {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 16 / 9;
-    margin-top: var(--space-8);
-    background: var(--color-surface);
-    border: 1px dashed var(--color-border-strong);
-    border-radius: var(--radius-base);
-    font: var(--type-compact);
-    letter-spacing: var(--tracking-body);
-    color: var(--color-subtle);
-  }
-</style>
 
