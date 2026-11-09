@@ -84,10 +84,10 @@
       "comingSoon": false
     },
     {
-      "slug": "des-sys",
-      "name": "Design Systems",
+      "slug": "des-sys-audit",
+      "name": "Design System Audit",
       "tags": ["design systems", "shipped"],
-      "title": "Bridging design and code with AI",
+      "title": "Bridging design and code within an enterprise design system",
       "image": "images/case-study-heroes/dessys.png",
       "comingSoon": false
     },

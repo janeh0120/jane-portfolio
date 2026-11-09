@@ -34,10 +34,10 @@ consistent and `/design-system` stays true. If what you need doesn't exist yet, 
 - **Spacing:** `var(--space-N)` in CSS (N × 4px: 1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24) or the
   matching Tailwind classes (`mt-3`, `gap-6`). Section gaps: `.section-stack` /
   `--space-section(-sm)`. No literal px/rem spacing. Negative nudges and em padding are allowed.
-- **Type:** the ramp classes (`hero-copy`, `text-intro`, `heading`, `subheading`, `text-body`,
+- **Type:** the ramp classes (`hero-copy`, `heading`, `subheading`, `text-body`,
   Label = `text-body font-medium`) in markup, or in CSS `font: var(--type-…)` plus
-  `letter-spacing: var(--tracking-tight | --tracking-body)`. Other styles: `--type-quote`,
-  `--type-compact` (controls, dense text), `--type-tag`, `--type-count`. Weight-only changes use
+  `letter-spacing: var(--tracking-display | --tracking-body)`. Other styles:
+  `--type-compact` (controls, tags, dense text), `--type-count`. Weight-only changes use
   `--weight-regular | medium | bold`. Never set font-size, line-height, font-weight, or
   letter-spacing directly.
 - **Shape:** `var(--radius-base)` everywhere; `--radius-menu` / `--radius-panel` for shells;

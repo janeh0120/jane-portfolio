@@ -13,6 +13,7 @@
  * runtime error, context loss, texture load error) tears the lens down and restores the plain column.
  */
 import { Renderer, Program, Mesh, Geometry, Texture, Transform, RenderTarget, Triangle } from 'ogl';
+import { colorToRgb } from './resolve-color';
 
 /** Fraction of the viewport (along the scroll direction) covered by each lens zone. */
 const ZONE = { y: 0.24, x: 0.2 };
@@ -191,7 +192,12 @@ export function startProjectLens(column: HTMLElement, { strength = 1, axis = 'y'
     });
     const cardsScene = new Transform();
     let target = new RenderTarget(ctx, { width: 1, height: 1 });
-    const radius = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--radius-base')) * 16 || 8;
+    // The corner token in px, whatever unit it's written in
+    const probe = document.createElement('div');
+    probe.style.borderTopLeftRadius = 'var(--radius-base)';
+    document.body.append(probe);
+    const radius = parseFloat(getComputedStyle(probe).borderTopLeftRadius) || 8;
+    probe.remove();
 
     const lensProgram = new Program(ctx, {
       vertex: lensVertex,
@@ -259,7 +265,7 @@ export function startProjectLens(column: HTMLElement, { strength = 1, axis = 'y'
     probe.style.cssText = 'position:absolute;width:0;height:0;visibility:hidden;color:var(--color-page)';
     document.body.appendChild(probe);
     const pageColor = () => {
-      const [r, g, b] = (getComputedStyle(probe!).color.match(/[\d.]+/g) ?? ['240', '240', '241']).map(Number);
+      const [r, g, b] = colorToRgb(getComputedStyle(probe!).color) ?? [245, 245, 245];
       return [r / 255, g / 255, b / 255];
     };
 

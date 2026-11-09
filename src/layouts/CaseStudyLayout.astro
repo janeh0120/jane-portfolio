@@ -124,10 +124,10 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     border-radius: var(--radius-base);
   }
 
-  .case-study-content :global(h3:not(.hero-copy, .text-intro, .heading)) {
+  .case-study-content :global(h3:not(.hero-copy, .heading)) {
     margin: 0;
     font: var(--type-subheading);
-    letter-spacing: var(--tracking-tight);
+    letter-spacing: var(--tracking-display);
   }
 
 
@@ -136,8 +136,15 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     margin-top: var(--space-12);
   }
 
+  /* Statements: large text reads best in shorter lines, about 35 characters, balanced so no word is
+     left stranded */
+  .case-study-content :global(p.heading) {
+    max-width: 30ch;
+    text-wrap: balance;
+  }
+
   /* Body type for paragraphs, except ones that set a type-ramp class (statements in .heading) */
-  .case-study-content :global(p:not(.hero-copy, .text-intro, .heading, .subheading)),
+  .case-study-content :global(p:not(.hero-copy, .heading, .subheading)),
   .case-study-content :global(.lead) {
     margin: 0;
     font: var(--type-body);
@@ -146,7 +153,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
   }
 
   /* As specific as the margin reset above, so it wins */
-  .case-study-content :global(p + p:not(.hero-copy, .text-intro, .subheading)) {
+  .case-study-content :global(p + p:not(.hero-copy, .subheading)) {
     margin-top: var(--space-4);
   }
 
@@ -176,7 +183,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
   .case-study-content :global(ol li h3) {
     font: var(--type-subheading);
-    letter-spacing: var(--tracking-tight);
+    letter-spacing: var(--tracking-display);
     margin: 0 0 var(--space-1);
     color: var(--color-ink);
   }
@@ -186,6 +193,20 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     font: var(--type-body);
     letter-spacing: var(--tracking-body);
     color: var(--color-muted);
+  }
+
+  /* Decision row: text beside a figure, stacked on phones */
+  .case-study-content :global(.decision-row) {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 640px) {
+    .case-study-content :global(.decision-row) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
   }
 
   .case-study-content :global(.case-study-figure) {
@@ -243,7 +264,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
   .case-study-content :global(.case-study-stats) {
     display: grid;
-    gap: var(--space-5);
+    gap: var(--space-4);
     margin-top: var(--space-6);
   }
 
@@ -253,15 +274,18 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     }
   }
 
+  /* Stat card: the quote card panel, so each stat reads as its own card */
   .case-study-content :global(.case-study-stat) {
-    padding: 0;
-    background: transparent;
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
   }
 
   .case-study-content :global(.case-study-stat strong) {
     display: block;
     font: var(--type-subheading);
-    letter-spacing: var(--tracking-tight);
+    letter-spacing: var(--tracking-display);
     color: var(--color-ink);
   }
 

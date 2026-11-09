@@ -15,8 +15,9 @@ ramp, the single corner radius, component states, motion, and the do's and don't
 - No literal spacing, colours, radii, shadows, or type (font size, line height, weight, letter
   spacing): use the tokens. Run
   `npm run check:design` before finishing UI work. It runs `scripts/check-design-tokens.mjs` (should
-  report 0) and lints DESIGN.md (no errors; "never referenced" warnings for the border and accent
-  colours are expected, since the format can't express borders or focus rings). Mark a genuine
+  report 0), `scripts/check-design-md-sync.mjs` (DESIGN.md's values and the `/design-system` labels must match
+  the CSS), and lints
+  DESIGN.md (no errors; "never referenced" warnings for the border and accent colours are expected, since the format can't express borders or focus rings). Mark a genuine
   exception with a `design-tokens-ignore: <reason>` comment.
 
 - Skills: follow `.claude/skills/use-design-system` for any UI work, and
@@ -27,7 +28,8 @@ ramp, the single corner radius, component states, motion, and the do's and don't
 
 - Astro with Tailwind v4 and React islands. Site copy, projects, and experience live in
   `content/site.json`; the Play gallery in `content/gallery.json`.
-- Dev server: `npm run dev` (port 4321). `npm run build` first checks media file sizes.
+- Dev server: `npm run dev` (port 4321). `npm run build` first checks media file sizes and runs `check:design`, so
+  any drift fails the build.
 - Pages scroll inside `#site-canvas`, not the window. Scroll listeners and scroll-driven code need to
   use that element.
 - Respect `prefers-reduced-motion`, and keep content visible if JavaScript fails.

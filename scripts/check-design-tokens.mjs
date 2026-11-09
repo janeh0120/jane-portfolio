@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * Flags styling that bypasses the design tokens (see DESIGN.md): literal spacing values, raw
- * colours, off-token corner radii, ad-hoc shadows, and type set directly instead of with the
- * --type-*, --tracking-*, and --weight-* tokens.
+ * colours, off-token corner radii, ad-hoc shadows, type set directly instead of with the
+ * --type-*, --tracking-*, and --weight-* tokens, and transitions or animations timed without the
+ * --duration-* and --ease-* tokens.
  *
  * Exempt: the case study reels (illustrations with their own palette), EdgeBlur (alpha masks), and
  * the specular button pair (its WebGL shine needs literal colours; they mirror the tokens). Token
@@ -83,12 +84,32 @@ const checks = {
   },
 };
 
-const results = Object.fromEntries(Object.keys(checks).map((key) => [key, []]));
+// Motion is checked per declaration, not per line, because transitions span several lines.
+const motion = {
+  label: 'Transitions and animations not using motion tokens',
+  re: /(?<![-\w])(?:transition|transition-delay|animation)\s*:([^;{}]*);/g,
+  find(value) {
+    const found = [...value.matchAll(/cubic-bezier\([^)]*\)|(?<![-\w])ease(?:-in-out|-in|-out)?(?![-\w])/g)];
+    // Loops (demo cycles, blinks) keep their own cycle length; 0s is an instant switch
+    if (!/infinite/.test(value)) found.push(...value.matchAll(/(?<![-\w.])(?!0m?s\b)\d*\.?\d+m?s(?![-\w])/g));
+    return found.map((m) => m[0]);
+  },
+};
+
+const results = Object.fromEntries([...Object.keys(checks), 'motion'].map((key) => [key, []]));
 
 for (const path of files(SRC)) {
   const file = relative(ROOT, path);
   if (EXEMPT.some((re) => re.test(file))) continue;
-  const lines = readFileSync(path, 'utf8').split('\n');
+  const text = readFileSync(path, 'utf8');
+  const lines = text.split('\n');
+  // Blank out comments, keeping line breaks so line numbers still match
+  const code = text.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '));
+  for (const match of code.matchAll(motion.re)) {
+    const index = code.slice(0, match.index).split('\n').length - 1;
+    if (/design-tokens-ignore/.test(lines[index]) || /design-tokens-ignore/.test(lines[index - 1] ?? '')) continue;
+    for (const value of motion.find(match[1])) results.motion.push({ file, line: index + 1, value });
+  }
   let inFontFace = false; // @font-face descriptors (font-weight: 700) describe the file, not type
   lines.forEach((line, index) => {
     if (/@font-face/.test(line)) inFontFace = true;
@@ -109,7 +130,7 @@ for (const path of files(SRC)) {
 }
 
 let total = 0;
-for (const [key, check] of Object.entries(checks)) {
+for (const [key, check] of [...Object.entries(checks), ['motion', motion]]) {
   const found = results[key];
   total += found.length;
   const distinct = new Set(found.map((f) => f.value)).size;
@@ -117,3 +138,5 @@ for (const [key, check] of Object.entries(checks)) {
   if (list) for (const f of found) console.log(`  ${f.file}:${f.line}  ${f.value}`);
 }
 console.log(`\nTotal: ${total}`);
+// Fail the build on any drift
+if (total > 0) process.exitCode = 1;

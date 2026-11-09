@@ -9,97 +9,80 @@ colors:
   # Light mode. Dark-mode values are in the Colors section below; src/styles/global.css is the
   # source of truth for both.
   primary: "{colors.ink}"
-  page: "#f0f0f1"
+  page: "#f5f5f5"
   canvas: "#ffffff"
-  ink: "#111111"
+  ink: "#171717"
   # Ink eased toward canvas, for the primary control on hover. (In CSS: color-mix(in srgb,
   # var(--color-ink) 82%, var(--color-canvas)).)
-  ink-hover: "#3c3c3c"
-  muted: "#555555"
-  subtle: "#6b6b6b"
-  line: "#f0f0f0"
-  surface: "#f5f5f5"
-  fill: "#ebebeb"
-  hover: "#e0e0e0"
+  ink-hover: "#414141"
+  muted: "#404040"
+  subtle: "#525252"
+  surface: "#fafafa"
+  fill: "#e5e5e5"
+  hover: "#d4d4d4"
   hover-subtle: "#f5f5f5"
-  border: "#e8e8e8"
-  border-strong: "#e0e0e0"
-  hairline: "rgb(17 17 17 / 8%)"
+  border: "#e5e5e5"
+  border-strong: "#d4d4d4"
+  hairline: "rgb(23 23 23 / 8%)"
   glass: "rgb(255 255 255 / 72%)"
   glass-hover: "rgb(255 255 255 / 82%)"
-  placeholder: "#c8c8c8"
-  accent: "#246cff"
+  placeholder: "#d4d4d4"
+  accent: "#155dfc"
   # Text and icons on an accent fill (the primary button); white in both colour modes.
   on-accent: "#ffffff"
-  accent-soft: "rgb(36 108 255 / 12%)"
-  danger: "#b42318"
+  accent-soft: "rgb(21 93 252 / 12%)"
+  danger: "#c10007"
   danger-soft: "#fef2f2"
+  success: "#007a55"
+  success-soft: "#ecfdf5"
   # The media overlay (Play, About): the page colour at 88%, so it follows the colour mode and the
   # page shows faintly behind. (In CSS: color-mix(in srgb, var(--color-page) 88%, transparent).)
-  overlay: "rgb(240 240 241 / 88%)"
+  overlay: "rgb(245 245 245 / 88%)"
   # Solid black behind embedded video (letterboxing), in both modes.
   media-backdrop: "#000000"
-  # /design-system Inspect mode only, in Figma's dev-mode colours: measurements and callout pins.
-  measure: "#f24822"
+  # Inspect mode only (/design-system and its case study callouts), in Figma's dev-mode colours: measurements and callout pins.
+  measure: "#f54900"
   on-measure: "#ffffff"
-  pin: "#14ae5c"
+  pin: "#009966"
 typography:
   # Display, intro, heading and subheading scale with the viewport (CSS clamp); these are the
   # largest sizes. Body and label are fixed.
   display:
     fontFamily: TeX Gyre Heros
-    fontSize: 3.625rem
+    fontSize: 3.75rem
     fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: -0.04em
-  intro:
-    fontFamily: TeX Gyre Heros
-    fontSize: 2.5rem
-    fontWeight: 700
-    lineHeight: 1.15
-    letterSpacing: -0.04em
+    lineHeight: 1.25
+    letterSpacing: -0.05em
   heading:
     fontFamily: TeX Gyre Heros
-    fontSize: 2.375rem
+    fontSize: 2.25rem
     fontWeight: 700
-    lineHeight: 1.2
-    letterSpacing: -0.04em
+    lineHeight: 1.25
+    letterSpacing: -0.05em
   subheading:
     fontFamily: TeX Gyre Heros
     fontSize: 1.25rem
     fontWeight: 700
-    lineHeight: 1.3
-    letterSpacing: -0.04em
-  quote:
-    fontFamily: TeX Gyre Heros
-    fontSize: 1.25rem
-    fontWeight: 400
-    lineHeight: 1.35
-    letterSpacing: -0.04em
+    lineHeight: 1.25
+    letterSpacing: -0.05em
   body:
     fontFamily: TeX Gyre Heros
     fontSize: 0.875rem
     fontWeight: 400
-    lineHeight: 1.65
-    letterSpacing: -0.01em
+    lineHeight: 1.625
+    letterSpacing: 0em
   label:
     fontFamily: TeX Gyre Heros
     fontSize: 0.875rem
     fontWeight: 500
-    lineHeight: 1.65
-    letterSpacing: -0.01em
+    lineHeight: 1.625
+    letterSpacing: 0em
   compact:
     fontFamily: TeX Gyre Heros
     fontSize: 0.875rem
     fontWeight: 400
-    lineHeight: 1.35
-    letterSpacing: -0.01em
-  tag:
-    fontFamily: TeX Gyre Heros
-    fontSize: 0.875rem
-    fontWeight: 400
-    lineHeight: 1
-    letterSpacing: -0.01em
+    lineHeight: 1.375
+    letterSpacing: 0em
   count:
     fontFamily: TeX Gyre Heros
     fontSize: 0.75rem
@@ -107,12 +90,13 @@ typography:
     lineHeight: 1
 rounded:
   none: 0px
-  base: 0.5rem
+  base: 8px
   menu: 12.5px
   panel: 16.5px
   pill: 999px
 spacing:
-  # A 4px grid, the same steps as Tailwind's spacing classes (space-3 = mt-3 = 0.75rem).
+  # A 4px grid built from Tailwind's spacing unit, so space-3 = mt-3 = 0.75rem. Values are written
+  # out here because the format needs them; in CSS each is calc(var(--spacing) * N).
   space-1: 0.25rem
   space-2: 0.5rem
   space-3: 0.75rem
@@ -209,7 +193,7 @@ components:
   tag:
     backgroundColor: "{colors.fill}"
     textColor: "{colors.ink}"
-    typography: "{typography.tag}"
+    typography: "{typography.compact}"
     rounded: "{rounded.base}"
     padding: "{spacing.inset}"
   tag-count:
@@ -296,32 +280,40 @@ light, dark, and system colour modes, and every decision has to hold up in both.
 
 ## Colors
 
-The palette is neutral greys plus one accent and one error colour. Tokens are named by role, not
+The palette is neutral greys plus one accent and one error colour, all from Tailwind's default
+palette; each token points at a Tailwind step, such as `--color-muted: var(--color-neutral-700)`. Steps were
+chosen to keep roles distinct and text at WCAG AA, so they aren't always the numerically nearest. Tokens are named by role, not
 by hue, so the same names work in dark mode.
 
-- **Page (#f0f0f1):** the background of every page, a cool off-white.
+- **Page (#f5f5f5):** the background of every page, an off-white.
 - **Canvas (#ffffff):** cards, menus, and other raised surfaces sit on pure white.
-- **Ink (#111111):** primary text, headings, and the one filled primary control. This is the
+- **Ink (#171717):** primary text, headings, and the one filled primary control. This is the
   `primary` token.
-- **Muted (#555555):** secondary text: body copy, captions, roles, resting tertiary buttons.
-- **Subtle (#6b6b6b):** labels (years in the experience list, column headers, metadata) and
-  disabled text. It passes WCAG AA (4.5:1 or better) on Page, Canvas, and Surface; it was
-  darkened from #919191 (about 2.8:1) after the audit in `DESIGN_SYSTEM_AUDIT.md`.
+- **Muted (#404040):** secondary text: body copy, captions, roles, resting tertiary buttons.
+- **Subtle (#525252):** labels (years in the experience list, column headers, metadata) and
+  disabled text. It passes WCAG AA (4.5:1 or better) on Page, Canvas, and Surface.
 - **Ink hover:** the primary (ink-filled) control on hover, ink eased toward the canvas.
-- **Line, Surface, Fill, Hover, Hover subtle, Border, Border strong:** the grey ramp for dividers,
-  panels, control fills at rest, hover and pressed fills, and outlines.
-- **Hairline (8% ink):** the 0.5px border on the nav bar, comment cards, and page frame.
+- **Surface, Fill, Hover, Hover subtle:** the grey ramp for panels, control fills at rest, and hover
+  and pressed fills.
+- **Border:** the default outline, 1px, solid grey: cards, panels, menus, and the dividers inside
+  them. Use this unless one of the next two applies.
+- **Border strong:** an outline that needs more presence: a bordered card on hover, form fields, and
+  the dashed outlines in diagrams on `/design-system`.
+- **Hairline (8% ink):** a 0.5px edge for anything sitting over content: the nav bar, footer card,
+  and secondary buttons. It's translucent, so it reads on any background, including glass and
+  images, which an opaque Border can't do.
 - **Glass (white at 72%, 82% on hover):** floating bars and secondary buttons, always with
   `backdrop-filter: blur(40px) saturate(1.5)`.
-- **Accent (#246cff):** three jobs only: focus rings (2px outline, 2px offset), selected states
+- **Accent (#155dfc, Tailwind's blue-600):** three jobs only: focus rings (2px outline, 2px offset), selected states
   (comment mode's highlighted target and active tab), and the fill of the one primary button,
   Leave feedback. Accent soft (12%) is the matching selected fill; lighter tints are mixed from the
   accent (`color-mix(in srgb, var(--color-accent) 8%, transparent)`), never a different blue. It
   is never a link colour or decoration, and no other button uses it.
 - **On accent (#ffffff):** text and icons on an accent fill. White in both colour modes (Canvas,
   which sits on Ink fills, turns dark in dark mode, so it can't do this job). White on the accent is
-  4.5:1, just meeting WCAG AA, so keep on-accent text at body size or larger.
-- **Danger (#b42318) and Danger soft:** destructive hovers and errors.
+  about 5.3:1, which meets WCAG AA.
+- **Danger (#c10007) and Danger soft:** destructive hovers and errors.
+- **Success (#007a55) and Success soft:** additions and confirmed states, the counterpart to Danger.
 - **Overlay:** the media overlay on Play and About is the page colour at 88%, so it follows the
   colour mode, the page shows faintly behind it, and everything on it uses the ordinary text and
   control tokens. `media-backdrop` (black) is only for letterboxing embedded video.
@@ -333,23 +325,24 @@ Accent, on-accent, and `media-backdrop` are unchanged; `overlay` follows `page` 
 
 | Token | Dark value |
 | --- | --- |
-| page | #141414 |
-| canvas | #1c1c1c |
-| ink | #f3f3f3 |
-| muted | #a8a8a8 |
-| subtle | #8d8d8d (5.5:1 on the dark page) |
-| line | #2a2a2a |
+| page | #0a0a0a |
+| canvas | #171717 |
+| ink | #f5f5f5 |
+| muted | #d4d4d4 |
+| subtle | #a1a1a1 (about 7:1 on the dark page) |
 | surface | #262626 |
-| fill | #303030 |
-| hover | #4a4a4a |
+| fill | #404040 |
+| hover | #525252 |
 | hover-subtle | #262626 |
-| border | #3a3a3a |
-| border-strong | #4a4a4a |
+| border | #404040 |
+| border-strong | #525252 |
 | hairline | white at 12% |
-| glass | rgb(28 28 28 / 78%), 88% on hover |
-| placeholder | #5c5c5c |
-| danger | #ff8d85 |
-| danger-soft | #3a1d1b |
+| glass | rgb(23 23 23 / 78%), 88% on hover |
+| placeholder | #525252 |
+| danger | #ffa2a2 |
+| danger-soft | #460809 |
+| success | #5ee9b5 |
+| success-soft | #002c22 |
 
 The grain overlay switches from `multiply` at 35% to `overlay` at 18%, and text selection becomes
 white at 16% instead of black at 8%.
@@ -363,30 +356,27 @@ baseline but 0.22em below, which sat text about 0.11em high in every line box. D
 overrides, or labels in buttons, dropdowns, and toggles drift above centre again.
 
 Type is set only through tokens in `global.css`. Each `--type-*` token holds weight, size, line
-height, and family, and is applied as `font: var(--type-body)` with its letter spacing,
-`--tracking-tight` (-0.04em, the bold display styles and quotes) or `--tracking-body` (-0.01em,
+height, and family, drawn from Tailwind's type scale, and is applied as `font: var(--type-body)` with its letter spacing,
+`--tracking-display` (-0.05em, display styles and pull quotes) or `--tracking-body` (0em,
 everything else). The few places that change only the weight use `--weight-regular`,
 `--weight-medium`, or `--weight-bold`. Never set `font-size`, `line-height`, `font-weight`, or
 `letter-spacing` directly; `scripts/check-design-tokens.mjs` flags it.
 
-- **Display (`--type-display`, `.hero-copy`):** the largest headline, 2.5rem up to 3.625rem, bold.
-- **Intro (`--type-intro`, `.text-intro`):** the intro line (when shown large) and Brand's project
-  titles, 1.75rem up to 2.5rem, bold.
-- **Heading (`--type-heading`, `.heading`):** page titles and case study statements, 1.625rem up to
-  2.375rem, bold.
+- **Display (`--type-display`, `.hero-copy`):** the largest headline, 2.25rem up to 3.75rem, bold.
+- **Heading (`--type-heading`, `.heading`):** page titles, case study statements, the intro line
+  when shown large, and Brand's project titles, 1.5rem up to 2.25rem, bold.
 - **Subheading (`--type-subheading`, `.subheading`):** section and project titles, 1rem up to
   1.25rem, bold.
-- **Quote (`--type-quote`):** pull quotes, subheading size at regular weight with a 1.35 line height.
 - **Body (`--type-body`, `.text-body`):** everything else, including body copy, captions, metadata,
-  and nav, at a fixed 14px with 1.65 line height. Also the page default on `body`.
+  and nav, at a fixed 0.875rem (14px) with 1.625 line height. Also the page default on `body`.
 - **Label (`--type-label`, `.text-body` + `font-medium`):** labels above values, column headers,
   comment titles, and the current nav link; body size at weight 500.
-- **Compact (`--type-compact`, `.text-compact`):** body size with a 1.35 line height, for controls
-  (buttons, dropdowns, the segmented toggle, menus) and dense text (the experience list, project tag
-  lines, status messages, and the homepage intro, so it reads as one block with the list).
-- **Tag (`--type-tag`):** body size at line height 1; tags also trim their text box to the cap
-  height so the padding looks even.
-- **Count (`--type-count`):** 12px medium at line height 1, with tabular figures.
+- **Compact (`--type-compact`, `.text-compact`):** body size with a 1.375 line height, for controls
+  (buttons, dropdowns, the segmented toggle, menus), tags, and dense text (the experience list,
+  project tag lines, status messages, and the homepage intro, so it reads as one block with the
+  list). Tags also trim their text box to the cap height so the padding looks even.
+- Pull quotes use Subheading at `--weight-regular`.
+- **Count (`--type-count`):** 0.75rem (12px) medium at line height 1, with tabular figures.
 
 The only weights are 400, 500, and 700; there is no 600. The one exception to the sizes is 16px
 on comment form fields on touch screens, which stops iOS zooming the page when they're focused.
@@ -394,13 +384,19 @@ on comment form fields on touch screens, which stops iOS zooming the page when t
 ## Layout
 
 - **Spacing scale:** every padding, margin, and gap uses `--space-N`, where N × 4px is the value:
-  1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24 (4px to 96px). These are the same steps as Tailwind's
-  spacing classes, so `mt-3` in markup and `var(--space-3)` in CSS mean the same 12px. Don't type
+  1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24 (4px to 96px). Each is built from Tailwind's
+  `--spacing` unit (0.25rem), so `mt-3` in markup and `var(--space-3)` in CSS are always the same 12px. Don't type
   literal spacing values; `node scripts/check-design-tokens.mjs` flags them. Negative values
   (optical nudges) and em values (padding that scales with text) are allowed.
+- **Units:** `rem` for anything from Tailwind's scales: type, spacing, reading widths, and the
+  base radius. `px` for details that shouldn't scale with text: borders, focus rings, shadows, blurs,
+  icons, the pill radius, and the 1400px site width. Radii are listed in px because that's what they
+  resolve to and how shells are calculated. Breakpoints are
+  also in `px`.
 - **Page frame:** content sits in `.page-frame`, max 1400px wide with a 1.5rem gutter on each side
   (1rem below 768px).
-- **Reading widths:** case studies max 768px, the About page 672px.
+- **Reading widths:** case studies max 768px, the About page 672px. Case study statements in Heading
+  type stop at 30ch (about 35 characters a line), with balanced line breaks.
 - **Section rhythm:** page sections are separated by one parent gap (`.section-stack`):
   `--space-section` (7rem), or `--space-section-sm` (5.5rem) below 768px. Prefer that gap over
   margins on individual sections.
@@ -425,9 +421,9 @@ on comment form fields on touch screens, which stops iOS zooming the page when t
 Mostly flat. Hierarchy comes from tone (white Canvas cards on the grey Page), hairline borders,
 and the grain texture. There are exactly two shadow levels:
 
-- **Raised (`--shadow-raised`, `0 2px 8px rgb(0 0 0 / 6%)`):** things that lift slightly off the
+- **Raised (`--shadow-raised`, Tailwind's `shadow-sm`):** things that lift slightly off the
   page: comment cards, the Brand page's light/dark toggle.
-- **Floating (`--shadow-floating`, `0 12px 32px rgb(0 0 0 / 14%)`):** things that float over
+- **Floating (`--shadow-floating`, Tailwind's `shadow-xl`):** things that float over
   content: dropdown menus and the comment popover.
 
 Focus-style rings (`0 0 0 2px var(--color-accent-soft)`) aren't elevation and are allowed. The
@@ -442,7 +438,7 @@ case study artwork may use its own shadows, marked in the CSS with `design-token
 
 ## Shapes
 
-One corner radius, **0.5rem (8px)**, for every control, card, image, and tag. `none` (0) is for
+One corner radius, **8px** (Tailwind's `rounded-lg`, 0.5rem), for every control, card, image, and tag. `none` (0) is for
 full-bleed frames only. Tailwind's `rounded-full` is also 8px here.
 
 The one exception is **Pill (`--radius-pill`, 999px)**, reserved for segmented toggles (Light /
@@ -513,7 +509,10 @@ are used only there.
     deletes it (shown on hover, always on touch), and clicking the text edits it. States: hover
     (Border strong and `shadow-raised`; the text shows Hover subtle behind it), active / pinned
     (Accent border with a 2px Accent soft ring), editing (the text becomes a field with the same
-    ring), and an error under the field in Danger on Danger soft.
+    border and ring), and an error under the field in Danger on Danger soft. The category
+    dropdown shows the Accent focus ring on keyboard focus. In the comment popover, the compose
+    field has no box of its own, so the popover card takes the Accent border and soft ring while
+    you type.
   - *Read-only* (All comments, and the admin review): the category is a tag and nothing is
     editable. States: hover, active; the admin review adds a Subtle line with when and on what
     device it was left (`.comment-sidebar-card-meta`).
@@ -526,7 +525,13 @@ are used only there.
   pretitles.
 - **Status labels:** use a tag (for example "Live" on `/history`), not uppercase or letter-spaced
   text.
-- **Focus:** every focusable element shows a 2px Accent outline with a 2px offset (3px for links).
+- **Focus:** every focusable element shows a 2px Accent outline with a 2px offset (3px for links)
+  on keyboard focus. Components set their own, and a base `:focus-visible` rule in `global.css`
+  gives the same ring to anything that doesn't (the nav logo, gallery tiles, carousel dots), so a
+  new control can't fall back to the browser's ring. Don't remove an outline without replacing it
+  with this ring or an Accent border; the soft 12% ring alone is too faint to show focus.
+- **Headings:** every page has exactly one `<h1>`. Pages led by images (About, Play) use a visually
+  hidden one (`sr-only`) so screen readers still get a page title.
 
 ### Patterns
 
@@ -538,7 +543,11 @@ it appears.
   overlay (Play gallery, About cards).
 - **Experience list:** year in Subtle, company as a link, role in Muted; each year shows once.
 - **Case study figure:** media with the corner radius and an optional caption in Muted.
+- **Decision row:** a titled text block beside a case study figure, in two equal columns with a
+  `space-5` gap, stacked on phones.
 - **Quote card:** a Surface panel with a 1px border, the corner radius, and `space-5` padding.
+- **Stat card:** the quote card panel holding a subheading figure over a Muted label; stats sit in
+  a row of three (stacked on phones) with a `space-4` gap.
 - **Footer card:** a Canvas panel with a hairline border and the panel radius.
 - **Floating bar:** hugs its contents, centred (full width on phones). Glass with a 40px backdrop
   blur, a hairline border, the panel radius, and
@@ -546,29 +555,51 @@ it appears.
 
 ## Motion
 
-- **Press:** buttons and dropdown triggers scale to 0.97 when pressed; icon controls to 0.92.
-- **Hover:** colour and background transitions run 0.12 to 0.15s.
-- **Menus** fade in over 0.12s, and the option highlight slides with
-  `cubic-bezier(0.22, 1, 0.36, 1)` over 0.2s.
-- **Reveal on scroll:** project cards and case study sections rise 1.5rem and fade in.
+Every transition and animation is timed with the motion tokens in `global.css`; never type a
+duration or a `cubic-bezier()` directly (`scripts/check-design-tokens.mjs` flags it). They aren't in
+the front matter because the format has no motion section. Tailwind's bare `transition` class uses
+`--duration-150` and `--ease-standard` too. Looping animations (the `/design-system` previews, a
+blinking caret) keep their own cycle length but still use the easing tokens.
+
+| Duration | Value | For |
+| --- | --- | --- |
+| `--duration-80` | 80ms | following the pointer (comment mode's hover outline) |
+| `--duration-150` | 150ms | hovers, presses, menus fading in |
+| `--duration-200` | 200ms | small changes in size (menu highlight, comment cards expanding) |
+| `--duration-320` | 320ms | fades and overlays sliding |
+| `--duration-500` | 500ms | the media morph and slow fades |
+| `--duration-700` | 700ms | the nav bar folding, comment mode opening |
+| `--duration-1000` | 1000ms | long arrivals: reveal on scroll, the colour mode wipe |
+
+| Easing | Value | For |
+| --- | --- | --- |
+| `--ease-standard` | Tailwind's `--ease-in-out`, `cubic-bezier(0.4, 0, 0.2, 1)` | colour, opacity, and things that leave and return |
+| `--ease-settle` | Tailwind's `--ease-out`, `cubic-bezier(0, 0, 0.2, 1)` | things arriving or growing, including the media overlay |
+
+- **Press:** buttons and dropdown triggers scale to `--press-scale` (0.97) when pressed; icon
+  controls to `--press-scale-icon` (0.92). Both over `--duration-150`.
+- **Hover:** colour and background transitions run `--duration-150` on `--ease-standard`.
+- **Menus** fade in over `--duration-150`, and the option highlight slides over `--duration-200`
+  on `--ease-settle`.
+- **Reveal on scroll:** project cards and case study sections rise 1.5rem and fade in, the rise
+  over `--duration-1000` on `--ease-settle`, the fade over `--duration-700`.
 - **Nav bar (desktop):** the bar hugs its contents, centred at the top. Scrolling down collapses
   the nav links so only the logo and Leave feedback remain, and the bar narrows with them; any scroll up, the top of the page, or keyboard focus brings them back. The
-  links' column eases between its width and nothing over 0.7s (ease in and out) while they fade,
-  slower than other transitions so the bar never snaps.
+  links' column eases between its width and nothing over `--duration-700` on `--ease-standard` while
+  they fade, slower than other transitions so the bar never snaps.
 - **Primary button shine:** the Leave feedback glow circles continuously and slowly; never fast
   enough to read as flashing.
 - **Media overlay:** the clicked image grows from its place on the page to the centre of the
-  overlay while the backdrop fades in (0.46s), and shrinks back on close; skipped for reduced
-  motion, off-screen sources, and video previews.
+  overlay while the backdrop fades in (`--duration-500` on `--ease-settle`, read from the tokens by
+  `src/lib/media-morph.ts`), and shrinks back on close; skipped for reduced motion, off-screen
+  sources, and video previews.
 - **Colour mode switch:** picking a mode that changes light or dark rises the new mode in from the
-  bottom of the screen to the top over 1.1s (`cubic-bezier(0.45, 0, 0.25, 1)`), behind a soft
+  bottom of the screen to the top over `--duration-1000` on `--ease-standard`, behind a soft
   gradient edge. Three backdrop-blur bands (4, 12, 28px) ride that edge, strongest at its centre,
   so the page warps as the modes meet, like the edge blur. It runs as a view transition
   (`theme-wipe` in `global.css`, started by `__setTheme` in `Layout.astro`). Switches that keep the
   same look (System matching the current mode), the OS changing mode on its own, reduced motion,
   and browsers without view transitions change instantly.
-- **Larger transitions** (the media overlay, view switches) ease with
-  `cubic-bezier(0.3, 0.7, 0.2, 1)` over roughly 0.3 to 0.5s.
 - **Reduced motion:** honour `prefers-reduced-motion` everywhere: drop reveals, slides, and
   morphs, and fall back to instant changes. Content must never depend on JavaScript to become
   visible.
@@ -584,7 +615,8 @@ it appears.
 - Do use Muted for readable secondary text; reserve Subtle for labels and disabled states.
 - Don't use the Accent blue for links, decoration, or any button but Leave feedback; it means
   focus, selection, or the primary call to action.
-- Don't add shadows outside the two elevation levels.
+- Don't add shadows outside the two elevation levels, or durations and easings outside the motion
+  tokens.
 - Don't introduce a second typeface or new font weights (400, 500, and 700 only).
 - Don't use the pill radius for anything but segmented toggles.
 - Don't add another primary call to action; Leave feedback is the one.

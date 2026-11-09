@@ -1,0 +1,440 @@
+---
+// Case study illustrations (/des-sys-audit), one per problem:
+// - "handoff": the same checkbox on a textured background, as prototyped and as implemented. Inspect
+//   callouts name each label's text colour token, so what's designed isn't what ships. The mismatch
+//   is the kind recorded on the manual audit.
+// - "hardcoded": design and code on the same textured background, before and after a theme change.
+//   One token's resolved primitive moves from blue to green: design references the token, so it
+//   updates; code hardcodes the hex, so it doesn't. A Before/After toggle cycles by itself while in
+//   view, to show it's interactive, and stops once clicked. Without JavaScript, or with reduced
+//   motion, nothing cycles and the "after" state shows. Inspect callouts name the token or hex; token
+//   names are illustrative.
+// The checkboxes depict fixed UI, so they use palette colours rather than
+// role tokens; everything else follows the colour mode.
+import '../../styles/inspect.css';
+
+interface Props {
+  kind: 'handoff' | 'hardcoded';
+}
+
+const { kind } = Astro.props;
+
+const texture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/pink-texture.webp`;
+
+const screens = [
+  { id: 'prototype', label: 'Design', token: '--color-text-primary' },
+  { id: 'implementation', label: 'Code', token: '--color-text-secondary' },
+];
+
+// design-tokens-ignore: labels quoting hex values, not styles
+const oldValue = 'blue-600 · #155DFC';
+// design-tokens-ignore: labels quoting hex values, not styles
+const newValue = 'emerald-600 · #009966';
+// design-tokens-ignore: label quoting the hardcoded hex, not a style
+const hardcodedHex = '#155DFC · not a token';
+---
+
+{
+  kind === 'handoff' ? (
+    <div class="problem-visual is-handoff" aria-hidden="true">
+      {screens.map((screen, i) => (
+        <>
+          {i === 1 && <span class="problem-between">≠</span>}
+          <div class:list={['handoff-side', `is-${screen.id}`]}>
+            <span class="problem-panel-label">{screen.label}</span>
+            <div class="handoff-frame">
+              <img src={texture} alt="" loading="lazy" decoding="async" />
+
+              <div class="handoff-component">
+                <span class="handoff-checkbox">
+                  <span class="handoff-box" />
+                  <span class="handoff-label">
+                    Mango
+                    <span class="handoff-leader" />
+                  </span>
+                </span>
+                <div class="inspect-panel">
+                  <span class="inspect-panel-title">Checkbox label</span>
+                  <dl>
+                    <dt>Text</dt>
+                    <dd>
+                      <span class="inspect-swatch" />
+                      <span>{screen.token}</span>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ))}
+    </div>
+  ) : (
+    <figure class="theme-compare" data-state="after" data-theme-compare>
+      <div class="theme-compare-head">
+        <div class="segmented" role="group" aria-label="Show before or after the theme change" hidden>
+          <span class="segmented-thumb" aria-hidden="true"></span>
+          <button type="button" class="segmented-option" data-state-choice="before" aria-pressed="false">Before theme change</button>
+          <button type="button" class="segmented-option" data-state-choice="after" aria-pressed="true">After theme change</button>
+        </div>
+      </div>
+
+      <div
+        class="problem-visual"
+        role="img"
+        aria-label="Before a theme change, design and code checkboxes are both blue. After the token --color-action changes to green, design updates to green because it uses the token. Code stays blue because it hardcodes the hex."
+      >
+        <div class="handoff-side">
+          <span class="theme-side-head">
+            <span class="problem-panel-label">Design</span>
+            <span class="tag" data-when="after">Updated</span>
+          </span>
+          <div class="handoff-frame">
+            <img src={texture} alt="" loading="lazy" decoding="async" />
+            <div class="handoff-component">
+              <span class="handoff-checkbox">
+                <span class="theme-box is-design">
+                  <svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" /></svg>
+                  <span class="handoff-leader" />
+                </span>
+                <span class="theme-label">Mango</span>
+              </span>
+              <div class="inspect-panel">
+                <span class="inspect-panel-title">Checkbox fill</span>
+                <dl>
+                  <dt>Token</dt>
+                  <dd>--color-action</dd>
+                  <dt>Value</dt>
+                  <dd>
+                    <span class="inspect-swatch is-design" />
+                    <span data-when="before">{oldValue}</span>
+                    <span data-when="after">{newValue}</span>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <span class="problem-between">
+          <span data-when="before">=</span>
+          <span data-when="after">≠</span>
+        </span>
+
+        <div class="handoff-side">
+          <span class="theme-side-head">
+            <span class="problem-panel-label">Code</span>
+            <span class="tag" data-when="after">Not updated</span>
+          </span>
+          <div class="handoff-frame">
+            <img src={texture} alt="" loading="lazy" decoding="async" />
+            <div class="handoff-component">
+              <span class="handoff-checkbox">
+                <span class="theme-box is-hardcoded">
+                  <svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" /></svg>
+                  <span class="handoff-leader" />
+                </span>
+                <span class="theme-label">Mango</span>
+              </span>
+              <div class="inspect-panel">
+                <span class="inspect-panel-title">Checkbox fill</span>
+                <dl>
+                  <dt>Value</dt>
+                  <dd class="is-untokened">
+                    <span class="inspect-swatch is-hardcoded" />
+                    <span>{hardcodedHex}</span>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+  )
+}
+
+<script>
+  // The theme change's toggle. It cycles by itself while in view so people notice it's interactive,
+  // and stops for good once someone clicks it. Reduced motion gets the toggle without the cycling.
+  const CYCLE_MS = 2800;
+
+  document.querySelectorAll<HTMLElement>('[data-theme-compare]').forEach((figure) => {
+    const toggle = figure.querySelector<HTMLElement>('.segmented');
+    if (!toggle) return;
+    const options = [...toggle.querySelectorAll<HTMLButtonElement>('[data-state-choice]')];
+    let timer: number | undefined;
+    let stopped = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const show = (state: string) => {
+      figure.dataset.state = state;
+      options.forEach((o) => o.setAttribute('aria-pressed', String(o.dataset.stateChoice === state)));
+    };
+
+    const pause = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const start = () => {
+      if (stopped || timer !== undefined) return;
+      timer = window.setInterval(() => {
+        show(figure.dataset.state === 'before' ? 'after' : 'before');
+      }, CYCLE_MS);
+    };
+
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        stopped = true;
+        pause();
+        show(option.dataset.stateChoice ?? 'after');
+      });
+    });
+
+    toggle.hidden = false;
+    if (!stopped) show('before');
+
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) start();
+        else pause();
+      },
+      { threshold: 0.4 },
+    ).observe(figure);
+  });
+</script>
+
+<style>
+  .problem-visual {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+  }
+
+  .problem-panel-label {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
+  }
+
+  .problem-between {
+    align-self: center;
+    font: var(--type-heading);
+    color: var(--color-subtle);
+  }
+
+  /* Handoff: the checkbox on its own, on the textured background */
+  .handoff-side {
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .handoff-frame {
+    container-type: inline-size;
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 8 / 9;
+    min-height: calc(var(--space-24) * 3.75);
+    overflow: hidden;
+    border-radius: var(--radius-base);
+  }
+
+  .handoff-frame img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .handoff-component {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: var(--space-8);
+    max-width: 90cqw;
+  }
+
+  .handoff-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-left: var(--space-2);
+  }
+
+  .handoff-box {
+    flex: none;
+    width: var(--space-5);
+    height: var(--space-5);
+    background: var(--color-white);
+    border: calc(var(--border-width) * 3) solid var(--color-neutral-500);
+    /* Half the base radius, so a small box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  .handoff-label {
+    position: relative;
+    font: var(--type-subheading);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-body);
+    /* The label being compared, selected as in Inspect mode */
+    outline: 1px solid var(--color-accent);
+    outline-offset: var(--space-1);
+  }
+
+  /* The one difference between the two sides */
+  .is-prototype .handoff-label {
+    color: var(--color-neutral-900);
+  }
+
+  .is-implementation .handoff-label {
+    color: var(--color-neutral-500);
+  }
+
+  .is-prototype .inspect-swatch {
+    background: var(--color-neutral-900);
+  }
+
+  .is-implementation .inspect-swatch {
+    background: var(--color-neutral-500);
+  }
+
+  .handoff-leader {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + var(--space-1));
+    height: calc(var(--space-8) - var(--space-1));
+    border-left: 1px dashed var(--color-pin);
+  }
+
+  .handoff-component .inspect-panel {
+    position: relative;
+    z-index: auto;
+    width: max-content;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .handoff-component .inspect-panel-title {
+    display: block;
+  }
+
+  .handoff-component .inspect-panel dl {
+    gap: var(--space-1) var(--space-3);
+  }
+
+  /* The ink swatch sits on a dark callout in dark mode, so it needs a visible edge */
+  .handoff-component .inspect-swatch {
+    border-color: var(--color-border-strong);
+  }
+
+  /* Stacked on phones, so each side keeps a readable size; the arrow then points down */
+  @media (max-width: 639px) {
+    .problem-visual {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .problem-between {
+      justify-self: center;
+    }
+  }
+
+  /* Hardcoded: the handoff layout, with a toggle for before and after the theme change */
+  .theme-compare {
+    margin: var(--space-4) 0 0;
+  }
+
+  .theme-compare-head {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: var(--space-3);
+  }
+
+  .theme-compare .problem-visual {
+    margin-top: 0;
+  }
+
+  /* The longer labels need to stay on one line at phone width */
+  @media (max-width: 639px) {
+    .theme-compare .segmented-option {
+      padding-inline: var(--space-2);
+      white-space: nowrap;
+    }
+  }
+
+  /* Same position on both sides, though design's callout has an extra row */
+  .theme-compare .handoff-component {
+    align-self: start;
+    width: 78cqw;
+    margin-top: var(--space-24);
+  }
+
+  .theme-compare .inspect-panel {
+    width: 100%;
+  }
+
+  .theme-side-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-height: var(--space-6);
+  }
+
+  .theme-label {
+    font: var(--type-subheading);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-neutral-900);
+  }
+
+  /* The checkbox's fill is what's being inspected, so the selection sits on the box */
+  .theme-box {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: var(--space-5);
+    height: var(--space-5);
+    /* Half the base radius, so a small box reads as a rounded square, not a circle */
+    border-radius: calc(var(--radius-base) / 2);
+    outline: 1px solid var(--color-accent);
+    outline-offset: var(--space-1);
+  }
+
+  .theme-box svg {
+    width: var(--space-4);
+    height: var(--space-4);
+    fill: none;
+    stroke: var(--color-white);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .theme-box.is-design,
+  .inspect-swatch.is-design {
+    background: var(--color-emerald-600);
+  }
+
+  .theme-compare[data-state='before'] .theme-box.is-design,
+  .theme-compare[data-state='before'] .inspect-swatch.is-design {
+    background: var(--color-blue-600);
+  }
+
+  .theme-box.is-hardcoded,
+  .inspect-swatch.is-hardcoded {
+    /* design-tokens-ignore: deliberately hardcoded, to show what a theme update misses */
+    background: #155dfc;
+  }
+
+  .theme-compare[data-state='before'] [data-when='after'],
+  .theme-compare[data-state='after'] [data-when='before'] {
+    display: none;
+  }
+</style>

@@ -61,7 +61,8 @@ say so.
 | Motion rule | `motion` |
 | New section or component | `sections` (sidebar nav, with `children` under Components) and a new `<section>` |
 
-Keep the page's copy short: one or two plain sentences per section or component saying what it
+Value labels in those arrays are checked against the CSS by `npm run check:design`, so write each in
+the unit its token uses. Keep the page's copy short: one or two plain sentences per section or component saying what it
 does, and a few words per list item. The detail belongs in DESIGN.md, not on the page. The page
 intro only says it's built with Astro, Tailwind, and React, documented in the DESIGN.md format, and
 adapts to light and dark mode.
