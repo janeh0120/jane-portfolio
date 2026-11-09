@@ -642,6 +642,14 @@
         "value": "{color.red.50}",
         "type": "color"
       },
+      "success": {
+        "value": "{color.emerald.700}",
+        "type": "color"
+      },
+      "success-soft": {
+        "value": "{color.emerald.50}",
+        "type": "color"
+      },
       "placeholder": {
         "value": "{color.neutral.300}",
         "type": "color"
@@ -758,6 +766,14 @@
       },
       "danger-soft": {
         "value": "{color.red.950}",
+        "type": "color"
+      },
+      "success": {
+        "value": "{color.emerald.300}",
+        "type": "color"
+      },
+      "success-soft": {
+        "value": "{color.emerald.950}",
         "type": "color"
       },
       "placeholder": {

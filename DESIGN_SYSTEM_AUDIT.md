@@ -397,3 +397,9 @@ width, the pill radius, and durations.
 Shadows and easings followed. Raised is now `shadow-sm` and Floating `shadow-xl`. Tailwind only has
 two easings that fit, so the four became two: Glide merged into Standard (`ease-in-out`) and Morph into
 Settle (`ease-out`). Motion loses a little of its long, soft settle as a result.
+
+### Follow-up: a success pair to match danger
+
+The audit case study needed a code diff, and the system only had a colour for what's removed. Added
+Success and Success soft (emerald-700 on emerald-50, emerald-300 on emerald-950 in dark mode), the same
+steps Danger uses on red, so the two read as a pair. The token checker stays at 0.

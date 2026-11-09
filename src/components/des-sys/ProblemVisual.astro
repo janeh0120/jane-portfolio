@@ -3,11 +3,13 @@
 // - "handoff": the same checkbox on a textured background, as prototyped and as implemented. Inspect
 //   callouts name each label's text colour token, so what's designed isn't what ships. The mismatch
 //   is the kind recorded on the manual audit.
-// - "hardcoded": a static grid of design and code, before and after a theme change. One token's
-//   resolved primitive moves from blue to green: design references the token, so it updates; code
-//   hardcodes the hex, so it doesn't. Inspect mode's callouts (src/styles/inspect.css) name the token
-//   or hex. Token names are illustrative.
-// The website screens and checkbox fills depict fixed UI, so they use palette colours rather than
+// - "hardcoded": design and code on the same textured background, before and after a theme change.
+//   One token's resolved primitive moves from blue to green: design references the token, so it
+//   updates; code hardcodes the hex, so it doesn't. A Before/After toggle cycles by itself while in
+//   view, to show it's interactive, and stops once clicked. Without JavaScript, or with reduced
+//   motion, nothing cycles and the "after" state shows. Inspect callouts name the token or hex; token
+//   names are illustrative.
+// The checkboxes depict fixed UI, so they use palette colours rather than
 // role tokens; everything else follows the colour mode.
 import '../../styles/inspect.css';
 
@@ -20,8 +22,8 @@ const { kind } = Astro.props;
 const texture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/pink-texture.webp`;
 
 const screens = [
-  { id: 'prototype', label: 'Prototype', token: '--color-text-primary' },
-  { id: 'implementation', label: 'Implementation', token: '--color-text-secondary' },
+  { id: 'prototype', label: 'Design', token: '--color-text-primary' },
+  { id: 'implementation', label: 'Code', token: '--color-text-secondary' },
 ];
 
 // design-tokens-ignore: labels quoting hex values, not styles
@@ -30,23 +32,6 @@ const oldValue = 'blue-600 · #155DFC';
 const newValue = 'emerald-600 · #009966';
 // design-tokens-ignore: label quoting the hardcoded hex, not a style
 const hardcodedHex = '#155DFC · not a token';
-
-const themeRows = [
-  {
-    side: 'Design',
-    cells: [
-      { fill: 'is-blue', token: '--color-action', value: oldValue },
-      { fill: 'is-green', token: '--color-action', value: newValue, result: 'Updated' },
-    ],
-  },
-  {
-    side: 'Code',
-    cells: [
-      { fill: 'is-hardcoded', value: hardcodedHex, untokened: true },
-      { fill: 'is-hardcoded', value: hardcodedHex, untokened: true, result: 'Not updated' },
-    ],
-  },
-];
 ---
 
 {
@@ -85,54 +70,139 @@ const themeRows = [
       ))}
     </div>
   ) : (
-    <div
-      class="theme-compare"
-      role="img"
-      aria-label="Before a theme change, design and code checkboxes are both blue. After the token --color-action changes to green, design updates to green because it uses the token. Code stays blue because it hardcodes the hex."
-    >
-      <span class="theme-corner" />
-      <span class="theme-col-label">Before theme change</span>
-      <span class="theme-col-label">After theme change</span>
+    <figure class="theme-compare" data-state="after" data-theme-compare>
+      <div class="theme-compare-head">
+        <div class="segmented" role="group" aria-label="Show before or after the theme change" hidden>
+          <span class="segmented-thumb" aria-hidden="true"></span>
+          <button type="button" class="segmented-option" data-state-choice="before" aria-pressed="false">Before theme change</button>
+          <button type="button" class="segmented-option" data-state-choice="after" aria-pressed="true">After theme change</button>
+        </div>
+      </div>
 
-      {themeRows.map((row) => (
-        <>
-          <span class="theme-row-label">{row.side}</span>
-          {row.cells.map((cell) => (
-            <div class="problem-panel theme-cell">
-              <span class="theme-cell-head">
-                <span class="theme-target">
-                  <span class:list={['theme-box', cell.fill]}>
-                    <svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" /></svg>
-                  </span>
-                  Mango
-                  <span class="inspect-box" />
+      <div
+        class="problem-visual"
+        role="img"
+        aria-label="Before a theme change, design and code checkboxes are both blue. After the token --color-action changes to green, design updates to green because it uses the token. Code stays blue because it hardcodes the hex."
+      >
+        <div class="handoff-side">
+          <span class="theme-side-head">
+            <span class="problem-panel-label">Design</span>
+            <span class="tag" data-when="after">Updated</span>
+          </span>
+          <div class="handoff-frame">
+            <img src={texture} alt="" loading="lazy" decoding="async" />
+            <div class="handoff-component">
+              <span class="handoff-checkbox">
+                <span class="theme-box is-design">
+                  <svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" /></svg>
+                  <span class="handoff-leader" />
                 </span>
-                {cell.result && <span class="tag">{cell.result}</span>}
+                <span class="theme-label">Mango</span>
               </span>
-              <span class="theme-leader" />
               <div class="inspect-panel">
                 <span class="inspect-panel-title">Checkbox fill</span>
                 <dl>
-                  {cell.token && (
-                    <>
-                      <dt>Token</dt>
-                      <dd>{cell.token}</dd>
-                    </>
-                  )}
+                  <dt>Token</dt>
+                  <dd>--color-action</dd>
                   <dt>Value</dt>
-                  <dd class:list={[cell.untokened && 'is-untokened']}>
-                    <span class:list={['inspect-swatch', cell.fill]} />
-                    <span>{cell.value}</span>
+                  <dd>
+                    <span class="inspect-swatch is-design" />
+                    <span data-when="before">{oldValue}</span>
+                    <span data-when="after">{newValue}</span>
                   </dd>
                 </dl>
               </div>
             </div>
-          ))}
-        </>
-      ))}
-    </div>
+          </div>
+        </div>
+
+        <span class="problem-between">
+          <span data-when="before">=</span>
+          <span data-when="after">≠</span>
+        </span>
+
+        <div class="handoff-side">
+          <span class="theme-side-head">
+            <span class="problem-panel-label">Code</span>
+            <span class="tag" data-when="after">Not updated</span>
+          </span>
+          <div class="handoff-frame">
+            <img src={texture} alt="" loading="lazy" decoding="async" />
+            <div class="handoff-component">
+              <span class="handoff-checkbox">
+                <span class="theme-box is-hardcoded">
+                  <svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10" /></svg>
+                  <span class="handoff-leader" />
+                </span>
+                <span class="theme-label">Mango</span>
+              </span>
+              <div class="inspect-panel">
+                <span class="inspect-panel-title">Checkbox fill</span>
+                <dl>
+                  <dt>Value</dt>
+                  <dd class="is-untokened">
+                    <span class="inspect-swatch is-hardcoded" />
+                    <span>{hardcodedHex}</span>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </figure>
   )
 }
+
+<script>
+  // The theme change's toggle. It cycles by itself while in view so people notice it's interactive,
+  // and stops for good once someone clicks it. Reduced motion gets the toggle without the cycling.
+  const CYCLE_MS = 2800;
+
+  document.querySelectorAll<HTMLElement>('[data-theme-compare]').forEach((figure) => {
+    const toggle = figure.querySelector<HTMLElement>('.segmented');
+    if (!toggle) return;
+    const options = [...toggle.querySelectorAll<HTMLButtonElement>('[data-state-choice]')];
+    let timer: number | undefined;
+    let stopped = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const show = (state: string) => {
+      figure.dataset.state = state;
+      options.forEach((o) => o.setAttribute('aria-pressed', String(o.dataset.stateChoice === state)));
+    };
+
+    const pause = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const start = () => {
+      if (stopped || timer !== undefined) return;
+      timer = window.setInterval(() => {
+        show(figure.dataset.state === 'before' ? 'after' : 'before');
+      }, CYCLE_MS);
+    };
+
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        stopped = true;
+        pause();
+        show(option.dataset.stateChoice ?? 'after');
+      });
+    });
+
+    toggle.hidden = false;
+    if (!stopped) show('before');
+
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) start();
+        else pause();
+      },
+      { threshold: 0.4 },
+    ).observe(figure);
+  });
+</script>
 
 <style>
   .problem-visual {
@@ -141,17 +211,6 @@ const themeRows = [
     align-items: stretch;
     gap: var(--space-3);
     margin-top: var(--space-4);
-  }
-
-  .problem-panel {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3);
-    padding: var(--space-4) var(--space-5);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-base);
-    color: var(--color-ink);
   }
 
   .problem-panel-label {
@@ -285,53 +344,58 @@ const themeRows = [
     }
   }
 
-  /* Hardcoded: design and code as rows, before and after the theme change as columns */
+  /* Hardcoded: the handoff layout, with a toggle for before and after the theme change */
   .theme-compare {
-    display: grid;
-    grid-template-columns: max-content repeat(2, minmax(0, 1fr));
-    align-items: stretch;
-    gap: var(--space-3);
-    margin-top: var(--space-4);
+    margin: var(--space-4) 0 0;
   }
 
-  .theme-col-label {
-    font: var(--type-compact);
-    letter-spacing: var(--tracking-body);
-    color: var(--color-subtle);
-  }
-
-  .theme-row-label {
-    align-self: center;
-    font: var(--type-label);
-    letter-spacing: var(--tracking-body);
-    color: var(--color-ink);
-  }
-
-  .theme-cell {
-    gap: 0;
-    min-width: 0;
-  }
-
-  .theme-cell-head {
+  .theme-compare-head {
     display: flex;
-    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: var(--space-3);
+  }
+
+  .theme-compare .problem-visual {
+    margin-top: 0;
+  }
+
+  /* The longer labels need to stay on one line at phone width */
+  @media (max-width: 639px) {
+    .theme-compare .segmented-option {
+      padding-inline: var(--space-2);
+      white-space: nowrap;
+    }
+  }
+
+  /* Same position on both sides, though design's callout has an extra row */
+  .theme-compare .handoff-component {
+    align-self: start;
+    width: 78cqw;
+    margin-top: var(--space-24);
+  }
+
+  .theme-compare .inspect-panel {
+    width: 100%;
+  }
+
+  .theme-side-head {
+    display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-1) var(--space-2);
-  }
-
-  .theme-target {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
     gap: var(--space-2);
-    margin: var(--space-1);
-    font: var(--type-body);
-    letter-spacing: var(--tracking-body);
-    color: var(--color-ink);
+    min-height: var(--space-6);
   }
 
+  .theme-label {
+    font: var(--type-subheading);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-neutral-900);
+  }
+
+  /* The checkbox's fill is what's being inspected, so the selection sits on the box */
   .theme-box {
+    position: relative;
     display: grid;
     place-items: center;
     flex: none;
@@ -339,6 +403,8 @@ const themeRows = [
     height: var(--space-5);
     /* Half the base radius, so a small box reads as a rounded square, not a circle */
     border-radius: calc(var(--radius-base) / 2);
+    outline: 1px solid var(--color-accent);
+    outline-offset: var(--space-1);
   }
 
   .theme-box svg {
@@ -351,14 +417,14 @@ const themeRows = [
     stroke-linejoin: round;
   }
 
-  .theme-box.is-blue,
-  .inspect-swatch.is-blue {
-    background: var(--color-blue-600);
+  .theme-box.is-design,
+  .inspect-swatch.is-design {
+    background: var(--color-emerald-600);
   }
 
-  .theme-box.is-green,
-  .inspect-swatch.is-green {
-    background: var(--color-emerald-600);
+  .theme-compare[data-state='before'] .theme-box.is-design,
+  .theme-compare[data-state='before'] .inspect-swatch.is-design {
+    background: var(--color-blue-600);
   }
 
   .theme-box.is-hardcoded,
@@ -367,73 +433,8 @@ const themeRows = [
     background: #155dfc;
   }
 
-  /* Inspect mode's overlay is fixed to the viewport; here each piece sits with its checkbox */
-  .theme-target .inspect-box {
-    position: absolute;
-    inset: calc(var(--space-1) * -1);
-    border-radius: var(--radius-none);
-  }
-
-  .theme-leader {
-    align-self: flex-start;
-    height: var(--space-4);
-    margin: var(--space-1) 0 0 var(--space-3);
-    border-left: 1px dashed var(--color-pin);
-  }
-
-  .theme-cell .inspect-panel {
-    position: relative;
-    z-index: auto;
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-  }
-
-  .theme-cell .inspect-panel-title {
-    display: block;
-  }
-
-  .theme-cell .inspect-panel dl {
-    gap: var(--space-1) var(--space-3);
-  }
-
-  /* On phones each row label takes its own line, and values wrap between words */
-  @media (max-width: 639px) {
-    .theme-compare {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--space-2);
-    }
-
-    .theme-corner {
-      display: none;
-    }
-
-    .theme-row-label {
-      grid-column: 1 / -1;
-      margin-top: var(--space-2);
-    }
-
-    .theme-cell .inspect-panel {
-      padding: var(--space-2) var(--space-3);
-    }
-
-    .theme-cell .inspect-panel dl {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
-    .theme-cell .inspect-panel dd {
-      align-items: flex-start;
-      overflow-wrap: normal;
-    }
-  }
-
-  @media (max-width: 639px) {
-    .problem-visual {
-      gap: var(--space-2);
-    }
-
-    .problem-panel {
-      padding: var(--space-3);
-    }
+  .theme-compare[data-state='before'] [data-when='after'],
+  .theme-compare[data-state='after'] [data-when='before'] {
+    display: none;
   }
 </style>

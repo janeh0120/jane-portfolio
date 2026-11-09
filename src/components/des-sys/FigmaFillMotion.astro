@@ -1,0 +1,502 @@
+---
+// Case study motion (/des-sys-audit, Fix Figma step): a recreated design file on the textured
+// background. A cursor opens the Fill panel's style picker and swaps the checkbox labels from
+// text-secondary to text-primary. An SVG scene, so everything keeps its position at any size.
+//
+// The default styles are the final state, which is what shows without JavaScript or with reduced
+// motion. It loops only while in view, and has a pause button. It depicts a fixed design tool, so
+// it uses palette colours and Figma's component purple rather than role tokens.
+import IconControl from '../IconControl.astro';
+
+const texture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/pink-texture.webp`;
+
+const check = 'M5 10.5l3.5 3.5 6.5-7.5';
+const dash = 'M5.5 10h9';
+
+// The last row runs off the bottom of the frame, like a larger component set would
+const rows = [
+  { box: 'is-default' },
+  { box: 'is-hover' },
+  { box: 'is-checked', mark: check },
+  { box: 'is-checked', mark: dash },
+  { box: 'is-error' },
+  { box: 'is-warning' },
+  { box: 'is-error-checked', mark: check },
+];
+
+const columns = [72];
+
+const picker = [
+  { name: 'text-secondary', swatch: 'is-secondary', y: 176 },
+  { name: 'text-primary', swatch: 'is-primary', y: 204 },
+  { name: 'text-disabled', swatch: 'is-disabled', y: 232 },
+];
+---
+
+<div class="fill-motion" data-fill-motion>
+  <svg
+    viewBox="0 0 640 360"
+    role="img"
+    aria-label="A checkbox component selected in a design file. A cursor opens the Fill style picker and changes the label colour from text-secondary to text-primary."
+  >
+    <image href={texture} x="0" y="0" width="640" height="360" preserveAspectRatio="xMidYMid slice"></image>
+
+    <!-- Component set: dashed border hugging the checkboxes, label, and resize nodes, cut off by the frame.
+         Centred with the panel as one group -->
+    <g transform="translate(47 0)">
+    <g class="fm-purple" font-size="11" font-weight="600">
+      <path d="M52 37l4-4 4 4-4 4z" class="fm-purple-fill"></path>
+      <text x="66" y="41" class="fm-purple-fill">Checkbox</text>
+    </g>
+    <rect x="48" y="52" width="174" height="360" class="fm-set"></rect>
+    <rect x="44" y="48" width="8" height="8" class="fm-node"></rect>
+    <rect x="218" y="48" width="8" height="8" class="fm-node"></rect>
+
+    <!-- The checkbox's variants -->
+    {
+      columns.map((x) =>
+        rows.map((row, i) => {
+          const y = 76 + i * 45;
+          return (
+            <g transform={`translate(${x} ${y})`}>
+              <rect width="20" height="20" rx="4" class:list={['fm-box', row.box]} />
+              {row.mark && <path d={row.mark} class="fm-mark" />}
+              <text x="30" y="15" font-size="14" class="fm-label">
+                Selection Label
+              </text>
+            </g>
+          );
+        }),
+      )
+    }
+
+    </g>
+
+    <g transform="translate(-71 0)">
+    <!-- Properties panel -->
+    <rect x="380" y="52" width="236" height="88" rx="8" class="fm-panel"></rect>
+    <text x="396" y="80" font-size="12" font-weight="600" class="fm-ink">Fill</text>
+    <path d="M596 71v10M591 76h10" class="fm-icon"></path>
+
+    <rect x="396" y="92" width="204" height="32" rx="6" class="fm-field"></rect>
+    <circle cx="414" cy="108" r="7" class="fm-swatch is-applied"></circle>
+    <text x="430" y="112" font-size="12" class="fm-ink fm-old fm-applied">text-secondary</text>
+    <text x="430" y="112" font-size="12" class="fm-ink fm-new fm-applied">text-primary</text>
+
+
+    <!-- Style picker, opened from the fill row -->
+    <g class="fm-picker">
+      <rect x="388" y="132" width="220" height="136" rx="8" class="fm-panel"></rect>
+      <text x="404" y="158" font-size="11" class="fm-muted">Libraries</text>
+      <rect x="396" y="204" width="204" height="28" rx="4" class="fm-highlight"></rect>
+      {
+        picker.map((item) => (
+          <g>
+            <circle cx="414" cy={item.y + 14} r="7" class:list={['fm-swatch', item.swatch]} />
+            <text x="430" y={item.y + 18} font-size="12" class="fm-ink">
+              {item.name}
+            </text>
+          </g>
+        ))
+      }
+      <path d="M580 190l3.5 3.5 6.5-7" class="fm-tick"></path>
+    </g>
+
+    <!-- Cursor -->
+    <g class="fm-cursor">
+      <path d="M0 0v16l4.5-4 3 7 2.6-1.1-3-6.9H13z" class="fm-cursor-shape"></path>
+    </g>
+    </g>
+  </svg>
+
+  <IconControl label="Pause animation" class="is-on-media fill-motion-toggle" data-fill-toggle hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true" data-when-playing>
+      <path d="M8 5v14M16 5v14"></path>
+    </svg>
+    <svg viewBox="0 0 24 24" aria-hidden="true" data-when-paused>
+      <path d="M7 4l13 8-13 8z"></path>
+    </svg>
+  </IconControl>
+</div>
+
+<script>
+  // Loop only while in view; the pause button holds it wherever it is. Reduced motion never starts.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll<HTMLElement>('[data-fill-motion]').forEach((motion) => {
+      const toggle = motion.querySelector<HTMLButtonElement>('[data-fill-toggle]');
+
+      if (toggle) {
+        toggle.hidden = false;
+        toggle.addEventListener('click', () => {
+          const paused = motion.classList.toggle('is-paused');
+          toggle.setAttribute('aria-label', paused ? 'Play animation' : 'Pause animation');
+        });
+      }
+
+      new IntersectionObserver(
+        ([entry]) => {
+          motion.classList.toggle('is-playing', entry.isIntersecting);
+        },
+        { threshold: 0.3 },
+      ).observe(motion);
+    });
+  }
+</script>
+
+<style>
+  .fill-motion {
+    --fm-purple: #9747ff; /* design-tokens-ignore: Figma's component purple, part of the depicted tool */
+    --fm-duration: calc(var(--duration-1000) * 8);
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius-base);
+  }
+
+  .fill-motion > svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    font-family: var(--font-sans);
+  }
+
+  .fm-purple-fill {
+    fill: var(--fm-purple);
+  }
+
+  .fm-set {
+    fill: none;
+    stroke: var(--fm-purple);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 3;
+  }
+
+  .fm-node {
+    fill: var(--color-white);
+    stroke: var(--fm-purple);
+    stroke-width: 1.5;
+  }
+
+  .fm-box {
+    fill: var(--color-white);
+    stroke: var(--color-neutral-400);
+    stroke-width: 1.5;
+  }
+
+  .fm-box.is-hover {
+    stroke: var(--color-blue-600);
+  }
+
+  .fm-box.is-error {
+    stroke: var(--color-red-700);
+  }
+
+  .fm-box.is-warning {
+    stroke: var(--color-orange-600);
+  }
+
+  .fm-box.is-error-checked {
+    fill: var(--color-red-700);
+    stroke: var(--color-red-700);
+  }
+
+  .fm-box.is-checked {
+    fill: var(--color-blue-600);
+    stroke: var(--color-blue-600);
+  }
+
+  .fm-mark {
+    fill: none;
+    stroke: var(--color-white);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .fm-label {
+    fill: var(--color-neutral-900);
+  }
+
+  .fm-panel {
+    fill: var(--color-white);
+    stroke: var(--color-neutral-200);
+  }
+
+  .fm-field {
+    fill: var(--color-neutral-100);
+  }
+
+  .fm-ink {
+    fill: var(--color-neutral-900);
+  }
+
+  .fm-muted {
+    fill: var(--color-neutral-500);
+  }
+
+  .fm-icon {
+    fill: none;
+    stroke: var(--color-neutral-500);
+    stroke-width: 1.25;
+    stroke-linecap: round;
+  }
+
+  .fm-swatch.is-secondary {
+    fill: var(--color-neutral-500);
+  }
+
+  .fm-swatch.is-primary,
+  .fm-swatch.is-applied {
+    fill: var(--color-neutral-900);
+  }
+
+  .fm-swatch.is-disabled {
+    fill: var(--color-neutral-300);
+  }
+
+  .fm-old {
+    opacity: 0;
+  }
+
+  .fm-highlight {
+    fill: var(--color-accent-soft);
+    opacity: 0;
+  }
+
+  .fm-tick {
+    fill: none;
+    stroke: var(--color-neutral-900);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .fm-picker,
+  .fm-cursor {
+    opacity: 0;
+  }
+
+  .fm-cursor-shape {
+    fill: var(--color-neutral-900);
+    stroke: var(--color-white);
+    stroke-width: 1.25;
+    stroke-linejoin: round;
+  }
+
+  .fill-motion-toggle {
+    position: absolute;
+    right: var(--space-2);
+    bottom: var(--space-2);
+  }
+
+  .fill-motion-toggle[hidden] {
+    display: none;
+  }
+
+  .fill-motion-toggle svg {
+    fill: currentColor;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .fill-motion-toggle [data-when-paused],
+  .fill-motion.is-paused .fill-motion-toggle [data-when-playing] {
+    display: none;
+  }
+
+  .fill-motion.is-paused .fill-motion-toggle [data-when-paused] {
+    display: block;
+  }
+
+  /* The timeline: secondary, cursor opens the picker, picks primary, the labels update, then rests */
+  @media (prefers-reduced-motion: no-preference) {
+    .is-playing .fm-label,
+    .is-playing .fm-swatch.is-applied,
+    .is-playing .fm-old,
+    .is-playing .fm-new,
+    .is-playing .fm-picker,
+    .is-playing .fm-highlight,
+    .is-playing .fm-cursor {
+      animation-duration: var(--fm-duration);
+      animation-timing-function: var(--ease-standard);
+      animation-iteration-count: infinite;
+    }
+
+    .is-paused .fm-label,
+    .is-paused .fm-swatch.is-applied,
+    .is-paused .fm-old,
+    .is-paused .fm-new,
+    .is-paused .fm-picker,
+    .is-paused .fm-highlight,
+    .is-paused .fm-cursor {
+      animation-play-state: paused;
+    }
+
+    .is-playing .fm-label {
+      animation-name: fm-label;
+    }
+
+    .is-playing .fm-swatch.is-applied {
+      animation-name: fm-swatch;
+    }
+
+    .is-playing .fm-old {
+      animation-name: fm-old;
+    }
+
+    .is-playing .fm-new {
+      animation-name: fm-new;
+    }
+
+    .is-playing .fm-picker {
+      animation-name: fm-picker;
+    }
+
+    .is-playing .fm-highlight {
+      animation-name: fm-highlight;
+    }
+
+    .is-playing .fm-cursor {
+      animation-name: fm-cursor;
+    }
+  }
+
+  @keyframes fm-label {
+    0%,
+    54% {
+      fill: var(--color-neutral-500);
+    }
+    60%,
+    92% {
+      fill: var(--color-neutral-900);
+    }
+    98%,
+    100% {
+      fill: var(--color-neutral-500);
+    }
+  }
+
+  @keyframes fm-swatch {
+    0%,
+    54% {
+      fill: var(--color-neutral-500);
+    }
+    58%,
+    92% {
+      fill: var(--color-neutral-900);
+    }
+    98%,
+    100% {
+      fill: var(--color-neutral-500);
+    }
+  }
+
+  @keyframes fm-old {
+    0%,
+    54% {
+      opacity: 1;
+    }
+    57%,
+    92% {
+      opacity: 0;
+    }
+    98%,
+    100% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fm-new {
+    0%,
+    54% {
+      opacity: 0;
+    }
+    57%,
+    92% {
+      opacity: 1;
+    }
+    98%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fm-picker {
+    0%,
+    31% {
+      opacity: 0;
+    }
+    34%,
+    53% {
+      opacity: 1;
+    }
+    56%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fm-highlight {
+    0%,
+    45% {
+      opacity: 0;
+    }
+    48%,
+    53% {
+      opacity: 1;
+    }
+    56%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fm-cursor {
+    0% {
+      opacity: 0;
+      transform: translate(560px, 330px);
+    }
+    8%,
+    12% {
+      opacity: 1;
+      transform: translate(560px, 330px);
+    }
+    28% {
+      opacity: 1;
+      transform: translate(490px, 108px);
+    }
+    30% {
+      opacity: 1;
+      transform: translate(490px, 108px) scale(0.85);
+    }
+    32%,
+    36% {
+      opacity: 1;
+      transform: translate(490px, 108px);
+    }
+    48% {
+      opacity: 1;
+      transform: translate(490px, 218px);
+    }
+    51% {
+      opacity: 1;
+      transform: translate(490px, 218px) scale(0.85);
+    }
+    54%,
+    60% {
+      opacity: 1;
+      transform: translate(490px, 218px);
+    }
+    76%,
+    86% {
+      opacity: 1;
+      transform: translate(560px, 330px);
+    }
+    92%,
+    100% {
+      opacity: 0;
+      transform: translate(560px, 330px);
+    }
+  }
+</style>

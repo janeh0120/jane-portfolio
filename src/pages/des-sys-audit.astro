@@ -5,7 +5,6 @@
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
 import AuditSkillFlow from '../components/des-sys/AuditSkillFlow.astro';
 import AuditReviewLoop from '../components/des-sys/AuditReviewLoop.astro';
-import TokenCompare from '../components/des-sys/TokenCompare.astro';
 import ProblemVisual from '../components/des-sys/ProblemVisual.astro';
 import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 
@@ -15,7 +14,6 @@ const nav = [
   { label: 'Solution', href: '#solution' },
   { label: 'Opportunity: AI', href: '#opportunity' },
   { label: 'New Solution', href: '#new-solution' },
-  { label: 'Opportunity: Docs', href: '#opportunity-docs' },
   { label: 'Final Solution', href: '#final' },
   { label: 'Impact', href: '#impact' },
   { label: 'Reflection', href: '#reflection' },
@@ -24,7 +22,7 @@ const nav = [
 
 <CaseStudyLayout
   title="Design System Audit"
-  heading="Auditing an enterprise design system with AI"
+  heading="Bridging design and code within an enterprise design system"
   role="Product Design Intern"
   company="Intuit Design System"
   team="Sole designer, 1 developer, guidance from 2 designers"
@@ -44,19 +42,11 @@ const nav = [
   </section>
 
   <section id="problem" data-comment-id="des-sys-audit-problem">
-    <h2 class="section-label">Problem</h2>
-    <ol>
-      <li>
-        <h3>Design handoff is less reliable</h3>
-        <p>Handoff breaks down when components aren’t 1-to-1 between prototypes and implementation.</p>
-        <ProblemVisual kind="handoff" />
-      </li>
-      <li>
-        <h3>Hardcoded values bypass tokens</h3>
-        <p>Hardcoded values in components skip tokens, so global theme updates never reach the UI.</p>
-        <ProblemVisual kind="hardcoded" />
-      </li>
-    </ol>
+    <h2 class="section-label">Why does this matter</h2>
+    <p class="heading text-ink">Design handoff is less reliable when components aren’t 1-to-1 between prototypes and implementation.</p>
+    <ProblemVisual kind="handoff" />
+    <p class="heading text-ink audit-next-point">Hardcoded values in components bypass tokens, so global theme updates never reach the UI.</p>
+    <ProblemVisual kind="hardcoded" />
   </section>
 
   <section id="solution" data-comment-id="des-sys-audit-solution">
@@ -76,15 +66,8 @@ const nav = [
 
   <section id="new-solution" data-comment-id="des-sys-audit-new-solution">
     <h2 class="section-label">New solution</h2>
-    <p class="heading text-ink">I built an AI skill that checks a component’s code and design to point out inconsistencies.</p>
+    <p class="heading text-ink">I started with a skill my team created to compare design and code, then iterated on it to refer to our design system docs and point out token misuse.</p>
     <AuditSkillFlow />
-  </section>
-
-  <section id="opportunity-docs" data-comment-id="des-sys-audit-opportunity-docs">
-    <h2 class="section-label">Opportunity</h2>
-    <p class="heading text-ink">Design system alignment isn’t just about alignment between design and code, but also compliance with documentation.</p>
-    <p>How might we refine skills to make recommendations on correct token usage based on design system documentation?</p>
-    <TokenCompare />
   </section>
 
   <section id="final" data-comment-id="des-sys-audit-final">
@@ -95,27 +78,73 @@ const nav = [
 
   <section id="impact" data-comment-id="des-sys-audit-impact">
     <h2 class="section-label">Impact</h2>
-    <!-- TODO(Jane): impact copy. -->
-    <div class="case-study-stats">
+    <h3 class="audit-stat-label">Time savings from auditing with skills</h3>
+    <div class="case-study-stats audit-stats is-single">
       <div class="case-study-stat">
-        <strong>355k+</strong>
+        <strong class="heading text-ink">5 days → 1 day</strong>
+        <span>to audit a component, from mostly manual to using skills</span>
+      </div>
+    </div>
+    <h3 class="audit-stat-label">Scope of the audit</h3>
+    <div class="case-study-stats audit-stats is-single">
+      <div class="case-study-stat">
+        <strong class="heading text-ink">3</strong>
+        <span>core components in the design system</span>
+      </div>
+    </div>
+    <h3 class="audit-stat-label">Impact of updating the checkbox specifically</h3>
+    <div class="case-study-stats audit-stats">
+      <div class="case-study-stat">
+        <strong class="heading text-ink">355k+</strong>
         <span>instances of checkbox in Figma</span>
       </div>
       <div class="case-study-stat">
-        <strong>143</strong>
+        <strong class="heading text-ink">143</strong>
         <span>business units use checkbox in code</span>
-      </div>
-      <div class="case-study-stat">
-        <strong>164</strong>
-        <span>design teams use checkbox</span>
       </div>
     </div>
   </section>
 
   <section id="reflection" data-comment-id="des-sys-audit-reflection">
     <h2 class="section-label">Reflection</h2>
-    <!-- TODO(Jane): reflection and takeaways copy. -->
+    <p class="heading text-ink">Skills can point out inconsistencies, but visual alignment and assessment of design/engineering decisions that were made for the broader system still require human judgement.</p>
   </section>
 </CaseStudyLayout>
 
+<style>
+  /* A second statement within a section, after the first one's figure */
+  :global(.case-study-content) section > p.audit-next-point {
+    margin-top: var(--space-12);
+  }
 
+  /* Impact's two groups of stats, each named so the numbers can't be read as one set */
+  :global(.case-study-content) section > h3.audit-stat-label {
+    margin: var(--space-8) 0 var(--space-3);
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  :global(.case-study-content) section > h2 + h3.audit-stat-label {
+    margin-top: 0;
+  }
+
+  :global(.case-study-content) section > .audit-stats {
+    margin-top: 0;
+  }
+
+  @media (min-width: 640px) {
+    :global(.case-study-content) section > .audit-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* The numbers use the heading style; specific enough to beat the layout's stat rule */
+  :global(.case-study-content) section > .audit-stats strong.heading {
+    font: var(--type-heading);
+  }
+
+  :global(.case-study-content) section > .audit-stats.is-single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+</style>

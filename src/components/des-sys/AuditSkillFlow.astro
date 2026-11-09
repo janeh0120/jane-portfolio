@@ -1,54 +1,46 @@
 ---
-// Case study diagram (/des-sys-audit): the audit skill, read top to bottom. The
-// component in a local copy of production code and the Figma component's YAML (each shown with a
-// screenshot of the real input) flow into the skill,
-// which compares them and returns a prioritised table. Rendered in HTML with role tokens so it follows
-// the colour mode. Example rows are illustrative.
-//
-// Comparing design with code finds hardcoded values and mismatches. A token that matches on both
-// sides passes here; TokenCompare shows the documentation catching it.
-const base = import.meta.env.BASE_URL;
-const img = (file: string) => `${base}images/case-studies/des-sys/${file}`;
-
-const rows = [
-  {
-    property: 'Text colour',
-    figma: 'color-ink',
-    code: 'Hardcoded hex',
-    issue: 'Hardcoded',
-    priority: 'High',
-    fix: 'Use the ink role so dark mode follows',
-  },
-  {
-    property: 'Padding',
-    figma: 'space-2 · space-3',
-    code: '10px · 12px',
-    issue: 'Hardcoded',
-    priority: 'Low',
-    fix: 'Snap to the 4px spacing grid',
-  },
-];
+// Case study diagram (/des-sys-audit): how the audit skill developed, read top to bottom. A toggle
+// switches between the skill as my team created it (code + design) and my iteration (code + design +
+// docs), running the same checkbox through both. The text colour matches in design and code, so the
+// team's skill passes it; with the docs, the iteration flags it. Only the docs card and that row change.
+// The toggle cycles by itself while in view, to show it's interactive, and stops once clicked. Without
+// JavaScript, or with reduced motion, nothing cycles and the iteration shows. Rendered in HTML with
+// role tokens so it follows the colour mode.
 ---
 
-<figure class="audit-flow">
-  <div class="audit-flow-inputs">
-    <div class="audit-card has-image">
-      <img
-        src={img('input-code.webp')}
-        alt="The checkbox's production stylesheet, with the label colour line, var(--color-text-primary), highlighted"
-        loading="lazy"
-        decoding="async"
-      />
-      <strong>Code</strong>
+<figure class="audit-flow" data-state="iteration" data-skill-flow>
+  <div class="audit-flow-head">
+    <div class="segmented" role="group" aria-label="Show the team's skill or my iteration" hidden>
+      <span class="segmented-thumb" aria-hidden="true"></span>
+      <button type="button" class="segmented-option" data-state-choice="team" aria-pressed="false">Team’s skill</button>
+      <button type="button" class="segmented-option" data-state-choice="iteration" aria-pressed="true">My iteration</button>
     </div>
-    <div class="audit-card has-image">
-      <img
-        src={img('input-figma-data.webp')}
-        alt="The checkbox component set in Figma, with the Specs plugin's Data tab set to export YAML with tokens across all variant combinations"
-        loading="lazy"
-        decoding="async"
-      />
-      <strong>Figma component (YAML data)</strong>
+  </div>
+
+  <div class="audit-flow-inputs">
+    <div class="audit-node">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m18 16 4-4-4-4M6 8l-4 4 4 4M14.5 4l-5 16"></path>
+      </svg>
+      <span>Code</span>
+    </div>
+    <svg class="audit-plus" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 5v14M5 12h14"></path>
+    </svg>
+    <div class="audit-node">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2l4 4-4 4-4-4zM6 8l4 4-4 4-4-4zM18 8l4 4-4 4-4-4zM12 14l4 4-4 4-4-4z"></path>
+      </svg>
+      <span>Design</span>
+    </div>
+    <svg class="audit-plus" data-when="iteration" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 5v14M5 12h14"></path>
+    </svg>
+    <div class="audit-node is-new" data-when="iteration">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path>
+      </svg>
+      <span>Docs</span>
     </div>
   </div>
 
@@ -56,10 +48,11 @@ const rows = [
     <path d="M12 5v14M6 13l6 6 6-6"></path>
   </svg>
 
-  <div class="audit-card is-skill">
-    <span class="audit-card-kicker">Skill</span>
-    <strong>Audit</strong>
-    <span>Compares every design and code property, then ranks what’s off</span>
+  <div class="audit-node">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path>
+    </svg>
+    <span>Skill</span>
   </div>
 
   <svg class="audit-arrow" viewBox="0 0 24 24" aria-hidden="true">
@@ -69,7 +62,7 @@ const rows = [
   <div class="audit-report">
     <div class="audit-report-title">
       <strong>Output: misalignment report</strong>
-      <span>Secondary button</span>
+      <span>Checkbox label</span>
     </div>
     <div class="audit-table-scroll" tabindex="0" role="region" aria-label="Example audit report">
       <table>
@@ -79,98 +72,166 @@ const rows = [
             <th scope="col">Design</th>
             <th scope="col">Code</th>
             <th scope="col">Issue</th>
-            <th scope="col">Priority</th>
             <th scope="col">Suggested fix</th>
           </tr>
         </thead>
         <tbody>
-          {
-            rows.map((row) => (
-              <tr>
-                <th scope="row">{row.property}</th>
-                <td><code>{row.figma}</code></td>
-                <td><code>{row.code}</code></td>
-                <td><span class="tag">{row.issue}</span></td>
-                <td>{row.priority}</td>
-                <td class="audit-muted">{row.fix}</td>
-              </tr>
-            ))
-          }
+          <tr class="is-changing">
+            <th scope="row">Text colour</th>
+            <td><code>--color-text-secondary</code></td>
+            <td><code>--color-text-secondary</code></td>
+            <td>
+              <span class="tag" data-when="team">Aligned</span>
+              <span class="tag" data-when="iteration">Wrong token</span>
+            </td>
+            <td class="audit-muted">
+              <span data-when="team">None</span>
+              <span data-when="iteration">Use --color-text-primary, per the docs</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Font weight</th>
+            <td><code>--font-weight-component-semibold</code></td>
+            <td><code>--font-weight-component</code></td>
+            <td><span class="tag">Mismatch</span></td>
+            <td class="audit-muted">Align design and code</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
-
-  <figcaption>
-    Intuit’s components are confidential, so this example audits a button from my own design system.
-  </figcaption>
 </figure>
+
+<script>
+  // The skill's toggle. It cycles by itself while in view so people notice it's interactive, and
+  // stops for good once someone clicks it. Reduced motion gets the toggle without the cycling.
+  const CYCLE_MS = 2800;
+
+  document.querySelectorAll<HTMLElement>('[data-skill-flow]').forEach((figure) => {
+    const toggle = figure.querySelector<HTMLElement>('.segmented');
+    if (!toggle) return;
+    const options = [...toggle.querySelectorAll<HTMLButtonElement>('[data-state-choice]')];
+    let timer: number | undefined;
+    let stopped = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const show = (state: string) => {
+      figure.dataset.state = state;
+      options.forEach((o) => o.setAttribute('aria-pressed', String(o.dataset.stateChoice === state)));
+    };
+
+    const pause = () => {
+      window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const start = () => {
+      if (stopped || timer !== undefined) return;
+      timer = window.setInterval(() => {
+        show(figure.dataset.state === 'team' ? 'iteration' : 'team');
+      }, CYCLE_MS);
+    };
+
+    options.forEach((option) => {
+      option.addEventListener('click', () => {
+        stopped = true;
+        pause();
+        show(option.dataset.stateChoice ?? 'iteration');
+      });
+    });
+
+    toggle.hidden = false;
+    if (!stopped) show('team');
+
+    new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) start();
+        else pause();
+      },
+      { threshold: 0.4 },
+    ).observe(figure);
+  });
+</script>
 
 <style>
   .audit-flow {
     margin: var(--space-8) 0 0;
   }
 
-  /* Everything flows down: the two inputs, the skill, then its report */
+  .audit-flow-head {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: var(--space-4);
+  }
+
+  .audit-flow[data-state='team'] [data-when='iteration'],
+  .audit-flow[data-state='iteration'] [data-when='team'] {
+    display: none;
+  }
+
+  /* Everything flows down: the inputs, the skill, then its report */
+  /* Equal-width cards, so the plus lines up with the arrow below it */
   .audit-flow-inputs {
-    display: grid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     gap: var(--space-3);
   }
 
-  @media (min-width: 640px) {
-    .audit-flow-inputs {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .audit-plus {
+    width: var(--space-5);
+    height: var(--space-5);
+    fill: none;
+    stroke: var(--color-subtle);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
-  /* The stat card panel, reused as a diagram node */
-  .audit-card {
+  /* The stat card panel, hugging an icon and its label. One width for all, set by the longest label */
+  .audit-node {
     display: grid;
-    gap: var(--space-1);
-    padding: var(--space-4) var(--space-5);
+    justify-items: center;
+    gap: var(--space-2);
+    width: var(--space-24);
+    margin-inline: auto;
+    padding: var(--space-5) var(--space-4);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-base);
-  }
-
-  /* An input's screenshot, above its label */
-  .audit-card.has-image {
-    align-content: start;
-  }
-
-  .audit-card.has-image img {
-    display: block;
-    width: 100%;
-    height: auto;
-    margin-bottom: var(--space-3);
-    border-radius: var(--radius-base);
-  }
-
-  .audit-card strong {
     font: var(--type-label);
     letter-spacing: var(--tracking-body);
     color: var(--color-ink);
   }
 
-  .audit-card span {
-    font: var(--type-compact);
-    letter-spacing: var(--tracking-body);
-    color: var(--color-muted);
+  .audit-flow-inputs .audit-node {
+    margin-inline: 0;
   }
 
-  .audit-card .audit-card-kicker {
-    color: var(--color-subtle);
-  }
-
-  /* The skill is the one inverted node, like the primary icon control */
-  .audit-card.is-skill {
-    background: var(--color-ink);
+  /* What my iteration added */
+  .audit-node.is-new {
     border-color: var(--color-ink);
   }
 
-  .audit-card.is-skill strong,
-  .audit-card.is-skill span {
-    color: var(--color-canvas);
+  /* Three cards need to fit at phone width */
+  @media (max-width: 639px) {
+    .audit-flow-inputs {
+      gap: var(--space-1);
+    }
+
+    .audit-node {
+      width: var(--space-20);
+      padding-inline: var(--space-2);
+    }
+  }
+
+  .audit-node svg {
+    width: var(--space-8);
+    height: var(--space-8);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .audit-arrow {
@@ -261,10 +322,8 @@ const rows = [
     color: var(--color-muted);
   }
 
-  .audit-flow figcaption {
-    margin-top: var(--space-2);
-    font: var(--type-body);
-    letter-spacing: var(--tracking-body);
-    color: var(--color-muted);
+  /* The row my iteration catches: the matching tokens turn out to be wrong */
+  .audit-flow[data-state='iteration'] .is-changing code {
+    color: var(--color-danger);
   }
 </style>

@@ -136,6 +136,13 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
     margin-top: var(--space-12);
   }
 
+  /* Statements: large text reads best in shorter lines, about 35 characters, balanced so no word is
+     left stranded */
+  .case-study-content :global(p.heading) {
+    max-width: 30ch;
+    text-wrap: balance;
+  }
+
   /* Body type for paragraphs, except ones that set a type-ramp class (statements in .heading) */
   .case-study-content :global(p:not(.hero-copy, .heading, .subheading)),
   .case-study-content :global(.lead) {

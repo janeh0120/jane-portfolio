@@ -33,6 +33,8 @@ colors:
   accent-soft: "rgb(21 93 252 / 12%)"
   danger: "#c10007"
   danger-soft: "#fef2f2"
+  success: "#007a55"
+  success-soft: "#ecfdf5"
   # The media overlay (Play, About): the page colour at 88%, so it follows the colour mode and the
   # page shows faintly behind. (In CSS: color-mix(in srgb, var(--color-page) 88%, transparent).)
   overlay: "rgb(245 245 245 / 88%)"
@@ -311,6 +313,7 @@ by hue, so the same names work in dark mode.
   which sits on Ink fills, turns dark in dark mode, so it can't do this job). White on the accent is
   about 5.3:1, which meets WCAG AA.
 - **Danger (#c10007) and Danger soft:** destructive hovers and errors.
+- **Success (#007a55) and Success soft:** additions and confirmed states, the counterpart to Danger.
 - **Overlay:** the media overlay on Play and About is the page colour at 88%, so it follows the
   colour mode, the page shows faintly behind it, and everything on it uses the ordinary text and
   control tokens. `media-backdrop` (black) is only for letterboxing embedded video.
@@ -338,6 +341,8 @@ Accent, on-accent, and `media-backdrop` are unchanged; `overlay` follows `page` 
 | placeholder | #525252 |
 | danger | #ffa2a2 |
 | danger-soft | #460809 |
+| success | #5ee9b5 |
+| success-soft | #002c22 |
 
 The grain overlay switches from `multiply` at 35% to `overlay` at 18%, and text selection becomes
 white at 16% instead of black at 8%.
@@ -390,7 +395,8 @@ on comment form fields on touch screens, which stops iOS zooming the page when t
   also in `px`.
 - **Page frame:** content sits in `.page-frame`, max 1400px wide with a 1.5rem gutter on each side
   (1rem below 768px).
-- **Reading widths:** case studies max 768px, the About page 672px.
+- **Reading widths:** case studies max 768px, the About page 672px. Case study statements in Heading
+  type stop at 30ch (about 35 characters a line), with balanced line breaks.
 - **Section rhythm:** page sections are separated by one parent gap (`.section-stack`):
   `--space-section` (7rem), or `--space-section-sm` (5.5rem) below 768px. Prefer that gap over
   margins on individual sections.
