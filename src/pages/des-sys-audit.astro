@@ -1,0 +1,141 @@
+---
+// The Intuit design system audit, in Jane's own words from her draft (grammar fixes only): context,
+// problems, the manual audit, the AI skill, the documentation opportunity, final solution, impact,
+// and reflection. Visuals sit where they illustrate each point. This is the version the homepage card links to; /des-sys is the older combined one.
+import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
+import AuditSkillFlow from '../components/des-sys/AuditSkillFlow.astro';
+import AuditReviewLoop from '../components/des-sys/AuditReviewLoop.astro';
+import ProblemVisual from '../components/des-sys/ProblemVisual.astro';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+import TokenDriftReel from '../components/react/TokenDriftReel';
+
+const nav = [
+  { label: 'Context', href: '#context' },
+  { label: 'Problem', href: '#problem' },
+  { label: 'Solution', href: '#solution' },
+  { label: 'Opportunity: AI', href: '#opportunity' },
+  { label: 'New Solution', href: '#new-solution' },
+  { label: 'Final Solution', href: '#final' },
+  { label: 'Impact', href: '#impact' },
+  { label: 'Reflection', href: '#reflection' },
+];
+---
+
+<CaseStudyLayout
+  title="Design System Audit"
+  heading="Bridging design and code within an enterprise design system"
+  role="Product Design Intern"
+  company="Intuit Design System"
+  team="Sole designer, 1 developer, guidance from 2 designers"
+  timeline="Jan – Mar 2026"
+  projectType="Design Systems"
+  nav={nav}
+  commentId="case-study-des-sys-audit"
+>
+  <TokenDriftReel slot="hero" client:visible />
+
+  <section id="context" data-comment-id="des-sys-audit-context">
+    <h2 class="section-label">Context</h2>
+    <p class="heading text-ink">As an intern on the Intuit Design System team, I was tasked with auditing components to ensure token alignment between design and code.</p>
+  </section>
+
+  <section id="problem" data-comment-id="des-sys-audit-problem">
+    <h2 class="section-label">Why does this matter</h2>
+    <p class="heading text-ink">Hardcoded values in components bypass tokens, so global theme updates never reach the UI.</p>
+    <ProblemVisual kind="hardcoded" />
+  </section>
+
+  <section id="solution" data-comment-id="des-sys-audit-solution">
+    <h2 class="section-label">Solution</h2>
+    <p class="heading text-ink">Manually auditing components for token misalignment between design and code can be slow and tedious.</p>
+    <CaseStudyFigure
+      src="images/case-studies/des-sys/manual-audit.webp"
+      alt="The manual audit board: for each checkbox property (description text colour, selection label font weight, label to description gap, description font size), Figma inspect panels sit beside the matching code, with each mismatch highlighted and marked Change Design or Change Code"
+      wide
+    />
+  </section>
+
+  <section id="opportunity" data-comment-id="des-sys-audit-opportunity">
+    <h2 class="section-label">Opportunity</h2>
+    <p class="heading text-ink">How might we use AI to make auditing faster and less prone to missing misalignments?</p>
+  </section>
+
+  <section id="new-solution" data-comment-id="des-sys-audit-new-solution">
+    <h2 class="section-label">New solution</h2>
+    <p class="heading text-ink">I started with a skill my team created to compare design and code, then iterated on it to refer to our design system docs and point out token misuse.</p>
+    <AuditSkillFlow />
+  </section>
+
+  <section id="final" data-comment-id="des-sys-audit-final">
+    <h2 class="section-label">Final solution</h2>
+    <!-- TODO(Jane): final solution copy. -->
+    <AuditReviewLoop />
+  </section>
+
+  <section id="impact" data-comment-id="des-sys-audit-impact">
+    <h2 class="section-label">Impact</h2>
+    <h3 class="audit-stat-label">Time savings from auditing with skills</h3>
+    <div class="case-study-stats audit-stats is-single">
+      <div class="case-study-stat">
+        <strong class="heading text-ink">5 days → 1 day</strong>
+        <span>to audit a component, from mostly manual to using skills</span>
+      </div>
+    </div>
+    <h3 class="audit-stat-label">Scope of the audit</h3>
+    <div class="case-study-stats audit-stats is-single">
+      <div class="case-study-stat">
+        <strong class="heading text-ink">3</strong>
+        <span>core components in the design system</span>
+      </div>
+    </div>
+    <h3 class="audit-stat-label">Impact of updating the checkbox specifically</h3>
+    <div class="case-study-stats audit-stats">
+      <div class="case-study-stat">
+        <strong class="heading text-ink">355k+</strong>
+        <span>instances of checkbox in Figma</span>
+      </div>
+      <div class="case-study-stat">
+        <strong class="heading text-ink">143</strong>
+        <span>business units use checkbox in code</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="reflection" data-comment-id="des-sys-audit-reflection">
+    <h2 class="section-label">Reflection</h2>
+    <p class="heading text-ink">Skills can point out inconsistencies, but visual alignment and assessment of design/engineering decisions that were made for the broader system still require human judgement.</p>
+  </section>
+</CaseStudyLayout>
+
+<style>
+  /* Impact's two groups of stats, each named so the numbers can't be read as one set */
+  :global(.case-study-content) section > h3.audit-stat-label {
+    margin: var(--space-8) 0 var(--space-3);
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  :global(.case-study-content) section > h2 + h3.audit-stat-label {
+    margin-top: 0;
+  }
+
+  :global(.case-study-content) section > .audit-stats {
+    margin-top: 0;
+  }
+
+  @media (min-width: 640px) {
+    :global(.case-study-content) section > .audit-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* The numbers use the heading style; specific enough to beat the layout's stat rule */
+  :global(.case-study-content) section > .audit-stats strong.heading {
+    font: var(--type-heading);
+  }
+
+  :global(.case-study-content) section > .audit-stats.is-single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+</style>

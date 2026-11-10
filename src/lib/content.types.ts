@@ -10,6 +10,10 @@ export type Project = {
   tags: string[];
   title: string;
   image: string;
+  /** Looping reel for the homepage card; `image` should be its first frame (it is the poster). */
+  video?: string;
+  /** Company logo shown in the top left corner of the homepage card's image. */
+  logo?: string;
   comingSoon: boolean;
   href?: string;
 };
@@ -62,6 +66,8 @@ export type GalleryItemMeta = {
   slug: string;
   title: string;
   description: string;
+  /** Opens in a new tab, after the description in the modal. */
+  link?: { label: string; href: string };
   year: string;
   images: string[];
   /** Dark-mode versions of `images`, in the same order. Adds a light/dark toggle to the modal. */

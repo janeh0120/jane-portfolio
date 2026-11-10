@@ -67,13 +67,13 @@ const nav = [
     <h2 class="section-label">Design decisions</h2>
     <ol>
       <li class="decision-row">
-        <div class="decision-text">
+        <div>
           <h3>Guardrails</h3>
           <p>
             Curse words and comments under a minimum word count aren’t allowed. Comments are visible to me but stay anonymous.
           </p>
         </div>
-        <figure class="case-study-figure decision-figure">
+        <figure class="case-study-figure">
           <img
             src={media('error.webp')}
             alt="Comment composer showing a validation error: Comments need at least 3 characters"
@@ -83,7 +83,7 @@ const nav = [
         </figure>
       </li>
       <li class="decision-row">
-        <div class="decision-text">
+        <div>
           <h3>Public commenting</h3>
           <p>
             I decided against making comments public to keep the scope narrow and focused on my
@@ -91,7 +91,7 @@ const nav = [
             make updates, creating multiple versions.
           </p>
         </div>
-        <figure class="case-study-figure decision-figure">
+        <figure class="case-study-figure">
           <img
             src={media('likes.webp')}
             alt="Mockup of a public comment card with a 34-like count, illustrating what public comments could look like"
@@ -101,14 +101,14 @@ const nav = [
         </figure>
       </li>
       <li class="decision-row">
-        <div class="decision-text">
+        <div>
           <h3>Web builder vs. fully custom</h3>
           <p>
             A web builder like Framer can’t give comments stable markup to anchor to, a server to keep
             keys private, or deploy hooks to pin each comment to a site version.
           </p>
         </div>
-        <figure class="case-study-figure decision-figure">
+        <figure class="case-study-figure">
           <img
             src={media('framer-vs-cursor.webp')}
             alt="Framer app icon versus Cursor app icon, comparing a web builder to building it myself"
@@ -118,7 +118,7 @@ const nav = [
         </figure>
       </li>
       <li class="decision-row">
-        <div class="decision-text">
+        <div>
           <h3>Existing tools</h3>
           <p>
             <a
@@ -133,7 +133,7 @@ const nav = [
             reviewed in an admin view, and stay pinned to the version they were left on.
           </p>
         </div>
-        <figure class="case-study-figure decision-figure">
+        <figure class="case-study-figure">
           <img
             src={media('agentation.webp')}
             alt="Agentation documentation page showing its annotation and feedback-to-agent workflow"
@@ -174,28 +174,6 @@ const nav = [
     box-shadow: 0 12px 40px rgb(0 20 80 / 35%);
   }
 
-  .decision-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-5);
-  }
-
-  @media (min-width: 640px) {
-    .decision-row {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: start;
-    }
-  }
-
-  .decision-figure {
-    margin-top: var(--space-4);
-  }
-
-  @media (min-width: 640px) {
-    .decision-figure {
-      margin-top: 0;
-    }
-  }
 </style>
 
 <script>

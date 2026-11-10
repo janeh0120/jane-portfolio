@@ -1,7 +1,8 @@
 ---
 /**
- * Homepage projects as one horizontal row that scrolls sideways. On the homepage, scrolling the page
- * down moves it first (see src/pages/index.astro); without JavaScript it is a plain sideways scroller.
+ * Homepage projects as one horizontal row that scrolls sideways. On the homepage, the page's own
+ * scroll moves it across while it is held in place (see src/pages/index.astro); without JavaScript
+ * it is a plain sideways scroller.
  * A WebGL lens (src/lib/project-lens.ts) warps the images as they pass the left and right edges of
  * the screen. It is progressive enhancement: the row is complete, readable HTML on its own.
  */
@@ -26,7 +27,27 @@ function commentId(project: (typeof projects)[number]) {
       const imageSrc = `${base}${project.image}`;
       const media = (
         <div class="project-card-media" data-lens-src={imageSrc}>
-          <img src={imageSrc} alt={href ? '' : project.title} class="project-row-image" draggable="false" />
+          {project.video ? (
+            <video
+              src={`${base}${project.video}`}
+              poster={imageSrc}
+              class="project-row-image"
+              data-card-video
+              muted
+              loop
+              playsinline
+              preload="none"
+              disablepictureinpicture
+              disableremoteplayback
+              aria-hidden={href ? 'true' : undefined}
+              aria-label={href ? undefined : project.title}
+            />
+          ) : (
+            <img src={imageSrc} alt={href ? '' : project.title} class="project-row-image" draggable="false" />
+          )}
+          {project.logo ? (
+            <img src={`${base}${project.logo}`} alt="" class="project-row-logo" data-lens-logo draggable="false" />
+          ) : null}
         </div>
       );
       const caption = (
@@ -82,8 +103,10 @@ function commentId(project: (typeof projects)[number]) {
     display: none;
   }
 
-  /* When the page scroll drives the row, snapping would fight it */
+  /* When the page scroll drives the row, snapping would fight it, and the row only moves with the
+     page (sideways swipes are passed on to the page, src/pages/index.astro) */
   .project-row.is-driven {
+    overflow-x: hidden;
     scroll-snap-type: none;
   }
 
@@ -100,7 +123,19 @@ function commentId(project: (typeof projects)[number]) {
   }
 
   .project-row-link .project-card-media {
+    position: relative;
     margin-bottom: var(--space-2);
+  }
+
+  /* In percentages so it scales with the card and the lens's copy of the image (which draws the
+     logo in at these proportions) still lines up after a resize. Top is a % of the height, so
+     6.4% of a 16:10 card matches 4% of its width. */
+  .project-row-logo {
+    position: absolute;
+    top: 6.4%; /* design-tokens-ignore: proportional to the card, see above */
+    left: 4%; /* design-tokens-ignore: proportional to the card, see above */
+    width: 14%;
+    height: auto;
   }
 
   .project-row-link p {
@@ -117,7 +152,7 @@ function commentId(project: (typeof projects)[number]) {
   .project-row-caption {
     display: grid;
     gap: var(--space-1);
-    transition: opacity 0.25s ease;
+    transition: opacity var(--duration-200) var(--ease-standard);
   }
 
   .project-row-link:hover .project-row-image {
@@ -141,4 +176,41 @@ function commentId(project: (typeof projects)[number]) {
   import { enhanceWithLens } from '../lib/lens-enhance';
 
   enhanceWithLens(document.querySelector<HTMLElement>('[data-project-row]'), { axis: 'x' });
+
+  // Card reels show their poster until they can be seen. Nothing downloads before then, and a reel
+  // only plays while it is on screen, the tab is open, and the lens isn't drawing that card.
+  function startCardVideos() {
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const syncs = [...document.querySelectorAll<HTMLVideoElement>('[data-card-video]')].map((video) => {
+      const media = video.parentElement!;
+      let inView = false;
+      const sync = () => {
+        const play = inView && !document.hidden && !reduceMotion.matches && media.style.opacity !== '0';
+        if (play && video.paused) video.play().catch(() => {}); // e.g. low power mode: the poster stays
+        else if (!play && !video.paused) video.pause();
+      };
+      new IntersectionObserver(
+        ([entry]) => {
+          inView = entry.isIntersecting;
+          sync();
+        },
+        { threshold: 0.25 },
+      ).observe(video);
+      new MutationObserver(sync).observe(media, { attributes: true, attributeFilter: ['style'] });
+      return sync;
+    });
+
+    const syncAll = () => syncs.forEach((sync) => sync());
+    document.addEventListener('visibilitychange', syncAll);
+    reduceMotion.addEventListener('change', syncAll);
+  }
+
+  // After the page has loaded, and late enough for the lens to claim the cards at the screen edges,
+  // so their reels are never fetched for nothing.
+  const startSoon = () => setTimeout(startCardVideos, 800);
+  if (document.readyState === 'complete') startSoon();
+  else window.addEventListener('load', startSoon, { once: true });
 </script>

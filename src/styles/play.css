@@ -20,7 +20,7 @@
   overflow: hidden;
   cursor: pointer;
   position: relative;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--duration-320) var(--ease-standard);
   display: block;
   width: 100%;
   margin: 0 0 var(--space-8);
@@ -57,7 +57,7 @@
 
 .gallery-modal.active {
   display: flex;
-  animation: play-fade-in 0.3s ease-out;
+  animation: play-fade-in var(--duration-320) var(--ease-settle);
 }
 
 /* The backdrop: the page colour, slightly see-through so the gallery shows behind. It's a layer of
@@ -144,7 +144,7 @@
 .gallery-carousel {
   display: flex;
   width: 100%;
-  transition: transform 0.4s ease-out;
+  transition: transform var(--duration-320) var(--ease-settle);
 }
 
 .gallery-carousel-slide {
@@ -187,7 +187,7 @@
 
 .gallery-themed img {
   grid-area: 1 / 1;
-  transition: opacity 320ms ease;
+  transition: opacity var(--duration-320) var(--ease-standard);
 }
 
 .gallery-modal[data-mode='light'] .gallery-mode-dark,
@@ -234,7 +234,9 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  transition: all 0.3s;
+  transition:
+    width var(--duration-320) var(--ease-standard),
+    background-color var(--duration-320) var(--ease-standard);
 }
 
 .carousel-dot.active {

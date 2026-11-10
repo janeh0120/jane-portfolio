@@ -1,0 +1,389 @@
+.token-drift-reel {
+  --font-sans: 'TeX Gyre Heros', Helvetica, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --inspect: #1f6fe8;
+  --ink: #171717;
+  --muted: #666;
+  --surface: #f6f6f6;
+  --edge: rgb(0 0 0 / 10%);
+
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-base, 8px);
+  background-color: #efefef;
+  isolation: isolate;
+  font-family: var(--font-sans);
+  /* The reel is an illustration laid out for these; pin them so page type changes don't shift it */
+  line-height: 1.5;
+  letter-spacing: normal;
+  -webkit-font-smoothing: antialiased;
+}
+
+.token-drift-reel[data-aspect='16/10'] {
+  aspect-ratio: 16 / 10;
+}
+
+.token-drift-reel__half {
+  position: absolute;
+  inset: 0 50% 0 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.token-drift-reel__half--code {
+  inset: 0 0 0 50%;
+  background-size: 200% 100%;
+  background-position: right center;
+}
+
+.token-drift-reel__canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  color: var(--ink);
+}
+
+.token-drift-reel:not([data-ready]) .token-drift-reel__canvas {
+  visibility: hidden;
+}
+
+.token-drift-reel__canvas svg {
+  display: block;
+}
+
+.token-drift-reel__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.token-drift-reel__side-name {
+  position: absolute;
+  top: 22px;
+  font-size: 15px;
+  color: rgb(23 23 23 / 62%);
+}
+
+/* ------------------------------------------------------------ the split checkbox */
+
+.token-drift-reel__layer {
+  position: absolute;
+  inset: 0;
+}
+
+.token-drift-reel__layer--design {
+  clip-path: inset(0 50% 0 0);
+}
+
+.token-drift-reel__layer--code {
+  clip-path: inset(0 0 0 50%);
+}
+
+.token-drift-reel__component {
+  position: absolute;
+  top: 22%;
+  left: 223px;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+}
+
+.token-drift-reel__box {
+  flex: none;
+  width: 66px;
+  height: 66px;
+  margin-top: 2px;
+  box-sizing: border-box;
+  border: 5px solid #8a8a8a;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.token-drift-reel__text {
+  position: relative;
+  width: 420px;
+}
+
+.token-drift-reel__label {
+  position: relative;
+  display: inline-block;
+  font-size: 60px;
+  line-height: 70px;
+  font-weight: 400;
+  white-space: nowrap;
+  paint-order: stroke fill;
+}
+
+.token-drift-reel__outline {
+  position: absolute;
+  inset: 0 -8px;
+  border: 2px solid var(--inspect);
+  border-radius: 4px;
+  opacity: 0;
+}
+
+.token-drift-reel__band {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  right: -20px;
+  background: rgb(31 111 232 / 22%);
+  opacity: 0;
+}
+
+.token-drift-reel__band span {
+  position: absolute;
+  top: 50%;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: var(--inspect);
+  color: #fff;
+  font-size: 13px;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  transform: translateY(-50%);
+}
+
+.token-drift-reel__layer--design .token-drift-reel__band span {
+  left: -26px;
+}
+
+.token-drift-reel__layer--code .token-drift-reel__band span {
+  right: -14px;
+}
+
+.token-drift-reel__description {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  display: block;
+  font-size: 28px;
+  line-height: 38px;
+  color: #5c5c5c;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------ design panel */
+
+.token-drift-reel__panel {
+  position: absolute;
+  height: 104px;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.token-drift-reel__page {
+  position: absolute;
+  inset: 0;
+}
+
+.token-drift-reel__panel-head {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+.token-drift-reel__panel-head i {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 19px;
+  color: var(--muted);
+}
+
+.token-drift-reel__row {
+  position: absolute;
+  top: 52px;
+  left: 10px;
+  right: 10px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 12px;
+  border-radius: 8px;
+  background: #e9e9e9;
+}
+
+.token-drift-reel__row.is-active {
+  box-shadow: inset 0 0 0 1.5px var(--inspect);
+}
+
+.token-drift-reel__icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: #4d4d4d;
+}
+
+.token-drift-reel__icon svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.token-drift-reel__swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.token-drift-reel__swap {
+  position: relative;
+  flex: 1;
+  height: 20px;
+}
+
+.token-drift-reel__swap span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+}
+
+.token-drift-reel__menu {
+  position: absolute;
+  top: 90px;
+  left: 8px;
+  right: 8px;
+  padding-bottom: 8px;
+  border: 1px solid var(--edge);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 14%);
+  visibility: hidden;
+}
+
+.token-drift-reel__menu p {
+  margin: 0;
+  height: 36px;
+  padding: 10px 14px 0;
+  box-sizing: border-box;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.token-drift-reel__menu-highlight {
+  position: absolute;
+  top: 36px;
+  left: 6px;
+  right: 6px;
+  height: 34px;
+  border-radius: 7px;
+  background: #e3e3e3;
+}
+
+.token-drift-reel__option {
+  position: relative;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-inline: 14px;
+}
+
+.token-drift-reel__option > span:nth-child(2) {
+  flex: 1;
+  white-space: nowrap;
+}
+
+.token-drift-reel__check {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ------------------------------------------------------------ code panel */
+
+.token-drift-reel__code {
+  position: absolute;
+  left: 527px;
+  width: 392px;
+  bottom: 0;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-bottom: 0;
+  border-radius: 12px 12px 0 0;
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 8%);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.token-drift-reel__code [data-code-scroll] {
+  position: absolute;
+  inset: 0;
+}
+
+.token-drift-reel__code-row {
+  --tint: 0;
+  --row: 239 68 68;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  padding-left: 32px;
+  line-height: 24px;
+  white-space: pre;
+  background: rgb(var(--row) / calc(var(--tint) * 16%));
+}
+
+.token-drift-reel__code-row.is-new {
+  --row: 16 185 129;
+}
+
+.token-drift-reel__code-row.is-focus {
+  --row: 31 111 232;
+}
+
+.token-drift-reel__code-row i {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  font-style: normal;
+  opacity: var(--tint);
+}
+
+.token-drift-reel__code-row code {
+  font: inherit;
+}
+
+.token-drift-reel__code-row mark {
+  border-radius: 2px;
+  color: inherit;
+  background: rgb(var(--row) / calc(var(--tint) * 30%));
+}
+
+/* ------------------------------------------------------------ cursor */
+
+.token-drift-reel__cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+}

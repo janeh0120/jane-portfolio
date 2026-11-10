@@ -1,0 +1,260 @@
+---
+// Case study illustration (/des-sys-audit, Implementation step): the two ways a finding got shipped.
+// Token-only changes became my own PR. Deeper causes went to a developer with a note; the example is
+// a pagination input whose empty div below the field, probably there for validation messages, pushes
+// it out of line with the arrows and labels. Rendered in HTML with role tokens so it follows
+// the colour mode. The PR title and validation message are illustrative.
+---
+
+<div class="impl">
+  <div class="impl-path">
+    <strong class="impl-title">Token adjustments: Open my own PR</strong>
+    <div class="impl-pr">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="18" cy="18" r="3"></circle>
+        <circle cx="6" cy="6" r="3"></circle>
+        <path d="M13 6h3a2 2 0 0 1 2 2v7M6 9v12"></path>
+      </svg>
+      <span>Checkbox: align text tokens with design</span>
+      <span class="tag">Token-only</span>
+    </div>
+  </div>
+
+  <span class="impl-or">or</span>
+
+  <div class="impl-path">
+    <strong class="impl-title">Requiring further investigation: Developer Handoff</strong>
+
+    <div class="impl-stage">
+      <span class="impl-stage-label">Pagination: the input sits higher than the arrows and labels</span>
+      <div class="impl-pagination">
+        <span class="impl-page-link">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+          Previous
+        </span>
+        <span class="impl-input">
+          <span class="impl-field">3</span>
+          <span class="impl-reserve"></span>
+          <span class="impl-badge">Empty div</span>
+        </span>
+        <span class="impl-page-link">
+          Next
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+        </span>
+        <span class="impl-line"></span>
+      </div>
+    </div>
+
+    <div class="impl-why">
+      <span class="impl-stage-label">The input field includes an empty div, probably meant to house the validation message</span>
+      <div class="impl-why-cols">
+        <div class="impl-why-col">
+          <span class="impl-why-name">In a form</span>
+          <span class="impl-input">
+            <span class="impl-field"></span>
+            <span class="impl-message">Enter a valid number</span>
+          </span>
+        </div>
+        <div class="impl-why-col">
+          <span class="impl-why-name">In pagination</span>
+          <span class="impl-input">
+            <span class="impl-field">3</span>
+            <span class="impl-reserve"></span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="impl-note">
+      <span class="impl-kicker">Note to developer</span>
+      <span>Worth investigating in the input field, or not worth touching because of technical constraints?</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .impl {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .impl-or {
+    justify-self: center;
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .impl-path {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .impl-title {
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .impl-kicker,
+  .impl-stage-label,
+  .impl-why-name {
+    color: var(--color-subtle);
+  }
+
+  .impl-pr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius-base);
+  }
+
+  .impl-pr svg {
+    flex: none;
+    width: var(--space-5);
+    height: var(--space-5);
+    fill: none;
+    stroke: var(--color-success);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .impl-pr > span:first-of-type {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .impl-stage,
+  .impl-why {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  /* Centred in a row, the input's extra height pushes its field above the row's centre line */
+  .impl-pagination {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: var(--space-4) 0 var(--space-10);
+    background: var(--color-surface);
+    border-radius: var(--radius-base);
+  }
+
+  /* Above the centre line, so it breaks around the labels instead of striking through them */
+  .impl-page-link {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding-inline: var(--space-1);
+    background: var(--color-surface);
+  }
+
+  .impl-page-link svg {
+    flex: none;
+    width: var(--space-4);
+    height: var(--space-4);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .impl-input {
+    position: relative;
+    display: grid;
+    justify-items: stretch;
+    width: var(--space-16);
+  }
+
+  .impl-why-col .impl-input {
+    width: 100%;
+    max-width: calc(var(--space-24) * 2);
+  }
+
+  .impl-field {
+    display: grid;
+    place-items: center;
+    height: var(--space-8);
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-base);
+  }
+
+  /* The empty div, hatched in Inspect mode's measurement colour */
+  .impl-reserve {
+    height: var(--space-5);
+    background: repeating-linear-gradient(
+      -45deg,
+      color-mix(in srgb, var(--color-measure) 40%, transparent) 0 2px,
+      transparent 2px 6px
+    );
+  }
+
+  .impl-message {
+    display: flex;
+    align-items: center;
+    height: var(--space-5);
+    font: var(--type-count);
+    color: var(--color-danger);
+  }
+
+  .impl-badge {
+    position: absolute;
+    top: calc(100% + var(--space-1));
+    left: 50%;
+    padding: var(--space-inset) var(--space-1);
+    border-radius: var(--radius-base);
+    background: var(--color-measure);
+    color: var(--color-on-measure);
+    font: var(--type-count);
+    white-space: nowrap;
+    transform: translateX(-50%);
+  }
+
+  /* The centre line the arrows and labels share, placed by the row's own padding */
+  .impl-line {
+    position: absolute;
+    top: calc(50% - var(--space-3));
+    right: var(--space-4);
+    left: var(--space-4);
+    border-top: 2px dotted var(--color-danger);
+    pointer-events: none;
+  }
+
+  .impl-why-cols {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .impl-why-col {
+    display: grid;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    border-radius: var(--radius-base);
+  }
+
+  .impl-note {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-base);
+  }
+</style>

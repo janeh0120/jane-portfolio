@@ -43,6 +43,20 @@
     "thumb": "images/play-thumbs/dex.webp"
   },
   {
+    "slug": "sequence",
+    "title": "Sequence",
+    "description": "A 5-day concept with Rayna Lai. Sequence helps product designers without motion experience turn their designs into launch videos: they storyboard shots on a canvas, group them into chapters, and shape the motion by prompting, annotating, or editing properties.",
+    "link": {
+      "label": "Watch the demo on YouTube",
+      "href": "https://www.youtube.com/watch?v=Ts35Q32hbhs"
+    },
+    "year": "",
+    "images": [
+      "images/case-study-heroes/sequence.jpg"
+    ],
+    "thumb": "images/play-thumbs/sequence.webp"
+  },
+  {
     "slug": "shoebox-craft",
     "title": "Shoebox craft cafe",
     "description": "I ran a craft cafe at my apartment and designed a brand and experience for it!",

@@ -50,11 +50,11 @@ const categoryLabels: Record<string, string> = {
         <>
           <h1 class="heading text-ink">Admin access required</h1>
           <p class="mt-4 text-body text-muted">
-            Add <code class="rounded bg-line px-1.5 py-0.5">?key=YOUR_ADMIN_SECRET</code> to the URL.
+            Add <code class="rounded bg-fill px-1.5 py-0.5">?key=YOUR_ADMIN_SECRET</code> to the URL.
           </p>
           <p class="mt-4 text-body text-muted">
             Example:{' '}
-            <code class="break-all rounded bg-line px-1.5 py-0.5">
+            <code class="break-all rounded bg-fill px-1.5 py-0.5">
               {Astro.url.origin}
               {base}admin/comments?key=…
             </code>
@@ -85,7 +85,7 @@ const categoryLabels: Record<string, string> = {
           <ul class="mt-10 space-y-8">
             {
               comments.map((item) => (
-                <li class="border border-line bg-canvas p-6" style="border-radius: var(--radius-base)">
+                <li class="border border-border bg-canvas p-6" style="border-radius: var(--radius-base)">
                   <div class="flex flex-wrap items-baseline justify-between gap-2">
                     <div>
                       <p class="text-body font-medium text-muted">

@@ -1,0 +1,825 @@
+---
+// Case study diagram (/des-sys-audit): what happens after the skill's report. Every recommendation
+// goes through a person: verify it, fix Figma, test the code in Cursor, compare the two, and shim
+// where rendering differences leave them visibly off. The last two steps repeat until they match,
+// so they sit together in a dashed loop panel. Every step has a small illustration of the same
+// (illustrative) checkbox: the findings checked, the Figma fix, the code diff, then the label split
+// between design and code against one baseline, before and after a 2px shim. Rendered in HTML with role
+// tokens so it follows the colour mode. Each step is a native <details>, so it works without
+// JavaScript; the first starts open, and several can be open at once. A script animates the height.
+import { Icon } from 'astro-icon/components';
+import FigmaFillMotion from './FigmaFillMotion.astro';
+import ImplementationPaths from './ImplementationPaths.astro';
+
+const texture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/pink-texture.webp`;
+const codeTexture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/grey-texture.webp`;
+
+// A code change from the audit: line numbers, +/- markers, and the changed part of each line picked out
+const diff = [
+  { old: 39, new: 39, code: '.spanWrapper {', flush: true },
+  { old: 40, type: 'removed', before: 'color: var(--color-', mark: 'input-label', after: ');' },
+  { new: 40, type: 'added', before: 'color: var(--color-', mark: 'text-primary', after: ');' },
+  { old: 41, new: 41, code: 'opacity: 100%;' },
+  { old: 42, new: 42, code: 'display: flex;' },
+  { old: 43, new: 43, code: 'align-items: flex-start;' },
+  { old: 44, new: 44, code: 'font-weight: var(--font-weight-component);' },
+  { old: 45, type: 'removed', before: 'line-height: var(--line-height-', mark: 'body', after: ');' },
+  { old: 46, type: 'removed', before: 'padding-top: ', mark: '1px', after: ';' },
+  { new: 45, type: 'added', before: 'line-height: var(--line-height-', mark: 'component', after: ');' },
+  { new: 46, type: 'added', before: 'padding-top: ', mark: 'var(--space-component-gap-x-small)', after: ';' },
+];
+
+const steps = [
+  { title: 'Review audit', body: 'Check each recommendation and why it was flagged', visual: 'verify' },
+  { title: 'Fix Figma', body: 'Make the design changes that are clearly needed', visual: 'figma' },
+  { title: 'Test in code', body: 'Apply the code changes in Cursor and preview them', visual: 'code' },
+] as const;
+
+const loopSteps = [
+  {
+    title: 'Compare',
+    body: 'Put design and code side by side. Same token, but the code text sits higher.',
+    shimmed: false,
+  },
+  {
+    title: 'Shim',
+    body: 'Add a small offset so the text lands on the same line, here 2px of top padding in code.',
+    shimmed: true,
+  },
+];
+---
+
+<figure class="audit-loop" style={`--audit-texture: url(${texture}); --audit-code-texture: url(${codeTexture})`}>
+  <ol class="audit-loop-steps">
+    {
+      steps.map((step, i) => (
+        <li class="audit-step">
+          <details open={i === 0}>
+            <summary class="audit-step-summary">
+              <span class="audit-step-number">{i + 1}</span>
+              <strong>{step.title}</strong>
+              <svg class="audit-step-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+            </summary>
+            <div class="audit-step-panel"><div class="audit-step-content">
+          <span class="audit-step-body">{step.body}</span>
+
+          <div
+            class:list={[
+              'audit-visual',
+              step.visual === 'verify' && 'is-table',
+              step.visual === 'figma' && 'is-media',
+              step.visual === 'code' && 'is-table is-cropped',
+            ]}
+          >
+            {step.visual === 'verify' && (
+              <div class="audit-review-scroll" tabindex="0" role="region" aria-label="Reviewing the audit's findings">
+                <table class="audit-review">
+                  <thead>
+                    <tr>
+                      <th scope="col">Property</th>
+                      <th scope="col">Design</th>
+                      <th scope="col">Code</th>
+                      <th scope="col">Issue</th>
+                      <th scope="col">Decision</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Text colour</th>
+                      <td><code>--color-text-secondary</code></td>
+                      <td><code>--color-text-secondary</code></td>
+                      <td><span class="tag">Wrong token</span></td>
+                      <td class="is-fix">
+                        <span class="audit-decision">
+                          <Icon name="lucide:check" class="audit-verdict" />
+                          Fix
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th scope="row">Font weight</th>
+                      <td><code>--font-weight-component-semibold</code></td>
+                      <td><code>--font-weight-component</code></td>
+                      <td><span class="tag">Mismatch</span></td>
+                      <td class="is-fix">
+                        <span class="audit-decision">
+                          <Icon name="lucide:check" class="audit-verdict" />
+                          Fix
+                        </span>
+                      </td>
+                    </tr>
+                    <tr class="is-kept">
+                      <th scope="row">Padding top</th>
+                      <td><code>None</code></td>
+                      <td><code>2px</code></td>
+                      <td><span class="tag">Hardcoded</span></td>
+                      <td class="is-keep">
+                        <span class="audit-decision">
+                          <Icon name="lucide:x" class="audit-verdict" />
+                          Keep
+                        </span>
+                        <small>A 2px shim, kept on purpose</small>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {step.visual === 'figma' && <FigmaFillMotion />}
+            {step.visual === 'code' && (
+              <div class="audit-diff-scroll" tabindex="0" role="region" aria-label="The code change">
+                <div class="audit-diff">
+                  {diff.map((line) => (
+                    <div class:list={['audit-diff-line', line.type && `is-${line.type}`]}>
+                      <span class="audit-diff-number">{line.old}</span>
+                      <span class="audit-diff-number">{line.new}</span>
+                      <span class="audit-diff-marker">
+                        {line.type === 'removed' ? '−' : line.type === 'added' ? '+' : ''}
+                      </span>
+                      {/* On one line: spaces between these would show in the code */}
+                      <code class:list={[line.flush && 'is-flush']}>{line.code ?? line.before}{line.mark && <mark>{line.mark}</mark>}{line.after}</code>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+            </div></div>
+          </details>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="audit-loop-panel">
+    <div class="audit-loop-repeat">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 12a8 8 0 0 1 14-5.3M20 4v4h-4M20 12a8 8 0 0 1-14 5.3M4 20v-4h4"></path>
+      </svg>
+      <span>Steps 4 and 5 repeat until design and code match</span>
+    </div>
+
+    <ol class="audit-loop-steps is-looped" start="4">
+      {
+        loopSteps.map((step, i) => (
+          <li class="audit-step">
+            <details>
+              <summary class="audit-step-summary">
+                <span class="audit-step-number">{i + 4}</span>
+                <strong>{step.title}</strong>
+                <svg class="audit-step-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+              </summary>
+              <div class="audit-step-panel"><div class="audit-step-content">
+            <span class="audit-step-body">{step.body}</span>
+
+            <div class:list={['audit-drift', step.shimmed && 'is-shimmed']} aria-hidden="true">
+              <span class="audit-drift-side">Design</span>
+              <span class="audit-drift-side">Code</span>
+              <div class="audit-drift-rows">
+                <span class="audit-drift-label">
+                  <span class="audit-drift-box" />
+                  <span class="audit-drift-textbox"><span class="audit-drift-text">Selection</span></span>
+                  <span class="audit-drift-line is-top" />
+                  <span class="audit-drift-line" />
+                </span>
+                <span class="audit-drift-label is-code">
+                  <span class="audit-drift-box" />
+                  <span class="audit-drift-textbox"><span class="audit-drift-text">Selection</span></span>
+                  <span class="audit-drift-shim"><span>{step.shimmed ? 'padding-top: 2px' : '2px too high'}</span></span>
+                  <span class="audit-drift-line is-top" />
+                  <span class="audit-drift-line" />
+                </span>
+              </div>
+            </div>
+              </div></div>
+            </details>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <ol class="audit-loop-steps is-last" start="6">
+    <li class="audit-step">
+      <details>
+        <summary class="audit-step-summary">
+          <span class="audit-step-number">6</span>
+          <strong>Implementation</strong>
+          <svg class="audit-step-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </summary>
+        <div class="audit-step-panel"><div class="audit-step-content">
+          <ImplementationPaths />
+        </div></div>
+      </details>
+    </li>
+  </ol>
+</figure>
+
+<script>
+  // Animate each step's height. The transition itself lives in the CSS, on the motion tokens, so this
+  // only sets the heights. Without this, or with reduced motion, the native open and close still work.
+  //
+  // Scrolling down also opens the steps one by one as each reaches the lower part of the screen, so
+  // people who don't click still see them all. The first click on any step hands control to the reader.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const steps = [...document.querySelectorAll<HTMLDetailsElement>('.audit-loop details')].flatMap((details) => {
+      const summary = details.querySelector('summary');
+      const panel = details.querySelector<HTMLElement>('.audit-step-panel');
+      return summary && panel ? [{ details, summary, panel }] : [];
+    });
+
+    const setOpen = ({ details, panel }: (typeof steps)[number], open: boolean) => {
+      panel.style.height = `${panel.getBoundingClientRect().height}px`;
+      if (open) {
+        details.removeAttribute('data-closing');
+        if (!details.open) {
+          panel.style.height = '0px';
+          details.open = true;
+        }
+      } else {
+        details.setAttribute('data-closing', '');
+      }
+      void panel.offsetHeight; // apply the starting height before changing it
+      panel.style.height = open ? `${panel.scrollHeight}px` : '0px';
+    };
+
+    const canvas = document.getElementById('site-canvas');
+    let lastTop = canvas?.scrollTop ?? 0;
+
+    const openNextOnScroll = () => {
+      if (!canvas) return;
+      const top = canvas.scrollTop;
+      const scrollingDown = top > lastTop;
+      lastTop = top;
+      if (!scrollingDown) return;
+
+      // One step per scroll event, and never one that's already above the screen
+      const line = canvas.clientHeight * 0.7;
+      const next = steps.find(({ details, summary }) => {
+        if (details.open) return false;
+        const { top: rowTop } = summary.getBoundingClientRect();
+        return rowTop >= 0 && rowTop < line;
+      });
+      if (next) setOpen(next, true);
+
+      if (steps.every(({ details }) => details.open)) stopAutoOpen();
+    };
+
+    const stopAutoOpen = () => canvas?.removeEventListener('scroll', openNextOnScroll);
+    canvas?.addEventListener('scroll', openNextOnScroll, { passive: true });
+
+    steps.forEach((step) => {
+      const { details, summary, panel } = step;
+
+      summary.addEventListener('click', (event) => {
+        event.preventDefault();
+        stopAutoOpen();
+        setOpen(step, !details.open || details.hasAttribute('data-closing'));
+      });
+
+      panel.addEventListener('transitionend', (event) => {
+        if (event.target !== panel || event.propertyName !== 'height') return;
+        if (details.hasAttribute('data-closing')) {
+          details.open = false;
+          details.removeAttribute('data-closing');
+        }
+        panel.style.height = '';
+      });
+    });
+  }
+</script>
+
+<style>
+  .audit-loop {
+    margin: var(--space-8) 0 0;
+  }
+
+  /* Specific enough to beat the case study layout's ol styles */
+  .audit-loop ol.audit-loop-steps {
+    display: grid;
+    /* minmax(0, ...) so the review table scrolls inside its row on phones, not past it */
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The stat card panel, reused as an accordion row */
+  .audit-step {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  .audit-step-summary {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-base);
+    list-style: none;
+    cursor: pointer;
+    transition: background-color var(--duration-150) var(--ease-standard);
+  }
+
+  .audit-step-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .audit-step-summary:hover {
+    background: var(--color-hover-subtle);
+  }
+
+  .audit-step-summary:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  .audit-step-number {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: var(--space-6);
+    height: var(--space-6);
+    border-radius: var(--radius-base);
+    background: var(--color-ink);
+    color: var(--color-canvas);
+    font: var(--type-count);
+  }
+
+  .audit-step strong {
+    flex: 1;
+    min-width: 0;
+    font: var(--type-label);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .audit-step-chevron {
+    flex: none;
+    width: var(--space-4);
+    height: var(--space-4);
+    fill: none;
+    stroke: var(--color-subtle);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform var(--duration-200) var(--ease-standard);
+  }
+
+  details[open]:not([data-closing]) > .audit-step-summary .audit-step-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* The script sets a height on this while a step opens or closes */
+  .audit-step-panel {
+    overflow: hidden;
+    transition: height var(--duration-320) var(--ease-settle);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .audit-step-summary,
+    .audit-step-chevron,
+    .audit-step-panel {
+      transition: none;
+    }
+  }
+
+  .audit-step-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: 0 var(--space-4) var(--space-4);
+  }
+
+  .audit-step .audit-step-body {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  /* The repeating steps share one dashed panel, headed by the loop note */
+  .audit-loop-panel {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-base);
+  }
+
+  .audit-loop-repeat {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-1) var(--space-3);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-muted);
+  }
+
+  .audit-loop-repeat svg {
+    flex: none;
+    width: var(--space-4);
+    height: var(--space-4);
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The illustration: one checkbox split down the middle like the hero reel, design on the left and
+     code on the right, so any drift shows where the two halves of the label meet */
+  .audit-drift {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    flex: 1 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: center;
+    gap: var(--space-2) var(--space-10);
+    margin-top: var(--space-3);
+    padding: var(--space-4) var(--space-5) var(--space-6);
+    border-radius: var(--radius-base);
+  }
+
+  .audit-drift::before,
+  .audit-drift::after {
+    content: '';
+    position: absolute;
+    inset: 0 50% 0 0;
+    z-index: -1;
+    background: var(--audit-texture) center / cover;
+  }
+
+  .audit-drift::after {
+    inset: 0 0 0 50%;
+    background-image: var(--audit-code-texture);
+  }
+
+  /* Every step's illustration sits on the same canvas panel */
+  .audit-visual {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-canvas);
+    border-radius: var(--radius-base);
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  /* 1. Review audit: the report's findings with a decision on each, styled like the report */
+  /* The card runs off the bottom of the frame, so the frame has no bottom padding */
+  .audit-visual.is-table {
+    padding: var(--space-6) var(--space-6) 0;
+    overflow: hidden;
+  }
+
+  @media (max-width: 639px) {
+    .audit-visual.is-table {
+      padding: var(--space-3) var(--space-3) 0;
+    }
+  }
+
+  .audit-visual.is-table .audit-review-scroll,
+  .audit-visual.is-table .audit-diff-scroll {
+    border-bottom: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  /* Step 3 also clips through its last line of code; step 1 keeps all its text */
+  .audit-visual.is-cropped .audit-diff-scroll {
+    margin-bottom: -0.6lh;
+  }
+
+  .audit-visual.is-cropped .audit-diff {
+    padding-bottom: 0;
+  }
+
+  .audit-review-scroll {
+    overflow-x: auto;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  .audit-review-scroll:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .audit-review {
+    width: 100%;
+    min-width: calc(var(--space-24) * 6);
+    border-collapse: collapse;
+    text-align: left;
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+  }
+
+  .audit-review th,
+  .audit-review td {
+    padding: var(--space-3) var(--space-4);
+    vertical-align: top;
+    color: var(--color-ink);
+  }
+
+  .audit-review thead th {
+    font-weight: var(--weight-medium);
+    color: var(--color-subtle);
+    background: var(--color-surface);
+  }
+
+  .audit-review tbody tr + tr th,
+  .audit-review tbody tr + tr td {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .audit-review tbody th {
+    font-weight: var(--weight-medium);
+  }
+
+  .audit-review code {
+    font: inherit;
+    color: var(--color-muted);
+  }
+
+  .audit-review td.is-fix {
+    background: var(--color-success-soft);
+    color: var(--color-success);
+  }
+
+  .audit-review td.is-keep {
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+  }
+
+  .audit-decision {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .audit-decision .audit-verdict {
+    flex: none;
+    width: var(--space-4);
+    height: var(--space-4);
+  }
+
+  .audit-review small {
+    display: block;
+    margin-top: var(--space-1);
+    font: var(--type-count);
+    color: inherit;
+  }
+
+  .audit-loop ol.audit-loop-steps.is-last {
+    margin-top: var(--space-2);
+  }
+
+  /* 2. Fix Figma: the motion scene fills the panel */
+  .audit-visual.is-media {
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* 3. Test in code: the change as a code review diff */
+  .audit-diff-scroll {
+    overflow-x: auto;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-base);
+  }
+
+  .audit-diff-scroll:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .audit-diff {
+    width: max-content;
+    min-width: 100%;
+    padding-block: var(--space-2);
+    font: var(--type-compact);
+    font-family: var(--font-mono);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+  }
+
+  .audit-diff-line {
+    display: grid;
+    grid-template-columns: var(--space-10) var(--space-10) var(--space-6) minmax(0, 1fr);
+    align-items: baseline;
+  }
+
+  .audit-diff-number {
+    padding-inline: var(--space-2);
+    text-align: right;
+    color: var(--color-subtle);
+  }
+
+  .audit-diff-marker {
+    text-align: center;
+  }
+
+  .audit-diff code {
+    padding-right: var(--space-4);
+    padding-left: var(--space-4);
+    font: inherit;
+    font-family: inherit;
+    white-space: pre;
+  }
+
+  .audit-diff code.is-flush {
+    padding-left: 0;
+  }
+
+  .audit-diff mark {
+    border-radius: var(--radius-none);
+    color: inherit;
+  }
+
+  .audit-diff-line.is-removed {
+    background: var(--color-danger-soft);
+  }
+
+  .audit-diff-line.is-added {
+    background: var(--color-success-soft);
+  }
+
+  .is-removed .audit-diff-number,
+  .is-removed mark {
+    background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+  }
+
+  .is-added .audit-diff-number,
+  .is-added mark {
+    background: color-mix(in srgb, var(--color-success) 20%, transparent);
+  }
+
+  .audit-drift-side {
+    font: var(--type-compact);
+    letter-spacing: var(--tracking-body);
+    color: var(--color-subtle);
+  }
+
+  .audit-drift-rows {
+    position: relative;
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    /* Room for the note above the text box, and for the text box below the baseline */
+    padding-top: calc(0.22em + var(--space-8));
+    padding-bottom: 0.22em;
+    /* Zoomed in, so the drift is easy to see. The lines' positions depend on this size */
+    font: var(--type-display);
+    font-weight: var(--weight-regular);
+    font-size: calc(clamp(var(--text-4xl), calc(4.8vw - 2px), var(--text-6xl)) * 2); /* design-tokens-ignore: illustration drawn at twice Display's size, using its own scale */
+  }
+
+  /* Display size on phones, the largest that still fits the frame */
+  @media (max-width: 639px) {
+    .audit-drift-rows {
+      font: var(--type-display);
+      font-weight: var(--weight-regular);
+    }
+  }
+
+  /* The same checkbox twice, stacked, each clipped to its half. Equal outer columns centre the
+     checkbox in the frame. The clip reaches past the row into the frame's padding, so the note, the
+     text box, and the ends of the lines aren't cut off */
+  .audit-drift-label {
+    position: relative;
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: 1fr auto auto 1fr;
+    align-items: end;
+    letter-spacing: var(--tracking-body);
+    color: var(--color-ink);
+    clip-path: inset(calc((0.22em + var(--space-8)) * -1) 50% -0.4em calc(var(--space-2) * -1));
+  }
+
+  .audit-drift-label.is-code {
+    clip-path: inset(calc((0.22em + var(--space-8)) * -1) calc(var(--space-2) * -1) -0.4em 50%);
+  }
+
+  .audit-drift-box {
+    grid-column: 2;
+    margin-right: var(--space-4);
+    /* Cap height, so the box sits on the baseline and lines up with the capitals */
+    width: 0.7em;
+    height: 0.7em;
+    border: calc(var(--border-width) * 6) solid var(--color-muted);
+    border-radius: var(--radius-base);
+  }
+
+  @media (max-width: 639px) {
+    .audit-drift-box {
+      margin-right: var(--space-2);
+      border-width: calc(var(--border-width) * 3);
+      /* Half the base radius, so a small box reads as a rounded square, not a circle */
+      border-radius: calc(var(--radius-base) / 2);
+    }
+  }
+
+  /* The text box holds the word. Its outline is the font's full height: 0.22em of space above the
+     capitals and below the baseline, from the ascent and descent set on the @font-face rules */
+  .audit-drift-textbox {
+    position: relative;
+    grid-column: 3;
+  }
+
+  .audit-drift-textbox::after {
+    content: '';
+    position: absolute;
+    inset: -0.22em calc(var(--space-1) * -1);
+    border: 2px solid var(--color-accent);
+  }
+
+  /* Trimmed to cap height and baseline, so the checkbox's bottom edge is the text's baseline */
+  .audit-drift-text {
+    display: block;
+    text-box: trim-both cap alphabetic;
+  }
+
+  /* Same token and same text box, but code renders the text higher inside it. 2px at this text's
+     real size (24px), so 1/12 of the type size keeps the proportion true at this zoom */
+  .audit-drift-label.is-code .audit-drift-text,
+  .audit-drift-label.is-code .audit-drift-line {
+    transform: translateY(calc(1em / -12));
+  }
+
+  /* The shim pushes the whole text box down by that amount. The text still sits high inside it, so
+     the letters land level with design while the box itself is now out of line */
+  .audit-drift.is-shimmed .audit-drift-label.is-code .audit-drift-textbox {
+    transform: translateY(calc(1em / 12));
+  }
+
+  .audit-drift.is-shimmed .audit-drift-label.is-code .audit-drift-line {
+    transform: none;
+  }
+
+  /* The baseline and cap height of each half's text. They step at the split while the code half is
+     high, and run straight across once it's shimmed */
+  .audit-drift-line {
+    position: absolute;
+    left: calc(var(--space-2) * -1);
+    right: calc(var(--space-2) * -1);
+    bottom: 0;
+    border-top: 2px dotted var(--color-danger);
+  }
+
+  .audit-drift-line.is-top {
+    /* 0.73em is the fallback for browsers without the cap unit */
+    bottom: 0.73em;
+    bottom: 1cap;
+  }
+
+  /* Starts just past the split, so it stays on the code side, and sits above the text box. Positioned
+     in the illustration's type size; the note inside it sets its own */
+  .audit-drift-shim {
+    position: absolute;
+    left: calc(50% + var(--space-2));
+    bottom: calc(100% + 0.22em + var(--space-2));
+  }
+
+  .audit-drift-shim > span {
+    display: block;
+    padding: var(--space-inset) var(--space-1);
+    border-radius: var(--radius-base);
+    background: var(--color-measure);
+    color: var(--color-on-measure);
+    font: var(--type-count);
+    white-space: nowrap;
+    text-box: normal;
+  }
+
+  /* Every step's illustration sits on the textured background. What's drawn straight on it uses
+     palette colours, since the texture doesn't change with the colour mode */
+  .audit-visual {
+    background: var(--audit-texture) center / cover;
+  }
+
+  .audit-drift-side {
+    color: var(--color-neutral-700);
+  }
+
+  .audit-drift-label {
+    color: var(--color-neutral-900);
+  }
+
+  .audit-drift-box {
+    background: var(--color-white);
+    border-color: var(--color-neutral-500);
+  }
+
+  .audit-drift-line {
+    border-top-color: var(--color-red-700);
+  }
+</style>

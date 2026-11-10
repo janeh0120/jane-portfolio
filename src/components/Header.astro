@@ -152,7 +152,7 @@ const linkClass = (href: string) =>
       display: grid;
       grid-template-rows: 0fr;
       overflow: hidden;
-      transition: grid-template-rows 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: grid-template-rows var(--duration-320) var(--ease-settle);
     }
 
     .mobile-nav-panel.is-open {
@@ -171,8 +171,8 @@ const linkClass = (href: string) =>
       opacity: 0;
       transform: translateY(-0.75rem);
       transition:
-        opacity 0.25s ease,
-        transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        opacity var(--duration-200) var(--ease-standard),
+        transform var(--duration-320) var(--ease-settle);
     }
 
     .mobile-nav-panel.is-open .mobile-nav-panel-inner {
@@ -203,12 +203,11 @@ const linkClass = (href: string) =>
        on the way back the links fade in once there's room for them. */
     /* The links' column animates between their real width (1fr) and nothing (0fr) */
     .main-nav {
-      --nav-ease: cubic-bezier(0.45, 0, 0.25, 1);
       grid-template-columns: 1fr;
       transition:
-        grid-template-columns 0.7s var(--nav-ease),
-        margin-right 0.7s var(--nav-ease),
-        opacity 0.5s ease 0.15s,
+        grid-template-columns var(--duration-700) var(--ease-standard),
+        margin-right var(--duration-700) var(--ease-standard),
+        opacity var(--duration-500) var(--ease-standard) var(--duration-150),
         visibility 0s;
     }
 
@@ -227,10 +226,10 @@ const linkClass = (href: string) =>
       opacity: 0;
       visibility: hidden;
       transition:
-        grid-template-columns 0.7s var(--nav-ease),
-        margin-right 0.7s var(--nav-ease),
-        opacity 0.4s ease,
-        visibility 0s 0.7s;
+        grid-template-columns var(--duration-700) var(--ease-standard),
+        margin-right var(--duration-700) var(--ease-standard),
+        opacity var(--duration-320) var(--ease-standard),
+        visibility 0s var(--duration-700);
     }
   }
 

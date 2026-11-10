@@ -129,7 +129,7 @@ const nav = [
   /* Outcome numbers use the page title's .heading style */
   #outcome :global(.case-study-stat strong) {
     font: var(--type-heading);
-    letter-spacing: var(--tracking-tight);
+    letter-spacing: var(--tracking-display);
   }
 
   #outcome .migration-outcome-note {
@@ -168,8 +168,9 @@ const nav = [
   .migration-quote blockquote p {
     margin: 0;
     color: var(--color-ink);
-    font: var(--type-quote);
-    letter-spacing: var(--tracking-tight);
+    font: var(--type-subheading);
+    font-weight: var(--weight-regular);
+    letter-spacing: var(--tracking-display);
   }
 
   .migration-quote blockquote p + p {
@@ -209,7 +210,7 @@ const nav = [
     color: var(--color-ink);
     text-decoration: underline;
     text-underline-offset: 0.15em;
-    transition: opacity 0.15s ease;
+    transition: opacity var(--duration-150) var(--ease-standard);
   }
 
   .migration-disclaimer a:hover {

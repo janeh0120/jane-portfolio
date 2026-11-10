@@ -1,0 +1,866 @@
+{
+  "primitives": {
+    "color": {
+      "white": {
+        "value": "#ffffff",
+        "type": "color"
+      },
+      "black": {
+        "value": "#000000",
+        "type": "color"
+      },
+      "neutral": {
+        "50": {
+          "value": "#fafafa",
+          "type": "color"
+        },
+        "100": {
+          "value": "#f5f5f5",
+          "type": "color"
+        },
+        "200": {
+          "value": "#e5e5e5",
+          "type": "color"
+        },
+        "300": {
+          "value": "#d4d4d4",
+          "type": "color"
+        },
+        "400": {
+          "value": "#a1a1a1",
+          "type": "color"
+        },
+        "500": {
+          "value": "#737373",
+          "type": "color"
+        },
+        "600": {
+          "value": "#525252",
+          "type": "color"
+        },
+        "700": {
+          "value": "#404040",
+          "type": "color"
+        },
+        "800": {
+          "value": "#262626",
+          "type": "color"
+        },
+        "900": {
+          "value": "#171717",
+          "type": "color"
+        },
+        "950": {
+          "value": "#0a0a0a",
+          "type": "color"
+        }
+      },
+      "blue": {
+        "50": {
+          "value": "#eff6ff",
+          "type": "color"
+        },
+        "100": {
+          "value": "#dbeafe",
+          "type": "color"
+        },
+        "200": {
+          "value": "#bedbff",
+          "type": "color"
+        },
+        "300": {
+          "value": "#8ec5ff",
+          "type": "color"
+        },
+        "400": {
+          "value": "#51a2ff",
+          "type": "color"
+        },
+        "500": {
+          "value": "#2b7fff",
+          "type": "color"
+        },
+        "600": {
+          "value": "#155dfc",
+          "type": "color"
+        },
+        "700": {
+          "value": "#1447e6",
+          "type": "color"
+        },
+        "800": {
+          "value": "#193cb8",
+          "type": "color"
+        },
+        "900": {
+          "value": "#1c398e",
+          "type": "color"
+        },
+        "950": {
+          "value": "#162456",
+          "type": "color"
+        }
+      },
+      "red": {
+        "50": {
+          "value": "#fef2f2",
+          "type": "color"
+        },
+        "100": {
+          "value": "#ffe2e2",
+          "type": "color"
+        },
+        "200": {
+          "value": "#ffc9c9",
+          "type": "color"
+        },
+        "300": {
+          "value": "#ffa2a2",
+          "type": "color"
+        },
+        "400": {
+          "value": "#ff6467",
+          "type": "color"
+        },
+        "500": {
+          "value": "#fb2c36",
+          "type": "color"
+        },
+        "600": {
+          "value": "#e7000b",
+          "type": "color"
+        },
+        "700": {
+          "value": "#c10007",
+          "type": "color"
+        },
+        "800": {
+          "value": "#9f0712",
+          "type": "color"
+        },
+        "900": {
+          "value": "#82181a",
+          "type": "color"
+        },
+        "950": {
+          "value": "#460809",
+          "type": "color"
+        }
+      },
+      "orange": {
+        "50": {
+          "value": "#fff7ed",
+          "type": "color"
+        },
+        "100": {
+          "value": "#ffedd4",
+          "type": "color"
+        },
+        "200": {
+          "value": "#ffd6a7",
+          "type": "color"
+        },
+        "300": {
+          "value": "#ffb86a",
+          "type": "color"
+        },
+        "400": {
+          "value": "#ff8904",
+          "type": "color"
+        },
+        "500": {
+          "value": "#ff6900",
+          "type": "color"
+        },
+        "600": {
+          "value": "#f54900",
+          "type": "color"
+        },
+        "700": {
+          "value": "#ca3500",
+          "type": "color"
+        },
+        "800": {
+          "value": "#9f2d00",
+          "type": "color"
+        },
+        "900": {
+          "value": "#7e2a0c",
+          "type": "color"
+        },
+        "950": {
+          "value": "#441306",
+          "type": "color"
+        }
+      },
+      "emerald": {
+        "50": {
+          "value": "#ecfdf5",
+          "type": "color"
+        },
+        "100": {
+          "value": "#d0fae5",
+          "type": "color"
+        },
+        "200": {
+          "value": "#a4f4cf",
+          "type": "color"
+        },
+        "300": {
+          "value": "#5ee9b5",
+          "type": "color"
+        },
+        "400": {
+          "value": "#00d492",
+          "type": "color"
+        },
+        "500": {
+          "value": "#00bc7d",
+          "type": "color"
+        },
+        "600": {
+          "value": "#009966",
+          "type": "color"
+        },
+        "700": {
+          "value": "#007a55",
+          "type": "color"
+        },
+        "800": {
+          "value": "#006045",
+          "type": "color"
+        },
+        "900": {
+          "value": "#004f3b",
+          "type": "color"
+        },
+        "950": {
+          "value": "#002c22",
+          "type": "color"
+        }
+      }
+    }
+  },
+  "core": {
+    "spacing": {
+      "1": {
+        "value": 4,
+        "type": "spacing"
+      },
+      "2": {
+        "value": 8,
+        "type": "spacing"
+      },
+      "3": {
+        "value": 12,
+        "type": "spacing"
+      },
+      "4": {
+        "value": 16,
+        "type": "spacing"
+      },
+      "5": {
+        "value": 20,
+        "type": "spacing"
+      },
+      "6": {
+        "value": 24,
+        "type": "spacing"
+      },
+      "8": {
+        "value": 32,
+        "type": "spacing"
+      },
+      "10": {
+        "value": 40,
+        "type": "spacing"
+      },
+      "12": {
+        "value": 48,
+        "type": "spacing"
+      },
+      "16": {
+        "value": 64,
+        "type": "spacing"
+      },
+      "20": {
+        "value": 80,
+        "type": "spacing"
+      },
+      "24": {
+        "value": 96,
+        "type": "spacing"
+      },
+      "bar-inset": {
+        "value": 8,
+        "type": "spacing"
+      },
+      "section-sm": {
+        "value": 88,
+        "type": "spacing"
+      },
+      "section": {
+        "value": 112,
+        "type": "spacing"
+      },
+      "inset": {
+        "value": 4,
+        "type": "spacing"
+      }
+    },
+    "sizing": {
+      "site": {
+        "value": 1400,
+        "type": "sizing"
+      },
+      "prose": {
+        "value": 768,
+        "type": "sizing"
+      },
+      "narrow": {
+        "value": 672,
+        "type": "sizing"
+      }
+    },
+    "borderRadius": {
+      "base": {
+        "value": 8,
+        "type": "borderRadius"
+      },
+      "panel": {
+        "value": 16.5,
+        "type": "borderRadius"
+      },
+      "menu": {
+        "value": 12.5,
+        "type": "borderRadius"
+      },
+      "pill": {
+        "value": 999,
+        "type": "borderRadius"
+      }
+    },
+    "borderWidth": {
+      "default": {
+        "value": 0.5,
+        "type": "borderWidth"
+      }
+    },
+    "fontFamilies": {
+      "sans": {
+        "value": "TeX Gyre Heros",
+        "type": "fontFamilies"
+      }
+    },
+    "typography": {
+      "display": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Bold",
+          "fontSize": 60,
+          "lineHeight": "125%",
+          "letterSpacing": "-5%"
+        },
+        "type": "typography",
+        "description": "Desktop: the largest size of clamp(2.25rem, calc(4.8vw - 2px), 3.75rem)."
+      },
+      "display-mobile": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Bold",
+          "fontSize": 36,
+          "lineHeight": "125%",
+          "letterSpacing": "-5%"
+        },
+        "type": "typography",
+        "description": "Mobile: the smallest size of clamp(2.25rem, calc(4.8vw - 2px), 3.75rem)."
+      },
+      "heading": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Bold",
+          "fontSize": 36,
+          "lineHeight": "125%",
+          "letterSpacing": "-5%"
+        },
+        "type": "typography",
+        "description": "Desktop: the largest size of clamp(1.5rem, calc(3.2vw - 2px), 2.25rem)."
+      },
+      "heading-mobile": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Bold",
+          "fontSize": 24,
+          "lineHeight": "125%",
+          "letterSpacing": "-5%"
+        },
+        "type": "typography",
+        "description": "Mobile: the smallest size of clamp(1.5rem, calc(3.2vw - 2px), 2.25rem)."
+      },
+      "subheading": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Bold",
+          "fontSize": 20,
+          "lineHeight": "125%",
+          "letterSpacing": "-5%"
+        },
+        "type": "typography",
+        "description": "Desktop: the largest size of clamp(1rem, calc(1.8vw - 2px), 1.25rem)."
+      },
+      "subheading-mobile": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Bold",
+          "fontSize": 16,
+          "lineHeight": "125%",
+          "letterSpacing": "-5%"
+        },
+        "type": "typography",
+        "description": "Mobile: the smallest size of clamp(1rem, calc(1.8vw - 2px), 1.25rem)."
+      },
+      "body": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Regular",
+          "fontSize": 14,
+          "lineHeight": "162.5%",
+          "letterSpacing": "0%"
+        },
+        "type": "typography"
+      },
+      "label": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Regular",
+          "fontSize": 14,
+          "lineHeight": "162.5%",
+          "letterSpacing": "0%"
+        },
+        "type": "typography",
+        "description": "Weight 500 in CSS, which draws as Regular: TeX Gyre Heros has no Medium."
+      },
+      "compact": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Regular",
+          "fontSize": 14,
+          "lineHeight": "137.5%",
+          "letterSpacing": "0%"
+        },
+        "type": "typography"
+      },
+      "count": {
+        "value": {
+          "fontFamily": "{fontFamilies.sans}",
+          "fontWeight": "Regular",
+          "fontSize": 12,
+          "lineHeight": "100%",
+          "letterSpacing": "0%"
+        },
+        "type": "typography",
+        "description": "Weight 500 in CSS, which draws as Regular: TeX Gyre Heros has no Medium."
+      }
+    },
+    "boxShadow": {
+      "raised": {
+        "value": [
+          {
+            "type": "dropShadow",
+            "color": "#0000001a",
+            "x": 0,
+            "y": 1,
+            "blur": 3,
+            "spread": 0
+          },
+          {
+            "type": "dropShadow",
+            "color": "#0000001a",
+            "x": 0,
+            "y": 1,
+            "blur": 2,
+            "spread": -1
+          }
+        ],
+        "type": "boxShadow"
+      },
+      "floating": {
+        "value": [
+          {
+            "type": "dropShadow",
+            "color": "#0000001a",
+            "x": 0,
+            "y": 20,
+            "blur": 25,
+            "spread": -5
+          },
+          {
+            "type": "dropShadow",
+            "color": "#0000001a",
+            "x": 0,
+            "y": 8,
+            "blur": 10,
+            "spread": -6
+          }
+        ],
+        "type": "boxShadow"
+      }
+    },
+    "motion": {
+      "duration": {
+        "80": {
+          "value": 80,
+          "type": "number",
+          "description": "Milliseconds"
+        },
+        "150": {
+          "value": 150,
+          "type": "number",
+          "description": "Milliseconds"
+        },
+        "200": {
+          "value": 200,
+          "type": "number",
+          "description": "Milliseconds"
+        },
+        "320": {
+          "value": 320,
+          "type": "number",
+          "description": "Milliseconds"
+        },
+        "500": {
+          "value": 500,
+          "type": "number",
+          "description": "Milliseconds"
+        },
+        "700": {
+          "value": 700,
+          "type": "number",
+          "description": "Milliseconds"
+        },
+        "1000": {
+          "value": 1000,
+          "type": "number",
+          "description": "Milliseconds"
+        }
+      },
+      "easing": {
+        "standard": {
+          "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+          "type": "other"
+        },
+        "settle": {
+          "value": "cubic-bezier(0, 0, 0.2, 1)",
+          "type": "other"
+        }
+      },
+      "press": {
+        "scale": {
+          "value": 0.97,
+          "type": "number"
+        },
+        "scale-icon": {
+          "value": 0.92,
+          "type": "number"
+        }
+      }
+    }
+  },
+  "light": {
+    "color": {
+      "page": {
+        "value": "{color.neutral.100}",
+        "type": "color"
+      },
+      "canvas": {
+        "value": "{color.white}",
+        "type": "color"
+      },
+      "ink": {
+        "value": "{color.neutral.900}",
+        "type": "color"
+      },
+      "muted": {
+        "value": "{color.neutral.700}",
+        "type": "color"
+      },
+      "subtle": {
+        "value": "{color.neutral.600}",
+        "type": "color"
+      },
+      "link": {
+        "value": "{color.ink}",
+        "type": "color"
+      },
+      "ink-hover": {
+        "value": "#414141",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-ink) 82%, var(--color-canvas))"
+      },
+      "accent": {
+        "value": "{color.blue.600}",
+        "type": "color"
+      },
+      "on-accent": {
+        "value": "{color.white}",
+        "type": "color"
+      },
+      "accent-soft": {
+        "value": "#155dfc1f",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-accent) 12%, transparent)"
+      },
+      "surface": {
+        "value": "{color.neutral.50}",
+        "type": "color"
+      },
+      "fill": {
+        "value": "{color.neutral.200}",
+        "type": "color"
+      },
+      "hover": {
+        "value": "{color.neutral.300}",
+        "type": "color"
+      },
+      "hover-subtle": {
+        "value": "{color.neutral.100}",
+        "type": "color"
+      },
+      "border": {
+        "value": "{color.neutral.200}",
+        "type": "color"
+      },
+      "border-strong": {
+        "value": "{color.neutral.300}",
+        "type": "color"
+      },
+      "danger": {
+        "value": "{color.red.700}",
+        "type": "color"
+      },
+      "danger-soft": {
+        "value": "{color.red.50}",
+        "type": "color"
+      },
+      "success": {
+        "value": "{color.emerald.700}",
+        "type": "color"
+      },
+      "success-soft": {
+        "value": "{color.emerald.50}",
+        "type": "color"
+      },
+      "placeholder": {
+        "value": "{color.neutral.300}",
+        "type": "color"
+      },
+      "glass": {
+        "value": "#ffffffb8",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-white) 72%, transparent)"
+      },
+      "glass-hover": {
+        "value": "#ffffffd1",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-white) 82%, transparent)"
+      },
+      "hairline": {
+        "value": "#17171714",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-neutral-900) 8%, transparent)"
+      },
+      "overlay": {
+        "value": "#f5f5f5e0",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-page) 88%, transparent)"
+      },
+      "media-backdrop": {
+        "value": "{color.black}",
+        "type": "color"
+      },
+      "measure": {
+        "value": "{color.orange.600}",
+        "type": "color"
+      },
+      "on-measure": {
+        "value": "{color.white}",
+        "type": "color"
+      },
+      "pin": {
+        "value": "{color.emerald.600}",
+        "type": "color"
+      }
+    }
+  },
+  "dark": {
+    "color": {
+      "page": {
+        "value": "{color.neutral.950}",
+        "type": "color"
+      },
+      "canvas": {
+        "value": "{color.neutral.900}",
+        "type": "color"
+      },
+      "ink": {
+        "value": "{color.neutral.100}",
+        "type": "color"
+      },
+      "muted": {
+        "value": "{color.neutral.300}",
+        "type": "color"
+      },
+      "subtle": {
+        "value": "{color.neutral.400}",
+        "type": "color"
+      },
+      "link": {
+        "value": "{color.ink}",
+        "type": "color"
+      },
+      "ink-hover": {
+        "value": "#cdcdcd",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-ink) 82%, var(--color-canvas))"
+      },
+      "accent": {
+        "value": "{color.blue.600}",
+        "type": "color"
+      },
+      "on-accent": {
+        "value": "{color.white}",
+        "type": "color"
+      },
+      "accent-soft": {
+        "value": "#155dfc1f",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-accent) 12%, transparent)"
+      },
+      "surface": {
+        "value": "{color.neutral.800}",
+        "type": "color"
+      },
+      "fill": {
+        "value": "{color.neutral.700}",
+        "type": "color"
+      },
+      "hover": {
+        "value": "{color.neutral.600}",
+        "type": "color"
+      },
+      "hover-subtle": {
+        "value": "{color.neutral.800}",
+        "type": "color"
+      },
+      "border": {
+        "value": "{color.neutral.700}",
+        "type": "color"
+      },
+      "border-strong": {
+        "value": "{color.neutral.600}",
+        "type": "color"
+      },
+      "danger": {
+        "value": "{color.red.300}",
+        "type": "color"
+      },
+      "danger-soft": {
+        "value": "{color.red.950}",
+        "type": "color"
+      },
+      "success": {
+        "value": "{color.emerald.300}",
+        "type": "color"
+      },
+      "success-soft": {
+        "value": "{color.emerald.950}",
+        "type": "color"
+      },
+      "placeholder": {
+        "value": "{color.neutral.600}",
+        "type": "color"
+      },
+      "glass": {
+        "value": "#171717c7",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-neutral-900) 78%, transparent)"
+      },
+      "glass-hover": {
+        "value": "#171717e0",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-neutral-900) 88%, transparent)"
+      },
+      "hairline": {
+        "value": "#ffffff1f",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-white) 12%, transparent)"
+      },
+      "overlay": {
+        "value": "#0a0a0ae0",
+        "type": "color",
+        "description": "CSS: color-mix(in srgb, var(--color-page) 88%, transparent)"
+      },
+      "media-backdrop": {
+        "value": "{color.black}",
+        "type": "color"
+      },
+      "measure": {
+        "value": "{color.orange.600}",
+        "type": "color"
+      },
+      "on-measure": {
+        "value": "{color.white}",
+        "type": "color"
+      },
+      "pin": {
+        "value": "{color.emerald.600}",
+        "type": "color"
+      }
+    }
+  },
+  "$themes": [
+    {
+      "id": "primitives",
+      "name": "Tailwind",
+      "group": "Primitives",
+      "selectedTokenSets": {
+        "primitives": "enabled"
+      }
+    },
+    {
+      "id": "core",
+      "name": "Default",
+      "group": "Core",
+      "selectedTokenSets": {
+        "primitives": "source",
+        "core": "enabled"
+      }
+    },
+    {
+      "id": "light",
+      "name": "Light",
+      "group": "Colour mode",
+      "selectedTokenSets": {
+        "primitives": "source",
+        "light": "enabled"
+      }
+    },
+    {
+      "id": "dark",
+      "name": "Dark",
+      "group": "Colour mode",
+      "selectedTokenSets": {
+        "primitives": "source",
+        "dark": "enabled"
+      }
+    }
+  ],
+  "$metadata": {
+    "tokenSetOrder": [
+      "primitives",
+      "core",
+      "light",
+      "dark"
+    ]
+  }
+}
