@@ -6,6 +6,7 @@ import SidebarNav from '../components/SidebarNav.astro';
 import IconControl from '../components/IconControl.astro';
 import ThemeMenu from '../components/ThemeMenu.astro';
 import ArrowIcon from '../components/ArrowIcon.astro';
+import AccordionStack from '../components/AccordionStack.astro';
 import LeaveFeedbackButton from '../components/react/LeaveFeedbackButton';
 import SpecularButton from '../components/react/SpecularButton';
 import { site } from '../data/site';
@@ -28,6 +29,7 @@ const sections = [
       { id: 'icon-control', label: 'Icon control' },
       { id: 'dropdown', label: 'Dropdown' },
       { id: 'segmented-toggle', label: 'Segmented toggle' },
+      { id: 'accordion-stack', label: 'Accordion stack' },
       { id: 'tag', label: 'Tag' },
       { id: 'links', label: 'Links' },
       { id: 'media-overlay', label: 'Media overlay' },
@@ -763,6 +765,44 @@ const sectionTitleClass = 'subheading text-ink';
                   <span class="segmented-thumb" aria-hidden="true"></span>
                   <button type="button" class="segmented-option" aria-pressed="true" tabindex="-1">Light</button>
                   <button type="button" class="segmented-option" aria-pressed="false" tabindex="-1">Dark</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="accordion-stack" class={sectionClass} aria-labelledby="accordion-stack-title">
+          <h3 id="accordion-stack-title" class={sectionTitleClass}>Accordion stack</h3>
+          <p class="mt-3 max-w-[58ch] text-body text-muted">
+            Related panels with one open at a time. A horizontal stack on desktop, a vertical accordion on phones.
+          </p>
+          <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-border [&>div+div]:pt-10">
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Example</p>
+              <AccordionStack
+                name="design-system-example"
+                texture="images/case-studies/des-sys/pink-texture.webp"
+                items={[
+                  { label: 'Low', body: 'A short description of this panel', src: 'videos/sequence/control-prompt-poster.webp', alt: 'Sequence with a prompt field and an empty canvas' },
+                  { label: 'Medium', body: 'A short description of this panel', src: 'videos/sequence/control-annotation-poster.webp', alt: 'Sequence with a storyboard of shots and the agent panel' },
+                  { label: 'High', body: 'A short description of this panel', src: 'videos/sequence/control-manual-poster.webp', alt: 'Sequence with animation properties open for a shot' },
+                ]}
+              />
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Collapsed panel</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <div class="accordion-stack-panel"><div class="accordion-stack-summary"><span class="accordion-stack-label">Low</span></div></div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <div class="accordion-stack-panel"><div class="accordion-stack-summary is-hover"><span class="accordion-stack-label">Low</span></div></div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <div class="accordion-stack-panel"><div class="accordion-stack-summary is-focus"><span class="accordion-stack-label">Low</span></div></div>
                 </div>
               </div>
             </div>

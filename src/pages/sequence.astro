@@ -1,11 +1,12 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
 import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+import AccordionStack from '../components/AccordionStack.astro';
 
 const nav = [
+  { label: 'Context', href: '#context' },
   { label: 'Problem', href: '#problem' },
   { label: 'Solution', href: '#solution' },
-  { label: 'Design decisions', href: '#decisions' },
   { label: 'Next steps', href: '#next-steps' },
 ];
 
@@ -15,9 +16,11 @@ const nav = [
 <CaseStudyLayout
   title="Sequence"
   heading="Making product motion reel as easy as storyboarding"
-  role="Product Designer"
-  team="Rayna Lai"
-  timeline="5 days, October 2026"
+  team={[
+    'Product Designer (me)',
+    { role: 'Product Designer', name: 'Rayna Lai', href: 'https://www.linkedin.com/in/raynalai/' },
+  ]}
+  timeline="8 days, October 2026"
   projectType="Product Design, Concept"
   nav={nav}
   commentId="case-study-sequence"
@@ -31,82 +34,82 @@ const nav = [
     wide
   />
 
+  <section id="context" data-comment-id="sequence-context">
+    <h2 class="section-label">Context</h2>
+    <p class="heading text-ink">In 8 days with another product/brand designer, we built out an interactive prototype of our MVP feature.</p>
+    <p>
+      <a href="https://svsd-nine.vercel.app" target="_blank" rel="noopener noreferrer" class="text-link">Try the prototype</a>
+      (desktop only) or
+      <a href="https://www.youtube.com/watch?v=Ts35Q32hbhs" target="_blank" rel="noopener noreferrer" class="text-link">watch the demo video</a>.
+    </p>
+  </section>
+
   <section id="problem" data-comment-id="sequence-problem">
     <h2 class="section-label">Problem</h2>
-    <p class="heading text-ink">
-      Product designers without motion experience struggle to turn their designs into launch videos.
-      Pro tools take time to learn, simpler ones don’t think in stories, and AI drafts are hard to
-      refine.
-    </p>
+    <div class="statement-row">
+      <p class="heading text-ink">Product designers without motion experience struggle to understand motion tools.</p>
+      <p>
+        Motion design is created and edited on one frame, making it hard to see the motion at a glance
+        and keep the narrative structure of your project in mind.
+        Pro tools take time to learn, simpler ones don’t think in stories, and AI motion is hard to refine.
+      </p>
+    </div>
   </section>
 
   <section id="solution" data-comment-id="sequence-solution">
     <h2 class="section-label">Solution</h2>
-    <h3 class="heading text-ink">Designers storyboard shots on a canvas and group them into chapters.</h3>
-    {/* Slides 11 and 15: storyboard canvas and chapters recordings */}
-    <CaseStudyFigure alt="Placeholder: shots laid out as storyboards, grouped into chapters (slides 11, 15)" placeholder wide />
+    <div class="statement-row">
+      <h3 class="heading text-ink">Motion is viewable as a storyboard, organized into chapters to group up the narrative arc.</h3>
+      <p>
+        Designers already think of motion as a series of frames. Showing motion as a chain of frames
+        keeps the story visible at a glance while grouping video into chapters makes it easier to keep
+        narrative structure in mind throughout the process.
+      </p>
+    </div>
+    <CaseStudyFigure
+      src="videos/sequence/storyboard-chapters.mp4"
+      poster="videos/sequence/storyboard-chapters-poster.webp"
+      alt="Screen recording of Sequence's canvas, with shots laid out as a storyboard and grouped into chapters"
+      loop
+      wide
+    />
 
-    <h3 class="heading text-ink">They shape the motion by prompting, annotating, or editing properties.</h3>
-    {/* Slides 18–20: ask the agent, annotate, edit properties recordings */}
-    <CaseStudyFigure alt="Placeholder: asking the agent, annotating a shot, then editing properties (slides 18–20)" placeholder wide />
-
-    <p>
-      Rayna and I built it in five days, prototyping the key interactions rather than a full editor:
-      storyboard editing works, and the AI agent is simulated.
-      <a href="https://svsd-nine.vercel.app" target="_blank" rel="noopener noreferrer" class="text-link">Try the prototype</a>
-      (desktop only).
-    </p>
-  </section>
-
-  <section id="decisions" data-comment-id="sequence-decisions">
-    <h2 class="section-label">Design decisions</h2>
-    <ol>
-      <li class="decision-row">
-        <div class="decision-text">
-          <h3>Storyboards, not a timeline</h3>
-          <p>
-            Designers already think in frames and artboards. Laying shots out on a canvas keeps the
-            story visible, where timeline tools make you think in elements appearing over time.
-          </p>
-        </div>
-        {/* Slide 5: Jitter / Figma Motion timeline */}
-        <CaseStudyFigure alt="Placeholder: a timeline-based motion tool (slide 5)" placeholder />
-      </li>
-      <li class="decision-row">
-        <div class="decision-text">
-          <h3>Two levels of control</h3>
-          <p>
-            Like Figma’s prototyping connections, editable connectors set how one shot transitions
-            into the next. Within a shot, designers select elements and adjust their properties.
-          </p>
-        </div>
-        {/* Slide 13: connectors and properties */}
-        <CaseStudyFigure alt="Placeholder: editing a connector between shots (slide 13)" placeholder />
-      </li>
-      <li class="decision-row">
-        <div class="decision-text">
-          <h3>Chapters for the bigger picture</h3>
-          <p>
-            Inspired by motion breakdown videos, chapters group shots into sections like an intro,
-            walkthrough, or call to action, so designers keep the whole flow in mind.
-          </p>
-        </div>
-        {/* Slide 14: motion breakdown inspiration */}
-        <CaseStudyFigure alt="Placeholder: motion breakdown video inspiration (slide 14)" placeholder />
-      </li>
-      <li class="decision-row">
-        <div class="decision-text">
-          <h3>Progressive control, not fewer controls</h3>
-          <p>
-            Too few controls feel limiting; too many feel overwhelming. Designers start with a prompt
-            and get more precise only when they need to, without prompting every change or learning a
-            pro animation tool.
-          </p>
-        </div>
-        {/* Slide 17: too few vs too many controls */}
-        <CaseStudyFigure alt="Placeholder: a sparse tool next to a dense pro animation tool (slide 17)" placeholder />
-      </li>
-    </ol>
+    <div class="statement-row is-next-group">
+      <h3 class="heading text-ink"> Progressively disclosure level of control</h3>
+      <p>
+        Instead of removing refinement capability in favour of simplifying the interface, we progressively disclosure the level of detail the user needs.
+      </p>
+    </div>
+    <div class="solution-control">
+      <AccordionStack
+        name="level-of-control"
+        texture="images/case-studies/des-sys/pink-texture.webp"
+        autoAdvance
+        items={[
+          {
+            label: 'Low',
+            body: 'Chat prompting creates a rough starting point',
+            src: 'videos/sequence/control-prompt.mp4',
+            poster: 'videos/sequence/control-prompt-poster.webp',
+            alt: 'Screen recording of writing a first prompt in Sequence to generate a rough draft of the motion',
+          },
+          {
+            label: 'Medium',
+            body: 'Annotation agent chat to refine within each storyboard',
+            src: 'videos/sequence/control-annotation.mp4',
+            poster: 'videos/sequence/control-annotation-poster.webp',
+            alt: 'Screen recording of annotating a shot in Sequence to refine it with the agent',
+          },
+          {
+            label: 'High',
+            body: 'Tweaks of specific parameters manually',
+            src: 'videos/sequence/control-manual.mp4',
+            poster: 'videos/sequence/control-manual-poster.webp',
+            alt: "Screen recording of editing specific values in a shot's properties in Sequence",
+          },
+        ]}
+      />
+    </div>
   </section>
 
   <section id="next-steps" data-comment-id="sequence-next-steps">
@@ -114,33 +117,71 @@ const nav = [
     <ol>
       <li class="decision-row">
         <div class="decision-text">
-          <h3>Bring existing work in</h3>
+          <h3>Skills &amp; Plugins</h3>
           <p>Import designs and sketches, and keep them editable once they’re in the workspace.</p>
         </div>
-        {/* Slide 26: inputs panel */}
-        <CaseStudyFigure alt="Placeholder: importing files, websites, and apps into Sequence (slide 26)" placeholder />
+        <CaseStudyFigure
+          src="images/case-studies/sequence/inputs-panel.webp"
+          alt="Sequence's inputs panel, with options to upload files, add websites, or connect apps above video properties and a prompt field"
+        />
       </li>
       <li class="decision-row">
         <div class="decision-text">
-          <h3>Easier ways to iterate</h3>
+          <h3>Branching &amp; Comparing</h3>
           <p>Branch to compare creative directions side by side without losing work.</p>
         </div>
-        {/* Slide 27: branching */}
-        <CaseStudyFigure alt="Placeholder: comparing creative directions side by side (slide 27)" placeholder />
+        <CaseStudyFigure
+          src="videos/sequence/branching.mp4"
+          poster="videos/sequence/branching-poster.webp"
+          alt="Screen recording of branching a storyboard shot in Sequence, so a second take sits below the original to compare"
+          loop
+        />
       </li>
       <li class="decision-row">
         <div class="decision-text">
-          <h3>Easier ways to edit</h3>
+          <h3>Tweaking in plain language</h3>
           <p>Refine motion in plain language, without animation jargon or metrics.</p>
         </div>
-        {/* Slide 28: animation log */}
-        <CaseStudyFigure alt="Placeholder: refining motion in plain language (slide 28)" placeholder />
+        <CaseStudyFigure
+          src="videos/sequence/animation-log.mp4"
+          poster="videos/sequence/animation-log-poster.webp"
+          alt="Screen recording of the animation log in Sequence, where each element's motion is written as a sentence with values that can be changed"
+          loop
+        />
       </li>
     </ol>
   </section>
 </CaseStudyLayout>
 
 <style>
+  /* A statement and its description: stacked on phones, side by side from 768px */
+  .statement-row {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  @media (min-width: 768px) {
+    .statement-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+      gap: var(--space-8);
+    }
+  }
+
+  /* The row sets the spacing, so the layout's gap between paragraphs doesn't apply */
+  :global(.case-study-content) .statement-row > p.heading + p {
+    margin-top: 0;
+  }
+
+  /* Solution's second group, after the first one's figure */
+  .statement-row.is-next-group {
+    margin-top: var(--space-12);
+  }
+
+  .solution-control {
+    margin-top: var(--space-4);
+  }
+
   .decision-row {
     display: grid;
     grid-template-columns: 1fr;

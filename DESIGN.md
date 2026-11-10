@@ -190,6 +190,12 @@ components:
     backgroundColor: "{colors.hover-subtle}"
     textColor: "{colors.ink}"
     rounded: "{rounded.base}"
+  accordion-stack:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    typography: "{typography.label}"
+    rounded: "{rounded.base}"
+    padding: "{spacing.space-3}"
   tag:
     backgroundColor: "{colors.fill}"
     textColor: "{colors.ink}"
@@ -482,6 +488,16 @@ are used only there.
   trigger with the current mode's icon; it sits in the footer, opening upward, and under the
   `/design-system` intro, opening downward, and every copy stays in step). Fill at rest, Hover when hovered or open; the menu is Canvas with a
   sliding highlight behind the options, and options show the accent focus ring.
+- **Accordion stack (`.accordion-stack`, `AccordionStack`):** a set of related panels with one open
+  at a time, for comparing levels or stages. Surface panels with a 1px border and the corner radius.
+  From 768px it's a horizontal stack: the open panel widens over `--duration-500` while the others
+  collapse to an 80px rail with their label centred at the top and a chevron centred at the bottom, pointing the way they open, and one
+  always stays open. On phones it's a vertical accordion with a chevron. With `autoAdvance`, panels
+  open in turn as the page scrolls down, until the first click on any panel (off for reduced motion). Each panel is a native `<details>`, so it works without
+  JavaScript. Hover fills a collapsed panel with Hover subtle; focus is an inset Accent ring, because
+  the panel clips its contents. A video plays only while its panel is open and on screen. Textured
+  (`.is-textured`) fills the panels with an image and uses palette colours on top, since the image
+  doesn't change with the colour mode.
 - **Tag (`.tag`):** a static label that matches the dropdown trigger without the chevron, for a
   value that can't be changed. `.tag.is-count` for a number beside a label.
 - **Segmented toggle (`.segmented`):** one shared component for every two-option switch (Light /

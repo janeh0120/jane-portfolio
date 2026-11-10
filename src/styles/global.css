@@ -678,6 +678,249 @@
   outline-offset: 2px;
 }
 
+/* Accordion stack — see src/components/AccordionStack.astro. One panel open at a time: a vertical
+   accordion on phones, and from 768px a horizontal stack where the open panel widens and the others
+   collapse to a labelled rail. Native <details>, so the transitions are progressive enhancement. */
+.accordion-stack {
+  --accordion-rail: var(--space-20);
+  --accordion-gap: var(--space-2);
+  /* The open panel's inner width. Its content is held at this width so it doesn't reflow as it opens */
+  --accordion-open: calc(100cqw - (var(--accordion-panels) - 1) * (var(--accordion-rail) + var(--accordion-gap)) - var(--border-width) * 4);
+  container-type: inline-size;
+}
+
+.accordion-stack-list {
+  display: grid;
+  gap: var(--accordion-gap);
+}
+
+.accordion-stack-panel {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+}
+
+.accordion-stack-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-base);
+  list-style: none;
+  cursor: pointer;
+  transition: background-color var(--duration-150) var(--ease-standard);
+}
+
+.accordion-stack-summary::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-stack-summary:hover,
+.accordion-stack-summary.is-hover {
+  background: var(--color-hover-subtle);
+}
+
+/* Inset, because the panel clips anything outside it */
+.accordion-stack-summary:focus-visible,
+.accordion-stack-summary.is-focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.accordion-stack-label {
+  flex: none;
+  font: var(--type-label);
+  letter-spacing: var(--tracking-body);
+  color: var(--color-ink);
+}
+
+.accordion-stack-chevron {
+  flex: none;
+  margin-left: auto;
+  width: var(--space-4);
+  height: var(--space-4);
+  fill: none;
+  stroke: var(--color-subtle);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--duration-200) var(--ease-standard);
+}
+
+.accordion-stack details[open] .accordion-stack-chevron {
+  transform: rotate(180deg);
+}
+
+.accordion-stack details::details-content {
+  block-size: 0;
+  overflow: clip;
+  interpolate-size: allow-keywords;
+  transition:
+    block-size var(--duration-320) var(--ease-settle),
+    content-visibility var(--duration-320) allow-discrete;
+}
+
+.accordion-stack details[open]::details-content {
+  block-size: auto;
+}
+
+.accordion-stack-content {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.accordion-stack-body {
+  font: var(--type-compact);
+  letter-spacing: var(--tracking-body);
+  color: var(--color-muted);
+}
+
+.accordion-stack-body:empty {
+  display: none;
+}
+
+/* Inset further than the text, so the media has room on every side */
+.accordion-stack-media {
+  margin: var(--space-3);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: var(--radius-base);
+}
+
+.accordion-stack-media.is-placeholder {
+  outline: 1px dashed var(--color-placeholder);
+}
+
+.accordion-stack-media img,
+.accordion-stack-media video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .accordion-stack-list {
+    display: flex;
+    align-items: stretch;
+  }
+
+  .accordion-stack-panel {
+    flex: 0 1 var(--accordion-rail);
+    transition: flex-grow var(--duration-500) var(--ease-standard);
+  }
+
+  .accordion-stack-panel:has(> details[open]) {
+    flex-grow: 1;
+  }
+
+  .accordion-stack details {
+    height: 100%;
+  }
+
+  .accordion-stack-summary {
+    padding-inline: var(--space-3);
+    transition:
+      background-color var(--duration-150) var(--ease-standard),
+      padding-inline var(--duration-500) var(--ease-standard);
+  }
+
+  /* A collapsed panel is all one target */
+  .accordion-stack details:not([open]) > .accordion-stack-summary {
+    height: 100%;
+  }
+
+  /* Only the narrow rails tighten their inset; an open panel lines its label up with its text */
+  .accordion-stack details[open] > .accordion-stack-summary {
+    padding-inline: var(--space-4);
+    cursor: default;
+    background: none;
+  }
+
+  /* A collapsed rail centres its label at the top and a chevron, pointing the way it opens, at the
+     bottom. The open panel has none, because one panel always stays open */
+  .accordion-stack details:not([open]) > .accordion-stack-summary {
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .accordion-stack details:not([open]) .accordion-stack-chevron {
+    margin-left: 0;
+    transform: rotate(-90deg);
+  }
+
+  .accordion-stack details[open] .accordion-stack-chevron {
+    display: none;
+  }
+
+  /* Width does the moving here, so the content only fades */
+  .accordion-stack details::details-content {
+    block-size: auto;
+    opacity: 0;
+    transition:
+      opacity var(--duration-320) var(--ease-standard),
+      content-visibility var(--duration-320) allow-discrete;
+  }
+
+  .accordion-stack details[open]::details-content {
+    opacity: 1;
+  }
+
+  .accordion-stack-content {
+    width: var(--accordion-open);
+    box-sizing: border-box;
+  }
+
+  .accordion-stack-media {
+    margin: var(--space-6);
+  }
+
+  /* Holds a line even when a panel has no text, so the row keeps its height as panels change */
+  .accordion-stack-body:empty {
+    display: block;
+    min-height: 1lh;
+  }
+}
+
+/* Textured: an image fills each panel instead of Surface. Sized to the whole stack, not the panel,
+   so it doesn't rescale as panels open. What's drawn on it uses palette colours, since the image
+   doesn't change with the colour mode */
+.accordion-stack.is-textured .accordion-stack-panel {
+  background: var(--accordion-texture) center top / 100cqw auto;
+  border-color: var(--color-hairline);
+}
+
+.accordion-stack.is-textured .accordion-stack-label {
+  color: var(--color-neutral-900);
+}
+
+.accordion-stack.is-textured .accordion-stack-body {
+  color: var(--color-neutral-700);
+}
+
+.accordion-stack.is-textured .accordion-stack-chevron {
+  stroke: var(--color-neutral-700);
+}
+
+.accordion-stack.is-textured .accordion-stack-summary:hover,
+.accordion-stack.is-textured .accordion-stack-summary.is-hover {
+  background: color-mix(in srgb, var(--color-white) 24%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accordion-stack-panel,
+  .accordion-stack-summary,
+  .accordion-stack-chevron,
+  .accordion-stack details::details-content {
+    transition: none;
+  }
+}
+
 /* Segmented toggle: two options on a pill track, with a thumb that slides to the pressed one.
    Variants: default (fill track, on the page) and is-glass (floating over media). */
 .segmented {

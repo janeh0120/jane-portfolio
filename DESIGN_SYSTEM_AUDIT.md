@@ -403,3 +403,14 @@ Settle (`ease-out`). Motion loses a little of its long, soft settle as a result.
 The audit case study needed a code diff, and the system only had a colour for what's removed. Added
 Success and Success soft (emerald-700 on emerald-50, emerald-300 on emerald-950 in dark mode), the same
 steps Danger uses on red, so the two read as a pair. The token checker stays at 0.
+
+### Follow-up: an accordion that runs sideways
+
+The Sequence case study needed its three levels of control compared side by side, and the only
+accordion was built into the audit page and ran vertically. Added the Accordion stack as a shared
+component: from 768px the open panel widens and the others collapse to a labelled rail, and on phones
+it's a vertical accordion. It's native `<details>`, so it still works without JavaScript. It reuses
+existing tokens, so nothing new was added and the token checker stays at 0. The audit page's accordion
+keeps its own styles for now, so the two share a look but not code. A Textured variant followed, so a
+page can fill the panels with an image without restyling the component itself. Later it gained
+scroll-driven opening, which stops at the first click, and chevrons on the collapsed desktop rails.

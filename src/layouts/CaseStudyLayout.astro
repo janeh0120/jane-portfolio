@@ -17,14 +17,18 @@ interface HeroImage {
   wide?: boolean;
 }
 
+/** A role as plain text, or a role credited to a named, linked person. */
+type TeamMember = string | { role: string; name: string; href: string };
+
 interface Props {
   title: string;
   heading: string;
-  role: string;
   /** Where the work was done, as plain text (no logos). */
   company?: string;
-  team?: string;
-  teamLabel?: string;
+  /** Roles on the project, one per line, with "(me)" on mine. */
+  team: TeamMember[];
+  /** One more fact in the details row, like what it was built with. */
+  detail?: { label: string; value: string };
   timeline: string;
   projectType: string;
   nav?: NavItem[];
@@ -35,10 +39,9 @@ interface Props {
 const {
   title,
   heading,
-  role,
   company,
   team,
-  teamLabel = 'Team',
+  detail,
   timeline,
   projectType,
   nav = [],
@@ -46,6 +49,7 @@ const {
   heroImage,
 } = Astro.props;
 const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+const detailsColumns = company && detail ? 'md:grid-cols-5' : company || detail ? 'md:grid-cols-4' : 'md:grid-cols-3';
 ---
 
 <Layout title={`${title} | Jane Hou's Portfolio`}>
@@ -76,7 +80,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
           )
         }
 
-        <dl class:list={['mt-10 grid gap-6 sm:grid-cols-2', company ? 'md:grid-cols-5' : 'md:grid-cols-4']}>
+        <dl class:list={['mt-10 grid gap-6 sm:grid-cols-2', detailsColumns]}>
           {company && (
             <div>
               <dt class="text-body text-muted">Company:</dt>
@@ -84,13 +88,23 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
             </div>
           )}
           <div>
-            <dt class="text-body text-muted">Role:</dt>
-            <dd class="mt-1 text-body text-ink">{role}</dd>
+            <dt class="text-body text-muted">Team:</dt>
+            {
+              team.map((member) => (
+                <dd class="mt-1 text-body text-ink">
+                  {typeof member === 'string' ? (
+                    member
+                  ) : (
+                    <>{member.role} (<a href={member.href} target="_blank" rel="noopener noreferrer" class="text-link">{member.name}</a>)</>
+                  )}
+                </dd>
+              ))
+            }
           </div>
-          {team && (
+          {detail && (
             <div>
-              <dt class="text-body text-muted">{teamLabel}:</dt>
-              <dd class="mt-1 text-body text-ink">{team}</dd>
+              <dt class="text-body text-muted">{detail.label}:</dt>
+              <dd class="mt-1 text-body text-ink">{detail.value}</dd>
             </div>
           )}
           <div>
@@ -139,7 +153,7 @@ const studyCommentId = commentId ?? `case-study-${title.toLowerCase().replace(/[
 
   /* Statements: large text reads best in shorter lines, about 35 characters, balanced so no word is
      left stranded */
-  .case-study-content :global(p.heading) {
+  .case-study-content :global(:is(p, h3).heading) {
     max-width: 30ch;
     text-wrap: balance;
   }

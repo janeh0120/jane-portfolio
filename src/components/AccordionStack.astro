@@ -1,0 +1,152 @@
+---
+/**
+ * A row of panels where one is open at a time. On desktop they sit side by side and the open one
+ * widens while the others collapse to a labelled rail; on phones they stack as a vertical accordion.
+ * Each panel is a native <details> sharing one name, so opening and closing work without JavaScript.
+ * The script only keeps one panel open on desktop and plays the open panel's video while it's visible.
+ * Styles live in global.css (.accordion-stack).
+ */
+interface Item {
+  /** Short label that stays visible on the collapsed rail, like "Low". */
+  label: string;
+  body?: string;
+  /** Image or .mp4 path, relative to public/. Defaults to the placeholder image. */
+  src?: string;
+  poster?: string;
+  alt: string;
+  placeholder?: boolean;
+}
+
+interface Props {
+  /** Shared by the panels, so the browser keeps only one open. */
+  name: string;
+  items: Item[];
+  /** Image path, relative to public/, used as the panels' fill instead of Surface. */
+  texture?: string;
+  /** Open each panel in turn as the page scrolls down, until someone picks a panel themselves. */
+  autoAdvance?: boolean;
+}
+
+const { name, items, texture, autoAdvance = false } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const resolve = (path: string) => `${base}${path.replace(/^\//, '')}`;
+const fallback = 'images/placeholders/case-study-filler.png';
+---
+
+<div
+  class:list={['accordion-stack', texture && 'is-textured']}
+  style={`--accordion-panels: ${items.length}${texture ? `; --accordion-texture: url(${resolve(texture)})` : ''}`}
+  data-accordion-stack
+  data-accordion-auto={autoAdvance ? '' : undefined}
+>
+  <div class="accordion-stack-list">
+    {
+      items.map((item, i) => {
+        const src = item.src ?? fallback;
+        const isVideo = /\.(mp4|webm|mov)$/i.test(src);
+        return (
+          <div class="accordion-stack-panel">
+            <details name={name} open={i === 0}>
+              <summary class="accordion-stack-summary">
+                <span class="accordion-stack-label">{item.label}</span>
+                <svg class="accordion-stack-chevron" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </summary>
+              <div class="accordion-stack-content">
+                <div class="accordion-stack-body">{item.body}</div>
+                <div class:list={['accordion-stack-media', (item.placeholder || !item.src) && 'is-placeholder']}>
+                  {isVideo ? (
+                    <video
+                      src={resolve(src)}
+                      poster={item.poster ? resolve(item.poster) : undefined}
+                      aria-label={item.alt}
+                      muted
+                      loop
+                      playsinline
+                      preload="metadata"
+                    />
+                  ) : (
+                    <img src={resolve(src)} alt={item.alt} loading="lazy" decoding="async" />
+                  )}
+                </div>
+              </div>
+            </details>
+          </div>
+        );
+      })
+    }
+  </div>
+</div>
+
+<script>
+  const desktop = window.matchMedia('(min-width: 768px)');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-accordion-stack]').forEach((stack) => {
+    const panels = [...stack.querySelectorAll('details')];
+    let onScreen = false;
+
+    const syncVideos = () => {
+      panels.forEach((details) => {
+        const video = details.querySelector('video');
+        if (!video) return;
+        if (details.open && onScreen && !reduceMotion.matches) video.play().catch(() => {});
+        else video.pause();
+      });
+    };
+
+    panels.forEach((details) => {
+      details.addEventListener('toggle', syncVideos);
+      // The horizontal stack always shows one panel; only the phone layout can close them all
+      details.querySelector('summary')?.addEventListener('click', (event) => {
+        if (desktop.matches && details.open) event.preventDefault();
+      });
+    });
+
+    desktop.addEventListener('change', () => {
+      if (desktop.matches && !panels.some((details) => details.open)) panels[0].open = true;
+    });
+
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      syncVideos();
+    }).observe(stack);
+
+    // Scrolling down opens the panels in turn as the stack rises up the screen. It goes by the top
+    // of the stack, which stays put as panels change, and never closes one on the way back up. The
+    // first click on any panel hands control to the reader.
+    const canvas = document.getElementById('site-canvas');
+    if (stack.hasAttribute('data-accordion-auto') && canvas && !reduceMotion.matches && panels.length > 1) {
+      const lastPanel = panels.length - 1;
+      let reached = 0;
+      let lastTop = canvas.scrollTop;
+
+      const stop = () => canvas.removeEventListener('scroll', advance);
+
+      function advance() {
+        const top = canvas!.scrollTop;
+        const scrollingDown = top > lastTop;
+        lastTop = top;
+        if (!scrollingDown) return;
+
+        const area = canvas!.getBoundingClientRect();
+        const box = stack.getBoundingClientRect();
+        if (box.bottom <= area.top || box.top >= area.bottom) return;
+
+        // Panel n opens once the stack's top is above its line: evenly from 55% to 20% of the screen
+        const position = (box.top - area.top) / canvas!.clientHeight;
+        const next = reached + 1;
+        const line = 0.55 - (0.35 * (next - 1)) / Math.max(lastPanel - 1, 1);
+        if (position > line) return;
+
+        reached = next;
+        panels[next].open = true;
+        if (reached === lastPanel) stop();
+      }
+
+      canvas.addEventListener('scroll', advance, { passive: true });
+      panels.forEach((details) => details.querySelector('summary')?.addEventListener('click', stop));
+    }
+  });
+</script>

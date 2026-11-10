@@ -72,16 +72,8 @@
       "name": "Sequence",
       "tags": ["Product Design", "concept"],
       "title": "Making product motion reel as easy as storyboarding",
-      "image": "images/case-study-heroes/sequence.jpg",
-      "comingSoon": false
-    },
-    {
-      "slug": "feedback",
-      "name": "Inline feedback",
-      "tags": ["product", "shipped"],
-      "title": "Make inline comments on my portfolio",
-      "image": "images/case-study-heroes/feedback-reel-poster.webp",
-      "video": "videos/reels/feedback.mp4",
+      "image": "images/case-study-heroes/sequence-reel-poster.webp",
+      "video": "videos/reels/sequence.mp4",
       "comingSoon": false
     },
     {
@@ -102,6 +94,15 @@
       "image": "images/case-study-heroes/des-sys-audit-reel-poster.webp",
       "video": "videos/reels/des-sys-audit.mp4",
       "logo": "images/logos/intuit.png",
+      "comingSoon": false
+    },
+    {
+      "slug": "feedback",
+      "name": "Inline feedback",
+      "tags": ["product", "shipped"],
+      "title": "Make inline comments on my portfolio",
+      "image": "images/case-study-heroes/feedback-reel-poster.webp",
+      "video": "videos/reels/feedback.mp4",
       "comingSoon": false
     },
     {
