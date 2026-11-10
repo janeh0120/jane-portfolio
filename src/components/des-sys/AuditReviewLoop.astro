@@ -3,8 +3,8 @@
 // goes through a person: verify it, fix Figma, test the code in Cursor, compare the two, and shim
 // where rendering differences leave them visibly off. The last two steps repeat until they match,
 // so they sit together in a dashed loop panel. Every step has a small illustration of the same
-// (illustrative) checkbox: the findings checked, the Figma fix, the code diff, then the label in
-// design and code against one baseline, before and after a 2px shim. Rendered in HTML with role
+// (illustrative) checkbox: the findings checked, the Figma fix, the code diff, then the label split
+// between design and code against one baseline, before and after a 2px shim. Rendered in HTML with role
 // tokens so it follows the colour mode. Each step is a native <details>, so it works without
 // JavaScript; the first starts open, and several can be open at once. A script animates the height.
 import { Icon } from 'astro-icon/components';
@@ -12,6 +12,7 @@ import FigmaFillMotion from './FigmaFillMotion.astro';
 import ImplementationPaths from './ImplementationPaths.astro';
 
 const texture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/pink-texture.webp`;
+const codeTexture = `${import.meta.env.BASE_URL}images/case-studies/des-sys/grey-texture.webp`;
 
 // A code change from the audit: line numbers, +/- markers, and the changed part of each line picked out
 const diff = [
@@ -48,7 +49,7 @@ const loopSteps = [
 ];
 ---
 
-<figure class="audit-loop" style={`--audit-texture: url(${texture})`}>
+<figure class="audit-loop" style={`--audit-texture: url(${texture}); --audit-code-texture: url(${codeTexture})`}>
   <ol class="audit-loop-steps">
     {
       steps.map((step, i) => (
@@ -177,17 +178,17 @@ const loopSteps = [
               <div class="audit-drift-rows">
                 <span class="audit-drift-label">
                   <span class="audit-drift-box" />
-                  <span class="audit-drift-text">Mango</span>
+                  <span class="audit-drift-textbox"><span class="audit-drift-text">Selection</span></span>
+                  <span class="audit-drift-line is-top" />
+                  <span class="audit-drift-line" />
                 </span>
                 <span class="audit-drift-label is-code">
                   <span class="audit-drift-box" />
-                  <span class="audit-drift-text">
-                    Mango
-                    <span class="audit-drift-shim">{step.shimmed ? 'padding-top: 2px' : '2px too high'}</span>
-                  </span>
+                  <span class="audit-drift-textbox"><span class="audit-drift-text">Selection</span></span>
+                  <span class="audit-drift-shim"><span>{step.shimmed ? 'padding-top: 2px' : '2px too high'}</span></span>
+                  <span class="audit-drift-line is-top" />
+                  <span class="audit-drift-line" />
                 </span>
-                <span class="audit-drift-line is-top" />
-                <span class="audit-drift-line" />
               </div>
             </div>
               </div></div>
@@ -427,17 +428,34 @@ const loopSteps = [
     stroke-linejoin: round;
   }
 
-  /* The illustration: design and code labels against one shared baseline */
+  /* The illustration: one checkbox split down the middle like the hero reel, design on the left and
+     code on the right, so any drift shows where the two halves of the label meet */
   .audit-drift {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     flex: 1 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-content: center;
-    gap: var(--space-2) var(--space-4);
+    gap: var(--space-2) var(--space-10);
     margin-top: var(--space-3);
     padding: var(--space-4) var(--space-5) var(--space-6);
-    background: var(--color-canvas);
     border-radius: var(--radius-base);
+  }
+
+  .audit-drift::before,
+  .audit-drift::after {
+    content: '';
+    position: absolute;
+    inset: 0 50% 0 0;
+    z-index: -1;
+    background: var(--audit-texture) center / cover;
+  }
+
+  .audit-drift::after {
+    inset: 0 0 0 50%;
+    background-image: var(--audit-code-texture);
   }
 
   /* Every step's illustration sits on the same canvas panel */
@@ -655,57 +673,100 @@ const loopSteps = [
     position: relative;
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: subgrid;
-    align-items: end;
-    /* Room for the label above the code text */
-    padding-top: var(--space-10);
+    grid-template-columns: minmax(0, 1fr);
+    /* Room for the note above the text box, and for the text box below the baseline */
+    padding-top: calc(0.22em + var(--space-8));
+    padding-bottom: 0.22em;
     /* Zoomed in, so the drift is easy to see. The lines' positions depend on this size */
     font: var(--type-display);
     font-weight: var(--weight-regular);
+    font-size: calc(clamp(var(--text-4xl), calc(4.8vw - 2px), var(--text-6xl)) * 2); /* design-tokens-ignore: illustration drawn at twice Display's size, using its own scale */
   }
 
+  /* Display size on phones, the largest that still fits the frame */
   @media (max-width: 639px) {
     .audit-drift-rows {
-      font: var(--type-heading);
+      font: var(--type-display);
       font-weight: var(--weight-regular);
     }
   }
 
+  /* The same checkbox twice, stacked, each clipped to its half. Equal outer columns centre the
+     checkbox in the frame. The clip reaches past the row into the frame's padding, so the note, the
+     text box, and the ends of the lines aren't cut off */
   .audit-drift-label {
-    display: inline-flex;
-    align-items: flex-end;
-    gap: var(--space-2);
+    position: relative;
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: 1fr auto auto 1fr;
+    align-items: end;
     letter-spacing: var(--tracking-body);
     color: var(--color-ink);
+    clip-path: inset(calc((0.22em + var(--space-8)) * -1) 50% -0.4em calc(var(--space-2) * -1));
+  }
+
+  .audit-drift-label.is-code {
+    clip-path: inset(calc((0.22em + var(--space-8)) * -1) calc(var(--space-2) * -1) -0.4em 50%);
   }
 
   .audit-drift-box {
-    flex: none;
+    grid-column: 2;
+    margin-right: var(--space-4);
     /* Cap height, so the box sits on the baseline and lines up with the capitals */
     width: 0.7em;
     height: 0.7em;
-    border: calc(var(--border-width) * 3) solid var(--color-muted);
-    /* Half the base radius, so a small box reads as a rounded square, not a circle */
-    border-radius: calc(var(--radius-base) / 2);
+    border: calc(var(--border-width) * 6) solid var(--color-muted);
+    border-radius: var(--radius-base);
   }
 
-  /* Trimmed to cap height and baseline, so the box's bottom edge is the text's baseline */
-  .audit-drift-text {
+  @media (max-width: 639px) {
+    .audit-drift-box {
+      margin-right: var(--space-2);
+      border-width: calc(var(--border-width) * 3);
+      /* Half the base radius, so a small box reads as a rounded square, not a circle */
+      border-radius: calc(var(--radius-base) / 2);
+    }
+  }
+
+  /* The text box holds the word. Its outline is the font's full height: 0.22em of space above the
+     capitals and below the baseline, from the ascent and descent set on the @font-face rules */
+  .audit-drift-textbox {
     position: relative;
+    grid-column: 3;
+  }
+
+  .audit-drift-textbox::after {
+    content: '';
+    position: absolute;
+    inset: -0.22em calc(var(--space-1) * -1);
+    border: 2px solid var(--color-accent);
+  }
+
+  /* Trimmed to cap height and baseline, so the checkbox's bottom edge is the text's baseline */
+  .audit-drift-text {
+    display: block;
     text-box: trim-both cap alphabetic;
   }
 
-  /* Same token, but code renders the text higher. 2px at this text's real size (24px), so 1/12 of
-     the type size keeps the proportion true at this zoom */
-  .audit-drift-label.is-code .audit-drift-text {
+  /* Same token and same text box, but code renders the text higher inside it. 2px at this text's
+     real size (24px), so 1/12 of the type size keeps the proportion true at this zoom */
+  .audit-drift-label.is-code .audit-drift-text,
+  .audit-drift-label.is-code .audit-drift-line {
     transform: translateY(calc(1em / -12));
   }
 
-  .audit-drift.is-shimmed .audit-drift-label.is-code .audit-drift-text {
+  /* The shim pushes the whole text box down by that amount. The text still sits high inside it, so
+     the letters land level with design while the box itself is now out of line */
+  .audit-drift.is-shimmed .audit-drift-label.is-code .audit-drift-textbox {
+    transform: translateY(calc(1em / 12));
+  }
+
+  .audit-drift.is-shimmed .audit-drift-label.is-code .audit-drift-line {
     transform: none;
   }
 
-  /* The lines both labels should sit between: baseline and cap height, across both columns */
+  /* The baseline and cap height of each half's text. They step at the split while the code half is
+     high, and run straight across once it's shimmed */
   .audit-drift-line {
     position: absolute;
     left: calc(var(--space-2) * -1);
@@ -720,10 +781,16 @@ const loopSteps = [
     bottom: 1cap;
   }
 
+  /* Starts just past the split, so it stays on the code side, and sits above the text box. Positioned
+     in the illustration's type size; the note inside it sets its own */
   .audit-drift-shim {
     position: absolute;
-    left: 0;
-    bottom: calc(100% + var(--space-2));
+    left: calc(50% + var(--space-2));
+    bottom: calc(100% + 0.22em + var(--space-2));
+  }
+
+  .audit-drift-shim > span {
+    display: block;
     padding: var(--space-inset) var(--space-1);
     border-radius: var(--radius-base);
     background: var(--color-measure);
@@ -735,8 +802,7 @@ const loopSteps = [
 
   /* Every step's illustration sits on the textured background. What's drawn straight on it uses
      palette colours, since the texture doesn't change with the colour mode */
-  .audit-visual,
-  .audit-drift {
+  .audit-visual {
     background: var(--audit-texture) center / cover;
   }
 

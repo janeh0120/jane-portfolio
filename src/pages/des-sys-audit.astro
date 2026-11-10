@@ -41,9 +41,7 @@ const nav = [
 
   <section id="problem" data-comment-id="des-sys-audit-problem">
     <h2 class="section-label">Why does this matter</h2>
-    <p class="heading text-ink">Design handoff is less reliable when components aren’t 1-to-1 between prototypes and implementation.</p>
-    <ProblemVisual kind="handoff" />
-    <p class="heading text-ink audit-next-point">Hardcoded values in components bypass tokens, so global theme updates never reach the UI.</p>
+    <p class="heading text-ink">Hardcoded values in components bypass tokens, so global theme updates never reach the UI.</p>
     <ProblemVisual kind="hardcoded" />
   </section>
 
@@ -110,11 +108,6 @@ const nav = [
 </CaseStudyLayout>
 
 <style>
-  /* A second statement within a section, after the first one's figure */
-  :global(.case-study-content) section > p.audit-next-point {
-    margin-top: var(--space-12);
-  }
-
   /* Impact's two groups of stats, each named so the numbers can't be read as one set */
   :global(.case-study-content) section > h3.audit-stat-label {
     margin: var(--space-8) 0 var(--space-3);
