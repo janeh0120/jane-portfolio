@@ -539,9 +539,11 @@ Recurring layouts built from the tokens and components above; each should look t
 it appears.
 
 - **Project card:** a 16:10 image with the corner radius, a muted tag line, and a subheading title.
+  Client work can show the company's logo in the image's top left corner, sized in proportion to the card.
+  The image can be a muted looping reel: its first frame is the poster, and it loads and plays only while on screen (poster only for reduced motion).
 - **Media tile:** an image with the corner radius that fades slightly on hover and opens the media
   overlay (Play gallery, About cards).
-- **Experience list:** year in Subtle, company as a link, role in Muted; each year shows once.
+- **Experience list:** year in Subtle, company as a link (or plain Ink text where a page unlinks it), role in Muted; each year shows once.
 - **Case study figure:** media with the corner radius and an optional caption in Muted.
 - **Decision row:** a titled text block beside a case study figure, in two equal columns with a
   `space-5` gap, stacked on phones.

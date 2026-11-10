@@ -4,9 +4,11 @@ import { site } from '../data/site';
 interface Props {
   /** Labels of previous roles to list first, in order. */
   order?: string[];
+  /** Labels of roles to show as plain text instead of a link. */
+  unlinked?: string[];
 }
 
-const { order = [] } = Astro.props;
+const { order = [], unlinked = [] } = Astro.props;
 const { current, previous } = site.experience;
 const rank = (label: string) => {
   const i = order.indexOf(label);
@@ -26,9 +28,13 @@ const rows = [
       rows.map((row) => (
         <li class="experience-row text-body">
           <span class="experience-when">{row.when}</span>
-          <a href={row.href} target="_blank" rel="noopener noreferrer" class="experience-place text-link text-ink">
-            {row.label}
-          </a>
+          {unlinked.includes(row.label) ? (
+            <span class="experience-place text-ink">{row.label}</span>
+          ) : (
+            <a href={row.href} target="_blank" rel="noopener noreferrer" class="experience-place text-link text-ink">
+              {row.label}
+            </a>
+          )}
           {row.role ? <span class="experience-role">{row.role}</span> : null}
         </li>
       ))

@@ -10,6 +10,10 @@ export type Project = {
   tags: string[];
   title: string;
   image: string;
+  /** Looping reel for the homepage card; `image` should be its first frame (it is the poster). */
+  video?: string;
+  /** Company logo shown in the top left corner of the homepage card's image. */
+  logo?: string;
   comingSoon: boolean;
   href?: string;
 };

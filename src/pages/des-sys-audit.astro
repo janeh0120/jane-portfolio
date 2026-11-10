@@ -7,6 +7,7 @@ import AuditSkillFlow from '../components/des-sys/AuditSkillFlow.astro';
 import AuditReviewLoop from '../components/des-sys/AuditReviewLoop.astro';
 import ProblemVisual from '../components/des-sys/ProblemVisual.astro';
 import CaseStudyFigure from '../components/CaseStudyFigure.astro';
+import TokenDriftReel from '../components/react/TokenDriftReel';
 
 const nav = [
   { label: 'Context', href: '#context' },
@@ -30,12 +31,9 @@ const nav = [
   projectType="Design Systems"
   nav={nav}
   commentId="case-study-des-sys-audit"
-  heroImage={{
-    src: 'images/case-study-heroes/dessys.png',
-    alt: 'A checkbox component with its label annotated with the --text-primary colour and --font-weight-component tokens',
-    wide: true,
-  }}
 >
+  <TokenDriftReel slot="hero" client:visible />
+
   <section id="context" data-comment-id="des-sys-audit-context">
     <h2 class="section-label">Context</h2>
     <p class="heading text-ink">As an intern on the Intuit Design System team, I was tasked with auditing components to ensure token alignment between design and code.</p>

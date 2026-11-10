@@ -72,7 +72,8 @@
       "name": "Inline feedback",
       "tags": ["product", "shipped"],
       "title": "Make inline comments on my portfolio",
-      "image": "images/case-study-heroes/feedback-demo.webp",
+      "image": "images/case-study-heroes/feedback-reel-poster.webp",
+      "video": "videos/reels/feedback.mp4",
       "comingSoon": false
     },
     {
@@ -80,15 +81,19 @@
       "name": "Migration",
       "tags": ["Intuit", "product", "partially shipped"],
       "title": "Leading design of 0 → 1 internal tooling",
-      "image": "images/case-study-heroes/migration-reel.webp",
+      "image": "images/case-study-heroes/migration-reel-poster.webp",
+      "video": "videos/reels/migration.mp4",
+      "logo": "images/logos/intuit.png",
       "comingSoon": false
     },
     {
       "slug": "des-sys-audit",
       "name": "Design System Audit",
-      "tags": ["design systems", "shipped"],
+      "tags": ["Intuit", "design systems", "shipped"],
       "title": "Bridging design and code within an enterprise design system",
-      "image": "images/case-study-heroes/dessys.png",
+      "image": "images/case-study-heroes/des-sys-audit-reel-poster.webp",
+      "video": "videos/reels/des-sys-audit.mp4",
+      "logo": "images/logos/intuit.png",
       "comingSoon": false
     },
     {

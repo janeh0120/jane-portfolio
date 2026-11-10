@@ -126,7 +126,13 @@ type Card = {
   caption: HTMLElement | null;
   mesh: Mesh;
   program: Program;
+  texture: Texture;
   ready: boolean;
+  video: HTMLVideoElement | null;
+  logo: HTMLImageElement | null;
+  canvas: HTMLCanvasElement | null;
+  /** Whether WebGL drew this card last frame. */
+  drawn: boolean;
 };
 
 function assertLinked(gl: WebGLRenderingContext, program: Program, name: string) {
@@ -134,6 +140,47 @@ function assertLinked(gl: WebGLRenderingContext, program: Program, name: string)
   if (!handle || !gl.getProgramParameter(handle, gl.LINK_STATUS)) {
     throw new Error(`Lens shader failed to compile/link (${name})`);
   }
+}
+
+/**
+ * Paints the lens's copy of a card: its image or current video frame, with the HTML logo drawn on,
+ * because the card's HTML (logo included) is hidden while WebGL draws it. Cropped to the card's
+ * shape as `object-fit: cover` shows it, so the logo lands in the same place.
+ */
+function paintCard(card: Card, source: CanvasImageSource, sourceWidth: number, sourceHeight: number) {
+  const box = card.media.getBoundingClientRect();
+  const shape = box.width / box.height;
+  const cropWidth = Math.min(sourceWidth, sourceHeight * shape);
+  const cropHeight = cropWidth / shape;
+  const canvas = (card.canvas ??= document.createElement('canvas'));
+  canvas.width = Math.round(cropWidth);
+  canvas.height = Math.round(cropHeight);
+  const context = canvas.getContext('2d')!;
+  context.drawImage(
+    source,
+    (sourceWidth - cropWidth) / 2,
+    (sourceHeight - cropHeight) / 2,
+    cropWidth,
+    cropHeight,
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  );
+  if (card.logo) {
+    const mark = card.logo.getBoundingClientRect();
+    const scale = canvas.width / box.width;
+    context.drawImage(
+      card.logo,
+      (mark.left - box.left) * scale,
+      (mark.top - box.top) * scale,
+      mark.width * scale,
+      mark.height * scale,
+    );
+  }
+  card.texture.image = canvas;
+  card.texture.needsUpdate = true;
+  card.program.uniforms.uImageSize.value = [canvas.width, canvas.height];
 }
 
 /**
@@ -193,11 +240,11 @@ export function startProjectLens(column: HTMLElement, { strength = 1, axis = 'y'
     const cardsScene = new Transform();
     let target = new RenderTarget(ctx, { width: 1, height: 1 });
     // The corner token in px, whatever unit it's written in
-    const probe = document.createElement('div');
-    probe.style.borderTopLeftRadius = 'var(--radius-base)';
-    document.body.append(probe);
-    const radius = parseFloat(getComputedStyle(probe).borderTopLeftRadius) || 8;
-    probe.remove();
+    const radiusProbe = document.createElement('div');
+    radiusProbe.style.borderTopLeftRadius = 'var(--radius-base)';
+    document.body.append(radiusProbe);
+    const radius = parseFloat(getComputedStyle(radiusProbe).borderTopLeftRadius) || 8;
+    radiusProbe.remove();
 
     const lensProgram = new Program(ctx, {
       vertex: lensVertex,
@@ -245,14 +292,26 @@ export function startProjectLens(column: HTMLElement, { strength = 1, axis = 'y'
         caption: media.parentElement?.querySelector<HTMLElement>('[data-lens-caption]') ?? null,
         mesh,
         program,
+        texture,
         ready: false,
+        video: media.querySelector('video'),
+        logo: null,
+        canvas: null,
+        drawn: false,
       };
       const image = new Image();
       image.decoding = 'async';
-      image.onload = () => {
+      image.onload = async () => {
+        const logo = media.querySelector<HTMLImageElement>('[data-lens-logo]');
+        // A logo that fails to load is simply left out of the lens's copy.
+        if (logo) card.logo = await logo.decode().then(() => logo, () => null);
         if (stopped) return;
-        texture.image = image;
-        program.uniforms.uImageSize.value = [image.naturalWidth, image.naturalHeight];
+        if (card.logo) {
+          paintCard(card, image, image.naturalWidth, image.naturalHeight);
+        } else {
+          texture.image = image;
+          program.uniforms.uImageSize.value = [image.naturalWidth, image.naturalHeight];
+        }
         card.ready = true; // a card that never loads simply stays plain HTML
         requestRender();
       };
@@ -314,6 +373,11 @@ export function startProjectLens(column: HTMLElement, { strength = 1, axis = 'y'
           const inZone = from < zonePx || to > length - zonePx;
           const onScreen = to > 0 && from < length;
           const drawGl = visible && card.ready && inZone && onScreen;
+          // A reel freezes on the frame it had reached as the lens takes over, so nothing jumps.
+          if (drawGl && !card.drawn && card.video && card.video.readyState >= 2) {
+            paintCard(card, card.video, card.video.videoWidth, card.video.videoHeight);
+          }
+          card.drawn = drawGl;
           card.mesh.visible = drawGl;
           if (drawGl) {
             const u = card.program.uniforms;
