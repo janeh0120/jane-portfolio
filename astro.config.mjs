@@ -53,6 +53,11 @@ export default defineConfig({
       }),
       ADMIN_SECRET: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
       DEPLOY_HOOK_SECRET: envField.string({ context: 'server', access: 'secret', optional: true }),
+      GITHUB_OAUTH_CLIENT_ID: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
+      GITHUB_OAUTH_CLIENT_SECRET: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
+      ADMIN_GITHUB_USER_ID: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
+      CLAUDE_TASK_FIRE_URL: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
+      CLAUDE_TASK_TOKEN: envField.string({ context: 'server', access: 'secret', optional: true, default: '' }),
       PUBLIC_COMMENT_API_URL: envField.string({
         context: 'client',
         access: 'public',

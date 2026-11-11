@@ -998,6 +998,67 @@ const sectionTitleClass = 'subheading text-ink';
                 }
               </div>
             </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Admin actions</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <article class="comment-sidebar-card comment-sidebar-card--readonly">
+                    <p class="comment-sidebar-card-title">Hero image</p>
+                    <p class="comment-sidebar-card-body">The contrast on this caption is a little low.</p>
+                    <div class="comment-sidebar-card-actions">
+                      <button type="button" class="button is-secondary" tabindex="-1">Open PR</button>
+                      <button type="button" class="dropdown-trigger" tabindex="-1">Archive</button>
+                    </div>
+                  </article>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Confirm PR</p>
+                  <article class="comment-sidebar-card comment-sidebar-card--readonly">
+                    <p class="comment-sidebar-card-title">Hero image</p>
+                    <p class="comment-sidebar-card-body">The contrast on this caption is a little low.</p>
+                    <div class="comment-sidebar-card-confirm">
+                      <p class="comment-sidebar-card-title">Claude will get this comment and:</p>
+                      <p class="comment-sidebar-card-meta">Page: /about</p>
+                      <p class="comment-sidebar-card-meta">Device: desktop · Safari 18 · macOS · 1440×900</p>
+                      <label class="comment-sidebar-card-title">Note to Claude (optional)</label>
+                      <textarea class="comment-sidebar-card-body-input" rows="2" tabindex="-1" readonly></textarea>
+                      <div class="comment-sidebar-card-confirm-actions">
+                        <button type="button" class="button is-tertiary" tabindex="-1">Cancel</button>
+                        <button type="button" class="button is-secondary" tabindex="-1">Open PR</button>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">PR requested</p>
+                  <article class="comment-sidebar-card comment-sidebar-card--readonly">
+                    <p class="comment-sidebar-card-title">Hero image</p>
+                    <p class="comment-sidebar-card-body">The contrast on this caption is a little low.</p>
+                    <div class="comment-sidebar-card-actions">
+                      <span class="tag">PR requested</span>
+                      <a class="text-link" href="#comments" tabindex="-1">Claude session</a>
+                      <a class="text-link" href="#comments" tabindex="-1">Branch</a>
+                      <button type="button" class="button is-tertiary" tabindex="-1">Copy preview command</button>
+                      <button type="button" class="dropdown-trigger" tabindex="-1">Archive</button>
+                    </div>
+                  </article>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Archived</p>
+                  <article class="comment-sidebar-card comment-sidebar-card--readonly">
+                    <div class="comment-sidebar-card-header">
+                      <span class="tag comment-sidebar-card-category-label">Resolved</span>
+                    </div>
+                    <p class="comment-sidebar-card-title">Hero image</p>
+                    <p class="comment-sidebar-card-body">The contrast on this caption is a little low.</p>
+                    <div class="comment-sidebar-card-actions">
+                      <button type="button" class="button is-tertiary" tabindex="-1">Restore</button>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </div>

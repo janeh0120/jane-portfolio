@@ -120,8 +120,8 @@ See **[COMMENTS_SETUP.md](./COMMENTS_SETUP.md)** for Supabase + Vercel deploy st
 
 ## Admin (private)
 
-- All comments: `/admin/comments?key=YOUR_ADMIN_SECRET`
-- Version review (admin iframe): `/admin/review?key=YOUR_ADMIN_SECRET`
+- Sign in: `/admin/login` with your `ADMIN_SECRET`
+- Version review (admin iframe): `/admin/review`
 
 ## Pages
 

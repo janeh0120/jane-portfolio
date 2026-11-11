@@ -3,37 +3,41 @@ export const prerender = false;
 
 import Layout from '../../layouts/Layout.astro';
 import AdminCommentReview from '../../components/AdminCommentReview.astro';
-import { ADMIN_SECRET } from 'astro:env/server';
-import { listCommentsByVersion } from '../../lib/comments';
+import { isAdminSession, isGitHubVerified } from '../../lib/admin-auth';
+import {
+  listArchivedComments,
+  listCommentsByVersion,
+  type PortfolioComment,
+} from '../../lib/comments';
 import { resolvePortfolioPreviewBase } from '../../lib/deploy-url';
+import { latestPrRequests, shortCommentId } from '../../lib/pr-requests';
 import { getVersionById, listVersions } from '../../lib/versions';
 
-const key = Astro.url.searchParams.get('key') ?? '';
+if (!isAdminSession(Astro.cookies)) return Astro.redirect('/admin/login');
+
 const base = import.meta.env.BASE_URL;
-const authorized = Boolean(ADMIN_SECRET && key === ADMIN_SECRET);
 
 let versions: Awaited<ReturnType<typeof listVersions>> = [];
-let comments: Awaited<ReturnType<typeof listCommentsByVersion>> = [];
+let comments: PortfolioComment[] = [];
+let prRequests: Awaited<ReturnType<typeof latestPrRequests>> = new Map();
 let selectedVersion: Awaited<ReturnType<typeof getVersionById>> = null;
 let error = '';
 
-if (!ADMIN_SECRET) {
-  error =
-    'ADMIN_SECRET is not configured on the server. Add it in Vercel Environment Variables and redeploy.';
-} else if (authorized) {
-  try {
-    versions = await listVersions();
-    const active = versions.find((item) => item.isActive) ?? versions[0] ?? null;
-    selectedVersion = active ? await getVersionById(active.id) : null;
+try {
+  versions = await listVersions();
+  const active = versions.find((item) => item.isActive) ?? versions[0] ?? null;
+  selectedVersion = active ? await getVersionById(active.id) : null;
 
-    if (selectedVersion) {
-      comments = await listCommentsByVersion(selectedVersion.id);
-    }
-  } catch (e) {
-    error =
-      'Could not load version review. Check Supabase configuration and run supabase/migrations/001_initial.sql.';
-    console.error(e);
-  }
+  const [activeComments, archivedComments] = await Promise.all([
+    selectedVersion ? listCommentsByVersion(selectedVersion.id) : [],
+    listArchivedComments(),
+  ]);
+  comments = [...activeComments, ...archivedComments];
+  prRequests = await latestPrRequests(comments.map((item) => item.id));
+} catch (e) {
+  error =
+    'Could not load version review. Check Supabase configuration and run the files in supabase/migrations.';
+  console.error(e);
 }
 
 const frameBaseUrl = resolvePortfolioPreviewBase(
@@ -42,57 +46,49 @@ const frameBaseUrl = resolvePortfolioPreviewBase(
   base,
 );
 
-const clientComments = comments.map((item) => ({
-  id: item.id,
-  pageUrl: item.pageUrl,
-  selector: item.selector,
-  elementDisplayName: item.elementDisplayName || item.elementLabel,
-  category: item.category ?? '',
-  comment: item.comment,
-  deviceType: item.deviceType,
-  os: item.os,
-  viewportWidth: item.viewportWidth,
-  scrollY: item.scrollY,
-  createdAt: item.createdAt.toISOString(),
-}));
+const clientComments = comments.map((item) => {
+  const pr = prRequests.get(item.id);
+  return {
+    id: item.id,
+    shortId: shortCommentId(item.id),
+    pageUrl: item.pageUrl,
+    selector: item.selector,
+    elementDisplayName: item.elementDisplayName || item.elementLabel,
+    category: item.category ?? '',
+    comment: item.comment,
+    deviceType: item.deviceType,
+    os: item.os,
+    viewportWidth: item.viewportWidth,
+    viewportHeight: item.viewportHeight ?? null,
+    devicePixelRatio: item.devicePixelRatio ?? null,
+    colorTheme: item.colorTheme ?? null,
+    reducedMotion: item.reducedMotion ?? null,
+    browser: item.browser ?? null,
+    browserVersion: item.browserVersion ?? null,
+    scrollY: item.scrollY,
+    createdAt: item.createdAt.toISOString(),
+    archivedAt: item.archivedAt?.toISOString() ?? null,
+    archiveReason: item.archiveReason ?? null,
+    pr: pr ? { status: pr.status, branch: pr.branch, sessionUrl: pr.sessionUrl } : null,
+  };
+});
+
+const githubVerified = isGitHubVerified(Astro.cookies);
 ---
 
-<Layout title="Admin review" adminReview={authorized && !error}>
+<Layout title="Admin review" adminReview={!error}>
   {
-    !authorized ? (
-      <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
-        <h1 class="heading text-ink">Admin access required</h1>
-        <p class="mt-4 text-body text-muted">
-          Add <code class="rounded bg-fill px-1.5 py-0.5">?key=YOUR_ADMIN_SECRET</code> to the URL.
-        </p>
-        {!ADMIN_SECRET && (
-          <p class="mt-4 text-body text-danger">
-            <code class="rounded bg-fill px-1 py-0.5">ADMIN_SECRET</code> is not set on this server.
-            Add it in Vercel Environment Variables and redeploy.
-          </p>
-        )}
-        <p class="mt-4 text-body text-muted">
-          Example:{' '}
-          <code class="break-all rounded bg-fill px-1.5 py-0.5">
-            {Astro.url.origin}
-            {base}admin/review?key=…
-          </code>
-        </p>
-      </main>
-    ) : error ? (
+    error ? (
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
         <h1 class="heading text-ink">Version review</h1>
         <p class="mt-6 text-body text-danger">{error}</p>
-        <p class="mt-4 text-body text-muted">
-          On Vercel, open <strong>Settings → Environment Variables</strong> and add{' '}
-          <code class="rounded bg-fill px-1 py-0.5">SUPABASE_URL</code>,{' '}
-          <code class="rounded bg-fill px-1 py-0.5">SUPABASE_SERVICE_ROLE_KEY</code>, and{' '}
-          <code class="rounded bg-fill px-1 py-0.5">ADMIN_SECRET</code> (same values as your local{' '}
-          <code class="rounded bg-fill px-1 py-0.5">.env</code>), then redeploy.
-        </p>
       </main>
     ) : selectedVersion ? (
-      <AdminCommentReview adminKey={key} comments={clientComments} frameBaseUrl={frameBaseUrl} />
+      <AdminCommentReview
+        comments={clientComments}
+        frameBaseUrl={frameBaseUrl}
+        githubVerified={githubVerified}
+      />
     ) : (
       <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
         <h1 class="heading text-ink">Version review</h1>

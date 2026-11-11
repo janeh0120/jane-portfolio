@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { ADMIN_SECRET } from 'astro:env/server';
+import { isAdminSession } from '../../lib/admin-auth';
 import {
   insertComment,
   listComments,
@@ -33,6 +33,16 @@ function json(data: unknown, status = 200) {
   });
 }
 
+function boundedNumber(value: unknown, max: number): number | undefined {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 && number <= max ? number : undefined;
+}
+
+function boundedInt(value: unknown, max: number): number | undefined {
+  const number = boundedNumber(value, max);
+  return number === undefined ? undefined : Math.round(number);
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const ip = getClientIp(request);
   const ipRate = checkRateLimit(`comment-post:${ip}`, 20, 60 * 60 * 1000);
@@ -52,6 +62,13 @@ export const POST: APIRoute = async ({ request }) => {
     const category: CommentCategory = VALID_CATEGORIES.has(rawCategory) ? rawCategory : '';
     const viewportWidth = Number(body.viewportWidth ?? 0);
     const scrollY = Number(body.scrollY ?? 0);
+    const viewportHeight = boundedInt(body.viewportHeight, 20000);
+    const devicePixelRatio = boundedNumber(body.devicePixelRatio, 10);
+    const colorTheme =
+      body.colorTheme === 'light' || body.colorTheme === 'dark' ? body.colorTheme : undefined;
+    const reducedMotion =
+      typeof body.reducedMotion === 'boolean' ? body.reducedMotion : undefined;
+    const hasTouch = body.hasTouch === true;
     const visitorId = String(body.visitorId ?? '').trim().slice(0, 64) || undefined;
     const userAgent = request.headers.get('user-agent') ?? '';
 
@@ -61,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!selector || selector.length > 500) {
       return json({ error: 'Invalid element selector.' }, 400);
     }
-    if (!pageUrl) {
+    if (!pageUrl || pageUrl.length > 2000) {
       return json({ error: 'Page URL is required.' }, 400);
     }
 
@@ -100,7 +117,7 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const device = parseDeviceMeta(userAgent, viewportWidth || 0);
+    const device = parseDeviceMeta(userAgent, viewportWidth || 0, hasTouch);
 
     const id = await insertComment({
       pageUrl,
@@ -115,6 +132,12 @@ export const POST: APIRoute = async ({ request }) => {
       scrollY: Number.isFinite(scrollY) ? Math.max(0, Math.round(scrollY)) : 0,
       visitorId,
       versionId: null,
+      viewportHeight,
+      devicePixelRatio,
+      colorTheme,
+      reducedMotion,
+      browser: device.browser,
+      browserVersion: device.browserVersion ?? undefined,
     });
 
     return json({ ok: true, id });
@@ -124,7 +147,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-export const GET: APIRoute = async ({ request, url }) => {
+export const GET: APIRoute = async ({ cookies, url }) => {
   const isPublic = url.searchParams.get('public') === '1';
   const pageUrl = url.searchParams.get('pageUrl') ?? '';
 
@@ -142,10 +165,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     }
   }
 
-  const provided =
-    request.headers.get('x-admin-secret') ?? url.searchParams.get('key') ?? '';
-
-  if (!ADMIN_SECRET || provided !== ADMIN_SECRET) {
+  if (!isAdminSession(cookies)) {
     return json({ error: 'Unauthorized' }, 401);
   }
 

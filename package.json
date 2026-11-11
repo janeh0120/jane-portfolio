@@ -12,6 +12,7 @@
     "check:media": "node scripts/check-media-size.mjs",
     "check:design": "node scripts/check-design-tokens.mjs && node scripts/check-design-md-sync.mjs && npx @google/design.md lint DESIGN.md",
     "preview": "astro preview",
+    "preview:pr": "node scripts/preview-pr.mjs",
     "astro": "astro",
     "thumbs:play": "node scripts/generate-play-thumbs.mjs",
     "export:figma": "node scripts/export-figma-tokens.mjs"

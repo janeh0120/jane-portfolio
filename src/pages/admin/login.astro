@@ -1,0 +1,53 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import { ADMIN_SECRET } from 'astro:env/server';
+import { isAdminSession } from '../../lib/admin-auth';
+
+if (isAdminSession(Astro.cookies)) return Astro.redirect('/admin/review');
+
+const messages: Record<string, string> = {
+  invalid: 'That password is not right.',
+  limit: 'Too many attempts. Try again in 15 minutes.',
+  unavailable: 'Sign-in is unavailable. Check that the Supabase migrations have been run.',
+};
+const error = messages[Astro.url.searchParams.get('error') ?? ''] ?? '';
+---
+
+<Layout title="Admin sign in" showCommentMode={false}>
+  <main class="mx-auto max-w-4xl px-6 py-12 md:px-10">
+    <h1 class="heading text-ink">Admin sign in</h1>
+    {
+      ADMIN_SECRET ? (
+        <form method="post" action="/api/auth/login" class="mt-6 max-w-sm">
+          <label for="admin-password" class="text-body font-medium text-ink">
+            Password
+          </label>
+          <input
+            id="admin-password"
+            class="comment-sidebar-card-body-input mt-2"
+            type="password"
+            name="password"
+            autocomplete="current-password"
+            required
+            autofocus
+          />
+          {error && (
+            <p class="comment-sidebar-card-error" role="alert">
+              {error}
+            </p>
+          )}
+          <button type="submit" class="button is-secondary mt-4">
+            Sign in
+          </button>
+        </form>
+      ) : (
+        <p class="mt-6 text-body text-danger">
+          ADMIN_SECRET is not set on this server. Add it in Vercel Environment Variables and
+          redeploy.
+        </p>
+      )
+    }
+  </main>
+</Layout>

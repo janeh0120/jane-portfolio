@@ -532,6 +532,13 @@ are used only there.
   - *Read-only* (All comments, and the admin review): the category is a tag and nothing is
     editable. States: hover, active; the admin review adds a Subtle line with when and on what
     device it was left (`.comment-sidebar-card-meta`).
+  - *Admin actions* (the admin review): a row of controls under the comment
+    (`.comment-sidebar-card-actions`). An active comment has a secondary Open PR button and an
+    Archive dropdown; once requested, Open PR becomes a "PR requested" tag with links and a tertiary
+    copy button. An archived comment shows its reason as a tag and a tertiary Restore. Open PR
+    first expands a confirm section in the card (`.comment-sidebar-card-confirm`), split from the
+    comment by a 1px Border line, listing what Claude will receive. The admin sign-in page uses the
+    same editing field on one line.
   (Upvoting belongs to the public comments view, which is turned off, and isn't part of the
   documented system.)
 - **Links (`.text-link`):** underlined at 40% ink, full ink on hover, muted when pressed, medium

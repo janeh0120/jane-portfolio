@@ -474,6 +474,13 @@ body.comment-view-only .comment-sidebar-panel {
   box-shadow: 0 0 0 2px var(--comment-accent-soft);
 }
 
+/* Admin sign-in: the same field on one line, on a page without the comment shell's variables */
+input.comment-sidebar-card-body-input {
+  min-height: 0;
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-soft);
+}
+
 /* ── Selection + composer ── */
 body.comment-mode-active:not(.comment-sidebar-interacting) {
   cursor: crosshair;
@@ -819,6 +826,43 @@ body.comment-mode-active [data-comment-ui] * {
   font: var(--type-body);
   letter-spacing: var(--tracking-body);
   color: var(--color-subtle);
+}
+
+/* Admin review: what you can do with a comment */
+.comment-sidebar-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+/* The Archive dropdown's "Archive" row is a label, not a choice, so it never shows as picked */
+.dropdown-option[aria-disabled='true'][aria-selected='true'] .dropdown-check {
+  visibility: hidden;
+}
+
+/* Admin review: confirm what Claude will receive before opening a PR */
+.comment-sidebar-card-confirm {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.comment-sidebar-card-confirm .comment-sidebar-card-title {
+  display: block;
+  cursor: default;
+}
+
+.comment-sidebar-card-confirm label.comment-sidebar-card-title {
+  margin-top: var(--space-3);
+}
+
+.comment-sidebar-card-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .comment-sidebar-card-error {

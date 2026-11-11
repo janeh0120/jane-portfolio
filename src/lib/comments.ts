@@ -9,6 +9,8 @@ export type CommentCategory =
   | 'visual-design'
   | 'bug';
 
+export type ArchiveReason = 'not-feedback' | 'resolved';
+
 export type PortfolioComment = {
   id: string;
   versionId: string | null;
@@ -25,7 +27,29 @@ export type PortfolioComment = {
   scrollY: number;
   visitorId?: string;
   upvoteCount?: number;
+  archivedAt?: Date;
+  archiveReason?: ArchiveReason;
+  viewportHeight?: number;
+  devicePixelRatio?: number;
+  colorTheme?: 'light' | 'dark';
+  reducedMotion?: boolean;
+  browser?: string;
+  browserVersion?: number;
 };
+
+/** What visitors may see of other people's comments. Never add visitorId: it authorizes edits. */
+export type PublicComment = Pick<
+  PortfolioComment,
+  | 'id'
+  | 'pageUrl'
+  | 'selector'
+  | 'elementLabel'
+  | 'elementDisplayName'
+  | 'category'
+  | 'comment'
+  | 'createdAt'
+  | 'upvoteCount'
+>;
 
 type CommentRow = {
   id: string;
@@ -42,6 +66,14 @@ type CommentRow = {
   scroll_y: number;
   visitor_id: string | null;
   created_at: string;
+  archived_at?: string | null;
+  archive_reason?: string | null;
+  viewport_height?: number | null;
+  device_pixel_ratio?: number | null;
+  color_theme?: string | null;
+  reduced_motion?: boolean | null;
+  browser?: string | null;
+  browser_version?: number | null;
 };
 
 function mapComment(row: CommentRow, upvoteCount = 0): PortfolioComment {
@@ -61,6 +93,28 @@ function mapComment(row: CommentRow, upvoteCount = 0): PortfolioComment {
     scrollY: row.scroll_y,
     visitorId: row.visitor_id ?? undefined,
     upvoteCount,
+    archivedAt: row.archived_at ? new Date(row.archived_at) : undefined,
+    archiveReason: (row.archive_reason as ArchiveReason | null) ?? undefined,
+    viewportHeight: row.viewport_height ?? undefined,
+    devicePixelRatio: row.device_pixel_ratio ?? undefined,
+    colorTheme: (row.color_theme as PortfolioComment['colorTheme'] | null) ?? undefined,
+    reducedMotion: row.reduced_motion ?? undefined,
+    browser: row.browser ?? undefined,
+    browserVersion: row.browser_version ?? undefined,
+  };
+}
+
+function toPublicComment(item: PortfolioComment): PublicComment {
+  return {
+    id: item.id,
+    pageUrl: item.pageUrl,
+    selector: item.selector,
+    elementLabel: item.elementLabel,
+    elementDisplayName: item.elementDisplayName,
+    category: item.category,
+    comment: item.comment,
+    createdAt: item.createdAt,
+    upvoteCount: item.upvoteCount,
   };
 }
 
@@ -85,7 +139,7 @@ async function upvoteCountsFor(commentIds: string[]): Promise<Map<string, number
 }
 
 export async function insertComment(
-  input: Omit<PortfolioComment, 'id' | 'createdAt' | 'upvoteCount'>,
+  input: Omit<PortfolioComment, 'id' | 'createdAt' | 'upvoteCount' | 'archivedAt' | 'archiveReason'>,
 ): Promise<string> {
   const supabase = getSupabase();
   const versionId = input.versionId ?? (await ensureActiveVersion());
@@ -105,6 +159,12 @@ export async function insertComment(
       viewport_width: input.viewportWidth,
       scroll_y: input.scrollY,
       visitor_id: input.visitorId ?? null,
+      viewport_height: input.viewportHeight ?? null,
+      device_pixel_ratio: input.devicePixelRatio ?? null,
+      color_theme: input.colorTheme ?? null,
+      reduced_motion: input.reducedMotion ?? null,
+      browser: input.browser ?? null,
+      browser_version: input.browserVersion ?? null,
     })
     .select('id')
     .single();
@@ -118,6 +178,7 @@ export async function listComments(limit = 200): Promise<PortfolioComment[]> {
   const { data, error } = await supabase
     .from('comments')
     .select('*')
+    .is('archived_at', null)
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -133,6 +194,7 @@ export async function listCommentsByVersion(versionId: string): Promise<Portfoli
     .from('comments')
     .select('*')
     .eq('version_id', versionId)
+    .is('archived_at', null)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -141,7 +203,23 @@ export async function listCommentsByVersion(versionId: string): Promise<Portfoli
   return rows.map((row) => mapComment(row, counts.get(row.id) ?? 0));
 }
 
-export async function listPublicComments(pageUrl: string): Promise<PortfolioComment[]> {
+/** Across every portfolio version, so archived comments survive a new deploy. */
+export async function listArchivedComments(limit = 500): Promise<PortfolioComment[]> {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('comments')
+    .select('*')
+    .not('archived_at', 'is', null)
+    .order('archived_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  const rows = (data ?? []) as CommentRow[];
+  const counts = await upvoteCountsFor(rows.map((row) => row.id));
+  return rows.map((row) => mapComment(row, counts.get(row.id) ?? 0));
+}
+
+export async function listPublicComments(pageUrl: string): Promise<PublicComment[]> {
   const versionId = await ensureActiveVersion();
   const supabase = getSupabase();
 
@@ -150,12 +228,13 @@ export async function listPublicComments(pageUrl: string): Promise<PortfolioComm
     .select('*')
     .eq('version_id', versionId)
     .eq('page_url', pageUrl)
+    .is('archived_at', null)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
   const rows = (data ?? []) as CommentRow[];
   const counts = await upvoteCountsFor(rows.map((row) => row.id));
-  return rows.map((row) => mapComment(row, counts.get(row.id) ?? 0));
+  return rows.map((row) => toPublicComment(mapComment(row, counts.get(row.id) ?? 0)));
 }
 
 export async function getCommentById(id: string): Promise<PortfolioComment | null> {
@@ -189,6 +268,9 @@ export async function updateCommentByVisitor(
   if (!existing.visitorId || existing.visitorId !== visitorId) {
     throw new CommentAuthError('FORBIDDEN', 'You can only edit your own comments.');
   }
+  if (existing.archivedAt) {
+    throw new CommentAuthError('FORBIDDEN', 'This comment can no longer be changed.');
+  }
 
   const updates: { comment?: string; category?: string } = {};
   if (patch.comment !== undefined) updates.comment = patch.comment;
@@ -214,6 +296,9 @@ export async function deleteCommentByVisitor(id: string, visitorId: string): Pro
   if (!existing.visitorId || existing.visitorId !== visitorId) {
     throw new CommentAuthError('FORBIDDEN', 'You can only delete your own comments.');
   }
+  if (existing.archivedAt) {
+    throw new CommentAuthError('FORBIDDEN', 'This comment can no longer be changed.');
+  }
 
   const supabase = getSupabase();
   const { data, error } = await supabase
@@ -233,6 +318,32 @@ export async function deleteCommentById(id: string): Promise<void> {
 
   const supabase = getSupabase();
   const { data, error } = await supabase.from('comments').delete().eq('id', id).select('id');
+
+  if (error) throw error;
+  if (!data?.length) throw new CommentAuthError('NOT_FOUND', 'Comment not found.');
+}
+
+export async function archiveComment(id: string, reason: ArchiveReason): Promise<Date> {
+  const archivedAt = new Date();
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('comments')
+    .update({ archived_at: archivedAt.toISOString(), archive_reason: reason })
+    .eq('id', id)
+    .select('id');
+
+  if (error) throw error;
+  if (!data?.length) throw new CommentAuthError('NOT_FOUND', 'Comment not found.');
+  return archivedAt;
+}
+
+export async function restoreComment(id: string): Promise<void> {
+  const supabase = getSupabase();
+  const { data, error } = await supabase
+    .from('comments')
+    .update({ archived_at: null, archive_reason: null })
+    .eq('id', id)
+    .select('id');
 
   if (error) throw error;
   if (!data?.length) throw new CommentAuthError('NOT_FOUND', 'Comment not found.');

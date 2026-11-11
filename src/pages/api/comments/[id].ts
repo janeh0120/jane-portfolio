@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { ADMIN_SECRET } from 'astro:env/server';
+import { isAdminSession, isCrossSiteRequest } from '../../../lib/admin-auth';
 import {
   CommentAuthError,
   deleteCommentById,
@@ -84,7 +84,7 @@ export const PATCH: APIRoute = async ({ params, request }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ params, request, url }) => {
+export const DELETE: APIRoute = async ({ cookies, params, request }) => {
   const commentId = params.id;
   if (!commentId) return json({ error: 'Comment id is required.' }, 400);
 
@@ -96,13 +96,8 @@ export const DELETE: APIRoute = async ({ params, request, url }) => {
 
   try {
     const body = await request.json().catch(() => ({}));
-    const adminKey =
-      request.headers.get('x-admin-secret') ||
-      String(body.adminKey ?? '').trim() ||
-      url.searchParams.get('key') ||
-      '';
 
-    if (ADMIN_SECRET && adminKey === ADMIN_SECRET) {
+    if (isAdminSession(cookies) && !isCrossSiteRequest(request)) {
       await deleteCommentById(commentId);
       return json({ ok: true });
     }
