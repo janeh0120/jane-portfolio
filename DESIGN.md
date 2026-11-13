@@ -35,6 +35,8 @@ colors:
   danger-soft: "#fef2f2"
   success: "#007a55"
   success-soft: "#ecfdf5"
+  info: "#155dfc"
+  info-soft: "#eff6ff"
   # The media overlay (Play, About): the page colour at 88%, so it follows the colour mode and the
   # page shows faintly behind. (In CSS: color-mix(in srgb, var(--color-page) 88%, transparent).)
   overlay: "rgb(245 245 245 / 88%)"
@@ -202,6 +204,24 @@ components:
     typography: "{typography.compact}"
     rounded: "{rounded.base}"
     padding: "{spacing.inset}"
+  tag-info:
+    backgroundColor: "{colors.info-soft}"
+    textColor: "{colors.info}"
+    typography: "{typography.compact}"
+    rounded: "{rounded.base}"
+    padding: "{spacing.inset}"
+  tag-success:
+    backgroundColor: "{colors.success-soft}"
+    textColor: "{colors.success}"
+    typography: "{typography.compact}"
+    rounded: "{rounded.base}"
+    padding: "{spacing.inset}"
+  tag-danger:
+    backgroundColor: "{colors.danger-soft}"
+    textColor: "{colors.danger}"
+    typography: "{typography.compact}"
+    rounded: "{rounded.base}"
+    padding: "{spacing.inset}"
   tag-count:
     backgroundColor: "{colors.fill}"
     textColor: "{colors.ink}"
@@ -320,6 +340,8 @@ by hue, so the same names work in dark mode.
   about 5.3:1, which meets WCAG AA.
 - **Danger (#c10007) and Danger soft:** destructive hovers and errors.
 - **Success (#007a55) and Success soft:** additions and confirmed states, the counterpart to Danger.
+- **Info (#155dfc) and Info soft:** in-progress states on status tags. Info is the brand blue in light
+  mode and a lighter blue in dark mode, where the brand blue is too dim to read on its tint.
 - **Overlay:** the media overlay on Play and About is the page colour at 88%, so it follows the
   colour mode, the page shows faintly behind it, and everything on it uses the ordinary text and
   control tokens. `media-backdrop` (black) is only for letterboxing embedded video.
@@ -349,6 +371,8 @@ Accent, on-accent, and `media-backdrop` are unchanged; `overlay` follows `page` 
 | danger-soft | #460809 |
 | success | #5ee9b5 |
 | success-soft | #002c22 |
+| info | #8ec5ff |
+| info-soft | #162456 |
 
 The grain overlay switches from `multiply` at 35% to `overlay` at 18%, and text selection becomes
 white at 16% instead of black at 8%.
@@ -482,7 +506,8 @@ are used only there.
   the menu. Every variant is the same size: a 16px icon with `space-2` padding and the corner
   radius, 32px square (a 20px icon on phones, for a 36px touch target). Pages never resize it.
   Variants: dismiss (rotates 90° on hover), primary (ink fill, for the one main action in a
-  surface), destructive (danger hover).
+  surface), destructive (danger hover, with a trash icon for deleting). An icon control can open a
+  dropdown menu, as Archive does on the admin review.
 - **Dropdown (`.dropdown-trigger`, `.dropdown-menu`):** for picking one option from a short list,
   like a comment's category or the colour mode (the colour mode menu, `ThemeMenu`, is a dropdown
   trigger with the current mode's icon; it sits in the footer, opening upward, and under the
@@ -499,7 +524,8 @@ are used only there.
   (`.is-textured`) fills the panels with an image and uses palette colours on top, since the image
   doesn't change with the colour mode.
 - **Tag (`.tag`):** a static label that matches the dropdown trigger without the chevron, for a
-  value that can't be changed. `.tag.is-count` for a number beside a label.
+  value that can't be changed. `.tag.is-count` for a number beside a label. Status tags mark a
+  state: `.is-info` (in progress), `.is-success` (done), and `.is-danger` (failed).
 - **Segmented toggle (`.segmented`):** one shared component for every two-option switch (Light /
   Dark on Brand and Play, Web / Problems on About). A pill track with a thumb that slides to the
   option with `aria-pressed="true"`. Default is a Fill track with an Ink thumb (also on the media
@@ -521,8 +547,8 @@ are used only there.
   under it with a 1px line.
 - **Comment card:** comment mode's card (Canvas, 0.5px border, corner radius) with the category,
   the element it's about (Label; click it to pin the element), and the comment (Body). Two variants:
-  - *Your comment* (This page): the category is a dropdown you can change, a destructive dismiss
-    deletes it (shown on hover, always on touch), and clicking the text edits it. States: hover
+  - *Your comment* (This page): the category is a dropdown you can change, a destructive icon control
+    with a trash icon deletes it (shown on hover, always on touch), and clicking the text edits it. States: hover
     (Border strong and `shadow-raised`; the text shows Hover subtle behind it), active / pinned
     (Accent border with a 2px Accent soft ring), editing (the text becomes a field with the same
     border and ring), and an error under the field in Danger on Danger soft. The category
@@ -530,14 +556,21 @@ are used only there.
     field has no box of its own, so the popover card takes the Accent border and soft ring while
     you type.
   - *Read-only* (All comments, and the admin review): the category is a tag and nothing is
-    editable. States: hover, active; the admin review adds a Subtle line with when and on what
+    editable, so the text has no side inset and lines up with the title. States: hover, active; the admin review adds a Subtle line with when and on what
     device it was left (`.comment-sidebar-card-meta`).
-  - *Admin actions* (the admin review): a row of controls under the comment
-    (`.comment-sidebar-card-actions`). An active comment has a secondary Open PR button and an
-    Archive dropdown; once requested, Open PR becomes a "PR requested" tag with links and a tertiary
-    copy button. An archived comment shows its reason as a tag and a tertiary Restore. Open PR
-    first expands a confirm section in the card (`.comment-sidebar-card-confirm`), split from the
-    comment by a 1px Border line, listing what Claude will receive. The admin sign-in page uses the
+  - *Admin actions* (the admin review): the top corner holds an Archive icon control, which opens a
+    menu of reasons, to the left of Delete (`.comment-sidebar-card-controls`; both show on hover,
+    always on touch). A row under the comment (`.comment-sidebar-card-actions`) has a secondary
+    Open PR button, which sends the comment as written, and a tertiary Edit prompt. The top-left
+    tag shows the card's state in place of the category, checked against GitHub when the page
+    loads: "PR requested" (plain) until that check returns; "PR opened" (Info), with Claude session
+    and PR as links in one row, each with the external link arrow since they open a new tab;
+    "No PR yet" or "PR closed" (plain), with the session link above Open PR and Edit prompt to
+    start again; "PR failed" (Error), with Open PR to retry; "Merged" (Success)
+    or "Not feedback" (plain) once archived. An archived comment has a tertiary Restore and no
+    Archive control. Edit prompt
+    expands a section in the card (`.comment-sidebar-card-confirm`), split from the comment by a
+    1px Border line, with an editable copy of the comment; the comment above never changes. The admin sign-in page uses the
     same editing field on one line.
   (Upvoting belongs to the public comments view, which is turned off, and isn't part of the
   documented system.)
@@ -639,7 +672,7 @@ blinking caret) keep their own cycle length but still use the easing tokens.
   value.
 - Do use Muted for readable secondary text; reserve Subtle for labels and disabled states.
 - Don't use the Accent blue for links, decoration, or any button but Leave feedback; it means
-  focus, selection, or the primary call to action.
+  focus, selection, or the primary call to action. Info status tags use their own Info token.
 - Don't add shadows outside the two elevation levels, or durations and easings outside the motion
   tokens.
 - Don't introduce a second typeface or new font weights (400, 500, and 700 only).

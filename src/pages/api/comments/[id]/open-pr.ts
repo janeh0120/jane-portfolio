@@ -12,9 +12,10 @@ import {
   createPrRequest,
   DuplicatePrRequestError,
   isClaudeTaskConfigured,
-  MAX_OWNER_NOTE_LENGTH,
+  MAX_PROMPT_LENGTH,
   MAX_PR_REQUESTS_PER_DAY,
   startClaudeTask,
+  supersedePrRequests,
   updatePrRequest,
 } from '../../../../lib/pr-requests';
 
@@ -42,9 +43,10 @@ export const POST: APIRoute = async ({ cookies, params, request }) => {
 
   try {
     const body = await request.json().catch(() => ({}));
-    const ownerNote = String(body.note ?? '').trim();
-    if (ownerNote.length > MAX_OWNER_NOTE_LENGTH) {
-      return json({ error: 'Note is too long (max 2000 characters).' }, 400);
+    const prompt = body.prompt === undefined ? null : String(body.prompt).trim();
+    if (prompt === '') return json({ error: 'The prompt is empty.' }, 400);
+    if (prompt && prompt.length > MAX_PROMPT_LENGTH) {
+      return json({ error: 'Prompt is too long (max 2000 characters).' }, 400);
     }
 
     const comment = await getCommentById(params.id ?? '');
@@ -63,13 +65,18 @@ export const POST: APIRoute = async ({ cookies, params, request }) => {
       return json({ error: `Limit of ${MAX_PR_REQUESTS_PER_DAY} PRs per day reached.` }, 429);
     }
 
-    const branch = branchForComment(comment.id);
-    requestId = await createPrRequest(comment.id, ownerNote, branch);
+    // Unchanged text stays visitor text, so pressing send doesn't promote it to your instruction.
+    const ownerPrompt = prompt && prompt !== comment.comment.trim() ? prompt : '';
 
-    const sessionUrl = await startClaudeTask(buildClaudeTaskText(comment, ownerNote, branch));
+    if (body.retry === true) await supersedePrRequests(comment.id);
+
+    const branch = branchForComment(comment.id);
+    requestId = await createPrRequest(comment.id, ownerPrompt, branch);
+
+    const sessionUrl = await startClaudeTask(buildClaudeTaskText(comment, ownerPrompt, branch));
     await updatePrRequest(requestId, { session_url: sessionUrl });
 
-    return json({ ok: true, branch, sessionUrl });
+    return json({ ok: true, branch, sessionUrl, sentPrompt: ownerPrompt });
   } catch (error) {
     if (error instanceof DuplicatePrRequestError) {
       return json({ error: 'A PR was already requested for this comment.' }, 409);

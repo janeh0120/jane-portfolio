@@ -102,7 +102,11 @@ function labelFor(select: HTMLSelectElement): string {
   return label?.textContent?.trim() ?? '';
 }
 
-export function enhanceSelect(select: HTMLSelectElement): HTMLButtonElement {
+/** With `icon`, the trigger shows that SVG instead of the selected option's text. */
+export function enhanceSelect(
+  select: HTMLSelectElement,
+  { icon }: { icon?: string } = {},
+): HTMLButtonElement {
   const enhanced = select as Enhanced;
   if (enhanced.__dropdownTrigger) return enhanced.__dropdownTrigger;
 
@@ -128,7 +132,8 @@ export function enhanceSelect(select: HTMLSelectElement): HTMLButtonElement {
   const syncTrigger = () => {
     const option = select.options[select.selectedIndex];
     const text = option?.textContent ?? '';
-    trigger.textContent = text;
+    if (icon) trigger.innerHTML = icon;
+    else trigger.textContent = text;
     if (label) trigger.setAttribute('aria-label', text ? `${label}, ${text}` : label);
     trigger.dataset.value = select.value;
     trigger.dataset.empty = select.value === '' ? 'true' : 'false';

@@ -2,6 +2,8 @@
 export function lucideSvg(
   name:
     | 'x'
+    | 'trash'
+    | 'archive'
     | 'send'
     | 'menu'
     | 'arrow-left'
@@ -13,6 +15,10 @@ export function lucideSvg(
 ) {
   const paths: Record<string, string> = {
     x: 'M18 6 6 18M6 6l12 12',
+    trash:
+      'M10 11v6m4-6v6m5-11v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2',
+    archive:
+      'M3 3h18a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8m-10 4h4',
     send: 'M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939',
     menu: 'M4 5h16M4 12h16M4 19h16',
     'arrow-left': 'm12 19-7-7 7-7m7 7H5',

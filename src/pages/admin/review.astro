@@ -69,7 +69,14 @@ const clientComments = comments.map((item) => {
     createdAt: item.createdAt.toISOString(),
     archivedAt: item.archivedAt?.toISOString() ?? null,
     archiveReason: item.archiveReason ?? null,
-    pr: pr ? { status: pr.status, branch: pr.branch, sessionUrl: pr.sessionUrl } : null,
+    pr: pr
+      ? {
+          status: pr.status,
+          branch: pr.branch,
+          sessionUrl: pr.sessionUrl,
+          sentPrompt: pr.ownerPrompt,
+        }
+      : null,
   };
 });
 

@@ -990,9 +990,9 @@ import IconControl from './IconControl.astro';
 
       const deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
-      deleteBtn.className = 'icon-control is-dismiss is-destructive inline-flex comment-sidebar-card-delete';
+      deleteBtn.className = 'icon-control is-destructive inline-flex comment-sidebar-card-delete';
       deleteBtn.setAttribute('aria-label', 'Delete comment');
-      deleteBtn.innerHTML = lucideSvg('x', 14);
+      deleteBtn.innerHTML = lucideSvg('trash', 14);
       deleteBtn.addEventListener('click', (event) => {
         event.stopPropagation();
         void deleteComment(item.id);

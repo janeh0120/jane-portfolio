@@ -91,6 +91,8 @@
   --color-danger-soft: var(--color-red-50);
   --color-success: var(--color-emerald-700);
   --color-success-soft: var(--color-emerald-50);
+  --color-info: var(--color-blue-600);
+  --color-info-soft: var(--color-blue-50);
   --color-placeholder: var(--color-neutral-300);
   --color-glass: color-mix(in srgb, var(--color-white) 72%, transparent);
   --color-glass-hover: color-mix(in srgb, var(--color-white) 82%, transparent);
@@ -369,7 +371,8 @@
   }
 
   .icon-control:hover,
-  .icon-control.is-hover {
+  .icon-control.is-hover,
+  .icon-control[aria-expanded='true'] {
     color: var(--color-ink);
     background: var(--color-hover);
   }
@@ -567,6 +570,22 @@
   font-variant-numeric: tabular-nums;
   text-align: center;
   color: inherit;
+}
+
+/* Status tags: a state worth noticing, rather than a plain value */
+.tag.is-info {
+  color: var(--color-info);
+  background: var(--color-info-soft);
+}
+
+.tag.is-success {
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.tag.is-danger {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
 }
 
 /* Text button. Secondary sits on its own surface; tertiary is text until hovered */
@@ -1192,6 +1211,8 @@ html.theme-dark {
   --color-danger-soft: var(--color-red-950);
   --color-success: var(--color-emerald-300);
   --color-success-soft: var(--color-emerald-950);
+  --color-info: var(--color-blue-300);
+  --color-info-soft: var(--color-blue-950);
   --color-placeholder: var(--color-neutral-600);
   --color-glass: color-mix(in srgb, var(--color-neutral-900) 78%, transparent);
   --color-glass-hover: color-mix(in srgb, var(--color-neutral-900) 88%, transparent);

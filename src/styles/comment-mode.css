@@ -262,6 +262,9 @@ body.comment-view-only .comment-sidebar-panel {
 }
 
 .comment-sidebar-card--readonly .comment-sidebar-card-body {
+  /* The side inset is for the editable field; read-only text lines up with the title */
+  padding-inline: 0;
+  border-inline-width: 0;
   cursor: default;
 }
 
@@ -390,6 +393,15 @@ body.comment-view-only .comment-sidebar-panel {
   outline-offset: 2px;
 }
 
+/* The card's icon controls: archive (admin review) and delete */
+.comment-sidebar-card-controls {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.comment-sidebar-card-archive,
 .comment-sidebar-card-delete {
   opacity: 0;
   transition:
@@ -398,6 +410,10 @@ body.comment-view-only .comment-sidebar-panel {
     color var(--duration-150) var(--ease-standard);
 }
 
+.comment-sidebar-card:hover .comment-sidebar-card-archive,
+.comment-sidebar-card.is-hover .comment-sidebar-card-archive,
+.comment-sidebar-card-archive:focus-visible,
+.comment-sidebar-card-archive[aria-expanded='true'],
 .comment-sidebar-card:hover .comment-sidebar-card-delete,
 .comment-sidebar-card.is-hover .comment-sidebar-card-delete,
 .comment-sidebar-card-delete:focus-visible {
@@ -405,6 +421,7 @@ body.comment-view-only .comment-sidebar-panel {
 }
 
 @media (hover: none), (max-width: 900px) {
+  .comment-sidebar-card-archive,
   .comment-sidebar-card-delete {
     opacity: 1;
   }
@@ -837,12 +854,17 @@ body.comment-mode-active [data-comment-ui] * {
   margin-top: var(--space-3);
 }
 
-/* The Archive dropdown's "Archive" row is a label, not a choice, so it never shows as picked */
-.dropdown-option[aria-disabled='true'][aria-selected='true'] .dropdown-check {
-  visibility: hidden;
+/* A row of links needs more room than buttons, which have their own padding */
+.comment-sidebar-card-actions.is-links {
+  gap: var(--space-4);
 }
 
-/* Admin review: confirm what Claude will receive before opening a PR */
+/* Inline beside the label, as the footer's arrows render */
+.comment-sidebar-card-actions .external-link-icon {
+  display: inline-block;
+}
+
+/* Admin review: edit the prompt sent to Claude, leaving the comment above untouched */
 .comment-sidebar-card-confirm {
   margin-top: var(--space-3);
   padding-top: var(--space-3);
@@ -854,13 +876,12 @@ body.comment-mode-active [data-comment-ui] * {
   cursor: default;
 }
 
-.comment-sidebar-card-confirm label.comment-sidebar-card-title {
-  margin-top: var(--space-3);
+.comment-sidebar-card-confirm .comment-sidebar-card-body-input {
+  field-sizing: content;
 }
 
 .comment-sidebar-card-confirm-actions {
   display: flex;
-  justify-content: flex-end;
   gap: var(--space-2);
   margin-top: var(--space-3);
 }

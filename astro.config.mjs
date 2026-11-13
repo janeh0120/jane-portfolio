@@ -24,6 +24,7 @@ export default defineConfig({
     icon({
       include: {
         lucide: [
+          'archive',
           'arrow-left',
           'arrow-right',
           'arrow-up-right',
@@ -36,6 +37,7 @@ export default defineConfig({
           'moon',
           'send',
           'sun',
+          'trash',
           'x',
         ],
       },

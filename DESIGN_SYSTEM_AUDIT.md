@@ -414,3 +414,18 @@ existing tokens, so nothing new was added and the token checker stays at 0. The 
 keeps its own styles for now, so the two share a look but not code. A Textured variant followed, so a
 page can fill the panels with an image without restyling the component itself. Later it gained
 scroll-driven opening, which stops at the first click, and chevrons on the collapsed desktop rails.
+
+### Follow-up: comments can be archived, and delete became a trash can
+
+Triaging feedback on the admin review needed a way to keep a comment without acting on it. Added an
+Archive icon control beside Delete, which opens the shared dropdown menu, and a row for opening a PR,
+with an inline field for editing what gets sent.
+Delete moved from an X that rotates on hover to a trash icon, because an X reads as closing rather than
+removing. It reuses existing tokens, so nothing new was added and the token checker stays at 0.
+
+### Follow-up: status tags
+
+Comments now move through states, and a plain tag couldn't say which were good news. Added Info,
+Success, and Error tags. Success and Error reuse existing colours. Info needed a new pair: the brand blue
+reads at 4.82:1 on its tint in light mode but only 2.82:1 in dark mode, so Info is the brand blue in
+light and a lighter blue in dark, the same way Success and Danger shift. The token checker stays at 0.

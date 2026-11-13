@@ -3,12 +3,13 @@ import type { PortfolioComment } from './comments';
 import { getSupabase } from './supabase';
 
 export const MAX_PR_REQUESTS_PER_DAY = 10;
-export const MAX_OWNER_NOTE_LENGTH = 2000;
+export const MAX_PROMPT_LENGTH = 2000;
 
 export type PrRequest = {
   id: string;
   commentId: string;
-  ownerNote: string;
+  /** Your edited version of the comment; empty when it was sent as the visitor wrote it. */
+  ownerPrompt: string;
   status: 'requested' | 'failed';
   branch: string;
   sessionUrl: string | null;
@@ -31,7 +32,7 @@ function mapPrRequest(row: PrRequestRow): PrRequest {
   return {
     id: row.id,
     commentId: row.comment_id,
-    ownerNote: row.owner_note,
+    ownerPrompt: row.owner_note,
     status: row.status,
     branch: row.branch,
     sessionUrl: row.session_url,
@@ -83,12 +84,12 @@ export async function countPrRequestsToday(): Promise<number> {
 
 export async function createPrRequest(
   commentId: string,
-  ownerNote: string,
+  ownerPrompt: string,
   branch: string,
 ): Promise<string> {
   const { data, error } = await getSupabase()
     .from('pr_requests')
-    .insert({ comment_id: commentId, owner_note: ownerNote, branch })
+    .insert({ comment_id: commentId, owner_note: ownerPrompt, branch })
     .select('id')
     .single();
 
@@ -97,6 +98,16 @@ export async function createPrRequest(
     throw error;
   }
   return data.id;
+}
+
+/** Starting again replaces the live request, which the one-per-comment rule would otherwise block. */
+export async function supersedePrRequests(commentId: string): Promise<void> {
+  const { error } = await getSupabase()
+    .from('pr_requests')
+    .update({ status: 'failed' })
+    .eq('comment_id', commentId)
+    .eq('status', 'requested');
+  if (error) throw error;
 }
 
 export async function updatePrRequest(
@@ -118,11 +129,12 @@ function pagePath(pageUrl: string): string {
 /**
  * JSON keeps a visitor's text inside one escaped string, so it can't close a delimiter and
  * pose as an instruction. Older comments have no browser, and their OS is unreliable: Macs
- * used to be recorded as iOS.
+ * used to be recorded as iOS. An edited prompt replaces the visitor's text entirely, so anything
+ * you cut never reaches Claude.
  */
 export function buildClaudeTaskText(
   comment: PortfolioComment,
-  ownerNote: string,
+  ownerPrompt: string,
   branch: string,
 ): string {
   const captured = Boolean(comment.browser);
@@ -130,8 +142,8 @@ export function buildClaudeTaskText(
     {
       branch,
       commentId: comment.id,
-      ownerNote,
-      visitorComment: comment.comment,
+      ownerPrompt: ownerPrompt || null,
+      visitorComment: ownerPrompt ? null : comment.comment,
       category: comment.category || null,
       page: pagePath(comment.pageUrl),
       element: comment.elementDisplayName || comment.elementLabel,

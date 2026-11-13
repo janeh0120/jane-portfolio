@@ -20,7 +20,7 @@ interface SerializedComment {
   shortId: string;
   archivedAt: string | null;
   archiveReason: string | null;
-  pr: { status: string; branch: string; sessionUrl: string | null } | null;
+  pr: { status: string; branch: string; sessionUrl: string | null; sentPrompt: string } | null;
 }
 
 interface Props {
@@ -51,13 +51,8 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
         <div class="comment-sidebar-header-row">
           <span class="comment-sidebar-title">Comments</span>
           <form method="post" action="/api/auth/logout">
-            <button type="submit" class="button is-tertiary">Sign out</button>
+            <button type="submit" class="button is-secondary">Sign out</button>
           </form>
-        </div>
-        <div class="segmented" role="group" aria-label="Comment status">
-          <span class="segmented-thumb" aria-hidden="true"></span>
-          <button type="button" id="admin-status-active" class="segmented-option" aria-pressed="true">Active</button>
-          <button type="button" id="admin-status-archived" class="segmented-option" aria-pressed="false">Archived</button>
         </div>
         <div class="comment-sidebar-tabs" role="tablist" aria-label="Comment filter">
           <button
@@ -77,8 +72,18 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
             role="tab"
             aria-selected="false"
           >
-            All pages
+            All
             <span class="tag is-count" id="admin-scope-all-count">{activeCount}</span>
+          </button>
+          <button
+            type="button"
+            id="admin-scope-archived"
+            class="comment-sidebar-tab"
+            role="tab"
+            aria-selected="false"
+          >
+            Archived
+            <span class="tag is-count" id="admin-scope-archived-count">{comments.length - activeCount}</span>
           </button>
         </div>
       </div>
@@ -109,12 +114,12 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
 
   const ARCHIVE_LABELS = {
     'not-feedback': 'Not feedback',
-    resolved: 'Resolved',
+    resolved: 'Merged',
   };
 
   const OS_LABELS = { ios: 'iOS', android: 'Android', macos: 'macOS', other: 'Other OS' };
 
-  const REPO_URL = 'https://github.com/janeh0120/jane-portfolio';
+  const REPO_API_URL = 'https://api.github.com/repos/janeh0120/jane-portfolio';
 
   let commentItems = [...comments];
 
@@ -125,14 +130,14 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
   const scopeAllBtn = document.getElementById('admin-scope-all');
   const pageCountEl = document.getElementById('admin-scope-page-count');
   const allCountEl = document.getElementById('admin-scope-all-count');
-  const statusActiveBtn = document.getElementById('admin-status-active');
-  const statusArchivedBtn = document.getElementById('admin-status-archived');
+  const scopeArchivedBtn = document.getElementById('admin-scope-archived');
+  const archivedCountEl = document.getElementById('admin-scope-archived-count');
 
   let scope = 'page';
-  let status = 'active';
   let confirmCardId = null;
   let submittingId = null;
-  const noteDrafts = new Map();
+  let focusPrompt = false;
+  const promptDrafts = new Map();
   const cardErrors = new Map();
   let activeCardId = null;
   let previewCardId = null;
@@ -158,25 +163,6 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
       ? `${item.viewportWidth}×${item.viewportHeight}`
       : `${item.viewportWidth}px`;
     return [browser, OS_LABELS[item.os] ?? item.os, size];
-  }
-
-  function contextSummary(item) {
-    const details = [
-      `Page: ${pagePathFromUrl(item.pageUrl)}`,
-      `Element: ${item.elementDisplayName}`,
-      `Device: ${[item.deviceType, ...deviceDetails(item)].join(' · ')}`,
-    ];
-    if (item.browser) {
-      const display = [
-        item.colorTheme && `${item.colorTheme} mode`,
-        item.devicePixelRatio && `${item.devicePixelRatio}x`,
-        item.reducedMotion === true && 'reduced motion',
-      ].filter(Boolean);
-      if (display.length > 0) details.push(`Display: ${display.join(' · ')}`);
-    } else {
-      details.push('Browser and screen height: not captured');
-    }
-    return details;
   }
 
   function pagePathFromUrl(pageUrl) {
@@ -424,7 +410,12 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
     renderSidebar();
   }
 
-  async function openPr(item) {
+  function githubStartUrl(item) {
+    return `/api/auth/github/start?comment=${encodeURIComponent(item.id)}`;
+  }
+
+  // Leaving `prompt` undefined sends the comment exactly as the visitor wrote it.
+  async function openPr(item, prompt) {
     if (submittingId) return;
     submittingId = item.id;
     cardErrors.delete(item.id);
@@ -433,15 +424,28 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
       const response = await fetch(`/api/comments/${encodeURIComponent(item.id)}/open-pr`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // A live request means this is starting again, after a run that never opened a PR.
         body: JSON.stringify({
           reviewedComment: item.comment,
-          note: noteDrafts.get(item.id) ?? '',
+          prompt,
+          retry: item.pr?.status === 'requested',
         }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'Could not open a PR.');
-      item.pr = { status: 'requested', branch: data.branch, sessionUrl: data.sessionUrl };
-      noteDrafts.delete(item.id);
+      if (!response.ok) {
+        // Only a 502 means the request was recorded and Claude didn't start.
+        if (response.status === 502) {
+          item.pr = { status: 'failed', branch: '', sessionUrl: null, sentPrompt: '' };
+        }
+        throw new Error(data.error || 'Could not open a PR.');
+      }
+      item.pr = {
+        status: 'requested',
+        branch: data.branch,
+        sessionUrl: data.sessionUrl,
+        sentPrompt: data.sentPrompt,
+      };
+      promptDrafts.delete(item.id);
       confirmCardId = null;
     } catch (error) {
       cardErrors.set(item.id, error instanceof Error ? error.message : 'Could not open a PR.');
@@ -465,23 +469,27 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
     link.href = href;
     link.target = '_blank';
     link.rel = 'noopener noreferrer';
-    link.textContent = label;
+    // A trailing space and an inline arrow, like the footer's ExternalLinkIcon links.
+    link.textContent = `${label} `;
+    link.insertAdjacentHTML(
+      'beforeend',
+      lucideSvg('arrow-up-right', 14).replace('<svg ', '<svg class="external-link-icon" '),
+    );
     return link;
   }
 
   function archiveSelect(item, parent) {
     const select = document.createElement('select');
-    select.className = 'dropdown-trigger';
+    select.className = 'icon-control inline-flex comment-sidebar-card-archive';
     select.setAttribute('aria-label', 'Archive comment');
-    const placeholder = new Option('Archive', '', true, true);
-    placeholder.disabled = true;
-    select.add(placeholder);
     for (const [value, label] of Object.entries(ARCHIVE_LABELS)) {
       select.add(new Option(label, value));
     }
+    // Nothing is selected, so picking either option counts as a change.
+    select.selectedIndex = -1;
     select.addEventListener('change', () => void archiveComment(item, select.value));
     parent.appendChild(select);
-    enhanceSelect(select);
+    enhanceSelect(select, { icon: lucideSvg('archive', 14) });
   }
 
   function renderActions(item) {
@@ -496,29 +504,32 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
       return actions;
     }
 
-    if (item.pr?.status === 'requested') {
-      const tag = document.createElement('span');
-      tag.className = 'tag';
-      tag.textContent = 'PR requested';
-      actions.appendChild(tag);
+    if (item.pr?.status === 'requested' && !canStartAgain(item)) {
+      actions.classList.add('is-links');
       if (item.pr.sessionUrl) actions.appendChild(textLink('Claude session', item.pr.sessionUrl));
-      actions.appendChild(textLink('Branch', `${REPO_URL}/tree/${item.pr.branch}`));
-      const copy = textButton('Copy preview command', 'is-tertiary', async () => {
-        await navigator.clipboard.writeText(`npm run preview:pr ${item.shortId}`);
-        copy.textContent = 'Copied';
-      });
-      actions.appendChild(copy);
+      if (item.pr.github?.url) actions.appendChild(textLink('PR', item.pr.github.url));
     } else if (confirmCardId !== item.id) {
-      actions.appendChild(
-        textButton('Open PR', 'is-secondary', () => {
+      const open = textButton(
+        submittingId === item.id ? 'Opening…' : 'Open PR',
+        'is-secondary',
+        () => {
+          // Starting again resends your last prompt, if you edited one.
+          if (githubVerified) void openPr(item, item.pr?.sentPrompt || undefined);
+          else window.location.href = githubStartUrl(item);
+        },
+      );
+      open.disabled = submittingId !== null;
+      actions.append(
+        open,
+        textButton('Edit prompt', 'is-tertiary', () => {
           confirmCardId = item.id;
+          focusPrompt = true;
           renderSidebar();
         }),
       );
     }
 
-    archiveSelect(item, actions);
-    return actions;
+    return actions.childElementCount > 0 ? actions : null;
   }
 
   function renderConfirm(item) {
@@ -526,86 +537,151 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
     panel.className = 'comment-sidebar-card-confirm';
     panel.addEventListener('click', (event) => event.stopPropagation());
 
-    const intro = document.createElement('p');
-    intro.className = 'comment-sidebar-card-title';
-    intro.textContent = 'Claude will get this comment and:';
-    panel.appendChild(intro);
-
-    for (const line of contextSummary(item)) {
-      const detail = document.createElement('p');
-      detail.className = 'comment-sidebar-card-meta';
-      detail.textContent = line;
-      panel.appendChild(detail);
-    }
-
-    const noteId = `admin-note-${item.id}`;
+    const promptId = `admin-prompt-${item.id}`;
     const label = document.createElement('label');
     label.className = 'comment-sidebar-card-title';
-    label.htmlFor = noteId;
-    label.textContent = 'Note to Claude (optional)';
-    const note = document.createElement('textarea');
-    note.id = noteId;
-    note.className = 'comment-sidebar-card-body-input';
-    note.rows = 2;
-    note.maxLength = 2000;
-    note.value = noteDrafts.get(item.id) ?? '';
-    note.addEventListener('input', () => noteDrafts.set(item.id, note.value));
-    panel.append(label, note);
+    label.htmlFor = promptId;
+    label.textContent = 'Prompt for Claude';
+    const prompt = document.createElement('textarea');
+    prompt.id = promptId;
+    prompt.className = 'comment-sidebar-card-body-input';
+    prompt.rows = 3;
+    prompt.maxLength = 2000;
+    prompt.value = promptDrafts.get(item.id) ?? (item.pr?.sentPrompt || item.comment);
+    panel.append(label, prompt);
+
+    if (focusPrompt) {
+      focusPrompt = false;
+      requestAnimationFrame(() => prompt.focus());
+    }
 
     const row = document.createElement('div');
     row.className = 'comment-sidebar-card-confirm-actions';
-    row.appendChild(
-      textButton('Cancel', 'is-tertiary', () => {
-        confirmCardId = null;
-        cardErrors.delete(item.id);
-        renderSidebar();
-      }),
-    );
-
     if (githubVerified) {
       const submit = textButton(
         submittingId === item.id ? 'Opening…' : 'Open PR',
         'is-secondary',
-        () => void openPr(item),
+        () => void openPr(item, prompt.value),
       );
-      submit.disabled = submittingId !== null;
+      const syncSubmit = () => {
+        submit.disabled = submittingId !== null || prompt.value.trim() === '';
+      };
+      prompt.addEventListener('input', syncSubmit);
+      syncSubmit();
       row.appendChild(submit);
     } else {
       const signIn = document.createElement('a');
       signIn.className = 'button is-secondary';
-      signIn.href = `/api/auth/github/start?comment=${encodeURIComponent(item.id)}`;
+      signIn.href = githubStartUrl(item);
       signIn.textContent = 'Sign in with GitHub';
+      // The page reloads after GitHub, so keep what you've typed for when it comes back.
+      signIn.addEventListener('click', () => {
+        try {
+          sessionStorage.setItem(`admin-prompt-${item.id}`, prompt.value);
+        } catch {
+          /* storage can be blocked; the draft is only a convenience */
+        }
+      });
       row.appendChild(signIn);
     }
+    row.appendChild(
+      textButton('Cancel', 'is-tertiary', () => {
+        confirmCardId = null;
+        promptDrafts.delete(item.id);
+        cardErrors.delete(item.id);
+        renderSidebar();
+      }),
+    );
+    prompt.addEventListener('input', () => promptDrafts.set(item.id, prompt.value));
     panel.appendChild(row);
     return panel;
   }
 
-  function statusComments() {
-    return commentItems.filter((item) =>
-      status === 'archived' ? Boolean(item.archivedAt) : !item.archivedAt,
-    );
+  // The state shown in the card's corner, in place of the category.
+  function cardStatus(item) {
+    if (item.archivedAt) {
+      return {
+        label: ARCHIVE_LABELS[item.archiveReason],
+        variant: item.archiveReason === 'resolved' ? 'is-success' : '',
+      };
+    }
+    if (item.pr?.status === 'requested') {
+      const pr = item.pr.github;
+      if (!pr) return { label: 'PR requested', variant: '' };
+      if (pr.merged) return { label: 'Merged', variant: 'is-success' };
+      if (pr.state === 'open') return { label: 'PR opened', variant: 'is-info' };
+      if (pr.state === 'closed') return { label: 'PR closed', variant: '' };
+      return { label: 'No PR yet', variant: '' };
+    }
+    if (item.pr?.status === 'failed') return { label: 'PR failed', variant: 'is-danger' };
+    return null;
+  }
+
+  // Without a PR on GitHub (none yet, or closed unmerged), a request can be started again.
+  // GitHub marks a merged PR as closed too, so merged has to be ruled out.
+  function canStartAgain(item) {
+    const pr = item.pr?.github;
+    if (item.pr?.status !== 'requested' || !pr || pr.merged) return false;
+    return pr.state === 'none' || pr.state === 'closed';
+  }
+
+  /**
+   * The site only knows each PR's branch, so ask GitHub's public API which PRs exist. The repo
+   * is public, so no credentials; one request per page load, within GitHub's 60 an hour.
+   */
+  async function checkGitHubPrs() {
+    const requested = commentItems.filter((item) => item.pr?.status === 'requested');
+    if (requested.length === 0) return;
+    try {
+      const response = await fetch(`${REPO_API_URL}/pulls?state=all&per_page=100`, {
+        headers: { Accept: 'application/vnd.github+json' },
+      });
+      if (!response.ok) return;
+      const pulls = await response.json();
+      for (const item of requested) {
+        const pr = pulls.find((pull) => pull.head?.ref === item.pr.branch);
+        item.pr.github = pr
+          ? { state: pr.state, merged: Boolean(pr.merged_at), url: pr.html_url }
+          : { state: 'none' };
+      }
+      renderSidebar();
+    } catch {
+      /* Offline or rate limited: the tags stay at "PR requested" */
+    }
+  }
+
+  function activeComments() {
+    return commentItems.filter((item) => !item.archivedAt);
+  }
+
+  function archivedComments() {
+    return commentItems.filter((item) => item.archivedAt);
   }
 
   function pageComments() {
     const path = currentFramePath();
-    return statusComments().filter((item) => pagePathFromUrl(item.pageUrl) === path);
+    return activeComments().filter((item) => pagePathFromUrl(item.pageUrl) === path);
   }
 
   function renderSidebar() {
     if (!sidebarList) return;
     const onPage = pageComments();
-    const all = statusComments();
-    const items = scope === 'all' ? all : onPage;
+    const all = activeComments();
+    const archived = archivedComments();
+    const items = scope === 'archived' ? archived : scope === 'all' ? all : onPage;
     if (pageCountEl) pageCountEl.textContent = String(onPage.length);
     if (allCountEl) allCountEl.textContent = String(all.length);
+    if (archivedCountEl) archivedCountEl.textContent = String(archived.length);
     sidebarList.innerHTML = '';
 
     if (items.length === 0) {
       const empty = document.createElement('p');
       empty.className = 'comment-sidebar-empty';
-      const noun = status === 'archived' ? 'archived comments' : 'comments';
-      empty.textContent = scope === 'page' ? `No ${noun} on this page.` : `No ${noun} yet.`;
+      empty.textContent = {
+        page: 'No comments on this page.',
+        all: 'No comments yet.',
+        archived: 'No archived comments yet.',
+      }[scope];
       sidebarList.appendChild(empty);
       return;
     }
@@ -620,9 +696,9 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
 
       const deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
-      deleteBtn.className = 'icon-control is-dismiss is-destructive inline-flex comment-sidebar-card-delete';
+      deleteBtn.className = 'icon-control is-destructive inline-flex comment-sidebar-card-delete';
       deleteBtn.setAttribute('aria-label', 'Delete comment');
-      deleteBtn.innerHTML = lucideSvg('x', 14);
+      deleteBtn.innerHTML = lucideSvg('trash', 14);
       deleteBtn.addEventListener('click', (event) => {
         event.stopPropagation();
         void deleteComment(item.id);
@@ -632,17 +708,23 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
       title.className = 'comment-sidebar-card-title';
       title.textContent = item.elementDisplayName;
 
-      const statusTag = item.archivedAt ? ARCHIVE_LABELS[item.archiveReason] : '';
+      const controls = document.createElement('div');
+      controls.className = 'comment-sidebar-card-controls';
+      controls.addEventListener('click', (event) => event.stopPropagation());
+      if (!item.archivedAt) archiveSelect(item, controls);
+      controls.appendChild(deleteBtn);
 
-      if (item.category || statusTag) {
+      const status = cardStatus(item);
+
+      if (item.category || status) {
         const category = document.createElement('span');
-        category.className = 'tag comment-sidebar-card-category-label';
-        category.textContent = statusTag || categoryLabel(item.category);
-        header.append(category, deleteBtn);
+        category.className = `tag comment-sidebar-card-category-label ${status?.variant ?? ''}`;
+        category.textContent = status?.label ?? categoryLabel(item.category);
+        header.append(category, controls);
         card.append(header, title);
       } else {
         header.classList.add('has-title');
-        header.append(title, deleteBtn);
+        header.append(title, controls);
         card.appendChild(header);
       }
 
@@ -656,7 +738,24 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
       meta.textContent = formatMeta(item);
       card.appendChild(meta);
 
-      card.appendChild(renderActions(item));
+      if (item.pr?.status === 'requested' && item.pr.sentPrompt) {
+        const sent = document.createElement('p');
+        sent.className = 'comment-sidebar-card-meta';
+        sent.textContent = `Sent to Claude: ${item.pr.sentPrompt}`;
+        card.appendChild(sent);
+      }
+
+      // When a run left no PR, its session link sits above the buttons to start again.
+      if (canStartAgain(item) && item.pr.sessionUrl) {
+        const links = document.createElement('div');
+        links.className = 'comment-sidebar-card-actions is-links';
+        links.addEventListener('click', (event) => event.stopPropagation());
+        links.appendChild(textLink('Claude session', item.pr.sessionUrl));
+        card.appendChild(links);
+      }
+
+      const actions = renderActions(item);
+      if (actions) card.appendChild(actions);
       if (confirmCardId === item.id && !item.archivedAt) card.appendChild(renderConfirm(item));
 
       const cardError = cardErrors.get(item.id);
@@ -694,28 +793,27 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
   }
 
   function setScope(next) {
+    // Moving in or out of the archive changes which comments exist, so drop the selection.
+    if ((scope === 'archived') !== (next === 'archived')) {
+      activeCardId = null;
+      pinnedComment = null;
+      hideHighlight();
+    }
     scope = next;
-    scopePageBtn?.classList.toggle('is-active', next === 'page');
-    scopeAllBtn?.classList.toggle('is-active', next === 'all');
-    scopePageBtn?.setAttribute('aria-selected', String(next === 'page'));
-    scopeAllBtn?.setAttribute('aria-selected', String(next === 'all'));
+    for (const [id, button] of [
+      ['page', scopePageBtn],
+      ['all', scopeAllBtn],
+      ['archived', scopeArchivedBtn],
+    ]) {
+      button?.classList.toggle('is-active', id === next);
+      button?.setAttribute('aria-selected', String(id === next));
+    }
     renderSidebar();
   }
 
-  function setStatus(next) {
-    status = next;
-    statusActiveBtn?.setAttribute('aria-pressed', String(next === 'active'));
-    statusArchivedBtn?.setAttribute('aria-pressed', String(next === 'archived'));
-    activeCardId = null;
-    pinnedComment = null;
-    hideHighlight();
-    renderSidebar();
-  }
-
-  statusActiveBtn?.addEventListener('click', () => setStatus('active'));
-  statusArchivedBtn?.addEventListener('click', () => setStatus('archived'));
   scopePageBtn?.addEventListener('click', () => setScope('page'));
   scopeAllBtn?.addEventListener('click', () => setScope('all'));
+  scopeArchivedBtn?.addEventListener('click', () => setScope('archived'));
 
   frame?.addEventListener('load', renderSidebar);
 
@@ -725,9 +823,18 @@ const activeCount = comments.filter((item) => !item.archivedAt).length;
   const reopenId = new URLSearchParams(window.location.search).get('open');
   if (reopenId && commentItems.some((item) => item.id === reopenId && !item.archivedAt)) {
     confirmCardId = reopenId;
+    focusPrompt = true;
+    try {
+      const draft = sessionStorage.getItem(`admin-prompt-${reopenId}`);
+      if (draft !== null) promptDrafts.set(reopenId, draft);
+      sessionStorage.removeItem(`admin-prompt-${reopenId}`);
+    } catch {
+      /* storage can be blocked; start from the comment instead */
+    }
     setScope('all');
     history.replaceState(null, '', window.location.pathname);
   } else {
     renderSidebar();
   }
+  void checkGitHubPrs();
 </script>
