@@ -8,17 +8,29 @@ interface Props {
 }
 
 const { subhead = site.hero.subhead, type = 'intro' } = Astro.props;
-const intro = [site.hero.headline, subhead].filter(Boolean).join(' ');
+const headline = site.hero.headline;
 ---
 
 <div class="home-hero">
   <h1 class:list={['text-ink', type === 'compact' ? 'text-compact' : 'heading']} data-comment-id="hero-intro">
-    {intro}
+    {headline && <span class="home-hero-headline">{headline}</span>}
+    {subhead}
   </h1>
 </div>
 
 <style>
   .home-hero {
     max-width: 28rem;
+  }
+
+  /* The greeting sits on its own line, set apart from the intro. */
+  .home-hero-headline {
+    display: block;
+    margin-bottom: 1lh;
+  }
+
+  /* Compact type is regular weight; give the greeting Label weight (the ramp has no 600). */
+  .text-compact .home-hero-headline {
+    font-weight: var(--weight-medium);
   }
 </style>
