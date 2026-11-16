@@ -16,19 +16,13 @@ function readAccent() {
 export type LeaveFeedbackButtonProps = {
   id?: string;
   className?: string;
-  /**
-   * Hide this control while comment mode is open (nav only).
-   * Other instances stay visible, keep the “Leave feedback” label, and disable.
-   */
-  hideInCommentMode?: boolean;
-  /** Pin a state for the design system page. */
-  previewState?: 'hover' | 'active' | 'focus' | 'disabled';
+  /** Pin a state for the design system page. `feedback` shows it as it is while feedback mode is open. */
+  previewState?: 'hover' | 'active' | 'focus' | 'disabled' | 'feedback';
 };
 
 export default function LeaveFeedbackButton({
   id,
   className = '',
-  hideInCommentMode = false,
   previewState,
 }: LeaveFeedbackButtonProps) {
   const [accent, setAccent] = useState(ACCENT_FALLBACK);
@@ -81,12 +75,29 @@ export default function LeaveFeedbackButton({
     document.dispatchEvent(new CustomEvent('portfolio:leave-feedback'));
   };
 
-  const hidden = hideInCommentMode && inCommentMode;
-  const disabled = previewState === 'disabled' || (!hideInCommentMode && inCommentMode);
+  const onExit: MouseEventHandler<HTMLButtonElement> = () => {
+    document.dispatchEvent(new CustomEvent('portfolio:exit-feedback'));
+  };
+
+  // While feedback mode is open, every instance becomes a secondary “Exit feedback mode” button.
+  // data-comment-ui keeps feedback mode from treating a click on it as picking a section.
+  if (previewState === 'feedback' || (inCommentMode && !previewState)) {
+    return (
+      <button
+        id={id}
+        type="button"
+        className={['button is-secondary', className].filter(Boolean).join(' ')}
+        data-comment-ui
+        onClick={previewState ? undefined : onExit}
+      >
+        Exit feedback mode
+      </button>
+    );
+  }
+
+  const disabled = previewState === 'disabled';
   const stateClass =
     previewState === 'active' ? 'is-pressed' : previewState === 'focus' ? 'is-focus' : '';
-
-  if (hidden) return null;
 
   return (
     <SpecularButton
@@ -111,7 +122,6 @@ export default function LeaveFeedbackButton({
       autoAnimate={!disabled}
       glow={!disabled}
       disabled={disabled}
-      aria-pressed={inCommentMode}
       onClick={onClick}
     >
       Leave feedback

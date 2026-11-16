@@ -469,7 +469,8 @@ const sectionTitleClass = 'subheading text-ink';
         <section id="buttons" class={sectionClass} aria-labelledby="buttons-title">
           <h3 id="buttons-title" class={sectionTitleClass}>Buttons</h3>
           <p class="mt-3 max-w-[58ch] text-body text-muted">
-            Leave feedback is the site's one call to action: the accent fill with on-accent text.
+            Leave feedback is the site's one call to action: the accent fill with on-accent text. While
+            feedback mode is open, it becomes a secondary Exit feedback mode button.
           </p>
           <div class="mt-8 showcase-card border border-border bg-surface p-6 sm:p-10">
             <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
@@ -492,6 +493,10 @@ const sectionTitleClass = 'subheading text-ink';
               <div>
                 <p class="mb-3 text-body text-subtle">Disabled</p>
                 <LeaveFeedbackButton client:load previewState="disabled" />
+              </div>
+              <div>
+                <p class="mb-3 text-body text-subtle">In feedback mode</p>
+                <LeaveFeedbackButton client:load previewState="feedback" />
               </div>
             </div>
           </div>

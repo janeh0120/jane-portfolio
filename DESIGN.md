@@ -508,7 +508,8 @@ are used only there.
   radius. Its WebGL shine is always on: an accent glow that circles the edge (as a halo just
   outside it, never over the fill) and turns toward a nearby pointer. It holds still for reduced motion,
   pauses off screen, and is off when the button is disabled. The shader needs real colour values,
-  so it reads them from the tokens at runtime.
+  so it reads them from the tokens at runtime. While feedback mode is open, every copy (nav and
+  footer) turns into a secondary text button labelled Exit feedback mode, which closes it.
 - **Text buttons (`.button`):** for lower-emphasis actions like Back. Secondary (Glass with a
   hairline border) when it floats over content; tertiary (muted text, no fill until hover) when
   the button sits in the page flow.
