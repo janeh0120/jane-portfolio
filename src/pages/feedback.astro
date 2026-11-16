@@ -1,6 +1,6 @@
 ---
 import CaseStudyLayout from '../layouts/CaseStudyLayout.astro';
-import FeedbackDemoReel from '../components/react/FeedbackDemoReel';
+import CaseStudyFigure from '../components/CaseStudyFigure.astro';
 
 const img = (file: string) => `images/case-studies/feedback/${file}`;
 const media = (file: string) => `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}${img(file)}`;
@@ -9,32 +9,43 @@ const nav = [
   { label: 'Problem', href: '#problem' },
   { label: 'Solution', href: '#solution' },
   { label: 'Design decisions', href: '#decisions' },
+  { label: 'Next steps', href: '#next-steps' },
 ];
 ---
 
 <CaseStudyLayout
   title="Inline feedback"
-  heading="Make inline comments on my portfolio"
+  heading="Converting user comments into code updates on my portfolio"
   team={['Product designer & engineer (me)']}
-  detail={{ label: 'Built with', value: 'Astro, React, Supabase, Vercel, Cursor' }}
-  timeline="May 2026 – present"
+  detail={{ label: 'Built with', value: 'Astro, React, Supabase, Vercel, Cursor, Claude Code, GitHub' }}
+  timeline="May – Nov 2026"
   projectType="Product"
   nav={nav}
   commentId="case-study-feedback"
 >
-  <FeedbackDemoReel slot="hero" client:visible />
+  <CaseStudyFigure
+    slot="hero"
+    src="videos/feedback/feedback-loop.mp4"
+    poster="images/case-study-heroes/feedback-loop-poster.jpg"
+    alt="The feedback loop: a visitor comments on the intro, I open a PR from the admin sidebar and merge it on GitHub, and the intro updates on the site"
+    loop
+    wide
+  />
 
   <section id="problem" data-comment-id="feedback-need">
     <h2 class="section-label">Problem</h2>
     <p class="heading text-ink">
-      Portfolio reviewers and I want to keep track of portfolio feedback inline, so I can remember
-      where each comment was left and collect async feedback more easily.
+      I want to make leaving feedback on my portfolio easier for visitors, and possible asynchronously.
+    </p>
+    <p class="heading text-ink">
+      I want to make closing the feedback loop more seamless, from feedback to merged code.
     </p>
   </section>
 
+  <!-- The solution videos have the blue background built in (rendered with a zooming camera) -->
   <section id="solution" data-comment-id="feedback-feature">
     <h2 class="section-label">Solution</h2>
-    <h3 class="heading text-ink">Users can make and edit comments.</h3>
+    <h3 class="heading text-ink">Visitors can make and edit comments.</h3>
     <figure class="case-study-figure case-study-figure--wide feedback-video">
       <video
         class="feedback-video__media"
@@ -44,10 +55,10 @@ const nav = [
         loop
         playsinline
         preload="none"
-        aria-label="Leaving comments: selecting a section of the portfolio, writing a comment, and choosing a category"
+        aria-label="Leaving a comment: selecting the intro, writing a comment, choosing a category, then editing it in the sidebar"
       ></video>
     </figure>
-    <h3 class="heading text-ink">I can review and resolve comments after making updates.</h3>
+    <h3 class="heading text-ink">I review comments and open a PR to apply them.</h3>
     <figure class="case-study-figure case-study-figure--wide feedback-video">
       <video
         class="feedback-video__media"
@@ -57,7 +68,20 @@ const nav = [
         loop
         playsinline
         preload="none"
-        aria-label="Admin review: selecting a comment highlights the section it was left on"
+        aria-label="Admin review: editing the prompt for a comment, opening a PR, and the card changing to PR opened"
+      ></video>
+    </figure>
+    <h3 class="heading text-ink">I preview each PR locally, then merge it on GitHub to make it live.</h3>
+    <figure class="case-study-figure case-study-figure--wide feedback-video">
+      <video
+        class="feedback-video__media"
+        src={media('github-merge.mp4')}
+        poster={media('github-merge-poster.jpg')}
+        muted
+        loop
+        playsinline
+        preload="none"
+        aria-label="Merging the pull request on GitHub: confirming the merge, and the pull request changing from Open to Merged"
       ></video>
     </figure>
   </section>
@@ -69,7 +93,7 @@ const nav = [
         <div>
           <h3>Guardrails</h3>
           <p>
-            Curse words and comments under a minimum word count aren’t allowed. Comments are visible to me but stay anonymous.
+            Curse words and comments under a minimum length aren’t allowed. Comments are visible to me but stay anonymous.
           </p>
         </div>
         <figure class="case-study-figure">
@@ -83,34 +107,16 @@ const nav = [
       </li>
       <li class="decision-row">
         <div>
-          <h3>Public commenting</h3>
+          <h3>Editing the prompt</h3>
           <p>
-            I decided against making comments public to keep the scope narrow and focused on my
-            problem statement. It would also be more complex to design around as I
-            make updates, creating multiple versions.
+            I stay in the loop by being able to edit prompts and add more specifications, or
+            iterate on the feedback to turn its language into a prompt.
           </p>
         </div>
         <figure class="case-study-figure">
           <img
-            src={media('likes.webp')}
-            alt="Mockup of a public comment card with a 34-like count, illustrating what public comments could look like"
-            loading="lazy"
-            decoding="async"
-          />
-        </figure>
-      </li>
-      <li class="decision-row">
-        <div>
-          <h3>Web builder vs. fully custom</h3>
-          <p>
-            A web builder like Framer can’t give comments stable markup to anchor to, a server to keep
-            keys private, or deploy hooks to pin each comment to a site version.
-          </p>
-        </div>
-        <figure class="case-study-figure">
-          <img
-            src={media('framer-vs-cursor.webp')}
-            alt="Framer app icon versus Cursor app icon, comparing a web builder to building it myself"
+            src={media('refine-prompt.webp')}
+            alt="Admin comment card with the prompt for Claude open, edited to add: and keep the paragraph below it the same, above the Open PR button"
             loading="lazy"
             decoding="async"
           />
@@ -143,16 +149,21 @@ const nav = [
       </li>
     </ol>
   </section>
+
+  <section id="next-steps" data-comment-id="feedback-next-steps">
+    <h2 class="section-label">Next steps</h2>
+    <p class="heading text-ink">
+      Leaving feedback is secondary to viewing the work, so I want to encourage it without making it
+      too prominent.
+    </p>
+    <p class="heading text-ink">
+      I want to keep exploring how to promote this feature to visitors and increase conversion.
+    </p>
+  </section>
 </CaseStudyLayout>
 
 <style>
-  .feedback-video {
-    padding: clamp(1rem, 5%, 2.5rem);
-    border-radius: var(--radius-base);
-    /* design-tokens-ignore: case study artwork, the blue matches the background image */
-    background: #1e4fd6 url('/images/case-studies/feedback/blue-bg.jpg') center / cover;
-  }
-
+  /* The solution videos carry their own blue background, so the figure only sets spacing */
   .case-study-figure.feedback-video {
     margin-top: var(--space-4);
   }
@@ -163,14 +174,6 @@ const nav = [
 
   .feedback-video + h3 {
     margin-top: var(--space-12);
-  }
-
-  .feedback-video .feedback-video__media {
-    aspect-ratio: 2766 / 1638;
-    border-radius: calc(var(--radius-base) * 0.75);
-    background: var(--color-surface);
-    /* design-tokens-ignore: case study artwork, a blue-tinted shadow on the blue background */
-    box-shadow: 0 12px 40px rgb(0 20 80 / 35%);
   }
 
 </style>

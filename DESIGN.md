@@ -31,6 +31,10 @@ colors:
   # Text and icons on an accent fill (the primary button); white in both colour modes.
   on-accent: "#ffffff"
   accent-soft: "rgb(21 93 252 / 12%)"
+  # Secondary brand colour for brand moments, the same in both colour modes.
+  brand-secondary: "#f3c9d5"
+  # Text and icons on the secondary brand colour; dark in both colour modes.
+  on-brand-secondary: "#171717"
   danger: "#c10007"
   danger-soft: "#fef2f2"
   success: "#007a55"
@@ -307,7 +311,7 @@ light, dark, and system colour modes, and every decision has to hold up in both.
 ## Colors
 
 The palette is neutral greys plus one accent and one error colour, all from Tailwind's default
-palette; each token points at a Tailwind step, such as `--color-muted: var(--color-neutral-700)`. Steps were
+palette, and a secondary brand pink, the one colour picked outside it; each token points at a Tailwind step, such as `--color-muted: var(--color-neutral-700)`. Steps were
 chosen to keep roles distinct and text at WCAG AA, so they aren't always the numerically nearest. Tokens are named by role, not
 by hue, so the same names work in dark mode.
 
@@ -338,6 +342,12 @@ by hue, so the same names work in dark mode.
 - **On accent (#ffffff):** text and icons on an accent fill. White in both colour modes (Canvas,
   which sits on Ink fills, turns dark in dark mode, so it can't do this job). White on the accent is
   about 5.3:1, which meets WCAG AA.
+- **Brand secondary (#f3c9d5):** a soft pink for brand moments: motion and illustration, such as the
+  visitor's cursor in the feedback loop reel. It never marks focus, selection, or any other
+  interactive state, which are the accent's jobs, and it isn't a text colour. It's the same in both
+  colour modes, so it has no dark value.
+- **On brand secondary (#171717):** text and icons on the pink, dark in both colour modes. About
+  12:1, well past WCAG AA.
 - **Danger (#c10007) and Danger soft:** destructive hovers and errors.
 - **Success (#007a55) and Success soft:** additions and confirmed states, the counterpart to Danger.
 - **Info (#155dfc) and Info soft:** in-progress states on status tags. Info is the brand blue in light
@@ -673,6 +683,7 @@ blinking caret) keep their own cycle length but still use the easing tokens.
 - Do use Muted for readable secondary text; reserve Subtle for labels and disabled states.
 - Don't use the Accent blue for links, decoration, or any button but Leave feedback; it means
   focus, selection, or the primary call to action. Info status tags use their own Info token.
+- Don't use the secondary brand pink for interactive states, links, or text; it's for brand moments.
 - Don't add shadows outside the two elevation levels, or durations and easings outside the motion
   tokens.
 - Don't introduce a second typeface or new font weights (400, 500, and 700 only).

@@ -22,14 +22,14 @@
     "instagram": "https://www.instagram.com/hsz_design/",
     "x": "https://x.com/jane09890",
     "linkedin": "https://www.linkedin.com/in/hou-jane/",
-    "resume": "https://drive.google.com/file/d/111occ2vre2kxozXngtKpFiRRdHcc2ZfP/view"
+    "resume": "https://drive.google.com/file/d/17EOxWog2AXkA-spXHBQw_LAc74ZU16cH/view?usp=sharing"
   },
   "nav": [
     { "label": "About", "href": "/about" },
     { "label": "Play", "href": "/play" },
     {
       "label": "Resume",
-      "href": "https://drive.google.com/file/d/111occ2vre2kxozXngtKpFiRRdHcc2ZfP/view",
+      "href": "https://drive.google.com/file/d/17EOxWog2AXkA-spXHBQw_LAc74ZU16cH/view?usp=sharing",
       "external": true
     }
   ],
@@ -99,8 +99,8 @@
     {
       "slug": "feedback",
       "name": "Inline feedback",
-      "tags": ["product", "shipped"],
-      "title": "Make inline comments on my portfolio",
+      "tags": ["personal project", "product", "shipped"],
+      "title": "Converting user comments into code updates on my portfolio",
       "image": "images/case-study-heroes/feedback-reel-poster.webp",
       "video": "videos/reels/feedback.mp4",
       "comingSoon": false

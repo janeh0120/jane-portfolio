@@ -429,3 +429,10 @@ Comments now move through states, and a plain tag couldn't say which were good n
 Success, and Error tags. Success and Error reuse existing colours. Info needed a new pair: the brand blue
 reads at 4.82:1 on its tint in light mode but only 2.82:1 in dark mode, so Info is the brand blue in
 light and a lighter blue in dark, the same way Success and Danger shift. The token checker stays at 0.
+
+### Follow-up: a secondary brand colour
+
+The feedback loop reel needed a colour for the visitor's cursor that wasn't the accent blue, which
+already means focus and selection. Added Brand secondary (#f3c9d5), a soft pink kept for brand moments
+like motion and illustration, with dark ink for text on it. It's the one colour picked outside
+Tailwind's palette, and it stays the same in both colour modes. The token checker stays at 0.

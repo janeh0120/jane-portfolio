@@ -610,6 +610,15 @@
         "type": "color",
         "description": "CSS: color-mix(in srgb, var(--color-accent) 12%, transparent)"
       },
+      "brand-secondary": {
+        "value": "#f3c9d5",
+        "type": "color",
+        "description": "CSS: #f3c9d5"
+      },
+      "on-brand-secondary": {
+        "value": "{color.neutral.900}",
+        "type": "color"
+      },
       "surface": {
         "value": "{color.neutral.50}",
         "type": "color"
@@ -743,6 +752,15 @@
         "value": "#155dfc1f",
         "type": "color",
         "description": "CSS: color-mix(in srgb, var(--color-accent) 12%, transparent)"
+      },
+      "brand-secondary": {
+        "value": "#f3c9d5",
+        "type": "color",
+        "description": "CSS: #f3c9d5"
+      },
+      "on-brand-secondary": {
+        "value": "{color.neutral.900}",
+        "type": "color"
       },
       "surface": {
         "value": "{color.neutral.800}",

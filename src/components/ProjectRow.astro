@@ -194,6 +194,8 @@ function commentId(project: (typeof projects)[number]) {
       };
       new IntersectionObserver(
         ([entry]) => {
+          // Coming into view, a reel starts again from the beginning rather than mid-way
+          if (entry.isIntersecting && !inView && video.currentTime > 0) video.currentTime = 0;
           inView = entry.isIntersecting;
           sync();
         },

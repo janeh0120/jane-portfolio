@@ -80,6 +80,12 @@
   --color-on-accent: var(--color-white);
   --color-accent-soft: color-mix(in srgb, var(--color-accent) 12%, transparent);
 
+  /* Secondary brand colour, for brand moments (motion, illustration), never interactive states.
+     It's outside Tailwind's palette, and the same in both colour modes, so it has no dark value */
+  --color-brand-secondary: #f3c9d5;
+  /* Text and icons on the secondary brand colour: dark in both modes, since the pink stays light */
+  --color-on-brand-secondary: var(--color-neutral-900);
+
   --color-surface: var(--color-neutral-50);
   /* Controls at rest, hover/pressed/open, and hover inside menus or on white */
   --color-fill: var(--color-neutral-200);
