@@ -5,7 +5,10 @@ import vercel from '@astrojs/vercel';
 import icon from 'astro-icon';
 import tailwindcss from '@tailwindcss/vite';
 
-const vercelUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined;
+// Prefer the production domain so link previews (og:image, og:url) always point somewhere public:
+// per-deploy VERCEL_URLs can sit behind Vercel's login, which scrapers like LinkedIn can't pass.
+const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL;
+const vercelUrl = vercelHost ? `https://${vercelHost}` : undefined;
 
 // https://astro.build/config
 export default defineConfig({

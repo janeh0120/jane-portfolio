@@ -29,6 +29,16 @@ const base = import.meta.env.BASE_URL;
 const enableClarity = import.meta.env.PROD && !adminReview;
 /** Bump when favicon assets change — Safari caches icons aggressively. */
 const iconVersion = '3';
+/**
+ * Link preview shared by every page and platform: the logo reel as a looping GIF, then its first
+ * frame as a still for apps that skip GIFs. Regenerate both with `npm run og:image`.
+ */
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site).href;
+const ogImages = [
+  { url: new URL(`${base}og-image.gif`, Astro.site).href, type: 'image/gif' },
+  { url: new URL(`${base}og-image.png`, Astro.site).href, type: 'image/png' },
+];
+const ogImageAlt = `${site.name}'s knot logo, then the same shape found in a pattern, a clover, a knot, a keyboard key, and glasses`;
 ---
 
 <!doctype html>
@@ -125,12 +135,29 @@ const iconVersion = '3';
     <link rel="preload" href={`${base}fonts/texgyreheros-regular.woff2`} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={`${base}fonts/texgyreheros-bold.woff2`} as="font" type="font/woff2" crossorigin />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:site_name" content={site.title} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content={canonicalUrl} />
+    {
+      ogImages.map((image) => (
+        <>
+          <meta property="og:image" content={image.url} />
+          <meta property="og:image:secure_url" content={image.url} />
+          <meta property="og:image:type" content={image.type} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={ogImageAlt} />
+        </>
+      ))
+    }
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImages[0].url} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
     {

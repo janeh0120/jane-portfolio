@@ -15,6 +15,7 @@
     "preview:pr": "node scripts/preview-pr.mjs",
     "astro": "astro",
     "thumbs:play": "node scripts/generate-play-thumbs.mjs",
+    "og:image": "node scripts/generate-og-image.mjs",
     "export:figma": "node scripts/export-figma-tokens.mjs"
   },
   "dependencies": {
