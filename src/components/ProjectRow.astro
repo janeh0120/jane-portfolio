@@ -83,8 +83,10 @@ function commentId(project: (typeof projects)[number]) {
 <style>
   /* Full width, padded by half the space beside one card, so the first card sits centred on load
      and the last is centred when the row reaches its end (padding % is of the row's width) */
+  /* Cards grow past 36rem on wide screens (up to 52rem) while their 16:10 image still fits below
+     the intro, so tall, wide screens aren't left with empty space under the row */
   .project-row {
-    --card-width: clamp(16rem, 36vw, 36rem); /* design-tokens-ignore: card width, not spacing */
+    --card-width: clamp(16rem, 36vw, max(36rem, min(52rem, (100vh - 30rem) * 1.6))); /* design-tokens-ignore: card width, not spacing */
     --row-gutter: calc((100% - var(--card-width)) / 2);
     display: grid;
     grid-auto-flow: column;
