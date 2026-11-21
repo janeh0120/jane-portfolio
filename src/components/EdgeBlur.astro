@@ -92,6 +92,13 @@ const layers = [1, 2, 4, 8, 16, 32];
     right: 0;
   }
 
+  /* Phones: no side blur, so the first letters of the cards at the edges stay readable */
+  @media (max-width: 767px) {
+    .edge-blur-sides {
+      display: none;
+    }
+  }
+
   .edge-blur-layer {
     position: absolute;
     inset: 0;
