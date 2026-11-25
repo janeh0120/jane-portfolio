@@ -576,7 +576,7 @@ const sectionTitleClass = 'subheading text-ink';
         <section id="icon-control" class={sectionClass} aria-labelledby="icon-control-title">
           <h3 id="icon-control-title" class={sectionTitleClass}>Icon control</h3>
           <p class="mt-3 max-w-[58ch] text-body text-muted">
-            For compact actions where the icon speaks for itself. Dismiss closes, primary is the main action, destructive deletes.
+            For compact actions where the icon speaks for itself. Dismiss closes, primary is the main action, destructive deletes, glass floats over media.
           </p>
           <div class="mt-8 grid gap-10 showcase-card border border-border bg-surface p-6 sm:p-10 [&>div+div]:border-t [&>div+div]:border-border [&>div+div]:pt-10">
             <div>
@@ -668,6 +668,41 @@ const sectionTitleClass = 'subheading text-ink';
                 <div>
                   <p class="mb-3 text-body text-subtle">Focus</p>
                   <IconControl label="Delete comment" icon="trash" class="is-destructive is-focus" />
+                </div>
+              </div>
+            </div>
+            <div>
+              <p class="mb-5 text-body font-medium text-ink">Glass, over media</p>
+              <div class="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] items-start gap-x-10 gap-y-10">
+                <div>
+                  <p class="mb-3 text-body text-subtle">Default</p>
+                  <div class="media-demo inline-flex p-4" style={`background-image: url('${overlaySample}')`}>
+                    <IconControl label="Next case study" icon="arrow-right" class="is-glass" />
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Hover</p>
+                  <div class="media-demo inline-flex p-4" style={`background-image: url('${overlaySample}')`}>
+                    <IconControl label="Next case study" icon="arrow-right" class="is-glass is-hover" tabindex="-1" />
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Active</p>
+                  <div class="media-demo inline-flex p-4" style={`background-image: url('${overlaySample}')`}>
+                    <IconControl label="Next case study" icon="arrow-right" class="is-glass is-hover is-pressed" tabindex="-1" />
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Focus</p>
+                  <div class="media-demo inline-flex p-4" style={`background-image: url('${overlaySample}')`}>
+                    <IconControl label="Next case study" icon="arrow-right" class="is-glass is-focus" tabindex="-1" />
+                  </div>
+                </div>
+                <div>
+                  <p class="mb-3 text-body text-subtle">Disabled</p>
+                  <div class="media-demo inline-flex p-4" style={`background-image: url('${overlaySample}')`}>
+                    <IconControl label="Next case study" icon="arrow-right" class="is-glass is-disabled" tabindex="-1" />
+                  </div>
                 </div>
               </div>
             </div>

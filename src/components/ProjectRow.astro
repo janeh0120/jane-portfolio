@@ -1,13 +1,15 @@
 ---
 /**
- * Homepage projects as one horizontal row that scrolls sideways. On the homepage, the page's own
- * scroll moves it across while it is held in place (see src/pages/index.astro); without JavaScript
- * it is a plain sideways scroller.
+ * Homepage projects as one horizontal row that scrolls sideways. From 768px up, the mouse wheel
+ * moves it across while the pointer is over it (anywhere else the page scrolls down as usual), and
+ * glass arrow controls appear on hover to centre the previous or next card. Without JavaScript it
+ * is a plain sideways scroller and the arrows stay hidden.
  * A WebGL lens (src/lib/project-lens.ts) warps the images as they pass the left and right edges of
  * the screen. It is progressive enhancement: the row is complete, readable HTML on its own.
  */
 import { site } from '../data/site';
 import { formatProjectTags } from '../utils/tags';
+import IconControl from './IconControl.astro';
 
 const base = import.meta.env.BASE_URL;
 const projects = site.projects;
@@ -19,6 +21,7 @@ function commentId(project: (typeof projects)[number]) {
 }
 ---
 
+<div class="project-row-frame" data-project-row-frame>
 <div class="project-row" data-project-row role="region" aria-label="Case studies">
   {
     projects.map((project) => {
@@ -79,14 +82,33 @@ function commentId(project: (typeof projects)[number]) {
     })
   }
 </div>
+<IconControl
+  label="Previous case study"
+  icon="arrow-left"
+  class="is-glass project-row-arrow project-row-arrow--prev"
+  data-row-step="-1"
+  hidden
+/>
+<IconControl
+  label="Next case study"
+  icon="arrow-right"
+  class="is-glass project-row-arrow project-row-arrow--next"
+  data-row-step="1"
+  hidden
+/>
+</div>
 
 <style>
   /* Full width, padded by half the space beside one card, so the first card sits centred on load
      and the last is centred when the row reaches its end (padding % is of the row's width) */
   /* Cards grow past 36rem on wide screens (up to 52rem) while their 16:10 image still fits below
      the intro, so tall, wide screens aren't left with empty space under the row */
-  .project-row {
+  .project-row-frame {
     --card-width: clamp(16rem, 36vw, max(36rem, min(52rem, (100vh - 30rem) * 1.6))); /* design-tokens-ignore: card width, not spacing */
+    position: relative;
+  }
+
+  .project-row {
     --row-gutter: calc((100% - var(--card-width)) / 2);
     display: grid;
     grid-auto-flow: column;
@@ -105,11 +127,41 @@ function commentId(project: (typeof projects)[number]) {
     display: none;
   }
 
-  /* When the page scroll drives the row, snapping would fight it, and the row only moves with the
-     page (sideways swipes are passed on to the page, src/pages/index.astro) */
-  .project-row.is-driven {
-    overflow-x: hidden;
+  /* When the wheel moves the row (the script below), snapping would pull each small step back to a
+     card; the arrows do the centring instead */
+  .project-row.is-wheel {
     scroll-snap-type: none;
+  }
+
+  /* Arrows sit at the screen edges, centred on the card images (16:10, below the row's top
+     padding), above the side edge blur (z 8). They fade in while the row is hovered or one of them
+     has keyboard focus. */
+  .project-row-arrow {
+    position: absolute;
+    top: calc(var(--space-2) + var(--card-width) * 0.3125); /* design-tokens-ignore: half a 16:10 image's height */
+    z-index: 9;
+    translate: 0 -50%;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--duration-150) var(--ease-standard),
+      color var(--duration-150) var(--ease-standard),
+      background var(--duration-150) var(--ease-standard),
+      transform var(--duration-150) var(--ease-standard);
+  }
+
+  .project-row-arrow--prev {
+    left: var(--space-6);
+  }
+
+  .project-row-arrow--next {
+    right: var(--space-6);
+  }
+
+  .project-row-frame:hover .project-row-arrow:not(:disabled),
+  .project-row-frame:has(.project-row-arrow:focus-visible) .project-row-arrow:not(:disabled) {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .project-row-card {
@@ -177,6 +229,10 @@ function commentId(project: (typeof projects)[number]) {
       overflow-x: visible;
       scroll-snap-type: none;
     }
+
+    .project-row-arrow {
+      display: none;
+    }
   }
 </style>
 
@@ -184,6 +240,79 @@ function commentId(project: (typeof projects)[number]) {
   import { enhanceWithLens } from '../lib/lens-enhance';
 
   enhanceWithLens(document.querySelector<HTMLElement>('[data-project-row]'), { axis: 'x' });
+
+  // From 768px up: the mouse wheel moves the row across while the pointer is over it, and the arrows
+  // centre the previous or next card. Phones stack the cards in a column, so none of this runs.
+  function enhanceRow() {
+    const frame = document.querySelector<HTMLElement>('[data-project-row-frame]');
+    const row = frame?.querySelector<HTMLElement>('[data-project-row]');
+    if (!frame || !row) return;
+    const arrows = [...frame.querySelectorAll<HTMLButtonElement>('[data-row-step]')];
+    const cards = [...row.querySelectorAll<HTMLElement>('.project-row-card')];
+    const wide = window.matchMedia('(min-width: 768px)');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const maxScroll = () => row.scrollWidth - row.clientWidth;
+
+    // Where the row stops with each card centred, clamped to the ends (the first card starts in
+    // line with the intro, so its stop is the start of the row)
+    const stops = () => {
+      const max = maxScroll();
+      const stopsList = cards.map((card) =>
+        Math.round(Math.min(max, Math.max(0, card.offsetLeft + card.offsetWidth / 2 - row.clientWidth / 2))),
+      );
+      return [...new Set(stopsList)].sort((a, b) => a - b);
+    };
+
+    const syncArrows = () => {
+      const at = row.scrollLeft;
+      const list = stops();
+      arrows.forEach((arrow) => {
+        const step = Number(arrow.dataset.rowStep);
+        arrow.disabled = step < 0 ? !list.some((stop) => stop < at - 2) : !list.some((stop) => stop > at + 2);
+      });
+    };
+
+    const update = () => {
+      row.classList.toggle('is-wheel', wide.matches);
+      arrows.forEach((arrow) => (arrow.hidden = !wide.matches));
+      syncArrows();
+    };
+
+    // Vertical wheel turns become sideways movement until the row reaches its end in that
+    // direction; from there the page carries on scrolling, so the row never traps the pointer.
+    // Sideways swipes and pinch-zoom are left to the browser.
+    row.addEventListener(
+      'wheel',
+      (event) => {
+        if (!wide.matches || event.ctrlKey || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+        const delta = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaMode === 2 ? event.deltaY * row.clientWidth : event.deltaY;
+        const max = maxScroll();
+        if ((delta < 0 && row.scrollLeft <= 0) || (delta > 0 && row.scrollLeft >= max - 1)) return;
+        event.preventDefault();
+        row.scrollLeft = Math.min(max, Math.max(0, row.scrollLeft + delta));
+      },
+      { passive: false },
+    );
+
+    arrows.forEach((arrow) =>
+      arrow.addEventListener('click', () => {
+        const step = Number(arrow.dataset.rowStep);
+        const at = row.scrollLeft;
+        const list = stops();
+        const target = step < 0 ? list.filter((stop) => stop < at - 2).pop() : list.find((stop) => stop > at + 2);
+        if (target === undefined) return;
+        row.scrollTo({ left: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      }),
+    );
+
+    row.addEventListener('scroll', syncArrows, { passive: true });
+    wide.addEventListener('change', update);
+    window.addEventListener('resize', syncArrows);
+    row.querySelectorAll('img').forEach((img) => img.addEventListener('load', syncArrows, { once: true }));
+    update();
+  }
+
+  enhanceRow();
 
   // Card reels show their poster until they can be seen. Nothing downloads before then, and a reel
   // only plays while it is on screen, the tab is open, and the lens isn't drawing that card.

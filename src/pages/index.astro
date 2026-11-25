@@ -14,11 +14,9 @@ import SiteFooter from '../components/SiteFooter.astro';
   <div class="home-intro-content" id="home-intro-content">
     <main class="home-layout">
       <!-- Intro and experience, centred above the case studies -->
-      <div class="home-intro-pin">
-        <div class="home-intro page-frame">
-          <Hero type="compact" />
-          <Experience unlinked={['GWSK', 'Simple Ventures']} />
-        </div>
+      <div class="home-intro page-frame">
+        <Hero type="compact" />
+        <Experience unlinked={['GWSK', 'Simple Ventures']} />
       </div>
       <section id="projects" data-comment-id="project-grid" aria-label="Case studies">
         <ProjectRow />
@@ -49,29 +47,6 @@ import SiteFooter from '../components/SiteFooter.astro';
     gap: var(--space-6);
   }
 
-  /* Scroll-driven: the layout is made taller by the row's sideways distance, and the intro and the
-     row stick in place (tops set by the script below) while the page scrolls through that extra
-     height, so the scrollbar covers the whole journey, down and then across. Each sticks on its
-     own rather than as one wrapper, so the intro stays above the side edge blur and the cards
-     below it. The intro's wrapper gives it the same room to stick as the row (the script sets its
-     height and pulls the row back up by the same amount), so the two let go together. */
-  .home-layout.is-driven {
-    align-content: start;
-  }
-
-  .home-layout.is-driven .home-intro,
-  .home-layout.is-driven #projects {
-    position: sticky;
-  }
-
-  .home-layout.is-driven .home-intro {
-    top: var(--pin-intro-top, 0);
-  }
-
-  .home-layout.is-driven #projects {
-    top: var(--pin-row-top, 0);
-  }
-
   /* The first card starts in line with the intro's left edge (the intro's width, as above,
      centred); the row's far end keeps its own gutter so the last card ends centred */
   #projects :global(.project-row) {
@@ -98,110 +73,3 @@ import SiteFooter from '../components/SiteFooter.astro';
   }
 </style>
 
-<script>
-  // From 768px up the page's own scroll drives the case studies sideways. The layout grows by the
-  // row's sideways distance and the intro and row stick in place (frozen where the row's bottom
-  // meets the bottom of the screen) while the page scrolls through it, so the scrollbar reflects
-  // the full length, down to the row, across it, then on to the footer. How far the row has been
-  // held in place is how far it has moved across. On phones the cards stack in one column and
-  // scroll with the page, so none of this runs. Without this script the row is an ordinary
-  // sideways scroller.
-  const layout = document.querySelector<HTMLElement>('.home-layout');
-  const introPin = layout?.querySelector<HTMLElement>('.home-intro-pin');
-  const intro = introPin?.querySelector<HTMLElement>('.home-intro');
-  const section = document.getElementById('projects');
-  const row = document.querySelector<HTMLElement>('[data-project-row]');
-  const scroller = document.getElementById('site-canvas');
-  const wide = window.matchMedia('(min-width: 768px)');
-
-  if (layout && introPin && intro && section && row && scroller) {
-    let active = false;
-    let distance = 0;
-    let rowOffset = 0; // the row section's natural top within the layout
-
-    // How far the row is being held in place: its top within the layout, past where it would sit
-    const held = () =>
-      Math.min(
-        distance,
-        Math.max(0, section.getBoundingClientRect().top - layout.getBoundingClientRect().top - rowOffset),
-      );
-
-    const sync = () => {
-      if (active) row.scrollLeft = held();
-    };
-
-    const measure = () => {
-      if (!active) return;
-      const style = getComputedStyle(layout);
-      const padTop = parseFloat(style.paddingTop);
-      const padBottom = parseFloat(style.paddingBottom);
-      const gap = parseFloat(style.rowGap) || 0;
-      distance = Math.max(0, row.scrollWidth - row.clientWidth);
-      rowOffset = padTop + intro.offsetHeight + gap;
-      const content = rowOffset + section.offsetHeight;
-
-      // Freeze the layout where the row's bottom meets the bottom of the screen, or where it
-      // already is if it all fits
-      const layoutTop =
-        layout.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop;
-      const top = Math.floor(Math.min(layoutTop, scroller.clientHeight - content));
-      layout.style.setProperty('--pin-intro-top', `${top + padTop}px`);
-      layout.style.setProperty('--pin-row-top', `${top + rowOffset}px`);
-      introPin.style.height = `${intro.offsetHeight + distance}px`;
-      introPin.style.marginBottom = `${-distance}px`;
-      layout.style.height = `${content + distance + padBottom}px`;
-      sync();
-    };
-
-    // Turn the sideways journey on from 768px up, and off (back to the plain stacked column) below
-    const update = () => {
-      active = wide.matches;
-      layout.classList.toggle('is-driven', active);
-      row.classList.toggle('is-driven', active);
-      if (active) {
-        measure();
-      } else {
-        distance = 0;
-        layout.style.removeProperty('--pin-intro-top');
-        layout.style.removeProperty('--pin-row-top');
-        layout.style.removeProperty('height');
-        introPin.style.removeProperty('height');
-        introPin.style.removeProperty('margin-bottom');
-        row.scrollLeft = 0;
-      }
-    };
-
-    update();
-    wide.addEventListener('change', update);
-    scroller.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener('resize', measure);
-    if ('ResizeObserver' in window) {
-      const observer = new ResizeObserver(measure);
-      [scroller, intro, row].forEach((element) => observer.observe(element));
-    }
-    // Images load in after the first measure and change the row's width
-    row.querySelectorAll('img').forEach((img) => img.addEventListener('load', measure, { once: true }));
-
-    // Sideways swipes on the row move the page through the same journey
-    row.addEventListener(
-      'wheel',
-      (event) => {
-        if (!active || event.ctrlKey || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
-        event.preventDefault();
-        scroller.scrollTop += event.deltaMode === 1 ? event.deltaX * 16 : event.deltaX;
-      },
-      { passive: false },
-    );
-
-    // Anything else that moves the row (tabbing to a card) moves the page to match
-    row.addEventListener(
-      'scroll',
-      () => {
-        if (!active) return;
-        const drift = row.scrollLeft - held();
-        if (Math.abs(drift) > 1) scroller.scrollTop += drift;
-      },
-      { passive: true },
-    );
-  }
-</script>

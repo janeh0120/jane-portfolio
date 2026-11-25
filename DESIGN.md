@@ -178,6 +178,16 @@ components:
   icon-control-destructive-hover:
     backgroundColor: "{colors.danger-soft}"
     textColor: "{colors.danger}"
+  icon-control-glass:
+    # Glass over media; flattened over the page for the contrast check.
+    backgroundColor: "{colors.glass}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.base}"
+    padding: "{spacing.space-2}"
+    size: 32px
+  icon-control-glass-hover:
+    backgroundColor: "{colors.glass-hover}"
+    textColor: "{colors.ink}"
   dropdown-trigger:
     backgroundColor: "{colors.fill}"
     textColor: "{colors.ink}"
@@ -520,8 +530,10 @@ are used only there.
   the menu. Every variant is the same size: a 16px icon with `space-2` padding and the corner
   radius, 32px square (a 20px icon on phones, for a 36px touch target). Pages never resize it.
   Variants: dismiss (rotates 90° on hover), primary (ink fill, for the one main action in a
-  surface), destructive (danger hover, with a trash icon for deleting). An icon control can open a
-  dropdown menu, as Archive does on the admin review.
+  surface), destructive (danger hover, with a trash icon for deleting), glass (`.is-glass`: Glass
+  with a hairline ring, Ink icon, and the 40px backdrop blur, for floating over media; Glass hover on
+  hover, a Subtle icon when disabled). An icon control can open a dropdown menu, as Archive does on
+  the admin review.
 - **Dropdown (`.dropdown-trigger`, `.dropdown-menu`):** for picking one option from a short list,
   like a comment's category or the colour mode (the colour mode menu, `ThemeMenu`, is a dropdown
   trigger with the current mode's icon; it sits in the footer, opening upward, and under the
@@ -608,6 +620,11 @@ are used only there.
 Recurring layouts built from the tokens and components above; each should look the same wherever
 it appears.
 
+- **Case study row (homepage):** project cards in one sideways row from 768px up. While the
+  pointer is over the row, the mouse wheel moves it across, handing back to the page once the row
+  reaches its end; elsewhere the page scrolls down as usual. Hovering the row fades in glass arrow
+  icon controls at the screen edges, centred on the images, that centre the previous or next card
+  (disabled at the ends). Phones stack the cards in one column.
 - **Project card:** a 16:10 image with the corner radius, a muted tag line, and a subheading title.
   Client work can show the company's logo in the image's top left corner, sized in proportion to the card.
   The image can be a muted looping reel: its first frame is the poster, and it loads and plays only while on screen (poster only for reduced motion).

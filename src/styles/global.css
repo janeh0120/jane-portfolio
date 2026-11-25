@@ -421,6 +421,29 @@
     color: var(--color-danger);
   }
 
+  /* Glass: floats over media (the homepage case study arrows), like the secondary button */
+  .icon-control.is-glass {
+    background: var(--color-glass);
+    color: var(--color-ink);
+    /* A hairline border, with the padding trimmed to match so it stays 32px */
+    padding: calc(var(--space-2) - var(--border-width));
+    border: var(--border-width) solid var(--color-hairline);
+    backdrop-filter: blur(40px) saturate(1.5);
+    -webkit-backdrop-filter: blur(40px) saturate(1.5);
+  }
+
+  .icon-control.is-glass:hover,
+  .icon-control.is-glass.is-hover {
+    background: var(--color-glass-hover);
+    color: var(--color-ink);
+  }
+
+  .icon-control.is-glass:disabled,
+  .icon-control.is-glass.is-disabled {
+    color: var(--color-subtle);
+    cursor: not-allowed;
+  }
+
   .icon-control:focus-visible,
   .icon-control.is-focus {
     outline: 2px solid var(--color-accent);
