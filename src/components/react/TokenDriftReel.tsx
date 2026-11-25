@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './TokenDriftReel.css';
 
 /**
  * Motion reel for the design system audit: one checkbox split down the middle, design on the left and
- * code on the right, disagreeing on colour, weight, and spacing. In one beat, every token changes
- * together in the Figma panel and the code diff, and the two halves line up.
+ * code on the right (each half labelled), disagreeing on colour, weight, and spacing. In one beat,
+ * both halves settle on the same tokens and line up.
  *
  * The whole reel is one timeline in seconds. `render(t)` writes every style straight to the DOM from
  * `t`, so a frame is a pure function of time and React only renders the scene once.
@@ -20,12 +20,10 @@ const LOOP = 7.9;
 /** Shown instead of the animation when the visitor prefers reduced motion: the two sides disagreeing. */
 const STILL_TIME = 1.4;
 
-/** The moment everything changes: the tokens swap, then the checkbox follows. */
-const SWAP = 2.1;
-const SWAP_END = SWAP + 0.4;
-const SETTLE = SWAP + 0.45;
+/** The moment both halves settle on the same tokens. */
+const SETTLE = 2.55;
 const SETTLE_END = SETTLE + 0.6;
-/** The diff and the measurements stay up long enough to read, then clear. */
+/** The measurements stay up long enough to read, then clear. */
 const CLEAR = 5.2;
 const CLEAR_END = CLEAR + 0.4;
 /** Everything eases back to how it started, so the last frame runs straight into the first. */
@@ -39,14 +37,6 @@ const TEXT_PRIMARY = '#171717';
 const HEAVY_STROKE = 1.1;
 
 const GAP = { design: 4, code: 24, shared: 12 };
-
-const PANEL = { x: 105, width: 270 };
-/** Both panels start this far above the bottom of the reel. */
-const PANEL_RISE = 280;
-/** The checkbox.css title bar above the code rows. */
-const CODE_TITLE = 34;
-const CODE_ROW = 22;
-const CODE_TOP = 8;
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const lerp = (a: number, b: number, p: number) => a + (b - a) * p;
@@ -62,19 +52,6 @@ function mixHex(a: string, b: string, p: number) {
   const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
   return `rgb(${pa.map((v, i) => Math.round(lerp(v, pb[i], p))).join(',')})`;
 }
-
-type CodeRow = { kind?: 'old' | 'new'; before?: string; mark?: string; after?: string; text?: string };
-
-const CODE_ROWS: CodeRow[] = [
-  { text: '.spanWrapper {' },
-  { kind: 'old', before: '  color: var(--color-', mark: 'input-label', after: ');' },
-  { kind: 'new', before: '  color: var(--color-', mark: 'text-primary', after: ');' },
-  { text: '  display: flex;' },
-  { text: '  font-weight: var(--font-weight-component);' },
-  { kind: 'old', before: '  gap: var(--', mark: 'spacing-l', after: ');' },
-  { kind: 'new', before: '  gap: var(--', mark: 'spacing-s', after: ');' },
-  { text: '}' },
-];
 
 function Checkbox({ side }: { side: 'design' | 'code' }) {
   return (
@@ -93,21 +70,6 @@ function Checkbox({ side }: { side: 'design' | 'code' }) {
             Supporting description text
           </span>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function PanelRow({ name, icon, from, to }: { name: string; icon: ReactNode; from: string; to: string }) {
-  return (
-    <div className="token-drift-reel__panel-row">
-      <span className="token-drift-reel__row-name">{name}</span>
-      <div className="token-drift-reel__row" data-row>
-        <span className="token-drift-reel__icon">{icon}</span>
-        <span className="token-drift-reel__swap">
-          <span data-value-from>{from}</span>
-          <span data-value-to>{to}</span>
-        </span>
       </div>
     </div>
   );
@@ -165,7 +127,6 @@ export default function TokenDriftReel({ aspect = '16/9' }: { aspect?: Aspect })
     const canvas = canvasRef.current;
     if (!canvas) return;
     const q = <T extends Element = HTMLElement>(sel: string, from: ParentNode = canvas) => from.querySelector(sel) as T;
-    const qa = (sel: string) => Array.from(canvas.querySelectorAll<HTMLElement>(sel));
 
     const side = (name: string) => {
       const layer = q(`[data-layer="${name}"]`);
@@ -179,13 +140,6 @@ export default function TokenDriftReel({ aspect = '16/9' }: { aspect?: Aspect })
     };
     const design = side('design');
     const code = side('code');
-
-    const swatch = q('[data-swatch]');
-    const panelRows = qa('[data-row]');
-    const valuesFrom = qa('[data-value-from]');
-    const valuesTo = qa('[data-value-to]');
-    const codePanel = q('[data-code]');
-    const codeRows = qa('[data-code-row]');
 
     const render = (t: number) => {
       const kept = 1 - ease(t, DRIFT, DRIFT_END);
@@ -206,37 +160,6 @@ export default function TokenDriftReel({ aspect = '16/9' }: { aspect?: Aspect })
         parts.bandValue.textContent = String(Math.round(gap));
         parts.outline.style.opacity = String(marks);
       }
-
-      // ---------------------------------------------------------- Figma panel: every value at once
-      const swapped = ease(t, SWAP, SWAP_END) * kept;
-      valuesFrom.forEach((el) => {
-        el.style.opacity = String(1 - swapped);
-      });
-      valuesTo.forEach((el) => {
-        el.style.opacity = String(swapped);
-      });
-      swatch.style.background = mixHex(TEXT_SECONDARY, TEXT_PRIMARY, swapped);
-      const active = pulse(t, SWAP - 0.4, SWAP - 0.1, CLEAR, CLEAR_END);
-      panelRows.forEach((row) => row.style.setProperty('--active', String(active)));
-
-      // ---------------------------------------------------------- code panel: the whole diff at once
-      const redTint = pulse(t, SWAP - 0.4, SWAP - 0.1, CLEAR, CLEAR_END);
-      const greenIn = ease(t, SWAP, SWAP_END) * kept;
-      const greenTint = pulse(t, SWAP, SWAP_END, CLEAR, CLEAR_END);
-      const collapse = ease(t, CLEAR, CLEAR_END) * kept;
-
-      let y = CODE_TITLE + CODE_TOP;
-      codeRows.forEach((row, i) => {
-        const { kind } = CODE_ROWS[i];
-        const h = kind === 'old' ? 1 - collapse : kind === 'new' ? greenIn : 1;
-        row.style.transform = `translateY(${y}px)`;
-        row.style.height = `${h * CODE_ROW}px`;
-        row.style.opacity = String(Math.min(1, h * 1.4));
-        row.style.visibility = h > 0 ? 'visible' : 'hidden';
-        row.style.setProperty('--tint', String(kind === 'old' ? redTint : kind === 'new' ? greenTint : 0));
-        y += h * CODE_ROW;
-      });
-      codePanel.style.height = `${y + CODE_TOP}px`;
     };
 
     renderRef.current = render;
@@ -278,7 +201,7 @@ export default function TokenDriftReel({ aspect = '16/9' }: { aspect?: Aspect })
       data-aspect={aspect}
       data-ready={scale > 0 ? '' : undefined}
       role="img"
-      aria-label="Animation: a checkbox split between design and code. Its label colour, weight, and the spacing above its description differ between the two. The tokens all change together in Figma and in the code, and both sides match."
+      aria-label="Animation: a checkbox split between design and code. Its label colour, weight, and the spacing above its description differ between the two, then both sides settle on the same tokens and match."
     >
       <div
         className="token-drift-reel__half token-drift-reel__half--design"
@@ -298,48 +221,8 @@ export default function TokenDriftReel({ aspect = '16/9' }: { aspect?: Aspect })
           <Checkbox side="design" />
           <Checkbox side="code" />
 
-          <div className="token-drift-reel__panel" style={{ left: PANEL.x, top: H - PANEL_RISE, width: PANEL.width }}>
-            <div className="token-drift-reel__panel-title">
-              <svg viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M8 1.2 10.2 3.4 8 5.6 5.8 3.4ZM3.4 5.8 5.6 8 3.4 10.2 1.2 8ZM12.6 5.8 14.8 8 12.6 10.2 10.4 8ZM8 10.4 10.2 12.6 8 14.8 5.8 12.6Z" />
-              </svg>
-              Checkbox
-            </div>
-            <PanelRow
-              name="Fill"
-              icon={<b className="token-drift-reel__swatch" data-swatch />}
-              from="text-secondary"
-              to="text-primary"
-            />
-            <PanelRow name="Weight" icon={<span>Aa</span>} from="font-weight-heading" to="font-weight-component" />
-            <PanelRow
-              name="Gap"
-              icon={
-                <svg viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M2 2.5h12M2 13.5h12M8 5v6M6.2 6.6 8 4.8l1.8 1.8M6.2 9.4 8 11.2l1.8-1.8" />
-                </svg>
-              }
-              from="spacing-xxs"
-              to="spacing-s"
-            />
-          </div>
-
-          <div className="token-drift-reel__code" data-code style={{ top: H - PANEL_RISE }}>
-            <div className="token-drift-reel__code-title" style={{ height: CODE_TITLE }}>
-              <i>{'{}'}</i>
-              checkbox.css
-            </div>
-            {CODE_ROWS.map((row, i) => (
-              <div key={i} className={`token-drift-reel__code-row${row.kind ? ` is-${row.kind}` : ''}`} data-code-row>
-                {row.kind ? <i>{row.kind === 'old' ? '−' : '+'}</i> : null}
-                <code>
-                  {row.text ?? row.before}
-                  {row.mark ? <mark>{row.mark}</mark> : null}
-                  {row.after}
-                </code>
-              </div>
-            ))}
-          </div>
+          <span className="tag token-drift-reel__side-tag token-drift-reel__side-tag--design">Design</span>
+          <span className="tag token-drift-reel__side-tag token-drift-reel__side-tag--code">Code</span>
         </div>
       </div>
     </div>
