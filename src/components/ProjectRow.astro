@@ -166,10 +166,16 @@ function commentId(project: (typeof projects)[number]) {
     outline-offset: 4px;
   }
 
+  /* Phones: one column that scrolls with the page instead of a sideways row */
   @media (max-width: 767px) {
     .project-row {
-      --card-width: 80vw; /* design-tokens-ignore: card width, not spacing */
-      gap: var(--space-4);
+      grid-auto-flow: row;
+      grid-auto-columns: auto;
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-10);
+      padding-inline: 0;
+      overflow-x: visible;
+      scroll-snap-type: none;
     }
   }
 </style>

@@ -11,13 +11,17 @@
  * mode, and it never covers the comments sidebar beside it.
  * `sides` is one sticky, zero-height strip at the top of the scroll container holding a full-height
  * band at each side, so the bands stay put and span the whole visible area.
+ * Below 768px the homepage's cards stack and scroll down, so `sides` hides and the layout shows
+ * `top` and `bottom` bands marked `phoneOnly` instead.
  * Purely decorative: pointer-events none, and browsers without backdrop-filter simply show nothing.
  */
 interface Props {
   edge: 'top' | 'bottom' | 'sides';
+  /** Only below 768px (the homepage's top and bottom bands, where the sides band hides) */
+  phoneOnly?: boolean;
 }
 
-const { edge } = Astro.props;
+const { edge, phoneOnly = false } = Astro.props;
 const layers = [1, 2, 4, 8, 16, 32];
 ---
 
@@ -31,7 +35,7 @@ const layers = [1, 2, 4, 8, 16, 32];
       ))}
     </div>
   ) : (
-    <div class:list={['edge-blur', `edge-blur--${edge}`]} aria-hidden="true">
+    <div class:list={['edge-blur', `edge-blur--${edge}`, { 'is-phone-only': phoneOnly }]} aria-hidden="true">
       {layers.map((px) => <div class="edge-blur-layer" style={`--blur: ${px}px`} />)}
     </div>
   )
@@ -92,9 +96,16 @@ const layers = [1, 2, 4, 8, 16, 32];
     right: 0;
   }
 
-  /* Phones: no side blur, so the first letters of the cards at the edges stay readable */
+  /* Phones: no side blur, so the first letters of the cards at the edges stay readable; the
+     homepage shows its phone-only top and bottom bands instead */
   @media (max-width: 767px) {
     .edge-blur-sides {
+      display: none;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .edge-blur.is-phone-only {
       display: none;
     }
   }

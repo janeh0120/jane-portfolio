@@ -451,7 +451,10 @@ on comment form fields on touch screens, which stops iOS zooming the page when t
   continues to the footer once the last card is in view; scrolling up rewinds the row first. Touch
   and sideways swipes scroll the row directly. A WebGL lens warps and colour-splits the cards at the
   left and right edges (skipped for reduced motion), and the progressive edge blur (`EdgeBlur`),
-  at the top and bottom on every other page, runs down the left and right sides instead (not on phones, where it would cover the cards' text); without JavaScript it is a plain sideways row.
+  at the top and bottom on every other page, runs down the left and right sides instead; without JavaScript it is a plain sideways row.
+  On phones (below 768px) the cards stack in one column in line with the intro and scroll with the
+  page, with the usual top and bottom edge blur (no side blur, which would cover the cards' text)
+  and no lens.
 - **Breakpoints:** 768px (tablet), 900px (comment sidebar stacks), 1024px (desktop).
 - **Insets:** `--space-inset` (4px) for menu and tag padding; `--bar-inset` (8px) between a
   floating bar's edge and its controls.

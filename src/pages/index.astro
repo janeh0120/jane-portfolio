@@ -85,8 +85,10 @@ import SiteFooter from '../components/SiteFooter.astro';
   }
 
   @media (max-width: 767px) {
+    /* One column, in line with the intro on both sides */
     #projects :global(.project-row) {
       --intro-width: min(var(--nav-bar-width, 30rem), 100% - 2rem); /* design-tokens-ignore: the intro and .page-frame widths */
+      padding-inline: calc((100% - var(--intro-width)) / 2);
     }
 
     .home-layout {
@@ -97,22 +99,23 @@ import SiteFooter from '../components/SiteFooter.astro';
 </style>
 
 <script>
-  // The page's own scroll drives the case studies sideways. The layout grows by the row's sideways
-  // distance and the intro and row stick in place (frozen where the row's bottom meets the bottom
-  // of the screen) while the page scrolls through it, so the scrollbar reflects the full length,
-  // down to the row, across it, then on to the footer. How far the row has been held in place is
-  // how far it has moved across. Without this script the row is an ordinary sideways scroller.
+  // From 768px up the page's own scroll drives the case studies sideways. The layout grows by the
+  // row's sideways distance and the intro and row stick in place (frozen where the row's bottom
+  // meets the bottom of the screen) while the page scrolls through it, so the scrollbar reflects
+  // the full length, down to the row, across it, then on to the footer. How far the row has been
+  // held in place is how far it has moved across. On phones the cards stack in one column and
+  // scroll with the page, so none of this runs. Without this script the row is an ordinary
+  // sideways scroller.
   const layout = document.querySelector<HTMLElement>('.home-layout');
   const introPin = layout?.querySelector<HTMLElement>('.home-intro-pin');
   const intro = introPin?.querySelector<HTMLElement>('.home-intro');
   const section = document.getElementById('projects');
   const row = document.querySelector<HTMLElement>('[data-project-row]');
   const scroller = document.getElementById('site-canvas');
+  const wide = window.matchMedia('(min-width: 768px)');
 
   if (layout && introPin && intro && section && row && scroller) {
-    layout.classList.add('is-driven');
-    row.classList.add('is-driven');
-
+    let active = false;
     let distance = 0;
     let rowOffset = 0; // the row section's natural top within the layout
 
@@ -124,10 +127,11 @@ import SiteFooter from '../components/SiteFooter.astro';
       );
 
     const sync = () => {
-      row.scrollLeft = held();
+      if (active) row.scrollLeft = held();
     };
 
     const measure = () => {
+      if (!active) return;
       const style = getComputedStyle(layout);
       const padTop = parseFloat(style.paddingTop);
       const padBottom = parseFloat(style.paddingBottom);
@@ -149,7 +153,26 @@ import SiteFooter from '../components/SiteFooter.astro';
       sync();
     };
 
-    measure();
+    // Turn the sideways journey on from 768px up, and off (back to the plain stacked column) below
+    const update = () => {
+      active = wide.matches;
+      layout.classList.toggle('is-driven', active);
+      row.classList.toggle('is-driven', active);
+      if (active) {
+        measure();
+      } else {
+        distance = 0;
+        layout.style.removeProperty('--pin-intro-top');
+        layout.style.removeProperty('--pin-row-top');
+        layout.style.removeProperty('height');
+        introPin.style.removeProperty('height');
+        introPin.style.removeProperty('margin-bottom');
+        row.scrollLeft = 0;
+      }
+    };
+
+    update();
+    wide.addEventListener('change', update);
     scroller.addEventListener('scroll', sync, { passive: true });
     window.addEventListener('resize', measure);
     if ('ResizeObserver' in window) {
@@ -163,7 +186,7 @@ import SiteFooter from '../components/SiteFooter.astro';
     row.addEventListener(
       'wheel',
       (event) => {
-        if (event.ctrlKey || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+        if (!active || event.ctrlKey || Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
         event.preventDefault();
         scroller.scrollTop += event.deltaMode === 1 ? event.deltaX * 16 : event.deltaX;
       },
@@ -174,6 +197,7 @@ import SiteFooter from '../components/SiteFooter.astro';
     row.addEventListener(
       'scroll',
       () => {
+        if (!active) return;
         const drift = row.scrollLeft - held();
         if (Math.abs(drift) > 1) scroller.scrollTop += drift;
       },

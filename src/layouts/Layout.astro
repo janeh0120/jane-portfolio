@@ -196,8 +196,9 @@ const ogImageAlt = `${site.name}'s knot logo, then the same shape found in a pat
         <div id="site-shell" class="site-shell">
           <div id="site-canvas" class="site-canvas">
             <EdgeBlur edge={edgeBlur === 'sides' ? 'sides' : 'top'} />
+            {edgeBlur === 'sides' && <EdgeBlur edge="top" phoneOnly />}
             <slot />
-            {edgeBlur === 'top-bottom' && <EdgeBlur edge="bottom" />}
+            <EdgeBlur edge="bottom" phoneOnly={edgeBlur === 'sides'} />
           </div>
         </div>
       ) : (
