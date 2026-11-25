@@ -337,10 +337,14 @@ const linkClass = (href: string) =>
 
   // Publish the bar's expanded width (it hugs its contents) as --nav-bar-width, so the homepage
   // intro can match it. Measured only while expanded: on load, once fonts are in, on resize, and
-  // when the links finish easing back in.
+  // when the links finish easing back in. A fast scroll can fire these while the bar is still
+  // mid-animation (class already expanded, width still narrow), so also skip whenever the links are
+  // clipped; the next expand's transitionend publishes the real width.
   const bar = header?.querySelector<HTMLElement>('.site-header-bar');
+  const links = header?.querySelector<HTMLElement>('.main-nav-links');
   function publishBarWidth() {
     if (!bar || header?.classList.contains('is-collapsed')) return;
+    if (links && desktop.matches && links.scrollWidth > links.clientWidth + 1) return;
     document.documentElement.style.setProperty('--nav-bar-width', `${bar.getBoundingClientRect().width}px`);
   }
   publishBarWidth();
