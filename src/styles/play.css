@@ -3,15 +3,15 @@
   overflow-x: clip;
 }
 
+/* On the page grid (.page-frame.page-grid), the gallery in the content columns */
 .gallery-section {
-  padding: var(--space-12) var(--space-10) var(--space-section);
-  max-width: 1400px;
-  margin: 0 auto;
+  padding-block: var(--space-12) var(--space-section);
 }
 
+/* Images sit the page grid's gutter apart, across and down */
 .gallery-grid {
   column-count: 3;
-  column-gap: var(--space-8);
+  column-gap: var(--grid-gap);
 }
 
 .gallery-item {
@@ -23,7 +23,7 @@
   transition: opacity var(--duration-320) var(--ease-standard);
   display: block;
   width: 100%;
-  margin: 0 0 var(--space-8);
+  margin: 0 0 var(--grid-gap);
   border: none;
   padding: 0;
   text-align: left;
@@ -253,7 +253,7 @@
 
 @media (max-width: 768px) {
   .gallery-section {
-    padding: var(--space-8) var(--space-5) var(--space-section);
+    padding-block: var(--space-8) var(--space-section);
   }
 
   .gallery-grid {

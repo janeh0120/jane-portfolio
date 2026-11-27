@@ -120,8 +120,6 @@ spacing:
   inset: "{spacing.space-1}"
   bar-inset: "{spacing.space-2}"
   max-site: 1400px
-  max-case-study: 768px
-  max-about: 672px
 components:
   button-primary:
     # Leave feedback, the one primary call to action
@@ -445,16 +443,32 @@ on comment form fields on touch screens, which stops iOS zooming the page when t
   also in `px`.
 - **Page frame:** content sits in `.page-frame`, max 1400px wide with a 1.5rem gutter on each side
   (1rem below 768px).
-- **Reading widths:** case studies max 768px, the About page 672px. Case study statements in Heading
-  type stop at 30ch (about 35 characters a line), with balanced line breaks.
+- **Page grid:** `.page-grid` splits the frame into `--grid-columns` columns with a `--grid-gap`
+  gutter: 4 columns and `space-4` on phones, 8 and `space-6` from 768px, 12 from 1024px. Content
+  goes in `.grid-content` (`--grid-content`, the middle 8 of 12 columns), so it's centred on the
+  page; a sidebar goes in `.grid-margin-start` (`--grid-margin-start`, columns 1 to 2), the left
+  margin, and never shifts the content. Below 1024px both span the full frame. Case studies, the
+  design system page, the Play gallery, About, History, Playground, and the footer all use the
+  content columns, so they share one width. The Play gallery's images sit `--grid-gap` apart, across
+  and down.
+- **Comments sidebar:** from 901px up it spans the last 3 columns of the window's grid, a
+  `--grid-gap` from the page, so the page's right edge and the sidebar's edges land on grid lines.
+  The page narrows and its own grid re-centres inside it. Below 901px the sidebar stacks under the
+  page.
+- **Grid overlay:** Shift+G (or `?grid` in the URL, `?grid=0` to clear) shows the columns, the
+  content area, and the page centre line over the page's own grid (so it follows the page when the
+  comments sidebar narrows it), for troubleshooting alignment. It's remembered per browser.
+- **Reading widths:** short intros (History, Playground) stop at 42rem inside the content columns,
+  left-aligned. Case study statements in Heading type stop at 30ch
+  (about 35 characters a line), with balanced line breaks.
 - **Section rhythm:** page sections are separated by one parent gap (`.section-stack`):
   `--space-section` (7rem), or `--space-section-sm` (5.5rem) below 768px. Prefer that gap over
   margins on individual sections.
-- **Case studies and the design system page** use a 200px sticky sidebar (back link and section
-  nav) beside the content from 1024px up. From 768px up the back button sticks level with the nav
+- **Case studies and the design system page** use a sticky sidebar (back link and section nav) in
+  the grid's left margin from 1024px up. From 768px up the back button sticks level with the nav
   bar, centred on the same line (`--header-offset` + `space-2`); on phones it sticks just below it.
 - **Homepage:** the intro (Compact type, in Ink) and work experience at the top, as one left-aligned
-  block centred on the page at the expanded nav bar's width (`--nav-bar-width`, published by the
+  block centred on the page at the nav bar's width (`--nav-bar-width`, published by the
   header; the full page width on phones), then the case
   studies in one full-width row, padded so the first card is centred on load and the last is
   centred when the row ends. Scrolling down moves the row sideways first and the page only
@@ -657,7 +671,7 @@ blinking caret) keep their own cycle length but still use the easing tokens.
 | `--duration-200` | 200ms | small changes in size (menu highlight, comment cards expanding) |
 | `--duration-320` | 320ms | fades and overlays sliding |
 | `--duration-500` | 500ms | the media morph and slow fades |
-| `--duration-700` | 700ms | the nav bar folding, comment mode opening |
+| `--duration-700` | 700ms | comment mode opening, the reveal fade |
 | `--duration-1000` | 1000ms | long arrivals: reveal on scroll, the colour mode wipe |
 
 | Easing | Value | For |
@@ -672,10 +686,8 @@ blinking caret) keep their own cycle length but still use the easing tokens.
   on `--ease-settle`.
 - **Reveal on scroll:** project cards and case study sections rise 1.5rem and fade in, the rise
   over `--duration-1000` on `--ease-settle`, the fade over `--duration-700`.
-- **Nav bar (desktop):** the bar hugs its contents, centred at the top. Scrolling down collapses
-  the nav links so only the logo and Leave feedback remain, and the bar narrows with them; any scroll up, the top of the page, or keyboard focus brings them back. The
-  links' column eases between its width and nothing over `--duration-700` on `--ease-standard` while
-  they fade, slower than other transitions so the bar never snaps.
+- **Nav bar (desktop):** the bar hugs its contents, centred at the top, and stays the same size
+  while the page scrolls: it never folds or narrows.
 - **Primary button shine:** the Leave feedback glow circles continuously and slowly; never fast
   enough to read as flashing.
 - **Media overlay:** the clicked image grows from its place on the page to the centre of the

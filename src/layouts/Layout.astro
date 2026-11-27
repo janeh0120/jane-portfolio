@@ -195,6 +195,15 @@ const ogImageAlt = `${site.name}'s knot logo, then the same shape found in a pat
       ) : showCommentMode ? (
         <div id="site-shell" class="site-shell">
           <div id="site-canvas" class="site-canvas">
+            <div class="grid-overlay" aria-hidden="true">
+              <div class="page-frame page-grid">
+                {Array.from({ length: 12 }, () => <div class="grid-overlay-col" />)}
+              </div>
+              <div class="page-frame page-grid">
+                <div class="grid-overlay-margin grid-margin-start" />
+                <div class="grid-overlay-content grid-content" />
+              </div>
+            </div>
             <EdgeBlur edge={edgeBlur === 'sides' ? 'sides' : 'top'} />
             {edgeBlur === 'sides' && <EdgeBlur edge="top" phoneOnly />}
             <slot />
@@ -214,6 +223,31 @@ const ogImageAlt = `${site.name}'s knot logo, then the same shape found in a pat
         enhanceSelects();
       } catch (error) {
         console.error(error);
+      }
+
+      // Grid overlay for troubleshooting: Shift+G toggles it, ?grid turns it on; remembered per browser.
+      {
+        const root = document.documentElement;
+        const setGrid = (on: boolean) => {
+          root.classList.toggle('show-grid', on);
+          try {
+            localStorage.setItem('show-grid', on ? '1' : '0');
+          } catch {}
+        };
+        let stored = false;
+        try {
+          stored = localStorage.getItem('show-grid') === '1';
+        } catch {}
+        const param = new URLSearchParams(location.search).get('grid');
+        setGrid(param === null ? stored : param !== '0');
+        const toggleGrid = () => setGrid(!root.classList.contains('show-grid'));
+        (window as Window & { __toggleGrid?: () => void }).__toggleGrid = toggleGrid;
+        document.addEventListener('keydown', (event) => {
+          if (event.key !== 'G' || !event.shiftKey || event.metaKey || event.ctrlKey || event.altKey) return;
+          const target = event.target;
+          if (target instanceof Element && target.closest('input, textarea, select, [contenteditable]')) return;
+          toggleGrid();
+        });
       }
 
       document.documentElement.setAttribute('data-reveal-active', '');

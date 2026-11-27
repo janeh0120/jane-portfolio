@@ -34,8 +34,8 @@ const contact = [
 ---
 
 <footer data-comment-id="site-footer">
-  <div class="page-frame footer">
-    <div class="footer-card">
+  <div class="page-frame page-grid footer">
+    <div class="footer-card grid-content">
       <div class="footer-top">
         <div class="footer-cta" data-comment-id="footer-feedback">
           <p class="subheading text-ink">
@@ -91,7 +91,7 @@ const contact = [
       </div>
     </div>
 
-    <div class="footer-meta">
+    <div class="footer-meta grid-content">
       <p>© {site.year} {site.name}</p>
       <ThemeMenu />
     </div>
@@ -106,9 +106,7 @@ const contact = [
   }
 
   .footer {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
+    row-gap: var(--space-4);
     padding-top: var(--space-6);
     padding-bottom: var(--space-5);
   }

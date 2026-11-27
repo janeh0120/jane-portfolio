@@ -28,8 +28,6 @@ const SPACING_NAMES = {
   inset: '--space-inset',
   'bar-inset': '--bar-inset',
   'max-site': '--max-w-site',
-  'max-case-study': '--max-w-prose',
-  'max-about': '--max-w-narrow',
 };
 
 const problems = [];
@@ -282,7 +280,7 @@ for (const step of spacingSteps) {
 }
 
 // Page widths: the label is written exactly as the token is
-const WIDTH_TOKENS = { Site: '--max-w-site', 'Case study': '--max-w-prose', About: '--max-w-narrow' };
+const WIDTH_TOKENS = { Site: '--max-w-site' };
 for (const row of pageRows('widths')) {
   const token = WIDTH_TOKENS[row.name];
   if (!token) {

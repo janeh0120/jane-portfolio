@@ -436,3 +436,21 @@ The feedback loop reel needed a colour for the visitor's cursor that wasn't the 
 already means focus and selection. Added Brand secondary (#f3c9d5), a soft pink kept for brand moments
 like motion and illustration, with dark ink for text on it. It's the one colour picked outside
 Tailwind's palette, and it stays the same in both colour modes. The token checker stays at 0.
+
+### Follow-up: one page grid
+
+Case study content sat off-centre, because the 200px sidebar was part of the width being centred,
+and the footer, Play gallery, and case studies were three different widths. Added a page grid (4, 8,
+then 12 columns) inside the page frame. Content, the footer, and Play share the middle 8 columns, and
+the sidebar moved into the left margin, so it no longer moves the content. About, History, and Playground
+moved onto the same columns. The 768px case study and 672px About width tokens are gone, replaced
+by the grid. The comments sidebar now spans 3 grid columns, and the Play
+gallery's gaps use the grid gutter. Shift+G shows the columns for troubleshooting. The token checker
+stays at 0.
+
+### Follow-up: a nav bar that holds still
+
+The nav bar used to fold its links away while scrolling down and bring them back on the way up.
+It now stays the same size, so the header is one fixed shape on the grid. The fold's motion entry and
+its demo on the design system page are gone; `--duration-700` stays for comment mode and the reveal
+fade. The token checker stays at 0.

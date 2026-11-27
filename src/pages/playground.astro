@@ -11,35 +11,37 @@ const timelineHref = `https://twitter.com/${handle}`;
 
 <Layout title={`Playground | ${site.title}`} description="Experiments and scraps. Find me on X.">
   <Header />
-  <main class="page-frame pb-24 pt-8 md:pt-10">
-    <div class="max-w-2xl">
-      <h1 class="heading text-ink">
-        A place for experiments.
-      </h1>
-      <p class="mt-5 text-body text-muted">
-        Half-formed ideas, visual scraps, and things that don’t fit the main grid yet, plus posts from
-        <a
-          href={twitterUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:opacity-70"
-        >
-          @{handle}
-        </a>.
-      </p>
-    </div>
+  <main class="page-frame page-grid pb-24 pt-8 md:pt-10">
+    <div class="grid-content">
+      <div class="max-w-2xl">
+        <h1 class="heading text-ink">
+          A place for experiments.
+        </h1>
+        <p class="mt-5 text-body text-muted">
+          Half-formed ideas, visual scraps, and things that don’t fit the main grid yet, plus posts from
+          <a
+            href={twitterUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-ink underline decoration-ink/30 underline-offset-4 transition hover:opacity-70"
+          >
+            @{handle}
+          </a>.
+        </p>
+      </div>
 
-    <section class="playground-feed mt-12 max-w-xl" aria-label={`Posts from @${handle}`}>
-      <a
-        class="twitter-timeline"
-        href={timelineHref}
-        data-height="720"
-        data-chrome="noheader nofooter noborders transparent"
-        data-tweet-limit="8"
-      >
-        Tweets by @{handle}
-      </a>
-    </section>
+      <section class="playground-feed mt-12 max-w-xl" aria-label={`Posts from @${handle}`}>
+        <a
+          class="twitter-timeline"
+          href={timelineHref}
+          data-height="720"
+          data-chrome="noheader nofooter noborders transparent"
+          data-tweet-limit="8"
+        >
+          Tweets by @{handle}
+        </a>
+      </section>
+    </div>
   </main>
   <SiteFooter />
 

@@ -41,6 +41,24 @@ body.comment-view-comment .site-shell {
   background: var(--color-surface);
 }
 
+/* Beside the page (901px up), the sidebar spans the last 3 columns of the window's page grid
+   (.page-grid in global.css): its right edge on the frame edge, a grid gutter between it and the
+   page, so both edges land on grid lines. The page shrinks and its own grid re-centres inside. */
+@media (min-width: 901px) {
+  body.comment-feedback-root {
+    --comment-frame: min(var(--max-w-site), 100vw - var(--space-12));
+    --comment-column: calc(
+      (var(--comment-frame) - (var(--grid-columns) - 1) * var(--grid-gap)) / var(--grid-columns)
+    );
+    --comment-sidebar-width: calc(var(--comment-column) * 3 + var(--grid-gap) * 2);
+  }
+
+  body.comment-view-comment .site-shell {
+    gap: var(--grid-gap);
+    padding-right: calc((100vw - var(--comment-frame)) / 2);
+  }
+}
+
 /* Keep the gray frame locked to the viewport; page content scrolls inside the canvas */
 body.comment-feedback-root:not(.admin-review-root) {
   overflow: hidden;

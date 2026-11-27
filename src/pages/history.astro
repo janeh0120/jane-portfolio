@@ -84,53 +84,55 @@ function formatDate(iso: string) {
   ) : (
     <Layout title="Portfolio history">
       <Header />
-      <main class="page-frame pb-24 pt-8 md:pt-12">
-        <h1 class="heading text-ink">Portfolio history</h1>
-        <p class="mt-4 max-w-2xl text-body text-muted">
-          Browse past versions of this site and the feedback left on each one. Comments stay tied to
-          the version they were written on. Open an archived version to see them in context.
-        </p>
-
-        {error ? (
-          <p class="mt-8 text-body text-danger">{error}</p>
-        ) : versions.length === 0 ? (
-          <p class="mt-8 text-body text-muted">
-            No versions recorded yet. After you deploy, call the deploy hook to snapshot this
-            portfolio (see README).
+      <main class="page-frame page-grid pb-24 pt-8 md:pt-12">
+        <div class="grid-content">
+          <h1 class="heading text-ink">Portfolio history</h1>
+          <p class="mt-4 max-w-2xl text-body text-muted">
+            Browse past versions of this site and the feedback left on each one. Comments stay tied to
+            the version they were written on. Open an archived version to see them in context.
           </p>
-        ) : (
-          <ol class="mt-12 space-y-6">
-            {versions.map((version) => {
-              const summary = getVersionSummary(version.label);
-              return (
-                <li class="py-8">
-                  <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div class="min-w-0 space-y-2">
-                      <div class="flex flex-wrap items-center gap-3">
-                        <h2 class="subheading text-ink">{version.label}</h2>
-                        {version.isActive && (
-                          <span class="tag">Live</span>
+
+          {error ? (
+            <p class="mt-8 text-body text-danger">{error}</p>
+          ) : versions.length === 0 ? (
+            <p class="mt-8 text-body text-muted">
+              No versions recorded yet. After you deploy, call the deploy hook to snapshot this
+              portfolio (see README).
+            </p>
+          ) : (
+            <ol class="mt-12 space-y-6">
+              {versions.map((version) => {
+                const summary = getVersionSummary(version.label);
+                return (
+                  <li class="py-8">
+                    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                      <div class="min-w-0 space-y-2">
+                        <div class="flex flex-wrap items-center gap-3">
+                          <h2 class="subheading text-ink">{version.label}</h2>
+                          {version.isActive && (
+                            <span class="tag">Live</span>
+                          )}
+                        </div>
+                        <p class="text-body text-muted">{formatDate(version.createdAt.toISOString())}</p>
+                        {summary && <p class="max-w-2xl text-body">{summary}</p>}
+                        {version.gitSha && (
+                          <p class="font-mono text-body text-muted">{version.gitSha.slice(0, 7)}</p>
                         )}
                       </div>
-                      <p class="text-body text-muted">{formatDate(version.createdAt.toISOString())}</p>
-                      {summary && <p class="max-w-2xl text-body">{summary}</p>}
-                      {version.gitSha && (
-                        <p class="font-mono text-body text-muted">{version.gitSha.slice(0, 7)}</p>
-                      )}
+                      <a
+                        href={`${base}history?version=${version.id}`}
+                        class="text-link inline-flex shrink-0 items-center justify-center gap-1.5 text-body font-medium text-ink"
+                      >
+                        View version
+                        <ArrowIcon direction="right" />
+                      </a>
                     </div>
-                    <a
-                      href={`${base}history?version=${version.id}`}
-                      class="text-link inline-flex shrink-0 items-center justify-center gap-1.5 text-body font-medium text-ink"
-                    >
-                      View version
-                      <ArrowIcon direction="right" />
-                    </a>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        )}
+                  </li>
+                );
+              })}
+            </ol>
+          )}
+        </div>
       </main>
       <SiteFooter />
     </Layout>

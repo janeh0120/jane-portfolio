@@ -191,52 +191,11 @@ const linkClass = (href: string) =>
     }
 
     /* The bar hugs its contents, centred, instead of spanning the page (phones keep full width
-       so the menu panel lines up under it). It narrows with the links as they collapse. */
+       so the menu panel lines up under it). It stays the same size while the page scrolls. */
     .site-header-bar {
       width: fit-content;
       margin-inline: auto;
       gap: var(--space-8);
-    }
-
-    /* Scrolling down collapses the links, leaving the logo and Leave feedback; scrolling up brings
-       them back. Slow and even on purpose (0.7s, ease in and out) so the bar eases rather than snaps;
-       on the way back the links fade in once there's room for them. */
-    /* The links' column animates between their real width (1fr) and nothing (0fr) */
-    .main-nav {
-      grid-template-columns: 1fr;
-      transition:
-        grid-template-columns var(--duration-700) var(--ease-standard),
-        margin-right var(--duration-700) var(--ease-standard),
-        opacity var(--duration-500) var(--ease-standard) var(--duration-150),
-        visibility 0s;
-    }
-
-    /* Clipped while collapsing; the padding (cancelled by the margin) leaves room for focus rings */
-    .main-nav-links {
-      min-width: 0;
-      margin: calc(var(--space-2) * -1);
-      padding: var(--space-2);
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .site-header.is-collapsed .main-nav {
-      grid-template-columns: 0fr;
-      margin-right: calc(var(--space-8) * -1);
-      opacity: 0;
-      visibility: hidden;
-      transition:
-        grid-template-columns var(--duration-700) var(--ease-standard),
-        margin-right var(--duration-700) var(--ease-standard),
-        opacity var(--duration-320) var(--ease-standard),
-        visibility 0s var(--duration-700);
-    }
-  }
-
-  @media (min-width: 768px) and (prefers-reduced-motion: reduce) {
-    .main-nav,
-    .site-header.is-collapsed .main-nav {
-      transition: none;
     }
   }
 
@@ -297,60 +256,14 @@ const linkClass = (href: string) =>
     if (event.matches) setOpen(false);
   });
 
-  // Desktop: collapse the nav links while scrolling down, bring them back on any scroll up (or
-  // near the top, or when the header gets keyboard focus). Small jitters are ignored.
-  const header = document.querySelector<HTMLElement>('.site-header');
-  const scroller = document.getElementById('site-canvas');
-  const desktop = window.matchMedia('(min-width: 768px)');
-  const TOP = 80;
-  const JITTER = 6;
-  let lastY = 0;
-  let frame = 0;
-
-  const scrollY = () => (scroller ? scroller.scrollTop : window.scrollY);
-  const setCollapsed = (collapsed: boolean) => header?.classList.toggle('is-collapsed', collapsed);
-
-  function onScroll() {
-    frame = 0;
-    const y = scrollY();
-    if (!desktop.matches || y < TOP) {
-      setCollapsed(false);
-    } else if (y > lastY + JITTER) {
-      setCollapsed(true);
-    } else if (y < lastY - JITTER) {
-      setCollapsed(false);
-    } else {
-      return; // within the jitter band: keep the current state and the reference point
-    }
-    lastY = y;
-  }
-
-  (scroller ?? window).addEventListener(
-    'scroll',
-    () => {
-      if (!frame) frame = requestAnimationFrame(onScroll);
-    },
-    { passive: true },
-  );
-  header?.addEventListener('focusin', () => setCollapsed(false));
-  desktop.addEventListener('change', () => setCollapsed(false));
-
-  // Publish the bar's expanded width (it hugs its contents) as --nav-bar-width, so the homepage
-  // intro can match it. Measured only while expanded: on load, once fonts are in, on resize, and
-  // when the links finish easing back in. A fast scroll can fire these while the bar is still
-  // mid-animation (class already expanded, width still narrow), so also skip whenever the links are
-  // clipped; the next expand's transitionend publishes the real width.
-  const bar = header?.querySelector<HTMLElement>('.site-header-bar');
-  const links = header?.querySelector<HTMLElement>('.main-nav-links');
+  // Publish the bar's width (it hugs its contents) as --nav-bar-width, so the homepage intro can
+  // match it: on load, once fonts are in, and on resize.
+  const bar = document.querySelector<HTMLElement>('.site-header-bar');
   function publishBarWidth() {
-    if (!bar || header?.classList.contains('is-collapsed')) return;
-    if (links && desktop.matches && links.scrollWidth > links.clientWidth + 1) return;
+    if (!bar) return;
     document.documentElement.style.setProperty('--nav-bar-width', `${bar.getBoundingClientRect().width}px`);
   }
   publishBarWidth();
   void document.fonts?.ready.then(publishBarWidth);
   window.addEventListener('resize', publishBarWidth);
-  header?.querySelector('.main-nav')?.addEventListener('transitionend', (event) => {
-    if ((event as TransitionEvent).propertyName === 'grid-template-columns') publishBarWidth();
-  });
 </script>

@@ -55,10 +55,10 @@ const detailsColumns = company && detail ? 'md:grid-cols-5' : company || detail 
 <Layout title={`${title} | Jane Hou's Portfolio`}>
   <Header />
   <main class="page-frame pb-24 pt-6 md:pt-8">
-    <div class="grid gap-8 lg:grid-cols-[200px_1fr] lg:gap-20">
+    <div class="page-grid gap-y-8">
       <SidebarNav nav={nav} ariaLabel="Case study" backLabel="Back" />
 
-      <article class="min-w-0 w-full max-w-3xl lg:mx-auto" data-comment-id={studyCommentId}>
+      <article class="grid-content" data-comment-id={studyCommentId}>
         <h1 class="heading text-ink">{heading}</h1>
 
         {
