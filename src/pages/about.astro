@@ -20,7 +20,7 @@ const aboutImageSrc = `${base}images/about/about-me.jpg`;
           loading="lazy"
         />
       </figure>
-      <div class="about-copy mt-8 space-y-2 md:mt-10">
+      <div class="about-copy mt-8 space-y-4 md:mt-10">
         {site.about.paragraphs.map((paragraph) => <p class="text-body text-muted">{paragraph}</p>)}
       </div>
     </article>
@@ -38,9 +38,5 @@ const aboutImageSrc = `${base}images/about/about-me.jpg`;
     width: 100%;
     height: auto;
     border-radius: var(--radius-base);
-  }
-
-  .about-copy p {
-    margin: 0;
   }
 </style>
